@@ -3,7 +3,7 @@
 > 验证时间：2026-06-16
 > 验证对象：`docs/audit/` 全量与增量审计文档
 > 验证方式：OMX team `validate-docs-audit-f-60bf5ebb`，5 个 verifier lane（事实核对、runtime、测试、架构、code-review）
-> 代码范围：仅验证 `app/` 与 `docs/audit/`，未修改 Flutter 源码
+> 代码范围：仅验证 `admin9-app-flutter/` 与 `admin9-app-flutter/docs/audit/`，未修改 Flutter 源码
 
 ## 验证结论
 
@@ -64,7 +64,7 @@
 
 ## 2026-06-17 修复状态更新
 
-> 执行范围：仅 `app/` 与本文档状态追加；未触碰 `backend/`、`frontend/`，未新增 public/mobile/backend API，未重开真实上传、真实聊天、真实直播 API 或 i18n 基础设施。
+> 执行范围：仅 `admin9-app-flutter/` 与本文档状态追加；未触碰 `admin9-app-admin/backend`、`admin9-app-admin/frontend`，未新增 public/mobile/backend API，未重开真实上传、真实聊天、真实直播 API 或 i18n 基础设施。
 
 ### 已完成修复
 
