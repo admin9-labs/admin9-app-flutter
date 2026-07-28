@@ -3,8 +3,8 @@
 ## Source of truth
 
 - Status: Active draft
-- Last refreshed: 2026-07-28
-- Primary product surface: the modular local-media Flutter App foundation in this repository. Go backend and Vue Admin live in `admin9-app-admin` and remain separate delivery surfaces.
+- Last refreshed: 2026-07-29
+- Primary product surface: the local-media Flutter App in this repository, with reusable infrastructure serving product delivery. Go backend and Vue Admin live in `admin9-app-admin` and remain separate delivery surfaces.
 - Evidence reviewed:
   - User-provided Sichuan Observer reference screenshots for profile, settings, login, messages, about, feedback, report, history, and community/activity layouts.
   - `lib/app/admin9_app.dart`, `lib/app/admin9_shell.dart`
@@ -17,29 +17,48 @@
 
 ## Project positioning
 
-本项目旨在建设一个以“西昌发布”为默认实例、具备可复用基础设施和地方融媒体行业核心能力的 Flutter App 基座，并通过可配置原生模块与 H5 轻应用支持不同客户和持续扩展。
+本项目是一个带有可复用基础设施的地方融媒体 App。“西昌发布”是默认实例；基础设施服务于产品持续交付和客户复用，不把项目扩展成通用 App 平台、插件市场或运行时多租户系统。
 
 本文中的术语统一如下：
 
-- **Flutter App 基座**：可复用的稳定宿主、设计系统、配置解析、模块注册、导航装配、状态与存储基础设施，不等同于只有账号和设置页面的 foundation。
-- **默认实例**：仓库当前可运行、可回归的“西昌发布”产品 profile。它是迁移兼容基线，不是可以散落到通用实现中的全局常量集合。
+- **Flutter App 基座**：地方融媒体 App 内可复用的稳定宿主、设计系统、配置解析、模块装配、状态与存储基础设施；它服务于产品，不是独立的通用平台。
+- **AppProfile**：由构建流程中唯一、规范化的 `profileId` 选定的独立 App 身份，集中定义名称、不可跨客户切换的品牌/合规资料、平台身份引用、允许能力和安全上限；它不自报安装包物理事实。
+- **默认实例**：仓库当前可运行、可回归的“西昌发布”`AppProfile`。它是迁移兼容基线，不是可以散落到通用实现中的全局常量集合。
+- **UserSession**：当前 App 内的登录用户、令牌状态和授权摘要，不参与 `AppProfile` 选择。
 - **地方融媒体行业核心**：首页、频道、稿件及其必要的内容展示、检索入口和详情链路。这些能力定义产品类别，不视为待清除的历史演示页面。
-- **可选原生模块**：直播、爆料、服务、积分等随安装包交付、由模块配置启停的 Flutter 能力。
-- **H5 轻应用**：运行在统一受控容器中的 Web 能力，只能使用声明并获授权的版本化 Bridge。
+- **可选业务能力**：直播、爆料、服务、积分等不定义产品类别、可按客户需要选配的能力；实施前另行选择原生、H5、混合或受控外部系统。当前代码只是遗留原型兼容实现，不构成产品对包含关系或载体的批准。
+- **原生模块 / AppModule**：随安装包交付的 Flutter 实现，是业务能力的一种交付载体，不代表所有可选业务能力。
+- **H5 轻应用**：运行在统一受控容器中的 Web 交付载体，可承载低频定制或频繁变化的业务主流程；只有获批需求确实需要宿主能力时，才使用声明并获授权的版本化 Bridge。
+- **混合交付**：原生承载稳定入口、高体验或设备能力，H5 承载频繁变化的业务主流程；混合本身是一种确定的获批实现，不表示运行期可在原生与 H5 之间切换。第三方办事系统也可采用经过宿主策略校验的受控外部跳转。
+- **核心基座**：`AppProfile`、最小原生模块装配、状态与存储拆分，以及全部活跃 WebView/调用入口的容器化和安全加固。
+- **条件能力**：版本化业务 Bridge 和经可验证真实性签名的正式 `RemoteAppConfig` 拉取链路；只有对应产品、API、安全和运维条件成立时实施。
+
+本项目的复用单位是代码基座；同一基座可为不同客户选择不同 `AppProfile` 分别构建；每个生产包对应一个独立 App。
 
 详细目标架构和增量迁移步骤见 [`docs/architecture/modular-media-app-plan.md`](docs/architecture/modular-media-app-plan.md)。
 
 ## Architecture invariants
 
-- “西昌发布”是默认 `TenantProfile`。客户名称、Logo、许可证、协议和地址不得散落在通用代码中，必须由 profile 或其引用的受控资源提供。
+- “西昌发布”是明确请求默认实例时使用的 `AppProfile`。客户名称、Logo、许可证、协议和地址不得散落在通用代码中，必须由 `AppProfile` 或其引用的受控资源提供；用户可选 theme preset/accent palette 只改变允许范围内的外观，不能改变品牌、Logo、法务或平台身份。
+- 一个生产安装包只绑定一个 `AppProfile`，且该身份在运行期不可切换；所有 flavor、入口或 `--dart-define` 只能承载同一个规范化 `profileId`。显式客户 profile 无效、生产 profile 缺失或平台身份不完整时必须 fail closed，不能回退西昌。
+- `AppProfile` 不包含交付载体引用，也不按 profile 为同一能力选择不同实现；某产品版本完成载体批准后只实现并维护获批方案，当前遗留原型代码不因此获得批准资格。
 - 首页、频道、稿件是地方融媒体行业核心能力，不因模块化迁移被降级为一次性演示内容。
-- 直播、爆料、服务、积分等能力由模块配置决定；默认西昌实例可以保持启用，但其他客户不必携带相同入口组合。
-- Feature 不得依赖另一个 feature 的实现文件。跨 feature 协作必须通过宿主契约、稳定接口、共享领域能力或事件完成。
-- 禁用模块后，其入口、路由、Provider、状态和后台任务均不得注册或启动；隐藏 UI 不是禁用模块。
-- 远程配置只能启停安装包中已经打包并注册的原生模块，不能下载、解释或执行新的 Dart 代码。
-- H5 轻应用必须受可信域名、逐项能力授权和版本化 Bridge 约束；重定向、子资源访问和 Bridge 调用也必须经过校验。
+- 直播、爆料、服务、积分等是候选业务能力，不保证每个客户包含，也不预设采用原生、H5、混合或受控外部跳转。
+- 业务能力选择与交付载体选择是两个实施前决策；凡作为产品能力进入某次产品装配、构建规范的 approved set 或待验收产物的运行时装配，必须在 `resolveBuild` 前取得该版本唯一载体批准。未批准能力不得因默认西昌、历史五 Tab 或当前代码存在而自动注册/启用；在物理裁剪 ADR 前遗留代码或插件仍可能存在于二进制中，canonical manifest 必须如实记录这种打包事实，但物理存在不产生产品批准。
+- 当前核心基座对原生能力的可验证保证是运行时裁剪：未选或禁用时不注册入口、Provider、状态、存储加载、订阅、后台任务及其他运行时副作用；仅隐藏入口不算裁剪。
+- 代码、插件和第三方原生 SDK 不进入特定客户安装包属于更强的客户级构建目标，须由独立构建组织/打包 ADR 保证；当前单一 `pubspec.yaml`、无 flavor 的仓库不能据此宣称 SDK 或平台权限已物理排除。现在仍须固定 `resolveBuild -> artifact + canonical manifest -> verifyArtifact` 的输入输出边界，不等到 ADR 才补产物证明。
+- `packagedCapabilities` 是构建所有的能力事实，不是 `AppProfile` 字段；唯一 canonical `PackagedCapabilityManifest` 必须嵌入产物或与产物不可分割绑定，由 verifier 与 artifact/spec 一起验证，attestation 绑定三者及源码/profile/产品决策 digest 和 verifier version。运行时只能消费该份已验证 manifest；最终身份、依赖/SDK、权限/entitlements、网络例外和 Bridge 必须从目标平台产物回读。配置集合必须满足 `defaultEnabledCapabilities ⊆ profileAllowedCapabilities ⊆ packagedCapabilities`。
+- 宿主组合根可以依赖各 feature 的公开工厂、窄入口和稳定契约并负责装配；Feature 不得依赖另一个 feature 的实现文件，也不得经 `data/domain/core/shared` 或 re-export 绕道依赖候选能力实现。历史 32 条 import 与覆盖全 `lib/` 所有权表的语义违规必须分别归零。
+- 跨 feature 跳转通过宿主注入的少量类型明确回调或公开契约完成，不建立包含所有页面方法的万能导航服务。
+- 第一版 `AppModule` 只要求稳定 `moduleId`、延迟创建依赖的工厂、可选最小 `AppShellSection`，以及真实需要时的清理钩子；Registry 必须在任何工厂调用前完成 module/section ID 冲突校验和禁用过滤。section builder 只接收当前真实需要的 `isActive`、reselect/scroll-to-top 等窄宿主信号；不建设通用生命周期或热卸载框架。
+- 已打包原生模块禁用后，其入口、内部路由、Provider、状态、存储加载、订阅和后台任务均不得注册或启动；隐藏 UI 不是禁用模块。
+- 首页、稿件、直播、爆料和服务通过小而类型明确的 `EngagementEventSink` 上报已发生行为，不依赖 points 实现；任何首切片只要产生六类事件之一，就同步前移最小 `SessionAccess`、opaque `AccountScope`、sink、no-op 和必要的遗留 adapter。手机号只允许留在遗留 adapter 私有实现中，不能进入公共契约；这不关闭稳定 subject 与 guest 策略的 Unknown。points 禁用时不得初始化 points 状态。
+- 远程配置只能启停或调整当前 `AppProfile` 允许、安装包已包含且产品方案已经确定的实现；必须使用可验证来源真实性的签名、单调 generation、防回放、原子应用、LKG 最大陈旧期和安全回滚，不能改变交付载体、执行新 Dart 或扩大安全上限。
+- `ChannelH5Tab`、`InAppWebPage` 及全部活跃调用入口都属于 H5 安全边界，必须受 HTTPS、逐跳重定向/外链和明确生命周期约束；`trustedMiniAppOrigins` 与媒体 `cleartextMediaHosts` 分离。当前 `Admin9H5LinkBridge` 只是容器内部链接通道，不具备可信 frame/origin 证明，不能直接作为业务 Bridge；真实消费者出现后先证明 top-frame transport，再增加逐项授权、版本化 Bridge 和审计。
+- 顶层导航由宿主根据已构建能力的公开入口装配；当前不建设通用 `AppDestination`、命名路由或统一深链分发层。
 - 迁移期间默认西昌实例的可见行为和既有本地数据保持不变，除非另有明确产品决定和迁移说明。
-- 模块化采用增量迁移：先引入 `TenantProfile`，再引入 `AppModule` / `ModuleRegistry`，随后拆分全局状态与存储，最后建设通用 H5 容器和远程配置。
+- 核心迁移依次引入 `AppProfile` 与构建证明边界、最小 `AppModule` / `ModuleRegistry` 与导航边界、状态与存储拆分、全部现有 H5 入口加固；完整 Bridge 和正式远程配置属于条件阶段。
+- Android/iOS 的正式发行范围，以及 macOS/Web 是仅预览还是真实发行，仍须由产品与 Release owner 决定；编译或浏览器预览不能自动升级为正式平台承诺。
 - 当前阶段不先大规模移动目录，不立即拆分多个 package，不迁移路由框架，不把所有页面改成 H5，也不引入动态 Dart。
 
 ## Brand
@@ -51,10 +70,10 @@
 ## Product goals
 
 - Goals:
-  - Build a reusable local-media Flutter App foundation with “西昌发布” as the default tenant profile and regression instance.
-  - Treat home, channels, and articles as industry-core capabilities while making live, report, services, points, and future capabilities configurable modules.
-  - Support controlled H5 mini apps without weakening native security, lifecycle, or observability boundaries.
-  - Support brand-color swapping, dark mode, app font-size levels, and one-tap global grayscale for memorial or public-event needs.
+  - Deliver a local-media Flutter App with reusable infrastructure, using “西昌发布” as the default app profile and regression instance.
+  - Treat home, channels, and articles as industry-core capabilities while selecting one approved native, H5, hybrid, or controlled-external implementation for each optional capability before implementation.
+  - Harden the current H5 surface first; add a versioned business Bridge only when an approved capability requires host access.
+  - Support profile-allowed theme preset/accent palette switching, dark mode, app font-size levels, and one-tap global grayscale for memorial or public-event needs without changing App brand identity.
   - Keep static repositories replaceable by future API repositories without rewriting UI structure.
 - Non-goals:
   - Do not create a generic blank Flutter starter that removes the local-media product category.
@@ -64,9 +83,11 @@
   - Do not make the Flutter prototype part of backend/Admin formal acceptance until API, deployment, and acceptance contracts are explicitly added.
   - Treat third-party login, SMS, and push Admin configs as reserved placeholders only; they have no runtime App/API effect in this iteration.
 - Success signals:
-  - A tenant can change its approved brand/legal identity without editing generic host or feature implementation files.
-  - Disabled modules contribute no navigation, routes, providers, state, or background work.
-  - H5 mini apps can only navigate to trusted origins and invoke explicitly authorized Bridge capabilities.
+  - A new customer build resolves exactly one approved `AppProfile`; invalid explicit input fails before producing an artifact rather than falling back to Xichang.
+  - An unneeded optional capability can be omitted from product assembly and runtime initialization; physical package exclusion is claimed only after target-artifact attestation, with build topology selected by a customer-level ADR when first required.
+  - Host assembly and typed callbacks keep feature implementations independent without introducing an unproven universal destination system.
+  - Disabled packaged native modules contribute no navigation, routes, providers, state, or background work.
+  - Every active WebView entry stays within approved navigation and lifecycle policy; the existing internal JavaScript channel is not treated as a business Bridge, and any later Bridge exposes only explicitly authorized capabilities over a proven transport.
   - New pages use shared tokens/components instead of local visual decisions.
   - Theme, dark mode, grayscale, and font-size settings survive app restart.
   - Widget tests cover the core foundation settings and navigation flows.
@@ -86,7 +107,7 @@
 
 ## Information architecture
 
-- Primary navigation for the default Xichang profile remains the five-tab `首页`, `直播`, `爆料`, `服务`, `我的` layout during migration; other profiles derive optional entries from the effective module configuration.
+- Primary navigation for the default Xichang profile remains the five-tab `首页`, `直播`, `爆料`, `服务`, `我的` layout during migration; builds for other customers derive optional entries from selected capabilities and signed-package host/module assembly. Runtime configuration may hide or reorder permitted entries but cannot change their implementation.
 - Top-level page roles:
   - `首页` is the information-feed entry and uses fixed search plus channel navigation, without a visible `首页` title.
   - The home top Chrome still participates in PageSurface: the brand backdrop is clipped to the fixed search and channel container, and scrolling must not move the backdrop into feed content.
@@ -118,7 +139,7 @@
 
 - Color:
   - Default brand follows the references: fresh blue primary with green secondary accents.
-  - Additional presets should include government red and service green to prove brand flexibility.
+  - Additional theme presets should include government red and service green to prove palette flexibility within the active `AppProfile` allowlist.
   - Page background is light cool gray; cards and list groups are white in light mode.
   - Accent yellow/orange is reserved for focused status, warning, or call-to-action states.
   - Dark mode must be explicit, not a tinted light theme.
@@ -261,7 +282,7 @@
   - Message card with unread dot.
   - Primary pill button and danger text button.
   - Agreement text/link row.
-  - Theme/brand swatch selector.
+  - Theme preset/accent palette selector; it changes appearance only, not App brand identity.
 - Variants and states:
   - Loading, empty, error, disabled, selected, unread, destructive, logged-in, logged-out.
 - Token/component ownership:
@@ -291,7 +312,7 @@
 - Target standard: practical mobile accessibility suitable for large Chinese text and touch use.
 - Keyboard/focus behavior: form fields and buttons must have predictable traversal; no hidden required action.
 - Contrast/readability: light and dark modes must keep body text and buttons legible; grayscale must not rely on color alone.
-- Selection/readability: selected tabs, bottom navigation, chips, quick actions, and service grids must remain distinguishable by luminance, font weight, shape, or structure when global grayscale is active. Brand color alone is not an acceptable state signal.
+- Selection/readability: selected tabs, bottom navigation, chips, quick actions, and service grids must remain distinguishable by luminance, font weight, shape, or structure when global grayscale is active. Accent color alone is not an acceptable state signal.
 - Screen-reader semantics: icon-only controls need tooltips/labels; login and setting rows should expose intent.
 - Screen-reader semantics: search entry surfaces are buttons with explicit labels, not decorative gray bars.
 - Reduced motion and sensory considerations: keep motion minimal; do not depend on animation for state understanding.
@@ -328,8 +349,8 @@
 
 - Framework/styling system: Flutter 3.44, Material 3, `provider`, `ChangeNotifier`, `SharedPreferences`.
 - Design-token constraints:
-  - Build themes from brand presets and `ColorScheme`.
-  - No feature page should hard-code a brand color when a token exists.
+  - Build themes from profile-allowed theme presets/accent palettes and `ColorScheme`; reserve “brand identity” for `AppProfile` name, Logo, legal copy, and platform metadata.
+  - No feature page should hard-code a profile brand or user accent color when a semantic token exists.
   - Global grayscale should be applied near `MaterialApp.builder`.
 - Architecture constraints:
   - Preserve UI / ViewModel / Repository / Service separation.
@@ -347,18 +368,18 @@
   - Add widget tests for theme, font-size, grayscale, settings navigation, login agreement, messages, and feedback limits.
   - For visual smoke, explicitly cover `首页`, `我的`, `设置`, `外观主题`, and `频道管理` in dark + global grayscale. Check for low-contrast text, color-only selected states, clipped labels, and horizontal overflow before calling smoke complete.
 
-## Iteration gates
+## Historical UI foundation verification checklist
 
-- Gate 0: Design source and Flutter prototype boundary are documented.
-- Gate 1: Theme tokens and appearance state exist and are persisted.
-- Gate 2: Foundation pages consume shared components and route through a consistent navigation helper.
-- Gate 3: Widget tests cover core user-foundation behavior.
-- Gate 4: `$code-review` runs clean or all blocking findings are fixed.
+- Historical check 0: Design source and Flutter prototype boundary are documented.
+- Historical check 1: Theme tokens and appearance state exist and are persisted.
+- Historical check 2: Foundation pages consume shared components and route through a consistent navigation helper.
+- Historical check 3: Widget tests cover core user-foundation behavior.
+- Historical check 4: `$code-review` runs clean or all blocking findings are fixed.
 
-## Iteration model
+## UI iteration model
 
-- Treat the Flutter mobile app as an iterative foundation, not a one-shot page fill.
-- Each gate should be independently verifiable and committed separately when possible.
+- Treat the Flutter mobile app as an iterative product with reusable infrastructure, not a one-shot page fill.
+- Each UI change should be independently verifiable and committed separately when possible; these historical checks are not the architecture migration stages in the modular-media plan.
 - Keep static data behind repository/model boundaries so future API integration replaces data sources instead of rewriting UI.
 - Use widget tests as the first regression layer for foundation behavior: login agreement gating, settings navigation, appearance switching, font levels, grayscale, messages, and feedback limits.
 - Use integration tests later when real device capabilities, public APIs, deep links, or third-party login/SMS SDKs are introduced.
