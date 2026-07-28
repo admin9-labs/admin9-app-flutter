@@ -8180,7 +8180,7 @@ void main() {
       expect(find.byKey(const Key('global-grayscale-filter')), findsOneWidget);
       await tester.pageBack();
       await tester.pumpAndSettle();
-      expect(find.text('主流红'), findsOneWidget);
+      expect(find.text('融媒红'), findsOneWidget);
 
       await tester.tap(find.text('有害信息举报'));
       await tester.pumpAndSettle();
