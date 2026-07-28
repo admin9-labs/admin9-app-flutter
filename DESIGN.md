@@ -3,8 +3,8 @@
 ## Source of truth
 
 - Status: Active draft
-- Last refreshed: 2026-06-09
-- Primary product surfaces: Flutter mobile prototype in this repository; Go backend and Vue Admin live in `admin9-app-admin`.
+- Last refreshed: 2026-07-28
+- Primary product surface: the modular local-media Flutter App foundation in this repository. Go backend and Vue Admin live in `admin9-app-admin` and remain separate delivery surfaces.
 - Evidence reviewed:
   - User-provided Sichuan Observer reference screenshots for profile, settings, login, messages, about, feedback, report, history, and community/activity layouts.
   - `lib/app/admin9_app.dart`, `lib/app/admin9_shell.dart`
@@ -13,6 +13,34 @@
   - `lib/ui/features/mine/views/*`
   - User-provided 2026-06-08 and 2026-06-09 iPhone screen recordings covering top-level page scroll behavior in light and dark modes.
   - `README.md`
+  - `docs/architecture/modular-media-app-plan.md`
+
+## Project positioning
+
+本项目旨在建设一个以“西昌发布”为默认实例、具备可复用基础设施和地方融媒体行业核心能力的 Flutter App 基座，并通过可配置原生模块与 H5 轻应用支持不同客户和持续扩展。
+
+本文中的术语统一如下：
+
+- **Flutter App 基座**：可复用的稳定宿主、设计系统、配置解析、模块注册、导航装配、状态与存储基础设施，不等同于只有账号和设置页面的 foundation。
+- **默认实例**：仓库当前可运行、可回归的“西昌发布”产品 profile。它是迁移兼容基线，不是可以散落到通用实现中的全局常量集合。
+- **地方融媒体行业核心**：首页、频道、稿件及其必要的内容展示、检索入口和详情链路。这些能力定义产品类别，不视为待清除的历史演示页面。
+- **可选原生模块**：直播、爆料、服务、积分等随安装包交付、由模块配置启停的 Flutter 能力。
+- **H5 轻应用**：运行在统一受控容器中的 Web 能力，只能使用声明并获授权的版本化 Bridge。
+
+详细目标架构和增量迁移步骤见 [`docs/architecture/modular-media-app-plan.md`](docs/architecture/modular-media-app-plan.md)。
+
+## Architecture invariants
+
+- “西昌发布”是默认 `TenantProfile`。客户名称、Logo、许可证、协议和地址不得散落在通用代码中，必须由 profile 或其引用的受控资源提供。
+- 首页、频道、稿件是地方融媒体行业核心能力，不因模块化迁移被降级为一次性演示内容。
+- 直播、爆料、服务、积分等能力由模块配置决定；默认西昌实例可以保持启用，但其他客户不必携带相同入口组合。
+- Feature 不得依赖另一个 feature 的实现文件。跨 feature 协作必须通过宿主契约、稳定接口、共享领域能力或事件完成。
+- 禁用模块后，其入口、路由、Provider、状态和后台任务均不得注册或启动；隐藏 UI 不是禁用模块。
+- 远程配置只能启停安装包中已经打包并注册的原生模块，不能下载、解释或执行新的 Dart 代码。
+- H5 轻应用必须受可信域名、逐项能力授权和版本化 Bridge 约束；重定向、子资源访问和 Bridge 调用也必须经过校验。
+- 迁移期间默认西昌实例的可见行为和既有本地数据保持不变，除非另有明确产品决定和迁移说明。
+- 模块化采用增量迁移：先引入 `TenantProfile`，再引入 `AppModule` / `ModuleRegistry`，随后拆分全局状态与存储，最后建设通用 H5 容器和远程配置。
+- 当前阶段不先大规模移动目录，不立即拆分多个 package，不迁移路由框架，不把所有页面改成 H5，也不引入动态 Dart。
 
 ## Brand
 
@@ -23,14 +51,22 @@
 ## Product goals
 
 - Goals:
-  - Turn the Flutter app into a reusable mobile foundation prototype with stable design tokens and user-foundation pages.
+  - Build a reusable local-media Flutter App foundation with “西昌发布” as the default tenant profile and regression instance.
+  - Treat home, channels, and articles as industry-core capabilities while making live, report, services, points, and future capabilities configurable modules.
+  - Support controlled H5 mini apps without weakening native security, lifecycle, or observability boundaries.
   - Support brand-color swapping, dark mode, app font-size levels, and one-tap global grayscale for memorial or public-event needs.
   - Keep static repositories replaceable by future API repositories without rewriting UI structure.
 - Non-goals:
+  - Do not create a generic blank Flutter starter that removes the local-media product category.
+  - Do not perform a big-bang folder migration, package split, router replacement, or H5 rewrite as the first architecture step.
+  - Do not download or execute dynamic Dart code; remote configuration only selects capabilities already present in the signed app package.
   - Do not add real public-client APIs, CMS contracts, SMS login, third-party OAuth, payment, mall, order, or activity business flows in this iteration.
   - Do not make the Flutter prototype part of backend/Admin formal acceptance until API, deployment, and acceptance contracts are explicitly added.
   - Treat third-party login, SMS, and push Admin configs as reserved placeholders only; they have no runtime App/API effect in this iteration.
 - Success signals:
+  - A tenant can change its approved brand/legal identity without editing generic host or feature implementation files.
+  - Disabled modules contribute no navigation, routes, providers, state, or background work.
+  - H5 mini apps can only navigate to trusted origins and invoke explicitly authorized Bridge capabilities.
   - New pages use shared tokens/components instead of local visual decisions.
   - Theme, dark mode, grayscale, and font-size settings survive app restart.
   - Widget tests cover the core foundation settings and navigation flows.
@@ -50,7 +86,7 @@
 
 ## Information architecture
 
-- Primary navigation: five-tab bottom navigation remains `首页`, `直播`, `爆料`, `服务`, `我的`.
+- Primary navigation for the default Xichang profile remains the five-tab `首页`, `直播`, `爆料`, `服务`, `我的` layout during migration; other profiles derive optional entries from the effective module configuration.
 - Top-level page roles:
   - `首页` is the information-feed entry and uses fixed search plus channel navigation, without a visible `首页` title.
   - The home top Chrome still participates in PageSurface: the brand backdrop is clipped to the fixed search and channel container, and scrolling must not move the backdrop into feed content.

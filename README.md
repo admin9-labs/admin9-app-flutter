@@ -1,10 +1,15 @@
-# Flutter 地方融媒体新闻 App 原型
+# Admin9 地方融媒体 Flutter App 基座
 
-这个项目已经从单文件教学 demo 调整为更接近真实新闻类 App 的 Flutter 结构。当前阶段仍使用本地静态数据，但页面、状态、仓库和本地存储已经按职责拆分，后续接接口时可以继续扩展。
+本项目旨在建设一个以“西昌发布”为默认实例、具备可复用基础设施和地方融媒体行业核心能力的 Flutter App 基座，并通过可配置原生模块与 H5 轻应用支持不同客户和持续扩展。
 
-当前仓库是独立 Flutter App 原型，不属于 `admin9-app-admin` 后端 + Admin 后台的正式交付基线；它不依赖 `/api/admin/*` 或已移除的 public-client API。后续如果接入真实新闻/CMS/会员接口，需要先补 API 契约、验收和部署文档。
+当前仓库仍处于静态数据驱动的产品化原型阶段。“西昌发布”是用于持续验证默认行为的 tenant profile；首页、频道和稿件属于地方融媒体行业核心能力，直播、爆料、服务、积分等能力将逐步纳入模块配置。仓库不属于 `admin9-app-admin` 后端 + Admin 后台的正式交付基线，也不依赖 `/api/admin/*` 或已移除的 public-client API；接入真实新闻、CMS、会员或远程配置前，必须先补齐 API 契约、验收和部署文档。
 
-本轮 Flutter 基座规范验收只看用户基础能力：账号、登录、设置、外观、字体、消息、反馈、关于、页面模板、主题 token 和核心组件。首页、直播、频道、专题、运营位等仍是历史媒体演示内容，用于验证列表、图片、频道和沉浸式页面的布局能力；它们不代表 foundation 已沉淀活动、商城、积分、签到或智媒工具等业务皮肤。
+## 文档导航
+
+- [`DESIGN.md`](DESIGN.md)：产品、设计与架构边界的 Source of truth。
+- [`docs/architecture/modular-media-app-plan.md`](docs/architecture/modular-media-app-plan.md)：模块化地方融媒体 App 基座的增量迁移计划。
+- [`docs/audit/VALIDATION.md`](docs/audit/VALIDATION.md)：历史审计裁决及验证记录。
+- [`docs/delivery/app-third-party-services-plan.md`](docs/delivery/app-third-party-services-plan.md)：工作区级第三方服务计划入口。
 
 ## 当前能力
 
