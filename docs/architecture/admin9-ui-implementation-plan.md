@@ -1,7 +1,7 @@
-# Admin9 UI 最终实施计划
+# Admin9 Design System Flutter 实施计划
 
-> 状态：v1.1 可执行实施基线，尚未授权开始代码实施
-> 版本：v1.1
+> 状态：v1.2 下游实施基线，尚未授权开始运行时代码实施
+> 版本：v1.2
 > 建立日期：2026-07-29
 > 修订日期：2026-07-29
 > 适用范围：Admin9 App Foundation Flutter（Android / iOS）
@@ -9,7 +9,7 @@
 
 ## 1. 文档目的与授权边界
 
-本文固定 Admin9 App Foundation Flutter 的 UI 架构、视觉基线、组件 API、平台映射、实施顺序和验收门禁，是后续代码实施的唯一基线。
+本文是 [Admin9 Design System v1.0](../design-system/README.md) 的下游 Flutter 实施计划。Design System 决定产品语义、Token、平台映射、公共合同和质量门禁；本文只决定在当前 Foundation 中如何分阶段实现。两者冲突时以 Design System v1.0 为准，本文不得成为竞争规范来源。
 
 本文已经关闭首期架构和产品表现的选择题。实施者不得在 feature 页面自行改用另一套 Material、Cupertino、自绘控件、路由转场、反馈形式或页面容器。发现 Flutter SDK 限制时，应先记录复现、影响范围和候选修正，经计划变更评审后再调整本基线。
 
@@ -17,18 +17,18 @@
 
 ## 2. 固定架构决策
 
-1. 整套 UI 体系命名为 **Admin9 UI**，项目级公共组件使用 `App*` 命名。
+1. 整套体系命名为 **Admin9 Design System**；“Admin9 UI”仅指其 Flutter 实现层，公共组件继续使用 `App*` 命名。
 2. 应用根节点固定使用 `MaterialApp`，不切换为 `CupertinoApp`，也不按平台维护两棵应用树。
 3. Android 交互控件使用 Material 3；iOS 交互控件使用 Flutter Cupertino 控件。品牌颜色、内容层级和业务语义保持一致，平台手势、控件结构、系统反馈和导航行为保持原生。
 4. 平台分支只存在于 Admin9 UI、主题桥接和 App Shell。feature 页面不得使用 `Platform.isIOS`，也不得直接选择 Material/Cupertino 实现。
 5. 页面路由固定保留 `MaterialPageRoute` 与 Flutter 默认 `PageTransitionsTheme`。首期不创建自定义路由类。
 6. 不引入 `flutter_platform_widgets` 等全局第三方 UI 套件。图表、富文本和媒体能力按独立需求评估。
-7. Admin9 UI 固定保留在当前应用仓库，首期不拆独立 package。
+7. Core 实现固定保留在当前应用仓库的 `lib/core/design_system/`，只经 `lib/admin9_ui.dart` 导出；品牌只经 `lib/app/brand/app_brand_theme.dart` 输入。首期不拆独立 package。
 8. 只封装具有平台差异、统一状态、无障碍或稳定复用价值的组件，不包装 `Row`、`Column`、`Text`、`Icon`、`Padding`、`SizedBox`、`Expanded` 和 `Flexible`。
 9. App Shell 固定持有一级导航、Tab 页面实例、页面保活和全局资源生命周期；各 feature 固定持有本页滚动控制器、表单状态、业务状态和页面级资源。公共组件只接收值、展示数据和回调。
 10. 媒体、频道、直播、积分、客户身份、Logo、法务资料和构建配置不进入 Admin9 UI。
-11. v1.1 只支持中文简体界面，固定配置 `zh_CN` 和 Flutter 的 Material、Cupertino、Widgets 本地化代理；日期、时间和 24 小时制尊重系统设置。
-12. 首期不启用 Android 动态颜色。两端都使用本计划固定的 Admin9 品牌主题。
+11. v1.2 首期只支持中文简体界面，固定配置 `zh_CN` 和 Flutter 的 Material、Cupertino、Widgets 本地化代理；日期、时间和 24 小时制尊重系统设置。
+12. 首期不启用 Android 动态颜色。两端使用 Design System 默认语义主题；派生项目只可通过 Brand Theme 覆盖已批准的 primary/secondary 对、品牌资产、批准字体和受限圆角性格。
 
 ## 3. 产品视觉基线
 
@@ -40,40 +40,26 @@ Android 保留 Material 3 的状态层、波纹、NavigationBar 和标准表单�
 
 ### 3.2 颜色
 
-主题固定以 `ColorScheme.fromSeed(seedColor: Color(0xff263238))` 生成完整角色，并覆盖以下品牌角色：
-
-| 角色 | 浅色 | 深色 |
-| --- | --- | --- |
-| `primary` | `#263238` | `#F4F6F7` |
-| `onPrimary` | `#FFFFFF` | `#20272A` |
-| `secondary` | `#C83F32` | `#FF8A7A` |
-| `tertiary` / success | `#08786E` | `#71D8CC` |
-| `surface` | `#F8F9FA` | `#15191B` |
-
-普通主题使用 `contrastLevel: 0.2`，有效高对比度开启时使用 `contrastLevel: 1.0`。Error、outline、surface container、disabled 和 state layer 角色从同一个 `ColorScheme` 获取，不在业务页面硬编码。
-
-`warning` 和 `info` 是 Flutter `ColorScheme` 未提供的通用语义，进入单个 `ThemeExtension`。固定颜色对如下：浅色 warning `#8A4D00` / onWarning `#FFFFFF`，深色 warning `#FFB86B` / onWarning `#2B1700`；浅色 info `#315E7D` / onInfo `#FFFFFF`，深色 info `#A7C7E7` / onInfo `#102636`。高对比度沿用同一颜色对并提高边框宽度，不生成第三套色值；Phase 1 必须计算并记录实际对比度。首期不为每个组件建立独立 Token 类。
+颜色角色、默认浅深色值、对比度与 Brand 覆盖边界只以 [Foundations](../design-system/01-foundations.md#ds-clr-001) 为准。旧 `ColorScheme.fromSeed(#263238)`、旧 warning/info 配对和固定 Admin9 客户品牌色已废弃。实现可用 `ColorScheme` 作为 Flutter 载体，但不得让 seed 推导结果覆盖已冻结语义角色。
 
 ### 3.3 字体、间距、圆角与密度
 
 - 两个平台都使用系统字体，不引入字体文件，不强制 `.AppleSystemUIFont`。
 - 文字语义以 `TextTheme` 为公共入口；Cupertino 组件从相同语义角色生成 `cupertinoOverrideTheme`，业务页面不写平台字号。
-- 间距刻度固定为 `4 / 8 / 12 / 16 / 20 / 24 / 32` logical pixels。
-- 紧凑控件圆角固定为 `4`，输入框、卡片和列表分组固定为 `8`，Dialog 与底部弹层固定为 `12`。
-- 页面水平内边距：宽度小于 `600` 时为 `16`，宽度不小于 `600` 时为 `24`。
-- 内容最大宽度固定为 `720`，大屏采用居中单栏；首期不实现双栏、NavigationRail 和桌面布局。
-- Android 列表项最小高度为 `56dp`，iOS 列表项最小高度为 `44pt`。共享自绘交互区域不得小于 `48 x 48` logical pixels。
-- Android 底部导航内容高度固定为 `72dp`，iOS 使用 `CupertinoTabBar` 默认高度并叠加系统安全区。
+- Core 间距刻度固定为 `4 / 8 / 12 / 16 / 24 / 32 / 48`；390lp 页面内边距 `20` 是页面测量，不是可复用 Token。
+- 输入框/inline notice 圆角为 `6`，按钮/Dialog/sheet/Android 分组面圆角为 `8`；iOS 分组列表使用系统形状。
+- 页面水平内边距：320/360 为 `16`、390 为 `20`、600 为 `24`；可读内容最大宽度 `640`，表单最大宽度 `480`。
+- 控件只设 minimum constraints 并按内容增长。按钮与输入框不要求等高；列表与底栏不得使用通用固定 56/72 高度。
+- Android hit bounds 至少 `48 x 48dp`，iOS 至少 `44 x 44pt`；visual bounds 与 hit bounds 分别测量。
 
 ### 3.4 响应式范围
 
-首期支持宽度不小于 `320` logical pixels 的手机竖屏和横屏。平板继续使用最大宽度 `720` 的单栏布局。组件不得依赖固定屏幕宽度；横排内容在 `320` 宽度或最大系统字号下放不下时，先让文字换行，再把复合字段切为纵排。只有分段控件和横向工具条使用横向滚动，不能缩小到验收字号以下。
+首期 Widget 窗口固定覆盖 320/360/390/600 logical pixels 和手机横屏；真实设备只记录实际型号、runtime/API 与逻辑宽度。组件不得依赖固定屏幕宽度；空间不足时尾值先下移、横排转纵排、页面保持可滚动，文字不得缩小。完整组合只使用 [A-L 唯一自动化矩阵](../design-system/06-accessibility-quality.md#ds-rsp-001)。
 
 ### 3.5 动效
 
-- 自定义微交互动效只使用 `100ms` fast、`200ms` standard 和 `300ms` emphasized 三档。
-- 进入使用 `Curves.easeOutCubic`，状态切换使用 `Curves.easeInOutCubic`，退出使用 `Curves.easeInCubic`。
-- 主题切换正常时固定 `200ms`，有效减少动态效果开启时固定 `Duration.zero`。
+- 自定义动效只使用 `instant 0ms`、`state 120ms easeOutCubic`、`enter 200ms easeOutCubic`、`exit 160ms easeInCubic`。
+- 有效减少动态效果开启时，非导航 state/enter/exit 变为 `0ms`。
 - 页面转场不读取上述 Token，始终使用 Flutter 的平台默认 builder 和时长。
 - 首期不实现弹跳、弹性、循环缩放、Hero 和视差自定义动画。
 
@@ -82,14 +68,14 @@ Android 保留 Material 3 的状态层、波纹、NavigationBar 和标准表单�
 ```text
 lib/
 ├── admin9_ui.dart
+├── app/
+│   └── brand/
+│       └── app_brand_theme.dart
 ├── core/
-│   ├── theme/
-│   │   ├── app_theme.dart
-│   │   ├── app_theme_tokens.dart
-│   │   ├── app_spacing.dart
-│   │   ├── app_radii.dart
-│   │   └── app_motion.dart
-│   └── widgets/
+│   └── design_system/
+│       ├── foundations/
+│       ├── platform/
+│       └── components/
 │       ├── app_button.dart
 │       ├── app_switch.dart
 │       ├── app_dialog.dart
@@ -102,6 +88,8 @@ lib/
 │       ├── app_feedback.dart
 │       ├── app_page.dart
 │       ├── app_bottom_navigation.dart
+│       ├── app_action_menu.dart
+│       ├── app_progress_indicator.dart
 │       └── internal/
 │           └── app_platform_icons.dart
 └── debug/
@@ -112,7 +100,7 @@ lib/
 
 `BrandMark` 继续属于应用 branding 层，不从 `admin9_ui.dart` 导出。`AppNotice` 只接收调用方文案和 tone，不内置“服务尚未接入”等业务文字。
 
-不为本项目引入自定义架构 lint。公共出口、禁止 feature 直引实现文件和内部 helper 不导出的规则，通过代码评审清单与现有静态检查执行。
+Phase 1 必须增加 analyzer AST 导入边界测试及正反 fixtures：公共出口、feature 禁止直引 Core、feature 禁止自行选择 Material/Cupertino 交互控件、Core 禁止依赖业务层、跨 feature 禁止实现文件引用。纯文本 `rg` 只能辅助排查，不作为硬门禁。
 
 ## 5. 固定平台组件映射
 
@@ -129,15 +117,15 @@ lib/
 | `AppTextField` | `TextFormField` | `FormField<String>` 桥接 `CupertinoTextField` | 统一 controller、focus、validator、autofill、错误语义 |
 | `AppSegmentedControl` | `SegmentedButton<T>` | `CupertinoSlidingSegmentedControl<T>` | 2 至 5 项、单选、即时生效 |
 | `AppSelect` | `DropdownMenuFormField<T>` | `FormField<T>` 桥接 `showCupertinoModalPopup` + `CupertinoPicker` | 仅处理 2 至 20 个无需搜索的单选项 |
+| `AppSingleChoiceList<T>` | `RadioGroup<T>` + `RadioListTile<T>` | 推入带 checkmark 与 selected trait 的列表 | 设置页主题/字号唯一映射；即时提交，用户主动返回 |
 | `AppListTile` | `ListTile` | `CupertinoListTile` | 平台原生按压反馈和尾部箭头 |
 | `AppSection` | `Column` + section title + unframed children + row `Divider` | `CupertinoListSection.insetGrouped` | 只负责标题、footer 和 children |
 | `AppPage` | `Scaffold` + `AppBar` | `CupertinoPageScaffold` + `CupertinoNavigationBar` | 标题栏固定使用平台原生结构 |
 | `AppBottomNavigation` | `NavigationBar` | `CupertinoTabBar` | Shell 持有 index、页面实例和生命周期 |
 | `AppFeedback` | 瞬时态固定使用 `SnackBar`；持久态固定使用 `MaterialBanner` | 顶部 `OverlayEntry` 通知条；持久态增加关闭控件 | 无操作且未启用无障碍导航时 info/success 3 秒、warning/error 5 秒；其余情况持久显示并即时公告 |
-| 确认弹窗之外的操作菜单 | `showModalBottomSheet` | `CupertinoActionSheet` | 只用于 2 至 6 个离散动作，不承担字段选择 |
-| 加载指示 | `CircularProgressIndicator` | `CupertinoActivityIndicator` | 有确定进度时 Android 使用 determinate；iOS 展示文字进度 |
+| `AppActionMenu<T>` | Material modal bottom sheet | `CupertinoActionSheet` | 只用于 2 至 6 个离散命令，不承担字段/设置选择；取消不提交 |
+| `AppProgressIndicator` | `CircularProgressIndicator` / `LinearProgressIndicator` | 未知进度使用 `CupertinoActivityIndicator`，确定进度使用 Core semantic bar | 必须有可读标签；确定值为 0...1；不伪造百分比 |
 | Checkbox | Material `Checkbox` | `CupertinoCheckbox` | 出现首个真实消费者后进入公共层 |
-| Radio | `RadioGroup<T>` + `RadioListTile<T>` | `RadioGroup<T>` + `CupertinoListTile` + `CupertinoRadio<T>` | 出现首个真实消费者后进入公共层 |
 | 日期选择 | `showDatePicker` | modal popup + `CupertinoDatePicker` | iOS 固定取消/完成；尊重 locale 和系统制式 |
 | 页面路由 | `MaterialPageRoute` 默认 Android builder | `MaterialPageRoute` 默认 Cupertino builder | 禁止替换默认 builder 破坏返回手势 |
 
@@ -145,41 +133,19 @@ lib/
 
 平台通用品牌组件固定为 `AppNotice`、空状态和业务卡片；它们在两端使用相同结构，只由主题提供平台适配后的字体和颜色。
 
-系统语义图标固定如下。带“normal / selected”的条目由 `AppBottomNavigation` 根据当前 index 自动选择：
-
-| `AppIconRole` | Android | iOS |
-| --- | --- | --- |
-| `back` | `Icons.arrow_back` | `CupertinoIcons.back` |
-| `close` | `Icons.close` | `CupertinoIcons.clear` |
-| `chevronForward` | `Icons.arrow_forward_ios` | `CupertinoIcons.forward` |
-| `home` | `Icons.home_outlined` / `Icons.home` | `CupertinoIcons.house` / `CupertinoIcons.house_fill` |
-| `account` | `Icons.person_outline` / `Icons.person` | `CupertinoIcons.person` / `CupertinoIcons.person_fill` |
-| `settings` | `Icons.settings_outlined` | `CupertinoIcons.settings` |
-| `search` | `Icons.search` | `CupertinoIcons.search` |
-| `info` | `Icons.info_outline` | `CupertinoIcons.info_circle` |
-| `warning` | `Icons.warning_amber` | `CupertinoIcons.exclamationmark_triangle` |
-| `success` | `Icons.check_circle_outline` | `CupertinoIcons.check_mark_circled` |
-| `error` | `Icons.error_outline` | `CupertinoIcons.exclamationmark_circle` |
-| `visibility` | `Icons.visibility` | `CupertinoIcons.eye` |
-| `visibilityOff` | `Icons.visibility_off` | `CupertinoIcons.eye_slash` |
-| `textSize` | `Icons.text_fields` | `CupertinoIcons.textformat_size` |
-| `contrast` | `Icons.contrast` | `CupertinoIcons.circle_lefthalf_fill` |
-| `grayscale` | `Icons.tonality` | `CupertinoIcons.circle_grid_3x3` |
-| `reduceMotion` | `Icons.motion_photos_off_outlined` | `CupertinoIcons.slowmo` |
-
-业务品牌图标和内容图标保持跨平台一致。feature 页面不得自行替换上述系统语义图标。
+系统语义图标只采用 [Design System 权威映射表](../design-system/02-platform-adaptation.md#21-authoritative-icon-mapping)。`home/homeSelected` 与 `account/accountSelected` 是不同角色，由 `AppBottomNavigation` 按当前 index 选择。业务品牌图标和内容图标保持跨平台一致；feature 页面不得自行替换系统语义图标。
 
 ## 6. Token 与主题所有权
 
-Token 采用三类所有权，但不要求三套类层级：
+Token 采用三类所有权，具体值只引用 Design System Foundations，不在本文复制第二套数值：
 
 1. Primitive：原始颜色、间距和圆角刻度，仅供主题实现内部使用。
 2. Semantic：`ColorScheme`、`TextTheme`、`warning`、`info` 和动效语义，是公共组件的主要输入。
 3. Component/platform：Android 度量写入 `NavigationBarThemeData`、`FilledButtonThemeData`、`OutlinedButtonThemeData`、`TextButtonThemeData`、`InputDecorationTheme`、`DialogThemeData` 和 `DividerThemeData`；Cupertino 与 Admin9 自定义度量写入对应组件实现文件，不开放给 feature 覆盖。
 
-固定消费顺序为：Flutter `ColorScheme` / `TextTheme` → 必要的单个 `ThemeExtension` → 间距和圆角常量 → 组件内部平台度量。`app_theme_tokens.dart` 不得成为无分类的万能常量文件。
+固定消费顺序为：Core primitive → Admin9 semantic roles → component/platform resolution。Flutter `ColorScheme`、`TextTheme`、`ThemeExtension` 和 `CupertinoThemeData` 是实现载体，不是 feature 逃生口。只读 `AppDesignTokens` facade 的查找机制在 Phase 0D 以真实实现 probe 冻结，不预先伪造 static method。
 
-Cupertino 主题固定从同一套 semantic Token 生成 `cupertinoOverrideTheme`，映射 `brightness`、`primaryColor`、`primaryContrastingColor`、`scaffoldBackgroundColor`、`barBackgroundColor`、`selectionHandleColor` 和 `textTheme`。禁用态固定使用解析后的 `CupertinoColors.inactiveGray`；Cupertino 组件不得逐个接收其他硬编码颜色。
+Cupertino 主题固定从同一套 semantic Token 生成 `cupertinoOverrideTheme`，映射 `brightness`、`primaryColor`、`primaryContrastingColor`、`scaffoldBackgroundColor`、`barBackgroundColor`、`selectionHandleColor` 和 `textTheme`。iOS 保留 Cupertino 的禁用交互行为，但最终禁用前景与容器必须解析 Design System `disabled` semantic roles，并对实际合成背景重新验证 4.5:1/3:1 门禁；不得直接固定 `CupertinoColors.inactiveGray` 或由组件接收硬编码颜色。
 
 ## 7. 无障碍与系统偏好
 
@@ -195,7 +161,7 @@ Cupertino 主题固定从同一套 semantic Token 生成 `cupertinoOverrideTheme
 
 ### 7.2 字体缩放
 
-系统 `TextScaler` 是基础，App 字号偏好只追加 `1.00 / 1.12 / 1.24` 倍。删除当前 `2.0` 硬上限，不对系统非线性缩放设置最大值。组件必须在 Android 200% 和 iOS 最大辅助功能字号下保持内容、操作入口和错误信息可达。
+系统 `TextScaler` 是基础，App 字号固定为 Standard `1.00`、Large `1.12`、Extra Large `1.24`。解析公式为 `systemTextScaler.scale(baseSize) * appFactor`，删除当前 `2.0` 硬上限，不对组合结果设置最大值。静态视觉证据只证明系统标准字号乘 `1.24`；A-L Widget 矩阵证明合成与压力布局，Android 200% 和 iOS 最大 Dynamic Type 仍由真实设备验收。
 
 ### 7.3 减少动态效果与返回手势
 
@@ -219,34 +185,30 @@ Cupertino 主题固定从同一套 semantic Token 生成 `cupertinoOverrideTheme
 
 ## 8. 公共组件契约
 
-下列公开名称、输入和行为是稳定契约。Phase 0 只负责把它们写成可编译的 Dart 签名，不得改名、合并成任意 `child` API 或增加页面级样式逃生口。新增可选能力必须保持向后兼容；改变现有语义需要先修订本文。
+公开名称、精确构造参数、泛型、nullability、`Key`、回调和状态所有权以 [Design System 组件规范](../design-system/03-components.md#ds-cmp-001) 与非导出的 [`design_system_contract_probe.dart`](../../tool/design_system/design_system_contract_probe.dart) 为唯一合同。Phase 0D 实现不得改名、合并成任意 `child/style` 逃生口或重新开放产品选择；任何签名变化必须先做版本化 Design System 变更并让 probe 通过。
 
 | 组件 | 必需输入与状态 | 固定约束 |
 | --- | --- | --- |
-| `AppButton` | `variant`、`label`、`onPressed`、`loading = false`、`AppIconRole? leadingIcon` | `loading` 时只触发一次、尺寸不变、语义为忙碌；`onPressed == null` 即禁用；不开放任意 `style` |
-| `AppSwitch` | `value`、`onChanged`、`semanticLabel` | 完全受控；不得持久化设置；读屏暴露 toggled 与 enabled |
-| `AppDialog` | `showInformation(title, message)`、`showConfirmation(title, message, confirmLabel)`、`showDestructive(title, message, confirmLabel)` | information 返回 `Future<void>`；另两种返回 `Future<bool>`；取消固定返回 `false`；destructive 不允许点遮罩关闭 |
-| `AppTextField` | `controller`、`label`、`focusNode`、`validator`、`forceErrorText`、`keyboardType`、`textInputAction`、`autofillHints`、`obscureText = false`、`showObscureToggle = false`、`enabled = true`、`onFieldSubmitted`、`AppIconRole? prefixIcon` | feature 持有 controller、focus 和校验；组件持有密码可见性的纯展示状态；错误文字与字段形成同一语义节点 |
-| `AppSegmentedControl<T extends Object>` | `List<AppSegment<T>> segments`、`value`、`onChanged`、`enabled = true` | `AppSegment` 只含 `value/label`；单选、受控、等宽；窄屏放入横向滚动区，不缩小文字；读屏暴露 selected |
-| `AppSelect<T extends Object>` | `label`、`value`、`List<AppSelectOption<T>> options`、`onChanged`、`enabled = true`、`validator`、`forceErrorText` | `AppSelectOption` 只含 `value/label`；不负责搜索、多选和远程加载；iOS 取消不改变值；当前值和校验错误必须被读出 |
-| `AppListTile` | `title`、`subtitle`、`AppIconRole? leadingIcon`、`Widget? trailing`、`onTap`、`enabled = true`、`selected = false` | `title/subtitle` 是字符串；trailing 只接受 Admin9 UI 控件或只读文字；装饰图标从语义树排除；不得重复朗读 title |
-| `AppSection` | `title`、`footer`、`List<Widget> children` | `title/footer` 是 nullable 字符串；不持有业务状态；不嵌套 Card；连续 section 间距使用 Token |
-| `AppNotice` | `tone`、`title`、`message`、`actionLabel`、`onAction` | `title/actionLabel/onAction` 可为空；tone 固定为 info/success/warning/error；业务文案由调用方传入；状态不只靠颜色 |
-| `AppFeedback` | `show(context, message, tone, actionLabel, onAction)` | `actionLabel/onAction` 同时为空或同时有值；同一时刻只显示一条；是否持久显示、关闭、替换和公告严格执行下述生命周期，不允许调用方指定 duration |
-| `AppPage` | `title`、`child`、`List<AppPageAction> actions`、`bodyMode = AppPageBodyMode.padded` | `actions` 默认为空；`padded` 使用标准页面内边距，`list` 让列表接管纵向滚动但仍限制内容宽度；不开放任意 padding、背景和页面 DSL |
-| `AppBottomNavigation` | `List<AppNavigationDestination> destinations`、`currentIndex`、`onSelect` | destination 只含 `label/AppIconRole`；数量 2 至 5；不创建页面、不保活、不启停资源；重复点当前 Tab 仍回调给 Shell |
+| `AppPage` / `AppPageAction` | title/body/navigationMode/actions/parentLabel/scrollable | root 禁止 back 且 parentLabel 为空；child 要求非空 parentLabel；Core 持有 page bar、安全区与滚动合同 |
+| `AppBottomNavigation` / `AppNavigationDestination` | destinations/selectedIndex/onDestinationSelected | Shell 持有 index、页面和生命周期；底栏只渲染与单次回调 |
+| `AppButton` | label/onPressed/variant/icon/enabled/loading | caller 持有任务幂等和 loading 迁移；Core 在 disabled/loading 时不派发，每次激活最多一次 |
+| `AppTextField` | controller/label/focus/validator/error/input/autofill/password/callback/icon | Business 持有文本、焦点、校验与提交；Core 只持有密码可见展示态 |
+| `AppSelect<T extends Object>` | label/value/options/onChanged/enabled/validator/error | 2-20 项字段选择；iOS Cancel 不提交，Done 回调一次；无搜索/远程/多选 |
+| `AppSegmentedControl<T extends Object>` | value/options/onChanged/enabled | 2-5 个短同级模式；不承载设置、导航或主行动 |
+| `AppSingleChoiceList<T extends Object>` | title/value/choices/onChanged/enabled | 设置主题/字号；Android radio、iOS checkmark；选择即时提交 |
+| `AppSwitch` | label/value/onChanged/enabled | caller 持有 App 偏好；整行与开关一个语义动作，不双触发 |
+| `AppListTile` | title/subtitle/icon/currentValue/onTap/states/disclosure | 尾值受压下移；导航 disclosure 由 Core 决定；不开放任意 trailing Widget；不承载业务分组 |
+| `AppSection` | title/footer/children | 页面持有顺序；无嵌套 Card，无业务状态 |
+| `AppNotice` | tone/title/message/action pair | Business 决定状态与文案；Core 只呈现 inline 状态，不替 Business 判成功 |
+| `AppFeedback` / controller/request | message/tone/action pair | App root 单一 owner；无 action 且非 accessible navigation 时 3s/5s，否则持久；关闭、替换、公告按 DS-FBK-001 |
+| `AppDialog` / controller | `showInformation(title,message)`、`showConfirmation(title,message,confirmLabel)`、`showDestructive(title,message,confirmLabel)` | Business 只经 controller 请求并等待 `Future<void/bool>`；Core 内部持有 Widget、平台呈现和焦点；取消返回 `false`，不可逆操作不可遮罩关闭 |
+| `AppActionMenu<T>` / item / controller | `showActionMenu<T>(title,items,cancelLabel)` | Business 等待 `Future<T?>`；2-6 命令，取消/系统关闭返回 `null`，一次选择最多返回一个非空值；不承担字段选择 |
+| `AppProgressIndicator` | label/kind/value | `null` 为未知，0...1 为确定；Business 持有真实进度，Core 持有渲染/Semantics |
+| `AppIconRole` | 跨平台语义枚举 | 仅含 back/close/chevronForward/home/homeSelected/account/accountSelected/settings/search/info/warning/success/error/visibility/visibilityOff/more；不暴露 `IconData` |
 
-`AppIconRole` 固定包含 `back`、`close`、`chevronForward`、`home`、`account`、`settings`、`search`、`info`、`warning`、`success`、`error`、`visibility`、`visibilityOff`、`textSize`、`contrast`、`grayscale` 和 `reduceMotion`。`AppPageAction` 固定包含 `label`、`AppIconRole icon` 和 `onPressed`。公共 API 不暴露 Material/Cupertino `IconData`。
+`forceErrorText` 非空时优先于 `validator`，直到 Business 在输入变化后显式清除。`AppFeedback` 的持久谓词为 action 存在或 `MediaQuery.accessibleNavigationOf(context)`；读屏设备必须实测该平台信号，无法证明时该设备门禁为 Unknown。新消息原子替换旧消息、取消旧 timer、保持焦点并只公告新消息一次。所有公共组件不得依赖 Provider、业务 ViewModel、实体、Repository 或服务。
 
-Dialog 固定使用“知道了”作为 information 关闭文案，使用“取消”作为 confirmation/destructive 的取消文案。确认文案由调用方通过 `confirmLabel` 提供，不能为空，也不能只用图标表达。
-
-`forceErrorText` 非空时优先于 `validator` 结果，直到 feature 在输入变化后显式清除；组件不得自行清除服务端错误状态。
-
-`AppFeedback` 的生命周期固定如下：`persistent = actionLabel != null || MediaQuery.accessibleNavigationOf(context) || SemanticsBinding.instance.semanticsEnabled`。`persistent == false` 时，info/success 在 3 秒后自动关闭，warning/error 在 5 秒后自动关闭；`persistent == true` 时不得自动关闭，必须显示使用 `AppIconRole.close` 的可见关闭控件，只能通过关闭控件、操作按钮激活或新消息替换而消失。操作按钮激活后立即封锁重复触发，只调用一次 `onAction`，随后关闭当前消息，不以回调结果决定是否关闭。新消息始终替换当前消息，无论当前消息处于瞬时态还是持久态。
-
-每条反馈的正文使用单一 `Semantics(liveRegion: true)` 节点公告 message 和 tone；出现时不得仅因公告抢走当前读屏焦点。替换时只公告新消息，不重复公告旧消息；关闭不额外播报。持久态的关闭控件和操作按钮各自使用独立语义节点，必须分别具有可读名称与可执行语义。
-
-所有公共组件必须拥有 `Key` 透传、const 可用性、light/dark/high-contrast 支持和适用状态的 Widget 测试。公共组件不得依赖 Provider、业务 ViewModel、业务实体、Repository 或接口服务。
+Dialog、ActionMenu 与 Feedback 的呈现入口分别由 `AppInteractionController` 和 `AppFeedbackController` 持有。information 返回 `Future<void>`，confirmation/destructive 返回 `Future<bool>`，所有取消路径返回 `false`；action menu 返回选择值或 `null`。关闭后恢复原焦点。Phase 0D 只可实现该已冻结合同，不得让 feature 直接持有 `BuildContext` 选择平台弹层。
 
 ## 9. 组件批次与现有迁移
 
@@ -259,9 +221,9 @@ Dialog 固定使用“知道了”作为 information 关闭文案，使用“取
 - `AppListTile`
 - `AppSection`
 - `AppSwitch`
-- `AppSegmentedControl`
-- `AppSelect`
+- `AppSingleChoiceList`
 - `AppFeedback`
+- `AppProgressIndicator`
 - 内部平台图标映射
 
 第二批通用操作：
@@ -270,8 +232,9 @@ Dialog 固定使用“知道了”作为 information 关闭文案，使用“取
 - `AppDialog`
 - `AppTextField`
 - `AppNotice`
+- `AppActionMenu`
 
-出现真实消费者后再增加：Checkbox、Radio、DatePicker、Empty、Result、Tag、Avatar、文件选择、图片选择、图表和富文本适配器。
+`AppSelect` 与 `AppSegmentedControl` 合同已冻结，但没有当前消费者；出现真实消费者时在同一变更中实现、补 Gallery/测试/设备证据。之后仍只按真实消费者增加 Checkbox、DatePicker、Empty、Result、Tag、Avatar、文件选择、图片选择、图表和富文本适配器。
 
 ### 9.2 迁移表
 
@@ -281,13 +244,15 @@ Dialog 固定使用“知道了”作为 information 关闭文案，使用“取
 | `SettingsSection` | `AppSection` |
 | `UnavailableNotice` | `AppNotice`，业务文案移回 feature |
 | `FilledButton` / `OutlinedButton` / `TextButton` | 对应 variant 的 `AppButton` |
-| `SwitchListTile` | `AppListTile` + `AppSwitch` |
+| `SwitchListTile` | 单一 `AppSwitch` 行；标签、状态和点击由一个语义动作承载，不与 `AppListTile` 嵌套 |
 | `TextFormField` | `AppTextField` |
 | `SegmentedButton` | `AppSegmentedControl` |
 | `DropdownButton` | `AppSelect` |
 | `NavigationBar` | `AppBottomNavigation` |
 | `SnackBar` | `AppFeedback` |
-| `AppRoutes` + `MaterialPageRoute` | 保留路由入口和默认 builder，补齐手势测试 |
+| 离散操作 bottom sheet / action sheet | `AppActionMenu` |
+| `CircularProgressIndicator` / `LinearProgressIndicator` | `AppProgressIndicator` |
+| Core 内 `AppRoutes` 业务路由组合 + `MaterialPageRoute` | 业务路由组合移至 App host；Core 只导出导航原语；继续使用平台默认 builder |
 
 Phase 0 必须用 `rg` 查清当前仓库内消费者。没有仓库外消费者时直接迁移并删除旧实现；只有真实跨阶段消费者存在时才建立带替代说明和删除里程碑的 `@Deprecated` 包装。
 
@@ -297,7 +262,7 @@ Phase 0 必须用 `rg` 查清当前仓库内消费者。没有仓库外消费者
 2. Android Shell 固定使用 `Scaffold(body: IndexedStack, bottomNavigationBar: AppBottomNavigation)`；iOS Shell 固定使用 `CupertinoPageScaffold`，在纵向布局中依次放置 `Expanded(IndexedStack)` 和 `AppBottomNavigation`。`CupertinoTabScaffold` 不进入首期，避免把页面所有权交给底栏组件。
 3. `AppBottomNavigation` 只渲染平台底栏并上报选择事件。
 4. Android 和 iOS 都保留当前两个一级目的地“首页”“我的”；两个目的地是已确认产品结构，不为迎合组件建议增加占位 Tab。
-5. 子页面统一经现有 `AppRoutes` 创建 `MaterialPageRoute`。
+5. Phase 0D 将现有 `AppRoutes` 的业务路由组合移至 App host；Core 只提供导航原语。子页面由 App host 创建 `MaterialPageRoute` 并保留平台默认 builder。
 6. iOS 使用默认 Cupertino 转场和边缘返回；Android 使用默认 predictive-back 转场。
 7. 根页不能返回；子页返回后仍停留在进入前的 Tab，Tab 页面状态和滚动位置不丢失。
 8. Dialog、Picker 和 modal sheet 先关闭自身，再允许页面返回。
@@ -307,16 +272,16 @@ Android `Scaffold` 和 iOS `CupertinoPageScaffold` 都启用键盘避让。子�
 
 ## 11. 实施阶段与门禁
 
-### Phase 0：盘点、签名冻结与证据基线
+### Phase 0D：实施声明与机器门禁（需另行授权）
 
-- 核对所有 UI 使用点和仓库内消费者。
-- 将第 8 节契约落实为逐组件 Dart API 草案，不写实现代码。
-- 记录首页、我的、设置、认证表单和隐私门禁的双端基线截图。
-- 记录当前 light/dark、高对比度、字体缩放、返回和键盘行为。
-- 确认 Flutter、Dart、Android SDK、iOS deployment target 与本文 SDK 基线一致。
-- 按最终迁移清单重新校准工期。
+- 以已通过的非导出 declaration probe 为输入，建立真实实现 probe，冻结 token lookup、Dialog、ActionMenu 和 Feedback 的 Core 呈现入口；禁止 `throw`、`external`、占位 Widget 和假服务。
+- 创建 `lib/core/design_system/`、真实 `lib/admin9_ui.dart` 与 Brand entry 时同步建立 analyzer AST 导入边界测试及正反 fixtures；禁止空 barrel。
+- 将业务路由组合从 Core `AppRoutes` 移至 App host，并以 AST 门禁证明 Core 不导入 feature 页面、模型或服务；Core 只保留导航原语。
+- 在派生项目模板中放置符合 schema 的 `admin9-foundation.yaml`，运行 validator；当前仓库不因本规范提交虚构自己是派生项目。
+- 固定 Gallery route registry 的 debug/profile 注册和 release 缺席测试接口，但不实现任何组件视觉。
+- 更新兼容表为实际实现 commit；设备不可用项继续记录 Unknown。
 
-退出门禁：迁移清单、API 草案、设备清单和基线证据齐全；不得遗留影响 Phase 1 至 Phase 3 的产品选择。
+退出门禁：declaration/implementation probes、manifest validator、AST import fixtures 和 Gallery release 门禁均有可执行命令；AST 证明 Core 无业务路由组合和 feature 依赖；公共 API 无待选签名；仍不得迁移页面或实现视觉。
 
 ### Phase 1：主题、系统偏好、本地化与 Gallery 骨架
 
@@ -327,11 +292,11 @@ Android `Scaffold` 和 iOS `CupertinoPageScaffold` 都启用键盘避让。子�
 - 增加 `flutter_localizations` 与固定 `zh_CN` 配置。
 - 建立仅 debug/profile 可达的 Gallery 路由和状态切换壳。
 
-退出门禁：主题单元/Widget 测试通过；系统偏好运行时变化能够重建；默认路由 builder 未被替换；Gallery 在 release 不注册路由。
+退出门禁：A-L 矩阵中的基础/主题行通过；系统偏好运行时变化能够重建；默认路由 builder 未被替换；Gallery AST、profile 可达、release build 与安装包不可达四项证据齐全。
 
 ### Phase 2：平台骨架与导航
 
-- 实现 `AppPage`、`AppBottomNavigation`、`AppFeedback` 和平台图标映射。
+- 实现 `AppPage`、`AppBottomNavigation`、`AppFeedback`、`AppProgressIndicator` 和平台图标映射。
 - 将 Shell、顶部标题栏、底部导航和现有反馈接入 Admin9 UI。
 - 覆盖 iOS 边缘返回完成/取消、普通系统返回前后的路由与 Tab 状态；在 Android API 34+ 模拟器或真机完成人工 predictive back 开始、可见进度、取消和完成硬门禁。
 
@@ -339,7 +304,7 @@ Android `Scaffold` 和 iOS `CupertinoPageScaffold` 都启用键盘避让。子�
 
 ### Phase 3：设置页端到端试点
 
-- 实现 `AppListTile`、`AppSection`、`AppSwitch`、`AppSegmentedControl` 和 `AppSelect`。
+- 实现 `AppListTile`、`AppSection`、`AppSwitch` 和 `AppSingleChoiceList`。
 - 完成“首页/我的切换 → 进入设置 → 修改主题与辅助功能 → 返回”的完整任务链。
 - 验证重启后偏好持久化，返回后 Tab 和页面状态正确。
 - 在 Gallery 展示每个组件的 variants、states、平台、主题、高对比度和字号。
@@ -348,7 +313,7 @@ Android `Scaffold` 和 iOS `CupertinoPageScaffold` 都启用键盘避让。子�
 
 ### Phase 4：按钮、弹窗、输入与通用页面
 
-- 实现 `AppButton`、`AppDialog`、`AppTextField` 和 `AppNotice`。
+- 实现 `AppButton`、`AppDialog`、`AppTextField`、`AppNotice` 和 `AppActionMenu`。
 - 迁移认证表单、账户页、隐私门禁、法务、关于和联系方式页面。
 - 保持路由、校验、隐私、会话和未接入服务边界不变。
 - 表单覆盖键盘、autofill、密码、错误聚焦、最长中文文案和防重复提交。
@@ -376,17 +341,18 @@ Android `Scaffold` 和 iOS `CupertinoPageScaffold` 都启用键盘避让。子�
 
 ### 12.1 自动化覆盖
 
-公共组件测试必须覆盖：
+公共组件与页面模式必须使用 Design System [A-L 唯一矩阵](../design-system/06-accessibility-quality.md#ds-rsp-001)，本文不定义第二套组合。每个已实现 Core 组件和三张参考页面模式都执行 A-L；无文字组件仍在每一行验证 bounds、焦点和状态。组件测试另外覆盖：
 
 - Android 与 iOS target platform；组件存在平台分支时两端都断言底层类型。
-- light、dark、高对比度以及有效系统偏好变化。
+- light、dark、高对比度以及有效系统偏好变化；缺失 A-L 任一要求即失败。
 - 契约中适用的 normal、disabled、loading、error、destructive、selected 状态。
-- 系统默认字号、App `1.12/1.24` 倍、Android 200% 和 iOS 最大辅助功能字号。
+- App `1.00/1.12/1.24` 与 synthetic system scaler `1.0/2.0/3.0` 的精确组合；synthetic case 不冒充真实 Android/iOS 最大字号。
 - Semantics 的 label、role、value/state、enabled、selected/toggled 和 action。
-- Widget 测试固定设置 320、360、390、600 逻辑像素宽度与一个手机横屏尺寸，断言无 overflow、裁切和操作入口丢失。
-- 减少动态效果开启后不播放非必要动画；iOS 边缘返回自动化仍覆盖开始、取消和完成，Android integration test 只覆盖普通返回事件前后的应用状态。
+- Widget 测试按 A-L 固定 320、360、390、600 与 844x390，断言无 overflow、裁切、重叠、操作入口或滚动终点丢失。
+- 减少动态效果开启后不播放非必要动画；Android/iOS integration test 只验证普通返回事件前后的应用状态。iOS edge-back 的开始、进度、取消、完成和 Android predictive back 四阶段都由对应模拟器/真机人工录像硬门禁证明，自动化不得冒充系统手势证据。
 - 系统 bold text 开启后不截字、不改变语义顺序，外接键盘 Tab/Shift+Tab、Enter/Space 和 Escape 行为符合组件角色。
-- `AppFeedback` Widget 测试覆盖：无操作且无无障碍导航时 3 秒/5 秒到期；存在操作按钮、`accessibleNavigation == true`、`semanticsEnabled == true` 时分别持久显示；关闭控件、操作回调仅一次、回调后关闭和新消息替换；同时断言 live region、消息标签、关闭/操作语义以及替换时只保留新消息。
+- `AppFeedback` Widget 测试覆盖：无操作且 `accessibleNavigation == false` 时 3 秒/5 秒到期；存在操作按钮或 `accessibleNavigation == true` 时持久显示；关闭控件、操作回调仅一次、回调后关闭和新消息原子替换；同时断言 live region、焦点不被抢走、消息标签、关闭/操作语义以及替换时只公告新消息。
+- `AppActionMenu` 覆盖 2/6 项、disabled、destructive、取消、焦点、一次选择与两端 sheet 类型；`AppProgressIndicator` 覆盖 circular/linear、indeterminate、0/45/100%、label/value Semantics 和 reduced motion。
 
 业务 Widget 与 integration test 固定使用稳定 Key、可见文字、Semantics 和结果状态定位。只有 Admin9 UI 自身的组件测试可以用 `find.byType` 断言 Material/Cupertino 底层映射。
 
@@ -394,7 +360,7 @@ iOS 边缘返回测试不得在拖动失败后调用系统返回作为兜底；�
 
 Golden 只覆盖以下代表组合，不做全矩阵笛卡尔积：
 
-- 核心组件 Gallery：Android light、iOS light、Android high-contrast dark、iOS 最大字号。
+- 核心组件 Gallery：A、F、G、L 及每个组件的关键状态。
 - 代表页面：首页、设置、认证表单和隐私门禁。
 - Golden 只作为视觉回归证据，不能替代对比度、Semantics 和真机手势测试。
 
@@ -404,6 +370,12 @@ Golden 只覆盖以下代表组合，不做全矩阵笛卡尔积：
 
 ```bash
 dart format --output=none --set-exit-if-changed lib test integration_test
+dart format --output=none --set-exit-if-changed tool
+dart run tool/design_system/validate_foundation_manifest.dart --fixtures
+flutter analyze tool/design_system/design_system_contract_probe.dart
+dart run tool/design_system/verify_rule_links.dart
+node tool/design_system/verify_documentation.mjs
+node docs/design-system/evidence/sources/verify_visual_references.mjs docs/design-system/evidence/visual-references
 flutter analyze
 flutter test -r expanded
 
@@ -467,7 +439,7 @@ Gallery 只在 debug/profile 构建注册入口，release 构建不得注册路�
 
 不得迁入：六套融媒体色板、频道渐变、媒体尺寸、直播规格、全平台强制 Apple 字体、Material-only iOS 控件、页面 DSL、Shell 状态、播放器生命周期和客户业务能力。
 
-归档中的测试数量和覆盖率是历史证据，不替代 v1.1 当前 SHA 的验收。实施阶段不恢复、合并或整体复制归档代码。
+归档中的测试数量和覆盖率是历史证据，不替代 v1.2 实施门禁。实施阶段不恢复、合并或整体复制归档代码。
 
 ## 15. 第三方依赖与 package 边界
 
@@ -496,13 +468,14 @@ Gallery 只在 debug/profile 构建注册入口，release 构建不得注册路�
 
 ## 17. 工作量基线
 
-- Phase 0 盘点、API 签名和证据：1 至 2 个工作日。
-- 主题、系统偏好、本地化和 Gallery 骨架：2 至 3 个工作日。
-- 平台骨架、导航和设置试点：4 至 6 个工作日。
-- 表单、操作组件和通用页面迁移：4 至 7 个工作日。
-- 自动化、真机验收、修正和文档：4 至 8 个工作日。
+- Phase 0D 真实声明、schema/validator 接入、AST fixtures 和 Gallery release gate：3 至 5 个工作日。
+- Foundations、系统偏好、本地化和平台主题桥：5 至 7 个工作日。
+- 首批平台组件、Shell、设置试点、ActionMenu/Progress：10 至 14 个工作日。
+- Gallery、参考 fixtures、Goldens 和 A-L 自动化：4 至 6 个工作日。
+- 认证及其余通用页面迁移：5 至 8 个工作日。
+- 双端设备/无障碍验收、修正和交付文档：4 至 7 个工作日。
 
-单人完整基础版预计 15 至 26 个工作日，其中包含 2 至 4 个工作日的双端验收与修正缓冲。该估算不包含新业务页面、专项第三方组件、签名证书故障和设备不可用。Phase 0 必须按最终消费者数量与可用设备重新校准，但不得通过删除 P1 验收项压缩工期。
+单人完整基础版预计 31 至 47 个工作日。两名协调工程师可以缩短经过时间，但视觉校准、API 门禁和设备验收仍需串行收口。该估算不包含新业务页面、无消费者的 Select/Segmented 实现、专项第三方组件、签名证书故障和设备不可用；不得通过删除 P1 门禁压缩工期。
 
 ## 18. 变更控制
 
@@ -518,7 +491,8 @@ Flutter SDK 升级后必须重新核对默认 `PageTransitionsTheme`、Android t
 
 ## 19. 变更记录
 
-- 2026-07-29：建立 Draft，记录 Admin9 UI、`App*` 命名和 Material/Cupertino 自适应方向。
+- 2026-07-29：建立初始工作版本，记录 Admin9 UI、`App*` 命名和 Material/Cupertino 自适应方向。
 - 2026-07-29：完成西昌归档评审与二次复核，形成 v1.0 正式实施计划。
 - 2026-07-29：依据六角色终审和对抗式复查修订为 v1.1；固定平台组件映射与产品基线，补齐系统辅助功能合并、字体缩放、gesture-preserving reduced motion、Android edge-to-edge/predictive back、组件契约、阶段顺序、设备测试命令和量化验收标准。
 - 2026-07-29：收口 v1.1 侧边验收；固定 `AppFeedback` 无障碍持久态、Android predictive back 人工硬门禁证据和 Widget/iOS 模拟器宽度职责。
+- 2026-07-29：同步 Admin9 Design System v1.0，形成 v1.2 下游计划；替换旧 Token，补齐 schema/validator、declaration probe、`AppSingleChoiceList`、`AppActionMenu`、`AppProgressIndicator`、A-L 自动化矩阵、Gallery release 门禁和 31-47 工作日工期。

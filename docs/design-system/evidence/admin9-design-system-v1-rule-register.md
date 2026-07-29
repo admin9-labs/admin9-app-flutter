@@ -1,0 +1,28 @@
+# Admin9 Design System v1.0 Normative Rule Register
+
+Stable IDs are never reused. Each ID links to exactly one explicit HTML anchor in the normative module. Verification and deviation records MUST cite the ID, not only a heading or prose fragment. Run `dart run tool/design_system/verify_rule_links.dart` to check ID uniqueness, target files, anchors, schema-field links, and test-gate links.
+
+| Rule | Layer/platform | Frozen default and override boundary | Machine/test association |
+| --- | --- | --- | --- |
+| [DS-GOV-001](../README.md#ds-gov-001) | Core/both | this directory is the only authority; change only by versioned DS review | rule-link verifier; acceptance report |
+| [DS-CLR-001](../01-foundations.md#ds-clr-001) | Core+Brand/both | semantic palette; Brand only verified primary/secondary pairs | visual calibration contrast table; Golden/device later |
+| [DS-TYP-001](../01-foundations.md#ds-typ-001) | Core/both | system font; App `1.00/1.12/1.24`; no total cap | visual generator; matrix E/F/J/K/L; device max text |
+| [DS-SPC-001](../01-foundations.md#ds-spc-001) | Core+Brand/both | spacing scale and 6/8 radii; Brand radius +/-2 only | visual generator; responsive Widget rows A-L |
+| [DS-MOT-001](../01-foundations.md#ds-mot-001) | Core/both | local motion tokens; platform route builders retained | Widget transition assertion; device gestures |
+| [DS-TOK-001](../01-foundations.md#ds-tok-001) | Core/both | immutable semantic facade; no raw Material/Cupertino styles | declaration and future import-boundary probes |
+| [DS-PLT-001](../02-platform-adaptation.md#ds-plt-001) | Core/both | unique Android/iOS mapping; no feature platform branch | target-platform Widget tests; device matrix |
+| [DS-NAV-001](../02-platform-adaptation.md#ds-nav-001) | Core/both | one host, Shell owns tabs, default route builders | navigation integration; edge/predictive device gates |
+| [DS-CMP-001](../03-components.md#ds-cmp-001) | Core/both | frozen controlled `App*` declarations and state ownership | `tool/design_system/design_system_contract_probe.dart` |
+| [DS-INP-001](../03-components.md#ds-inp-001) | Core+Business/both | persistent labels, local errors, ordered focus/autofill | matrix A-L; IME/reader device gate |
+| [DS-FBK-001](../03-components.md#ds-fbk-001) | Core/both | 3s/5s transient or action/accessibility persistent | lifecycle Widget matrix and reader walkthrough |
+| [DS-CMP-002](../03-components.md#ds-cmp-002) | Core/both | `AppActionMenu<T>` is 2-6 commands, not selection | declaration probe; Gallery menu states; sheet device gate |
+| [DS-CMP-003](../03-components.md#ds-cmp-003) | Core/both | labelled determinate/indeterminate progress | declaration probe; semantics/Golden/reduced-motion tests |
+| [DS-PAT-001](../04-page-patterns.md#ds-pat-001) | Core+Business/both | page patterns, not templates, schemas, or DSL | reference flows, responsive fixtures, device tasks |
+| [DS-DER-001](../05-derived-project-contract.md#ds-der-001) | all/both | provenance, fixed paths/export, exact source policy | schema fields `foundation`, `designSystem`, `app`, `brandConfiguration`, `toolchain`, `ownership`, `exports`, `compatibility`, `provenance`, `deviations`; compatibility registry |
+| [DS-SHR-001](../05-derived-project-contract.md#ds-shr-001) | Business then Core/both | feature -> `lib/ui/shared/` -> evidence-based Core request | consumer inventory and DS owner review |
+| [DS-ACC-001](../06-accessibility-quality.md#ds-acc-001) | Core/Android | 48dp, WCAG 4.5/3, system text and assistive tech | Widget geometry/semantics; TalkBack/Switch Access |
+| [DS-ACC-002](../06-accessibility-quality.md#ds-acc-002) | Core/iOS | 44pt, WCAG 4.5/3, Dynamic Type and assistive tech | Widget geometry/semantics; VoiceOver/Switch Control |
+| [DS-RSP-001](../06-accessibility-quality.md#ds-rsp-001) | Core/both | canonical automated rows A-L | exact matrix coverage report; device actual-width record |
+| [DS-GAL-001](../06-accessibility-quality.md#ds-gal-001) | Core/both | Gallery debug/profile only; release absent | AST route test, profile reachability, release build/device denial |
+| [DS-UPG-001](../06-accessibility-quality.md#ds-upg-001) | all/both | SDK/DS compatibility must be revalidated | manifest compatibility fields; upgrade checklist |
+| [DS-DEV-001](../06-accessibility-quality.md#ds-dev-001) | all/both | documented expiring deviations; no downward accessibility deviation | schema `deviations[]`; PR expiry gate |

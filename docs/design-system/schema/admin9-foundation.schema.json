@@ -1,0 +1,186 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://admin9.local/schemas/admin9-foundation-v1.schema.json",
+  "title": "Admin9 Foundation provenance manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "foundation",
+    "designSystem",
+    "app",
+    "brandConfiguration",
+    "toolchain",
+    "ownership",
+    "exports",
+    "compatibility",
+    "deviations",
+    "provenance"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "foundation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["commit", "tag", "upstreamRemote"],
+      "properties": {
+        "commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
+        "tag": { "type": ["string", "null"], "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$" },
+        "upstreamRemote": { "type": ["string", "null"], "pattern": "^https://[^ ]+$" }
+      }
+    },
+    "designSystem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "sourceTag"],
+      "properties": {
+        "version": { "const": "1.0.0" },
+        "sourceTag": { "const": "design-system-v1.0.0" }
+      }
+    },
+    "app": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version", "androidApplicationId", "iosBundleId"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:[-+][0-9A-Za-z.-]+)?$" },
+        "androidApplicationId": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_]*(?:\\.[A-Za-z][A-Za-z0-9_]*)+$" },
+        "iosBundleId": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9-]*(?:\\.[A-Za-z0-9][A-Za-z0-9-]*)+$" }
+      }
+    },
+    "brandConfiguration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["themeVersion", "themeSha256", "primaryPair", "secondaryPair", "approvedFont", "radiusDelta", "logoPath", "logoSha256", "launchAssetPath", "launchAssetSha256"],
+      "properties": {
+        "themeVersion": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+        "themeSha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "primaryPair": { "$ref": "#/$defs/colorPair" },
+        "secondaryPair": { "$ref": "#/$defs/colorPair" },
+        "approvedFont": { "type": ["string", "null"], "minLength": 1 },
+        "radiusDelta": { "type": "integer", "minimum": -2, "maximum": 2 },
+        "logoPath": { "type": "string", "pattern": "^assets/(?!\\.{1,2}(?:/|$))[A-Za-z0-9_.-]+(?:/(?!\\.{1,2}(?:/|$))[A-Za-z0-9_.-]+)*$" },
+        "logoSha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "launchAssetPath": { "type": "string", "pattern": "^assets/(?!\\.{1,2}(?:/|$))[A-Za-z0-9_.-]+(?:/(?!\\.{1,2}(?:/|$))[A-Za-z0-9_.-]+)*$" },
+        "launchAssetSha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      }
+    },
+    "toolchain": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["flutter", "dart"],
+      "properties": {
+        "flutter": { "const": "3.44.1" },
+        "dart": { "const": "3.12.1" }
+      }
+    },
+    "ownership": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["core", "brand", "business"],
+      "properties": {
+        "core": { "$ref": "#/$defs/ownerPath" },
+        "brand": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["owner", "path", "allowedOverrides"],
+          "properties": {
+            "owner": { "type": "string", "minLength": 1 },
+            "path": { "const": "lib/app/brand/" },
+            "allowedOverrides": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": {
+                "enum": ["primaryPair", "secondaryPair", "logo", "launchAssets", "approvedFont", "radiusCharacter"]
+              }
+            }
+          }
+        },
+        "business": { "$ref": "#/$defs/businessOwnerPath" }
+      }
+    },
+    "exports": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["public", "brandEntry", "coreInternal"],
+      "properties": {
+        "public": { "const": "lib/admin9_ui.dart" },
+        "brandEntry": { "const": "lib/app/brand/app_brand_theme.dart" },
+        "coreInternal": { "const": "lib/core/design_system/" }
+      }
+    },
+    "compatibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["designSystemRange", "foundationPolicy"],
+      "properties": {
+        "designSystemRange": { "const": ">=1.0.0 <2.0.0" },
+        "foundationPolicy": { "const": "exact-commit" }
+      }
+    },
+    "deviations": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/deviation" }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["generatedBy", "generatedAt"],
+      "properties": {
+        "generatedBy": { "type": "string", "minLength": 1 },
+        "generatedAt": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$" }
+      }
+    }
+  },
+  "$defs": {
+    "ownerPath": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["owner", "path"],
+      "properties": {
+        "owner": { "type": "string", "minLength": 1 },
+        "path": { "const": "lib/core/design_system/" }
+      }
+    },
+    "businessOwnerPath": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["owner", "path", "sharedPath"],
+      "properties": {
+        "owner": { "type": "string", "minLength": 1 },
+        "path": { "const": "lib/ui/features/" },
+        "sharedPath": { "const": "lib/ui/shared/" }
+      }
+    },
+    "deviation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ruleId", "reason", "owner", "coreApprover", "scope", "affectedApps", "platforms", "userImpact", "accessibilityImpact", "evidence", "startsOn", "expiresOn", "recoveryCondition"],
+      "properties": {
+        "ruleId": { "type": "string", "pattern": "^DS-[A-Z]{3}-[0-9]{3}$" },
+        "reason": { "type": "string", "minLength": 1 },
+        "owner": { "type": "string", "minLength": 1 },
+        "coreApprover": { "type": "string", "minLength": 1 },
+        "scope": { "type": "string", "minLength": 1 },
+        "affectedApps": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+        "platforms": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "enum": ["android", "ios"] } },
+        "userImpact": { "type": "string", "minLength": 1 },
+        "accessibilityImpact": { "type": "string", "minLength": 1 },
+        "evidence": { "type": "string", "minLength": 1 },
+        "startsOn": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
+        "expiresOn": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
+        "recoveryCondition": { "type": "string", "minLength": 1 }
+      }
+    },
+    "colorPair": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["light", "dark"],
+      "properties": {
+        "light": { "type": "string", "pattern": "^#[0-9A-F]{6}$" },
+        "dark": { "type": "string", "pattern": "^#[0-9A-F]{6}$" }
+      }
+    }
+  }
+}

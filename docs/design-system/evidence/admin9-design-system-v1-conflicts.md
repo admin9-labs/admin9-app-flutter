@@ -1,0 +1,28 @@
+# Admin9 Design System v1.0 Conflict Register
+
+All specification conflicts below have one v1.0 ruling. A runtime conflict may remain an explicitly assigned implementation/device Unknown, but no row reopens the product decision.
+
+| Source/state | Conflict | v1.0 ruling | Downstream change | Verification/status |
+| --- | --- | --- | --- | --- |
+| old plan v1.1 fixed seed/colors/spacing/radii/heights/motion | Phase 0C required calibration | DS palette, spacing `4/8/12/16/24/32/48`, field radius 6, control radius 8, content growth and 0/120/200/160 motion are authoritative | plan v1.2 links Foundations and retires old values | contrast/assets Pass; runtime Unknown |
+| old fixed Admin9 colors | derived apps own customer brand | Core fixes semantic relationships; Brand may replace verified primary/secondary pairs and approved assets/font/radius character only | schema allowlist and Brand entry fixed | validator rejects unauthorized override |
+| plan called itself unique/final authority | Phase 0 report/API remained Revise | DS v1.0 is authority; plan v1.2 is downstream | title, authority and conflict order updated | rule/link verifier |
+| “Admin9 UI” appeared parallel to Design System | duplicate authority | Admin9 Design System is the system; Admin9 UI is its Flutter implementation layer | terminology updated | document scan |
+| repository-local Core | clones and possible future package | remain local under `lib/core/design_system/`; provenance governs clones; package only on explicit trigger | paths/schema/upgrade rules fixed | validator and later AST imports |
+| Phase 0C Gate 1 was structure-only | visual/device/implementation were Unknown | commit `e473dab` stays low-fidelity evidence; regenerated v1 boards freeze visual direction, not runtime truth | visual manifest and labels distinguish design evidence | static Pass; device/runtime Unknown |
+| current `AppTextScaler` clamps at 2.0 | weakens system scaling | `system.scale(base) * 1.00/1.12/1.24`, no total cap | plan and A-L matrix synchronized | declaration/static Pass; runtime/device Unknown |
+| visual field radius 6 vs old prose radius 4 | conflicting token evidence | field/notice 6; button/dialog/sheet/group 8; Brand +/-2 only | generator, Foundations, plan synchronized | visual verifier Pass |
+| “large text” generic boards | no exact Extra Large evidence | third fixture uses exact semantic font size x1.24 and content-grown bounds | generator, visual record and A-L E/F/J/K/L synchronized | static asset Pass |
+| matrix differed across documents | missing combinations could pass | one A-L matrix in Accessibility; all other modules link it | components and plan no longer duplicate a second matrix | rule/link and document review Pass |
+| `AppActionMenu` and `AppProgressIndicator` absent | known shared interactions had no Core contract | both added to mapping, component rules, probe, Gallery states, tests and schedule | plan phases/migration updated | declaration probe Pass; runtime Unknown |
+| manifest was prose-only | clones could record invalid provenance | JSON Schema, approved compatibility registry, canonical brand/asset SHA-256 evidence, dependency-free Dart validator, assets-subtree containment, and exact calendar/UTC validation; JSON syntax is canonical YAML 1.2 | schema, 1 valid and 11 invalid fixtures cover shape, authority, traversal, brand drift, compatibility, rule and date failures | all fixtures Pass expected outcomes |
+| rules had IDs without section links | deviations/tests not traceable | every stable ID links one explicit anchor plus machine/test association | rule-link verifier added | verifier Pass |
+| current source is Material-only | target requires Cupertino-visible iOS behavior | platform branching only in Core/Shell with one mapping | future implementation/migration only | target Widget/device Unknown |
+| current reduced-motion `_NoTransitionBuilder` | breaks system back builders | retain platform navigation builders; suppress only local/decorative motion | Phase 1 removal and tests | runtime/device Unknown |
+| business tests locate Material types | test leaks implementation | only DS tests assert bottom types; Business uses Key/text/Semantics/result | future AST/test migration | runtime Unknown |
+| settings used Select/Segmented | approved pattern requires single-choice list | settings uses `AppSingleChoiceList<T>`; Select/Segmented contracts stay frozen until real consumers | plan phases/contracts updated | declaration Pass; runtime Unknown |
+| icon roles mixed navigation state and page-specific settings nouns | selected navigation glyphs were ambiguous while settings taxonomy leaked to Core | Core includes explicit `homeSelected`/`accountSelected` and ends at `more`; settings icons stay Business | authoritative platform table, full probe map, components and plan synchronized | declaration Pass |
+| static facade cannot be abstract honestly | old probe expected callable static declarations | v1.0 uses abstract widget/controller/value declarations; Phase 0D freezes real lookup/presentation with an implementation probe | no `throw`, `external`, placeholder or empty barrel | declaration probe Pass |
+| Core routes import feature views/models | reverse dependency | route composition moves to App host; Core exposes primitives only | future analyzer AST positive/negative fixtures | runtime Unknown |
+
+No row authorizes runtime implementation. Unknowns have a fixed Phase 0D, Phase 1, migration, or device gate and do not weaken v1.0 rules.
