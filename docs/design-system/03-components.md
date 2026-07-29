@@ -4,19 +4,21 @@
 
 All components belong to Core, accept semantic data, and expose controlled state unless explicitly stated. They do not read ViewModels, entities, repositories, services, session, permissions, or business copy. `Key` is supported through normal Widget construction. Feature tests locate behavior by stable keys, visible text, semantics, and result state; only Design System tests assert Material/Cupertino implementation types.
 
-Feature composition receives semantic values only through the future read-only `AppDesignTokens` contract. The implementation lookup mechanism is Core-owned and MUST be frozen by the Phase 0D implementation probe before it enters `lib/admin9_ui.dart`; v1.0 does not falsely specify a static abstract Dart method. The facade exposes Admin9 semantic values, not `ThemeData`, `CupertinoThemeData`, mutable styles, component internals, or arbitrary raw-value escape hatches.
+Feature composition receives semantic values only through the read-only `AppDesignTokens` contract and `AppDesignScope`. The Core-owned lookup mechanism is frozen by the Phase 0D implementation probe and exported from `lib/admin9_ui.dart`; v1.0.1 does not falsely specify a static abstract Dart method. The facade exposes Admin9 semantic values, not `ThemeData`, `CupertinoThemeData`, mutable styles, component internals, or arbitrary raw-value escape hatches.
 
 <a id="ds-cmp-001"></a>
 
-The v1.0 consumer shapes live in the non-exported [contract probe](../../tool/design_system/design_system_contract_probe.dart). Its abstract Widgets deliberately avoid fake runtime bodies. `flutter analyze tool/design_system/design_system_contract_probe.dart` proves Flutter 3.44.1/Dart 3.12.1 can express every frozen name, constructor parameter, generic bound, nullability, `Key`, callback, controlled-state owner, enum, and immutable value object. It does not prove that a consumer can instantiate a runtime Widget. Phase 0D replaces abstract probe shapes with same-named concrete implementations without changing those frozen consumer-facing shapes; its implementation probe is the first instantiability evidence.
+The v1.0 consumer shapes live in the non-exported [contract probe](../../tool/design_system/design_system_contract_probe.dart). Its abstract Widgets deliberately avoid fake runtime bodies. `flutter analyze tool/design_system/design_system_contract_probe.dart` proves Flutter 3.44.1/Dart 3.12.1 can express every frozen name, constructor parameter, generic bound, nullability, `Key`, callback, controlled-state owner, enum, and immutable value object. It does not prove that a consumer can instantiate a runtime Widget.
+
+v1.0.1 fixes the implementation boundary without changing those shapes: Phase 0D makes the value objects, controller interfaces, immutable token lookup scope, Brand entry, Gallery registry seam, and import boundary real. The [implementation probe](../../tool/design_system/design_system_implementation_probe.dart) instantiates those non-visual mechanisms through `lib/admin9_ui.dart`. Each concrete visual Widget replaces its abstract declaration only in its assigned Phase 1-4 and is exported in that same change, with constructor parity and instantiation evidence. Phase 0D does not manufacture a presentation Widget to satisfy an early gate.
 
 ### 1.1 Public export matrix
 
-| Public from `lib/admin9_ui.dart` | Core-internal presentation type | Rule |
+| Public from `lib/admin9_ui.dart` when owning phase completes | Core-internal presentation type | Rule |
 | --- | --- | --- |
 | concrete `AppPage`, `AppBottomNavigation`, `AppButton`, `AppTextField`, `AppSelect`, `AppSegmentedControl`, `AppSingleChoiceList`, `AppSwitch`, `AppListTile`, `AppSection`, `AppNotice`, `AppProgressIndicator` | platform implementation classes | consumers instantiate only the public semantic Widget |
-| `AppInteractionController`, `AppInteractionControllerOf`, `AppActionMenuItem<T>` | `AppDialog`, `AppActionMenu<T>` presentation Widgets | Business invokes controller methods and awaits results; presentation Widgets are Gallery/Core implementation details and are not exported |
-| `AppFeedbackController`, `AppFeedbackRequest` | `AppFeedback` app-root presentation Widget | app host installs the internal presenter; Business only submits/dismisses requests through the controller |
+| `AppInteractionController`, `AppInteractionControllerOf`, `AppInteractionHost`, `AppActionMenuItem<T>` | `AppDialog`, `AppActionMenu<T>` presentation Widgets | Phase 0D provides the non-visual lookup host; Phase 4 installs the real controller; Business invokes controller methods and awaits results |
+| `AppFeedbackController`, `AppFeedbackRequest`, `AppFeedbackHost` | `AppFeedback` app-root presentation Widget | Phase 0D provides the non-visual lookup host; Phase 2 installs the real presenter/controller; Business only submits/dismisses requests through it |
 | `AppPageAction`, `AppNavigationDestination`, `AppSelectOption<T>`, `AppChoice<T>`, enums and `AppDesignTokens` read-only facade | platform icon/token resolvers | values contain no raw Material/Cupertino types |
 
 The component names `AppDialog`, `AppActionMenu`, and `AppFeedback` remain normative Core capabilities even though their presentation Widgets are internal. There is one Business entry for each behavior, never a controller/Widget choice.
@@ -90,13 +92,13 @@ Information dialogs have exactly one closing action and no cancel label. Confirm
 
 Phase 0D MUST:
 
-- implement the frozen declarations without `throw`, `external`, placeholder Widgets, or fake services;
-- freeze the Core-owned lookup/presentation mechanism for tokens, dialogs, action menus, and feedback with a second implementation probe before public export;
+- implement and export the frozen non-visual value objects, enums, controller interfaces, and `AppDesignScope` without unimplemented/placeholder `throw`, `external`, placeholder Widgets, or fake services; a missing required host fails with a named `FlutterError` as a configuration precondition;
+- freeze the Core-owned token lookup and controller contract mechanism with a second implementation probe; actual dialog, action-menu, and feedback presenters remain in their owning visual phases;
 - preserve every enum, generic bound, nullability, callback, value object, and controlled-state owner in the v1.0 contract probe;
 - include `AppSingleChoiceList<T>`, `AppActionMenu<T>`, and `AppProgressIndicator` in the first implementation schedule;
 - keep `AppSelect` and `AppSegmentedControl` specified but defer implementation until a real consumer exists;
 - reduce `AppIconRole` to cross-pattern roles and prohibit raw `IconData` escapes;
 - define app-global feedback owner/scope and action pairing;
-- compile the declaration probe and implementation probe before public export;
-- create the public barrel only with real implementation, never as an empty/fake Phase 0 artifact.
+- compile the declaration probe and implementation probe before Phase 0D public export;
+- create a non-empty public barrel containing only real Phase 0D declarations; add each concrete Widget only when its owning phase supplies a working implementation and tests.
 - expose an immutable `AppDesignTokens` facade and prove that it exposes no Material/Cupertino or mutable-style escape.

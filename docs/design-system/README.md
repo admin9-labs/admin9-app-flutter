@@ -1,6 +1,6 @@
 # Admin9 Design System
 
-> Version: v1.0.0
+> Version: v1.0.1
 > Status: frozen normative baseline
 > Scope: Android and iOS Flutter apps derived from Admin9 App Foundation
 
@@ -8,7 +8,7 @@
 
 Admin9 Design System is the single specification source for shared product semantics, platform behavior, visual foundations, public `App*` component contracts, page patterns, accessibility, and quality gates. `Admin9 UI` means its Flutter implementation layer; it is not a competing system.
 
-The Design System version, Foundation Git version, Foundation tag, app version, and customer business version are independent. Design System v1.0.0 does not imply app version 1.0.0 or completed runtime implementation.
+The Design System version, Foundation Git version, Foundation tag, app version, and customer business version are independent. Design System v1.0.1 does not imply app version 1.0.0 or completed runtime implementation.
 
 Normative words are fixed:
 
@@ -28,7 +28,7 @@ Every normative rule records its layer, platforms, default behavior, permitted o
 | Brand Theme | brand color, logo, launch assets, approved font choice and limited visual character | through the single theme input | alter state meaning, hit targets, contrast, system text, semantics, keyboard or back behavior |
 | Business Layer | real routes, content, fields, identity, permissions, services and dangerous-operation conditions | per derived app | import Core internals, select Material/Cupertino directly, or promote first-use business code to Core |
 
-The implementation remains repository-local under future `lib/core/design_system/`, exported only by future `lib/admin9_ui.dart`; Brand enters only through future `lib/app/brand/app_brand_theme.dart`. No runtime files exist yet. A package is reconsidered only when a second real project needs synchronized fixes, an independent version cadence is required, or this repository cannot own Gallery, tests, and documentation.
+The implementation remains repository-local under `lib/core/design_system/`, exported only by `lib/admin9_ui.dart`; Brand enters only through `lib/app/brand/app_brand_theme.dart`. Phase 0D installs the real non-visual contracts and boundary mechanisms at those paths. Concrete visual Widgets enter the public barrel only when their owning implementation phase completes. A package is reconsidered only when a second real project needs synchronized fixes, an independent version cadence is required, or this repository cannot own Gallery, tests, and documentation.
 
 ## 3. Rule record
 
@@ -79,13 +79,24 @@ Each derived project keeps a repository-root `admin9-foundation.yaml`. Its canon
 dart run tool/design_system/validate_foundation_manifest.dart --fixtures
 # Derived-project repository only:
 dart run tool/design_system/validate_foundation_manifest.dart admin9-foundation.yaml
+# Derived-project generation and drift check:
+dart run tool/design_system/generate_brand_entry.dart admin9-foundation.yaml lib/app
+dart run tool/design_system/verify_brand_contract.dart admin9-foundation.yaml lib/app/brand/app_brand_theme.dart lib/app/app_identity.dart
 flutter analyze tool/design_system/design_system_contract_probe.dart
+flutter analyze tool/design_system/design_system_implementation_probe.dart
+dart run tool/design_system/verify_import_boundaries.dart --fixtures
+dart run tool/design_system/verify_import_boundaries.dart --phase=0d
+dart run tool/design_system/verify_gallery_boundary.dart
+dart run tool/design_system/verify_brand_contract.dart
+dart run tool/design_system/verify_brand_contract.dart --fixtures
 dart run tool/design_system/verify_rule_links.dart
 node tool/design_system/verify_documentation.mjs
 ```
 
 The declaration probe is non-exported and contains abstract declarations/value objects only. It proves Dart syntax, generic bounds, nullability, `Key`, callback, and state-owner shapes; it does not claim a runtime implementation.
 
-## 7. Current boundary
+## 7. v1.0.1 implementation boundary
 
-v1.0.0 freezes the specification and executable contracts. It does not authorize edits to `lib/`, runtime tests, platform projects, dependencies, navigation, theme, or business behavior. Runtime rendering, Gallery isolation, device gestures, readers, IME, and platform accessibility behavior remain implementation-stage gates, explicitly Unknown today.
+v1.0.1 makes one non-product clarification to v1.0.0: Phase 0D implements and exports only honest non-visual contracts and mechanisms. It proves value-object construction, immutable token lookup, Brand input, App-host route ownership, analyzer-AST import boundaries, and the debug/profile Gallery registry with a release guard. A concrete visual `App*` Widget is implemented, instantiated, tested, and exported only in its assigned Phase 1-4; `AppSelect` and `AppSegmentedControl` still wait for real consumers. This clarification changes no frozen token, public API shape, platform mapping, or product decision.
+
+Phase 0D does not claim theme rendering, component rendering, Gallery page reachability, device gestures, readers, IME, or platform accessibility behavior. Those remain assigned to Phase 1-6 and are Unknown until their stated gates pass.

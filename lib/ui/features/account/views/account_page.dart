@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../core/navigation/app_routes.dart';
+import '../../../../app/app_route_names.dart';
 import '../../../../core/widgets/settings_section.dart';
 import '../view_models/session_controller.dart';
 

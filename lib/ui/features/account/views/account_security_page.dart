@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/navigation/app_routes.dart';
+import '../../../../app/app_route_names.dart';
 import '../../../../core/widgets/foundation_page.dart';
 
 class AccountSecurityPage extends StatelessWidget {

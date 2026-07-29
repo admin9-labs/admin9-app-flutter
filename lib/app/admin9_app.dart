@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../core/branding/app_brand.dart';
 import '../core/lifecycle/app_lifecycle_controller.dart';
-import '../core/navigation/app_routes.dart';
 import '../core/preferences/app_preferences.dart';
 import '../core/theme/app_appearance.dart';
 import '../core/theme/app_theme.dart';
 import '../core/theme/appearance_controller.dart';
 import '../ui/features/account/view_models/session_controller.dart';
 import 'admin9_shell.dart';
+import 'app_routes.dart';
+import 'app_identity.dart';
 import 'privacy_gate.dart';
 
 class Admin9App extends StatelessWidget {
@@ -40,7 +40,7 @@ class Admin9App extends StatelessWidget {
           final appearance = controller.appearance;
           return MaterialApp(
             debugShowCheckedModeBanner: false,
-            title: AppBrand.name,
+            title: AppIdentity.name,
             theme: AppTheme.light(
               highContrast: appearance.highContrast,
               reduceMotion: appearance.reduceMotion,
@@ -53,7 +53,7 @@ class Admin9App extends StatelessWidget {
             themeAnimationDuration: appearance.reduceMotion
                 ? Duration.zero
                 : const Duration(milliseconds: 200),
-            onGenerateRoute: AppRoutes.onGenerateRoute,
+            onGenerateRoute: AppRouteFactory.onGenerateRoute,
             builder: (context, child) {
               final media = MediaQuery.of(context);
               Widget content = MediaQuery(

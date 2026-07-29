@@ -2,9 +2,9 @@
   "schemaVersion": "1.0.0",
   "approved": [
     {
-      "foundationCommit": "e473dabfeb572fe23bcdb4ccce606eb00f6baf7b",
-      "designSystemVersion": "1.0.0",
-      "designSystemSourceTag": "design-system-v1.0.0",
+      "foundationCommit": "67c3b12a71fbb0bbed9621e4cd5c7a0a3775cff0",
+      "designSystemVersion": "1.0.1",
+      "designSystemSourceTag": "design-system-v1.0.1",
       "flutter": "3.44.1",
       "dart": "3.12.1",
       "status": "approved"

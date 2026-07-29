@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../core/branding/app_brand.dart';
-import '../core/navigation/app_routes.dart';
 import '../core/preferences/app_preferences.dart';
-import '../core/widgets/brand_mark.dart';
+import 'app_route_names.dart';
+import 'app_identity.dart';
+import '../ui/shared/brand_mark.dart';
 
 class PrivacyController extends ChangeNotifier {
   PrivacyController(this._preferences)
@@ -61,7 +61,7 @@ class _PrivacyConsentPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   const Text(
-                    '${AppBrand.name} 需要在您同意后保存必要的本地偏好。当前版本不连接后端，也不会创建用户或会话。',
+                    '${AppIdentity.name} 需要在您同意后保存必要的本地偏好。当前版本不连接后端，也不会创建用户或会话。',
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 20),

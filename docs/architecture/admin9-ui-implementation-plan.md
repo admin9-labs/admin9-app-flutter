@@ -272,16 +272,17 @@ Android `Scaffold` 和 iOS `CupertinoPageScaffold` 都启用键盘避让。子�
 
 ## 11. 实施阶段与门禁
 
-### Phase 0D：实施声明与机器门禁（需另行授权）
+### Phase 0D：非视觉合同与机器门禁（v1.0.1 边界澄清）
 
-- 以已通过的非导出 declaration probe 为输入，建立真实实现 probe，冻结 token lookup、Dialog、ActionMenu 和 Feedback 的 Core 呈现入口；禁止 `throw`、`external`、占位 Widget 和假服务。
-- 创建 `lib/core/design_system/`、真实 `lib/admin9_ui.dart` 与 Brand entry 时同步建立 analyzer AST 导入边界测试及正反 fixtures；禁止空 barrel。
-- 将业务路由组合从 Core `AppRoutes` 移至 App host，并以 AST 门禁证明 Core 不导入 feature 页面、模型或服务；Core 只保留导航原语。
+- 以已通过的非导出 declaration probe 为输入，只实现枚举、值对象、controller 接口、`AppDesignScope`、`AppFeedbackHost`、`AppInteractionHost` 和 Brand entry 这些非视觉机制；禁止用 `throw`、`external`、占位 Widget 或假服务冒充 presenter 实现。lookup scope 缺失时抛出明确 `FlutterError` 属于 host 配置违约，不是临时实现。Dialog、ActionMenu、Feedback 和其他具体视觉 Widget 在所属 Phase 首次实现、实例化、测试并导出，不在 0D 伪造。
+- 创建 `lib/core/design_system/`、非空且精确白名单化的 `lib/admin9_ui.dart` 与 Brand entry，并建立 analyzer AST 导入边界测试及正反 fixtures。Phase 0D 硬门禁覆盖 Core/App/Business、Core internal、公共出口、`lib/ui/features/**`、`lib/ui/shared/**` 和跨 feature；Phase 5 在页面迁移完成后启用拒绝全部 Business 直接 Material/Cupertino 交互导入的 final 模式。
+- 将业务路由组合从 Core 移至 `lib/app/app_routes.dart`，路由名称合同单独放在 `lib/app/app_route_names.dart`；Business 对 App 的只读 allowlist 仅含路由名称与 `lib/app/app_identity.dart`，不得反向导入 App host 或 Brand entry。AST 门禁证明 Core 不导入 feature 页面、模型或服务，且不存在路由组装环。
+- 派生项目先验证根 manifest，再通过固定生成器生成 `lib/app/brand/app_brand_theme.dart` 与 `lib/app/app_identity.dart`；精确 Brand verifier 比较全部字段、类型、构造面、颜色、字体、圆角、资产和 App 身份，拒绝额外字段与任一 Dart 值漂移。
 - 在派生项目模板中放置符合 schema 的 `admin9-foundation.yaml`，运行 validator；当前仓库不因本规范提交虚构自己是派生项目。
-- 固定 Gallery route registry 的 debug/profile 注册和 release 缺席测试接口，但不实现任何组件视觉。
+- 固定 Gallery route registry 的 debug/profile 注册和 release 缺席测试接口，但不实现 Gallery 页或任何组件视觉。Phase 1 才建立可达页和 release 安装包不可达证据。
 - 更新兼容表为实际实现 commit；设备不可用项继续记录 Unknown。
 
-退出门禁：declaration/implementation probes、manifest validator、AST import fixtures 和 Gallery release 门禁均有可执行命令；AST 证明 Core 无业务路由组合和 feature 依赖；公共 API 无待选签名；仍不得迁移页面或实现视觉。
+退出门禁：declaration/implementation probes、manifest validator、AST import fixtures/0D 仓库模式和 Gallery registry/release guard 均有可执行命令；AST 证明 Core 无业务路由组合和 feature 依赖；公共非视觉 API 无待选签名；具体 Widget 实例化证据已唯一分配到所属 Phase；仍不得迁移页面或实现视觉。
 
 ### Phase 1：主题、系统偏好、本地化与 Gallery 骨架
 

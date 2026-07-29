@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../core/navigation/app_routes.dart';
+import '../../../../app/app_route_names.dart';
 import '../../../../core/widgets/foundation_page.dart';
 import '../../../../core/widgets/unavailable_notice.dart';
 import '../view_models/auth_form_view_model.dart';

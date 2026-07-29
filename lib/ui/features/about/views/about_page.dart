@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/branding/app_brand.dart';
-import '../../../../core/navigation/app_routes.dart';
-import '../../../../core/widgets/brand_mark.dart';
+import '../../../../app/app_route_names.dart';
+import '../../../../app/app_identity.dart';
+import '../../../shared/brand_mark.dart';
 import '../../../../core/widgets/foundation_page.dart';
 
 class AboutPage extends StatelessWidget {
@@ -22,12 +22,12 @@ class AboutPage extends StatelessWidget {
           const ListTile(
             leading: Icon(Icons.apps_outlined),
             title: Text('产品'),
-            trailing: Text(AppBrand.productName),
+            trailing: Text(AppIdentity.productName),
           ),
           const ListTile(
             leading: Icon(Icons.numbers),
             title: Text('版本'),
-            trailing: Text(AppBrand.version),
+            trailing: Text(AppIdentity.version),
           ),
           ListTile(
             leading: const Icon(Icons.contact_support_outlined),

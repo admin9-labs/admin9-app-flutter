@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "foundation": { "tag": null, "upstreamRemote": null },
-  "designSystem": { "version": "1.0.0", "sourceTag": "design-system-v1.0.0" },
+  "designSystem": { "version": "1.0.1", "sourceTag": "design-system-v1.0.1" },
   "app": { "name": "Missing source", "version": "1.0.0", "androidApplicationId": "com.example.missing", "iosBundleId": "com.example.missing" },
   "brandConfiguration": { "themeVersion": "1.0.0", "themeSha256": "70f89b817ff82091354db30771c793ba5471a84650ead1366022e0a598b29703", "primaryPair": { "light": "#315C66", "dark": "#9CCBD5" }, "secondaryPair": { "light": "#67587A", "dark": "#D1BCE4" }, "approvedFont": null, "radiusDelta": 0, "logoPath": "assets/brand/logo.svg", "logoSha256": "bbe187bea05fce88088c9bd19feb8d0ae660402a585f06bccac5da0dd6bef622", "launchAssetPath": "assets/brand/launch.svg", "launchAssetSha256": "9ed5811babdecd35a7e7d580d2529ea5034537b703c1daf62efe8ff3e6fe0b6f" },
   "toolchain": { "flutter": "3.44.1", "dart": "3.12.1" },

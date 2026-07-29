@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:admin9_app_flutter/app/admin9_app.dart';
 import 'package:admin9_app_flutter/app/admin9_shell.dart';
-import 'package:admin9_app_flutter/core/navigation/app_routes.dart';
+import 'package:admin9_app_flutter/app/app_route_names.dart';
 import 'package:admin9_app_flutter/core/theme/app_appearance.dart';
 import 'package:admin9_app_flutter/core/theme/appearance_controller.dart';
 import 'package:admin9_app_flutter/ui/features/account/view_models/session_controller.dart';

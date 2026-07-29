@@ -1,6 +1,4 @@
-class AppBrand {
-  const AppBrand._();
-
+abstract final class AppIdentity {
   static const name = 'Admin9';
   static const productName = 'Admin9 App Foundation';
   static const version = '1.0.0';

@@ -11,7 +11,7 @@ The full Foundation commit is mandatory. `tag` contains the exact source tag whe
 | Field | Required value |
 | --- | --- |
 | Foundation source | full commit SHA and exact tag or `null` |
-| Design System | exact specification version `1.0.0` and source tag `design-system-v1.0.0` |
+| Design System | exact specification version `1.0.1` and source tag `design-system-v1.0.1` |
 | App identity | app name/version, Android application ID, iOS bundle ID |
 | Brand evidence | theme version/hash, actual primary/secondary light-dark pairs, Logo and launch asset paths |
 | Toolchain | Flutter and Dart versions |
@@ -25,25 +25,28 @@ Foundation, Design System, and customer business versions remain independent.
 
 `brandConfiguration` is the only machine brand-evidence record and corresponds to `lib/app/brand/app_brand_theme.dart`; platform build tooling may derive launch assets from its named source, but it does not create another brand entry. `approvedFont` is a reviewed family name or `null`; `radiusDelta` is an integer from -2 through 2. Logo and launch source bytes have separate SHA-256 values, and both paths MUST resolve canonically inside the manifest-adjacent `assets/` subtree; dot-segment and symlink escapes are rejected. `themeSha256` is SHA-256 of UTF-8 JSON with no whitespace and this exact property order: `primaryPair`, `secondaryPair`, `approvedFont`, `radiusDelta`, `logoSha256`, `launchAssetSha256`; each color pair keeps `light`, then `dark`. The hash excludes `themeSha256`, paths, app identity, and timestamps. The validator recomputes all three hashes relative to the manifest directory, validates real calendar dates and exact UTC timestamps, and rejects edited theme data, escaped assets, or plausible-looking digests.
 
+The Dart Brand entry exposes only the same primary/secondary light-dark values, approved font, radius delta, and asset paths. Core derives `onPrimary` and `onSecondary` from the frozen semantic contrast policy; a derived app cannot inject untracked foreground colors. The manifest fixture intentionally demonstrates a derived customer's different valid brand values and is not the Admin9 default theme. A derived project first validates its root manifest, then runs `dart run tool/design_system/generate_brand_entry.dart admin9-foundation.yaml lib/app`; the generator writes the Brand entry and read-only App identity from that validated source. `verify_brand_contract.dart admin9-foundation.yaml lib/app/brand/app_brand_theme.dart lib/app/app_identity.dart` rejects extra fields, value drift, identity drift, and asset-path drift. Hand-editing either generated Dart file is prohibited.
+
 ## 2. Ownership and imports
 
 | Area | Owner | Allowed consumers | Rule |
 | --- | --- | --- | --- |
-| `lib/core/design_system/` future implementation | Core maintainers | `lib/admin9_ui.dart` public barrel only | derived apps do not edit internals for branding |
-| `lib/app/brand/app_brand_theme.dart` | app/brand owner, Core review | app host | the only Brand Theme data entry; only approved tokens/assets |
+| `lib/core/design_system/` implementation | Core maintainers | `lib/admin9_ui.dart` public barrel only | derived apps do not edit internals for branding |
+| `lib/app/brand/app_brand_theme.dart` | app/brand owner, Core review | app host only | the only Brand Theme data entry; Business cannot import it |
+| `lib/app/app_identity.dart` | app owner | app host and Business read-only consumers | stable name/product/version/Logo identity; no token or platform-control access |
 | `lib/ui/features/<feature>/` | Business feature owner | same feature; public feature route/contracts | no cross-feature implementation imports |
 | app host/navigation | Foundation owner | feature routes through declared boundary | feature does not replace Core controls or platform mapping |
 | Gallery | Core maintainers | debug/profile only | no release route or tree-shaken dependency leakage |
 
-Business MUST NOT depend on Core internal files or unexported types. Core MUST NOT import feature models, ViewModels, repositories, providers, services, sessions, or customer content.
+Business MUST NOT depend on Core internal files or unexported types. Business may import only `lib/app/app_route_names.dart` and the read-only `lib/app/app_identity.dart` from App; every other `lib/app/**` path is denied. Core MUST NOT import feature models, ViewModels, repositories, providers, services, sessions, or customer content.
 
-Phase 0D MUST create these exact paths only when real declarations/implementation exist. It MUST NOT create an empty barrel or placeholder theme object. Until then, the paths are contracts rather than current source claims.
+Phase 0D creates these exact paths with real non-visual declarations, token lookup, Brand data, import checks, and Gallery registration isolation. It MUST NOT create an empty barrel or placeholder theme object. Visual components are added to the same Core/public paths only in their owning implementation phase.
 
 ## 3. Override matrix
 
 | Item | Allowed | Review required | Prohibited |
 | --- | --- | --- | --- |
-| app name, logo, launch assets | `admin9-foundation.yaml#app`, `#brandConfiguration`, and `lib/app/brand/app_brand_theme.dart` only | asset hashes, platform generation, legibility and safe-area review | editing Core widget implementation or inventing another brand entry |
+| app name, logo, launch assets | `admin9-foundation.yaml#app` and `#brandConfiguration`, generated into the two fixed App files | asset hashes, platform generation, legibility and safe-area review | hand-editing generated identity/Brand data, editing Core, or inventing another entry |
 | primary/secondary color pairs | through Brand Theme | light/dark/high-contrast calculation and visual review | raw feature colors or reduced contrast |
 | font | no default override | Chinese/Bold Text/max-size/performance approval | page-local fonts or loss of system scaling |
 | spacing/radius personality | none by feature | bounded Brand Theme adjustment documented by Core | hit-target reduction, platform-control reshaping, arbitrary values |
@@ -66,9 +69,9 @@ Each approved Design System release adds a compatibility row before a derived pr
 
 | Design System | Foundation source | Flutter/Dart | Status |
 | --- | --- | --- | --- |
-| v1.0.0 specification | `e473dabfeb572fe23bcdb4ccce606eb00f6baf7b` Foundation baseline | 3.44.1 / 3.12.1 | normative contract; runtime implementation remains unavailable |
+| v1.0.1 Phase 0D contract | `67c3b12a71fbb0bbed9621e4cd5c7a0a3775cff0` Foundation source baseline | 3.44.1 / 3.12.1 | specification plus non-visual boundary mechanisms; visual runtime remains unavailable |
 
-An app is specification-conforming only when its manifest passes the validator and its exact tuple appears as `approved` in the machine compatibility registry. The validator rejects merely format-valid unapproved commits, unknown rule IDs, expired/invalid deviations, reversed date ranges, invalid UTC provenance timestamps, asset-subtree escapes, extra fields, and unauthorized overrides. It is runtime-conforming only after a later compatibility row names an implemented Foundation commit and all Phase 1/device gates pass. Arbitrary version mixing is prohibited; v1.0.0 does not claim the current runtime implements the system.
+An app is specification-conforming only when its manifest passes the validator and its exact tuple appears as `approved` in the machine compatibility registry. The validator rejects merely format-valid unapproved commits, unknown rule IDs, expired/invalid deviations, reversed date ranges, invalid UTC provenance timestamps, asset-subtree escapes, extra fields, and unauthorized overrides. It is runtime-conforming only after a later compatibility row names an implemented Foundation commit and all Phase 1/device gates pass. Arbitrary version mixing is prohibited; v1.0.1 does not claim that Phase 0D implements visual components.
 
 1. Record current Foundation and Design System sources.
 2. Fetch the read-only `foundation` remote and read the target release changelog/deprecations.
@@ -92,4 +95,4 @@ The review compares package maintenance cost, source compatibility, release owne
 
 ## 7. Clone acceptance
 
-A new project is specification-conforming only when `dart run tool/design_system/validate_foundation_manifest.dart admin9-foundation.yaml` exits 0, its compatibility pair is approved, its fetch-only `foundation` remote is recorded in repository setup evidence, it uses `lib/app/brand/app_brand_theme.dart`, imports shared UI only from `lib/admin9_ui.dart`, has no forbidden imports/platform branches/raw interactive controls, passes automated gates, records device Unknowns honestly, and has no expired deviation. A cloned app with changed colors but unverified contrast is not conforming.
+A new project is specification-conforming only when the manifest validator exits 0, the fixed generator and Brand verifier both pass, its compatibility pair is approved, its fetch-only `foundation` remote is recorded in repository setup evidence, it uses the two fixed generated App files, imports shared UI only from `lib/admin9_ui.dart`, has no forbidden imports/platform branches/raw interactive controls, passes automated gates, records device Unknowns honestly, and has no expired deviation. A cloned app with changed colors but unverified contrast is not conforming.

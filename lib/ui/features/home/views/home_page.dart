@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/branding/app_brand.dart';
-import '../../../../core/widgets/brand_mark.dart';
+import '../../../../app/app_identity.dart';
+import '../../../shared/brand_mark.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -9,7 +9,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text(AppBrand.name)),
+      appBar: AppBar(title: const Text(AppIdentity.name)),
       body: SafeArea(
         top: false,
         child: Center(

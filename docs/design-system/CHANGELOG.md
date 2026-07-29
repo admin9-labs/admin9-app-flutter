@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.1 - 2026-07-29
+
+- Clarified that Phase 0D implements honest non-visual contracts and boundary mechanisms, while each concrete visual Widget is instantiated and exported only in its assigned implementation phase.
+- Added the repository-local exact public contract barrel, manifest-derived Brand/App-identity generator and verifier, token lookup scope, precise Gallery registry guard, analyzer-AST Business/Core/App import fixtures, and implementation probe without changing frozen tokens, API shapes, platform mappings, or product decisions.
+
 ## 1.0.0 - 2026-07-29
 
 - Established Admin9 Design System as the single specification source.
