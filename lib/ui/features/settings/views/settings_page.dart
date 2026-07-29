@@ -1,10 +1,22 @@
-import 'package:flutter/material.dart';
+import 'dart:async';
+
+import 'package:flutter/widgets.dart'
+    show
+        BuildContext,
+        Key,
+        ListView,
+        MediaQuery,
+        MediaQueryData,
+        Navigator,
+        SizedBox,
+        StatelessWidget,
+        Widget;
 import 'package:provider/provider.dart';
 
+import '../../../../admin9_ui.dart';
+import '../../../../app/app_route_names.dart';
 import '../../../../core/theme/app_appearance.dart';
 import '../../../../core/theme/appearance_controller.dart';
-import '../../../../core/widgets/foundation_page.dart';
-import '../../../../core/widgets/settings_section.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -13,65 +25,85 @@ class SettingsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = context.watch<AppearanceController>();
     final appearance = controller.appearance;
-    return FoundationPage(
+    final system = MediaQuery.of(context);
+    return AppPage(
       title: '设置',
-      padding: EdgeInsets.zero,
-      child: ListView(
+      parentLabel: '我的',
+      navigationMode: AppPageNavigationMode.child,
+      scrollable: false,
+      body: ListView(
         children: [
-          SettingsSection(
+          AppSection(
             title: '外观',
             children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
-                child: SegmentedButton<AppThemePreference>(
-                  segments: [
-                    for (final item in AppThemePreference.values)
-                      ButtonSegment(value: item, label: Text(item.label)),
-                  ],
-                  selected: {appearance.theme},
-                  onSelectionChanged: (value) =>
-                      controller.setTheme(value.first),
-                  showSelectedIcon: false,
-                ),
+              AppListTile(
+                key: const Key('settings-theme'),
+                title: '主题',
+                currentValue: appearance.theme.label,
+                disclosure: true,
+                onTap: () => Navigator.of(context).pushNamed(AppRoutes.theme),
               ),
-              ListTile(
-                leading: const Icon(Icons.text_fields),
-                title: const Text('字体大小'),
-                trailing: DropdownButton<AppFontScale>(
-                  value: appearance.fontScale,
-                  underline: const SizedBox.shrink(),
-                  items: [
-                    for (final item in AppFontScale.values)
-                      DropdownMenuItem(value: item, child: Text(item.label)),
-                  ],
-                  onChanged: (value) {
-                    if (value != null) controller.setFontScale(value);
-                  },
-                ),
-              ),
-              SwitchListTile(
-                secondary: const Icon(Icons.tonality_outlined),
-                title: const Text('全局灰度'),
-                value: appearance.grayscale,
-                onChanged: controller.setGrayscale,
+              AppListTile(
+                key: const Key('settings-font-scale'),
+                title: 'App 字号',
+                currentValue: appearance.fontScale.label,
+                disclosure: true,
+                onTap: () =>
+                    Navigator.of(context).pushNamed(AppRoutes.fontScale),
               ),
             ],
           ),
-          SettingsSection(
-            title: '无障碍',
+          AppSection(
+            title: '辅助功能',
+            footer: controller.persistenceFailed
+                ? '设置暂未保存，请使用“重试保存设置”。'
+                : _effectiveStatus(system, appearance),
             children: [
-              SwitchListTile(
-                secondary: const Icon(Icons.contrast),
-                title: const Text('增强对比度'),
+              AppSwitch(
+                key: const Key('settings-grayscale'),
+                label: '灰度',
+                value: appearance.grayscale,
+                onChanged: (value) => unawaited(
+                  _saveBoolean(
+                    context,
+                    controller,
+                    () => controller.setGrayscale(value),
+                  ),
+                ),
+              ),
+              AppSwitch(
+                key: const Key('settings-high-contrast'),
+                label: '高对比度',
                 value: appearance.highContrast,
-                onChanged: controller.setHighContrast,
+                onChanged: (value) => unawaited(
+                  _saveBoolean(
+                    context,
+                    controller,
+                    () => controller.setHighContrast(value),
+                  ),
+                ),
               ),
-              SwitchListTile(
-                secondary: const Icon(Icons.motion_photos_off_outlined),
-                title: const Text('减少动态效果'),
+              AppSwitch(
+                key: const Key('settings-reduce-motion'),
+                label: '减少动态效果',
                 value: appearance.reduceMotion,
-                onChanged: controller.setReduceMotion,
+                onChanged: (value) => unawaited(
+                  _saveBoolean(
+                    context,
+                    controller,
+                    () => controller.setReduceMotion(value),
+                  ),
+                ),
               ),
+              if (controller.persistenceFailed)
+                AppListTile(
+                  key: const Key('settings-retry-persistence'),
+                  title: '重试保存设置',
+                  subtitle: '上次保存未完成，当前显示值尚未持久化。',
+                  leadingIcon: AppIconRole.warning,
+                  onTap: () =>
+                      unawaited(_retryFromSettings(context, controller)),
+                ),
             ],
           ),
           const SizedBox(height: 24),
@@ -79,4 +111,116 @@ class SettingsPage extends StatelessWidget {
       ),
     );
   }
+
+  String _effectiveStatus(MediaQueryData system, AppAppearance appearance) {
+    final requirements = <String>[
+      if (system.highContrast) '系统高对比度已生效',
+      if (system.disableAnimations) '系统减少动态效果已生效',
+    ];
+    if (requirements.isEmpty) {
+      return 'App 偏好即时生效并自动保存；系统辅助设置始终具有更高优先级。';
+    }
+    return '${requirements.join('，')}；关闭 App 偏好不会削弱系统要求。';
+  }
+
+  Future<void> _saveBoolean(
+    BuildContext context,
+    AppearanceController controller,
+    Future<void> Function() save,
+  ) async {
+    await save();
+    if (!context.mounted || !controller.persistenceFailed) return;
+    _showRetry(context, controller);
+  }
+}
+
+class SettingsThemePage extends StatelessWidget {
+  const SettingsThemePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = context.watch<AppearanceController>();
+    return AppSingleChoiceList<AppThemePreference>(
+      title: '主题',
+      value: controller.appearance.theme,
+      choices: [
+        for (final item in AppThemePreference.values)
+          AppChoice(value: item, label: item.label),
+      ],
+      onChanged: (value) => unawaited(_saveTheme(context, controller, value)),
+    );
+  }
+
+  Future<void> _saveTheme(
+    BuildContext context,
+    AppearanceController controller,
+    AppThemePreference value,
+  ) async {
+    await controller.setTheme(value);
+    if (!context.mounted || !controller.persistenceFailed) return;
+    _showRetry(context, controller);
+  }
+}
+
+class SettingsFontScalePage extends StatelessWidget {
+  const SettingsFontScalePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = context.watch<AppearanceController>();
+    return AppSingleChoiceList<AppFontScale>(
+      title: 'App 字号',
+      value: controller.appearance.fontScale,
+      choices: [
+        for (final item in AppFontScale.values)
+          AppChoice(value: item, label: item.label),
+      ],
+      onChanged: (value) =>
+          unawaited(_saveFontScale(context, controller, value)),
+    );
+  }
+
+  Future<void> _saveFontScale(
+    BuildContext context,
+    AppearanceController controller,
+    AppFontScale value,
+  ) async {
+    await controller.setFontScale(value);
+    if (!context.mounted || !controller.persistenceFailed) return;
+    _showRetry(context, controller);
+  }
+}
+
+void _showRetry(BuildContext context, AppearanceController controller) {
+  final feedback = AppFeedbackHost.of(context);
+  feedback.show(_retryRequest(feedback, controller));
+}
+
+AppFeedbackRequest _retryRequest(
+  AppFeedbackController feedback,
+  AppearanceController controller,
+) => AppFeedbackRequest(
+  message: '设置暂未保存。',
+  tone: AppTone.error,
+  actionLabel: '重试',
+  onAction: () => unawaited(_retryPersistence(feedback, controller)),
+);
+
+Future<void> _retryPersistence(
+  AppFeedbackController feedback,
+  AppearanceController controller,
+) async {
+  await controller.retryPersistence();
+  if (controller.persistenceFailed) {
+    feedback.show(_retryRequest(feedback, controller));
+  }
+}
+
+Future<void> _retryFromSettings(
+  BuildContext context,
+  AppearanceController controller,
+) async {
+  await controller.retryPersistence();
+  if (!context.mounted || !controller.persistenceFailed) return;
+  _showRetry(context, controller);
 }

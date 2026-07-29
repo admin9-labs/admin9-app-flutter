@@ -22,14 +22,14 @@ class AppPreferences {
 
   Future<void> setPrivacyAccepted(bool value) =>
       _preferences.setBool(_privacyAcceptedKey, value);
-  Future<void> setThemeMode(String value) =>
+  Future<bool> setThemeMode(String value) =>
       _preferences.setString(_themeModeKey, value);
-  Future<void> setFontScale(String value) =>
+  Future<bool> setFontScale(String value) =>
       _preferences.setString(_fontScaleKey, value);
-  Future<void> setGrayscale(bool value) =>
+  Future<bool> setGrayscale(bool value) =>
       _preferences.setBool(_grayscaleKey, value);
-  Future<void> setHighContrast(bool value) =>
+  Future<bool> setHighContrast(bool value) =>
       _preferences.setBool(_highContrastKey, value);
-  Future<void> setReduceMotion(bool value) =>
+  Future<bool> setReduceMotion(bool value) =>
       _preferences.setBool(_reduceMotionKey, value);
 }

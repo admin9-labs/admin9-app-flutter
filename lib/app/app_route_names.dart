@@ -9,6 +9,8 @@ abstract final class AppRoutes {
   static const accountSecurity = '/account/security';
   static const accountDeletion = '/account/deletion';
   static const settings = '/settings';
+  static const theme = '/settings/theme';
+  static const fontScale = '/settings/font-scale';
   static const userAgreement = '/legal/user-agreement';
   static const privacyPolicy = '/legal/privacy-policy';
   static const about = '/about';

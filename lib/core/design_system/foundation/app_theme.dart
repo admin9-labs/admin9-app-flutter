@@ -136,10 +136,15 @@ abstract final class AppTheme {
       barBackgroundColor: tokens.surface,
       selectionHandleColor: tokens.primary,
       textTheme: CupertinoTextThemeData(
-        textStyle: tokens.bodyTextStyle,
-        actionTextStyle: tokens.labelTextStyle.copyWith(color: tokens.primary),
-        navTitleTextStyle: tokens.pageTitleTextStyle,
-        navLargeTitleTextStyle: tokens.displayTextStyle,
+        textStyle: tokens.bodyTextStyle.copyWith(inherit: false),
+        actionTextStyle: tokens.labelTextStyle.copyWith(
+          inherit: false,
+          color: tokens.primary,
+        ),
+        navTitleTextStyle: tokens.pageTitleTextStyle.copyWith(inherit: false),
+        navLargeTitleTextStyle: tokens.displayTextStyle.copyWith(
+          inherit: false,
+        ),
       ),
     );
     final material = baseTheme.copyWith(

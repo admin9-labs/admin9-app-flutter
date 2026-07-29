@@ -135,19 +135,23 @@ Future<void> _openSettingsAndChangeAppearance(
     tester.element(find.byType(Admin9Shell)),
   ).pushNamed(AppRoutes.settings);
   await tester.pumpAndSettle();
-  expect(find.widgetWithText(AppBar, '设置'), findsOneWidget);
+  expect(find.text('设置'), findsWidgets);
 
+  await tester.tap(find.byKey(const Key('settings-theme')));
+  await tester.pumpAndSettle();
   await tester.tap(find.text('深色'));
   await tester.pumpAndSettle();
-  await tester.tap(find.byType(DropdownButton<AppFontScale>));
+  await _systemBack(tester);
+  await tester.tap(find.byKey(const Key('settings-font-scale')));
   await tester.pumpAndSettle();
-  await tester.tap(find.text('特大').last);
+  await tester.tap(find.text('特大'));
   await tester.pumpAndSettle();
-  await tester.tap(find.widgetWithText(SwitchListTile, '全局灰度'));
+  await _systemBack(tester);
+  await tester.tap(find.byKey(const Key('settings-grayscale')));
   await tester.pumpAndSettle();
-  await tester.tap(find.widgetWithText(SwitchListTile, '增强对比度'));
+  await tester.tap(find.byKey(const Key('settings-high-contrast')));
   await tester.pumpAndSettle();
-  await tester.tap(find.widgetWithText(SwitchListTile, '减少动态效果'));
+  await tester.tap(find.byKey(const Key('settings-reduce-motion')));
   await tester.pumpAndSettle();
 
   final appearance = tester

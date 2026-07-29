@@ -39,6 +39,8 @@ void main() {
       AppRoutes.accountSecurity: '账号安全',
       AppRoutes.accountDeletion: '账号注销',
       AppRoutes.settings: '设置',
+      AppRoutes.theme: '主题',
+      AppRoutes.fontScale: 'App 字号',
       AppRoutes.userAgreement: '用户协议',
       AppRoutes.privacyPolicy: '隐私政策',
       AppRoutes.about: '关于',

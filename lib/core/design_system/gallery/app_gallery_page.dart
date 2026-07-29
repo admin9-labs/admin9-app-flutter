@@ -4,6 +4,7 @@ import '../../theme/app_appearance.dart';
 import '../components/app_bottom_navigation.dart';
 import '../components/app_page.dart';
 import '../components/app_progress_indicator.dart';
+import '../components/app_settings_components.dart';
 import '../foundation/app_contracts.dart';
 import '../foundation/app_theme.dart';
 import '../foundation/app_design_tokens.dart';
@@ -149,6 +150,8 @@ class _AppGalleryPageState extends State<AppGalleryPage> {
                   const _TokenSample(),
                   const SizedBox(height: 24),
                   const _Phase2Sample(),
+                  const SizedBox(height: 24),
+                  const _Phase3Sample(),
                 ],
               ),
             ),
@@ -301,6 +304,113 @@ class _Phase2SampleState extends State<_Phase2Sample> {
     );
   }
 }
+
+class _Phase3Sample extends StatefulWidget {
+  const _Phase3Sample();
+
+  @override
+  State<_Phase3Sample> createState() => _Phase3SampleState();
+}
+
+class _Phase3SampleState extends State<_Phase3Sample> {
+  bool _enabledSwitch = true;
+  String _choice = 'system';
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = AppDesignScope.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text('设置与列表', style: tokens.sectionTitleTextStyle),
+        SizedBox(height: tokens.space12),
+        AppSection(
+          title: '外观样例',
+          footer: '当前值在内容压力下重排；启用项可按住查看按压态，并可通过键盘 Tab 获得焦点态。',
+          children: [
+            AppListTile(
+              key: const Key('gallery-phase3-interactive-tile'),
+              title: '主题',
+              currentValue: '跟随系统',
+              disclosure: true,
+              onTap: _galleryNoop,
+            ),
+            AppListTile(
+              title: '这是用于验证长中文内容增长的设置名称',
+              subtitle: '说明文字允许增长，不截断关键状态。',
+              currentValue: '一个较长的当前值',
+              disclosure: true,
+              onTap: _galleryNoop,
+            ),
+            const AppListTile(title: '已选择的设置项', selected: true),
+            const AppListTile(
+              title: '不可用的设置项',
+              subtitle: '禁用状态不会响应操作',
+              enabled: false,
+            ),
+          ],
+        ),
+        AppSection(
+          title: '布尔偏好',
+          footer: '启用开关提供平台原生按压态与键盘焦点态。',
+          children: [
+            AppSwitch(
+              key: const Key('gallery-phase3-interactive-switch'),
+              label: '高对比度',
+              value: _enabledSwitch,
+              onChanged: (value) => setState(() => _enabledSwitch = value),
+            ),
+            const AppSwitch(
+              label: '不可修改的系统要求',
+              value: true,
+              enabled: false,
+              onChanged: _galleryBoolNoop,
+            ),
+          ],
+        ),
+        SizedBox(height: tokens.space12),
+        OutlinedButton(
+          onPressed: () => Navigator.of(context).push<void>(
+            MaterialPageRoute(
+              builder: (_) => AppSingleChoiceList<String>(
+                title: '主题选择样例',
+                value: _choice,
+                choices: const [
+                  AppChoice(value: 'system', label: '跟随系统'),
+                  AppChoice(value: 'light', label: '浅色'),
+                  AppChoice(value: 'dark', label: '深色'),
+                ],
+                onChanged: (value) => setState(() => _choice = value),
+              ),
+            ),
+          ),
+          child: const Text('打开单选列表样例'),
+        ),
+        OutlinedButton(
+          onPressed: () => Navigator.of(context).push<void>(
+            MaterialPageRoute(
+              builder: (_) => AppSingleChoiceList<String>(
+                title: '禁用单选列表样例',
+                value: 'system',
+                choices: [
+                  AppChoice(value: 'system', label: '跟随系统'),
+                  AppChoice(value: 'dark', label: '深色'),
+                ],
+                enabled: false,
+                onChanged: _galleryStringNoop,
+              ),
+            ),
+          ),
+          child: const Text('打开禁用单选列表样例'),
+        ),
+      ],
+    );
+  }
+}
+
+void _galleryBoolNoop(bool _) {}
+
+void _galleryStringNoop(String _) {}
 
 void _galleryNoop() {}
 

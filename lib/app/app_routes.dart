@@ -19,9 +19,9 @@ abstract final class AppRouteFactory {
   static Route<void> onGenerateRoute(RouteSettings settings) {
     if (settings.name == AppGalleryRegistry.routeName &&
         AppGalleryRegistry.isRegistered) {
-      return MaterialPageRoute<void>(
+      return _platformRoute(
         settings: settings,
-        builder: (_) => AppGalleryPage(resolveTheme: _resolveGalleryTheme),
+        page: AppGalleryPage(resolveTheme: _resolveGalleryTheme),
       );
     }
     final page = switch (settings.name) {
@@ -43,6 +43,8 @@ abstract final class AppRouteFactory {
       AppRoutes.accountSecurity => const AccountSecurityPage(),
       AppRoutes.accountDeletion => const AccountDeletionPage(),
       AppRoutes.settings => const SettingsPage(),
+      AppRoutes.theme => const SettingsThemePage(),
+      AppRoutes.fontScale => const SettingsFontScalePage(),
       AppRoutes.userAgreement => const LegalDocumentPage(
         document: LegalDocument(type: LegalDocumentType.userAgreement),
       ),
@@ -54,8 +56,13 @@ abstract final class AppRouteFactory {
       _ => _UnknownRoutePage(routeName: settings.name),
     };
 
-    return MaterialPageRoute<void>(settings: settings, builder: (_) => page);
+    return _platformRoute(settings: settings, page: page);
   }
+
+  static Route<void> _platformRoute({
+    required RouteSettings settings,
+    required Widget page,
+  }) => MaterialPageRoute<void>(settings: settings, builder: (_) => page);
 
   static AppResolvedTheme _resolveGalleryTheme({
     required Brightness brightness,
