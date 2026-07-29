@@ -79,6 +79,13 @@ const publicBarrelExports = <String>{
   'core/design_system/foundation/app_design_tokens.dart',
 };
 
+const _appCoreInternalImportAllowlist = <String>{
+  'lib/app/admin9_app.dart|lib/core/design_system/foundation/app_theme.dart',
+  'lib/app/app_routes.dart|lib/core/design_system/foundation/app_theme.dart',
+  'lib/app/app_routes.dart|lib/core/design_system/gallery/app_gallery_page.dart',
+  'lib/app/app_routes.dart|lib/core/design_system/gallery/app_gallery_registry.dart',
+};
+
 const _businessAppImportAllowlist = <String>{
   'lib/app/app_identity.dart',
   'lib/app/app_route_names.dart',
@@ -225,7 +232,8 @@ List<String> _validateFile(
 
     if (!policyPath.startsWith('lib/core/design_system/') &&
         policyPath != 'lib/admin9_ui.dart' &&
-        target.startsWith('lib/core/design_system/')) {
+        target.startsWith('lib/core/design_system/') &&
+        !_appCoreInternalImportAllowlist.contains(pair)) {
       errors.add('$location imports Core internals instead of admin9_ui.dart');
     }
 

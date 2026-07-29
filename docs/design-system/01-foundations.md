@@ -47,7 +47,19 @@ The default is the platform system font; no font dependency is added. Brand MAY 
 | label | `labelLarge` | callout/semibold | buttons and controls |
 | caption | `bodySmall` | footnote | metadata and footer |
 
-Pages MUST use semantic roles, not platform point sizes. The system nonlinear `TextScaler` is the base. App modes are frozen as Standard `1.00`, Large `1.12`, and Extra Large `1.24`. For semantic base size `s`, the resolved size is `systemTextScaler.scale(s) * appFactor`. The factor is always at least `1.00`, preserves monotonic system scaling, and has no total upper cap. The current runtime `2.0` clamp is nonconforming and is removed only during authorized implementation.
+The theme bridge freezes the following standard-mode base geometry. The line value is the logical line height; pages still consume semantic roles rather than writing these numbers.
+
+| Semantic role | Android size / line / weight | iOS size / line / weight |
+| --- | --- | --- |
+| display | `36 / 44 / bold` | `34 / 41 / bold` |
+| pageTitle | `22 / 28 / bold` | `17 / 22 / bold` |
+| sectionTitle | `16 / 24 / bold` | `13 / 18 / bold` |
+| body | `16 / 24 / regular` | `17 / 22 / regular` |
+| supporting | `14 / 20 / regular` | `15 / 20 / regular` |
+| label | `14 / 20 / semibold` | `17 / 22 / semibold` |
+| caption | `12 / 16 / regular` | `12 / 16 / regular` |
+
+Pages MUST use semantic roles, not platform point sizes. The system nonlinear `TextScaler` is the base. App modes are frozen as Standard `1.00`, Large `1.12`, and Extra Large `1.24`. For semantic base size `s`, the resolved size is `systemTextScaler.scale(s) * appFactor`. The factor is always at least `1.00`, preserves monotonic system scaling, and has no total upper cap. Phase 1 removed the former runtime `2.0` clamp; automated stress cases prove `2.0 x 1.24 = 2.48` and `3.0 x 1.24 = 3.72`.
 
 The six visual boards use an exact `1.24` multiplier on every displayed semantic font size in the third fixture. Container height is independently content-driven: field 62lp versus 54lp, button 56lp versus 48lp, and row 72/78lp versus 52/56lp are calibration measurements, not fixed component heights. Automated rows `E`, `F`, `J`, `K`, and `L` in [the canonical matrix](06-accessibility-quality.md#ds-rsp-001) verify Extra Large, including synthetic system stress scalers. Android 200% and iOS maximum Dynamic Type remain device gates and are never inferred from the static boards.
 

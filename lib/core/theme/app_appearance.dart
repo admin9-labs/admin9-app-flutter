@@ -72,6 +72,38 @@ class AppAppearance {
 }
 
 @immutable
+final class EffectiveAppearance {
+  const EffectiveAppearance({
+    required this.brightness,
+    required this.fontScale,
+    required this.grayscale,
+    required this.highContrast,
+    required this.reduceMotion,
+    required this.boldText,
+  });
+
+  factory EffectiveAppearance.resolve({
+    required AppAppearance app,
+    required MediaQueryData system,
+    required Brightness resolvedBrightness,
+  }) => EffectiveAppearance(
+    brightness: resolvedBrightness,
+    fontScale: app.fontScale,
+    grayscale: app.grayscale,
+    highContrast: system.highContrast || app.highContrast,
+    reduceMotion: system.disableAnimations || app.reduceMotion,
+    boldText: system.boldText,
+  );
+
+  final Brightness brightness;
+  final AppFontScale fontScale;
+  final bool grayscale;
+  final bool highContrast;
+  final bool reduceMotion;
+  final bool boldText;
+}
+
+@immutable
 class AppTextScaler implements TextScaler {
   const AppTextScaler({required this.system, required this.preferenceFactor});
 
@@ -79,10 +111,7 @@ class AppTextScaler implements TextScaler {
   final double preferenceFactor;
 
   @override
-  double scale(double fontSize) {
-    final scaled = system.scale(fontSize) * preferenceFactor;
-    return scaled.clamp(fontSize * 0.8, fontSize * 2).toDouble();
-  }
+  double scale(double fontSize) => system.scale(fontSize) * preferenceFactor;
 
   @override
   double get textScaleFactor => scale(16) / 16;

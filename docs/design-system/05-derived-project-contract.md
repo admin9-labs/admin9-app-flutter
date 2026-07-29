@@ -27,6 +27,8 @@ Foundation, Design System, and customer business versions remain independent.
 
 The Dart Brand entry exposes only the same primary/secondary light-dark values, approved font, radius delta, and asset paths. Core derives `onPrimary` and `onSecondary` from the frozen semantic contrast policy; a derived app cannot inject untracked foreground colors. The manifest fixture intentionally demonstrates a derived customer's different valid brand values and is not the Admin9 default theme. A derived project first validates its root manifest, then runs `dart run tool/design_system/generate_brand_entry.dart admin9-foundation.yaml lib/app`; the generator writes the Brand entry and read-only App identity from that validated source. `verify_brand_contract.dart admin9-foundation.yaml lib/app/brand/app_brand_theme.dart lib/app/app_identity.dart` rejects extra fields, value drift, identity drift, and asset-path drift. Hand-editing either generated Dart file is prohibited.
 
+The manifest validator also computes WCAG relative luminance for both primary values. Light primary MUST provide at least `3:1` focus contrast against light background, surface, and surfaceContainer; dark primary MUST meet the same threshold against all dark surfaces. Core retains the frozen preferred foreground when it reaches `4.5:1`, otherwise chooses the higher-contrast black or white foreground. Runtime theme resolution repeats the focus check and rejects invalid manually constructed Brand data instead of rendering an inaccessible theme.
+
 ## 2. Ownership and imports
 
 | Area | Owner | Allowed consumers | Rule |

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../core/design_system/foundation/app_theme.dart';
+import '../core/design_system/gallery/app_gallery_page.dart';
+import '../core/design_system/gallery/app_gallery_registry.dart';
 import '../ui/features/about/views/about_page.dart';
 import '../ui/features/about/views/contact_page.dart';
 import '../ui/features/account/views/account_deletion_page.dart';
@@ -10,9 +13,17 @@ import '../ui/features/legal/models/legal_document.dart';
 import '../ui/features/legal/views/legal_document_page.dart';
 import '../ui/features/settings/views/settings_page.dart';
 import 'app_route_names.dart';
+import 'brand/app_brand_theme.dart';
 
 abstract final class AppRouteFactory {
   static Route<void> onGenerateRoute(RouteSettings settings) {
+    if (settings.name == AppGalleryRegistry.routeName &&
+        AppGalleryRegistry.isRegistered) {
+      return MaterialPageRoute<void>(
+        settings: settings,
+        builder: (_) => AppGalleryPage(resolveTheme: _resolveGalleryTheme),
+      );
+    }
     final page = switch (settings.name) {
       AppRoutes.login => const AuthFormPage(flow: AuthFlow.login),
       AppRoutes.register => const AuthFormPage(flow: AuthFlow.register),
@@ -45,6 +56,28 @@ abstract final class AppRouteFactory {
 
     return MaterialPageRoute<void>(settings: settings, builder: (_) => page);
   }
+
+  static AppResolvedTheme _resolveGalleryTheme({
+    required Brightness brightness,
+    required TargetPlatform platform,
+    required bool highContrast,
+    required bool reduceMotion,
+    required bool boldText,
+  }) => AppTheme.resolve(
+    brightness: brightness,
+    highContrast: highContrast,
+    reduceMotion: reduceMotion,
+    boldText: boldText,
+    platform: platform,
+    brandPrimary: brightness == Brightness.dark
+        ? appBrandTheme.primaryDark
+        : appBrandTheme.primaryLight,
+    brandSecondary: brightness == Brightness.dark
+        ? appBrandTheme.secondaryDark
+        : appBrandTheme.secondaryLight,
+    brandFontFamily: appBrandTheme.fontFamily,
+    brandRadiusDelta: appBrandTheme.radiusDelta,
+  );
 }
 
 class _UnknownRoutePage extends StatelessWidget {

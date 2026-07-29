@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math' as math;
 import 'dart:typed_data';
 
 const _schemaPath = 'docs/design-system/schema/admin9-foundation.schema.json';
@@ -14,6 +15,10 @@ const _fixtureExpectedErrors = <String, List<String>>{
   ],
   'invalid-brand-drift.yaml': [
     r'$.brandConfiguration.themeSha256 does not match',
+  ],
+  'invalid-brand-contrast.yaml': [
+    r'$.brandConfiguration.primaryPair.light must provide at least 3:1 focus contrast',
+    r'$.brandConfiguration.primaryPair.dark must provide at least 3:1 focus contrast',
   ],
   'invalid-calendar.yaml': [
     r'$.deviations[0].startsOn is not a valid calendar date',
@@ -350,6 +355,7 @@ void _validateSemanticContract(
 
   final brand = manifest['brandConfiguration'];
   if (brand is Map<String, Object?>) {
+    _validateBrandContrast(brand, errors);
     final canonical = <String, Object?>{
       'primaryPair': brand['primaryPair'],
       'secondaryPair': brand['secondaryPair'],
@@ -411,6 +417,64 @@ void _validateSemanticContract(
     }
   }
 }
+
+void _validateBrandContrast(Map<String, Object?> brand, List<String> errors) {
+  final primary = brand['primaryPair'];
+  if (primary is! Map<String, Object?>) return;
+  const surfaceSets = <String, List<String>>{
+    'light': ['#F7F8FA', '#FFFFFF', '#EEF1F4'],
+    'dark': ['#111418', '#191D22', '#242A31'],
+  };
+  for (final mode in surfaceSets.keys) {
+    final raw = primary[mode];
+    if (raw is! String || !RegExp(r'^#[0-9A-Fa-f]{6}$').hasMatch(raw)) {
+      continue;
+    }
+    final focus = _parseRgb(raw);
+    final minimum = surfaceSets[mode]!
+        .map((surface) => _contrastRatio(focus, _parseRgb(surface)))
+        .reduce((first, second) => first < second ? first : second);
+    if (minimum < 3) {
+      errors.add(
+        r'$.brandConfiguration.primaryPair.'
+        '$mode must provide at least 3:1 focus contrast against all $mode surfaces',
+      );
+    }
+  }
+}
+
+List<int> _parseRgb(String value) {
+  final packed = int.parse(value.substring(1), radix: 16);
+  return [(packed >> 16) & 0xff, (packed >> 8) & 0xff, packed & 0xff];
+}
+
+double _contrastRatio(List<int> first, List<int> second) {
+  final firstLuminance = _relativeLuminance(first);
+  final secondLuminance = _relativeLuminance(second);
+  final lighter = firstLuminance >= secondLuminance
+      ? firstLuminance
+      : secondLuminance;
+  final darker = firstLuminance >= secondLuminance
+      ? secondLuminance
+      : firstLuminance;
+  return (lighter + 0.05) / (darker + 0.05);
+}
+
+double _relativeLuminance(List<int> rgb) {
+  double linear(int channel) {
+    final value = channel / 255;
+    return value <= 0.04045
+        ? value / 12.92
+        : _pow((value + 0.055) / 1.055, 2.4);
+  }
+
+  return 0.2126 * linear(rgb[0]) +
+      0.7152 * linear(rgb[1]) +
+      0.0722 * linear(rgb[2]);
+}
+
+double _pow(double base, double exponent) =>
+    math.pow(base, exponent).toDouble();
 
 DateTime? _parseExactDate(String value) {
   final match = RegExp(r'^(\d{4})-(\d{2})-(\d{2})$').firstMatch(value);
