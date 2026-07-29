@@ -3,6 +3,7 @@
 > Date: 2026-07-29
 > Design System: v1.0.1
 > Input baseline: `design-system-v1.0.0` / `67c3b12a71fbb0bbed9621e4cd5c7a0a3775cff0`
+> Implementation commit: `1c91f21eaee511f081d5addbe765151f27a53fb9`
 > Decision: Go
 
 ## 1. Accepted Boundary

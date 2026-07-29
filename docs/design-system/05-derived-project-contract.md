@@ -69,7 +69,7 @@ Each approved Design System release adds a compatibility row before a derived pr
 
 | Design System | Foundation source | Flutter/Dart | Status |
 | --- | --- | --- | --- |
-| v1.0.1 Phase 0D contract | `67c3b12a71fbb0bbed9621e4cd5c7a0a3775cff0` Foundation source baseline | 3.44.1 / 3.12.1 | specification plus non-visual boundary mechanisms; visual runtime remains unavailable |
+| v1.0.1 Phase 0D contract | `1c91f21eaee511f081d5addbe765151f27a53fb9` Foundation source baseline | 3.44.1 / 3.12.1 | specification plus non-visual boundary mechanisms; visual runtime remains unavailable |
 
 An app is specification-conforming only when its manifest passes the validator and its exact tuple appears as `approved` in the machine compatibility registry. The validator rejects merely format-valid unapproved commits, unknown rule IDs, expired/invalid deviations, reversed date ranges, invalid UTC provenance timestamps, asset-subtree escapes, extra fields, and unauthorized overrides. It is runtime-conforming only after a later compatibility row names an implemented Foundation commit and all Phase 1/device gates pass. Arbitrary version mixing is prohibited; v1.0.1 does not claim that Phase 0D implements visual components.
 
