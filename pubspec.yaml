@@ -1,5 +1,5 @@
 name: admin9_app_flutter
-description: "Admin9 Flutter mobile app for the Admin9 app platform."
+description: "Admin9 App Foundation for Android and iOS."
 publish_to: 'none'
 version: 1.0.0+1
 
@@ -9,27 +9,15 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  cupertino_icons: ^1.0.8
   provider: ^6.1.5+1
   shared_preferences: ^2.5.5
-  path_provider: ^2.1.5
-  webview_flutter: ^4.14.0
-  video_player: ^2.11.1
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
-  webview_flutter_platform_interface: ^2.15.1
 
 flutter:
   uses-material-design: true
   assets:
-    - assets/images/xichang_publish_icon.png
-    - assets/images/top_level_mainstream_red_header.png
-    - assets/images/top_level_news_blue_header.png
-    - assets/images/top_level_livelihood_green_header.png
-    - assets/images/top_level_hot_orange_header.png
-    - assets/images/top_level_city_gold_header.png
-    - assets/images/top_level_jacaranda_header.png
-    - assets/images/onboarding_guide.png
+    - assets/branding/admin9_logo.png

@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.admin9.app.flutter"
+    namespace = "com.admin9.app.foundation"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -15,7 +15,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.admin9.app.flutter"
+        applicationId = "com.admin9.app.foundation"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion

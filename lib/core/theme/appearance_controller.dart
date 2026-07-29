@@ -1,46 +1,50 @@
 import 'package:flutter/foundation.dart';
 
-import '../../data/services/local_storage_service.dart';
+import '../preferences/app_preferences.dart';
 import 'app_appearance.dart';
 
 class AppearanceController extends ChangeNotifier {
-  AppearanceController({required LocalStorageService storage})
-    : _storage = storage,
-      _settings = storage.loadAppearance();
+  AppearanceController(this._preferences)
+    : _appearance = AppAppearance(
+        theme: AppThemePreference.parse(_preferences.themeMode),
+        fontScale: AppFontScale.parse(_preferences.fontScale),
+        grayscale: _preferences.grayscale,
+        highContrast: _preferences.highContrast,
+        reduceMotion: _preferences.reduceMotion,
+      );
 
-  final LocalStorageService _storage;
-  AppAppearanceSettings _settings;
+  final AppPreferences _preferences;
+  AppAppearance _appearance;
 
-  AppAppearanceSettings get settings => _settings;
-  AppBrand get brand => AppBrand.byId(_settings.brandId);
+  AppAppearance get appearance => _appearance;
 
-  Future<void> setBrand(AppBrandId brandId) {
-    return _update(_settings.copyWith(brandId: brandId));
-  }
-
-  Future<void> setThemeMode(AppThemeMode themeMode) {
-    return _update(_settings.copyWith(themeMode: themeMode));
-  }
-
-  Future<void> setFontLevel(AppFontLevel fontLevel) {
-    return _update(_settings.copyWith(fontLevel: fontLevel));
-  }
-
-  Future<void> setGrayscale(bool grayscale) {
-    return _update(_settings.copyWith(grayscale: grayscale));
-  }
-
-  Future<void> _update(AppAppearanceSettings next) async {
-    if (_isSame(next, _settings)) return;
-    _settings = next;
+  Future<void> setTheme(AppThemePreference value) async {
+    _appearance = _appearance.copyWith(theme: value);
     notifyListeners();
-    await _storage.saveAppearance(next);
+    await _preferences.setThemeMode(value.name);
   }
 
-  bool _isSame(AppAppearanceSettings a, AppAppearanceSettings b) {
-    return a.brandId == b.brandId &&
-        a.themeMode == b.themeMode &&
-        a.fontLevel == b.fontLevel &&
-        a.grayscale == b.grayscale;
+  Future<void> setFontScale(AppFontScale value) async {
+    _appearance = _appearance.copyWith(fontScale: value);
+    notifyListeners();
+    await _preferences.setFontScale(value.name);
+  }
+
+  Future<void> setGrayscale(bool value) async {
+    _appearance = _appearance.copyWith(grayscale: value);
+    notifyListeners();
+    await _preferences.setGrayscale(value);
+  }
+
+  Future<void> setHighContrast(bool value) async {
+    _appearance = _appearance.copyWith(highContrast: value);
+    notifyListeners();
+    await _preferences.setHighContrast(value);
+  }
+
+  Future<void> setReduceMotion(bool value) async {
+    _appearance = _appearance.copyWith(reduceMotion: value);
+    notifyListeners();
+    await _preferences.setReduceMotion(value);
   }
 }
