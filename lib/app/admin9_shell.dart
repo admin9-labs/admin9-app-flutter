@@ -1,5 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../admin9_ui.dart';
 import '../ui/features/account/views/account_page.dart';
 import '../ui/features/home/views/home_page.dart';
 
@@ -14,34 +16,44 @@ class _Admin9ShellState extends State<Admin9Shell> {
   int _selectedIndex = 0;
 
   static const _pages = [HomePage(), AccountPage()];
+  static const _destinations = [
+    AppNavigationDestination(
+      label: '首页',
+      icon: AppIconRole.home,
+      selectedIcon: AppIconRole.homeSelected,
+    ),
+    AppNavigationDestination(
+      label: '我的',
+      icon: AppIconRole.account,
+      selectedIcon: AppIconRole.accountSelected,
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Align(
-        alignment: Alignment.topCenter,
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 720),
-          child: IndexedStack(index: _selectedIndex, children: _pages),
-        ),
-      ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _selectedIndex,
-        onDestinationSelected: (value) =>
-            setState(() => _selectedIndex = value),
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home),
-            label: '首页',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.person_outline),
-            selectedIcon: Icon(Icons.person),
-            label: '我的',
-          ),
-        ],
+    final body = Align(
+      alignment: Alignment.topCenter,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 720),
+        child: IndexedStack(index: _selectedIndex, children: _pages),
       ),
     );
+    final navigation = AppBottomNavigation(
+      destinations: _destinations,
+      selectedIndex: _selectedIndex,
+      onDestinationSelected: (value) => setState(() => _selectedIndex = value),
+    );
+    if (Theme.of(context).platform == TargetPlatform.iOS) {
+      return CupertinoPageScaffold(
+        resizeToAvoidBottomInset: true,
+        child: Column(
+          children: [
+            Expanded(child: body),
+            navigation,
+          ],
+        ),
+      );
+    }
+    return Scaffold(body: body, bottomNavigationBar: navigation);
   }
 }

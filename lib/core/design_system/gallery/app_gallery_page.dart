@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/app_appearance.dart';
+import '../components/app_bottom_navigation.dart';
+import '../components/app_page.dart';
+import '../components/app_progress_indicator.dart';
+import '../foundation/app_contracts.dart';
 import '../foundation/app_theme.dart';
 import '../foundation/app_design_tokens.dart';
 
@@ -70,6 +74,7 @@ class _AppGalleryPageState extends State<AppGalleryPage> {
             builder: (context) => Scaffold(
               appBar: AppBar(title: const Text('Admin9 Gallery')),
               body: ListView(
+                key: const Key('gallery-scroll'),
                 padding: const EdgeInsets.all(16),
                 children: [
                   const Text('内部设计系统检查页'),
@@ -142,6 +147,8 @@ class _AppGalleryPageState extends State<AppGalleryPage> {
                   ),
                   const SizedBox(height: 24),
                   const _TokenSample(),
+                  const SizedBox(height: 24),
+                  const _Phase2Sample(),
                 ],
               ),
             ),
@@ -151,6 +158,151 @@ class _AppGalleryPageState extends State<AppGalleryPage> {
     );
   }
 }
+
+class _Phase2Sample extends StatefulWidget {
+  const _Phase2Sample();
+
+  @override
+  State<_Phase2Sample> createState() => _Phase2SampleState();
+}
+
+class _Phase2SampleState extends State<_Phase2Sample> {
+  int _selectedIndex = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = AppDesignScope.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text('平台骨架', style: tokens.sectionTitleTextStyle),
+        SizedBox(height: tokens.space12),
+        const AppProgressIndicator(label: '不确定进度'),
+        SizedBox(height: tokens.space16),
+        const AppProgressIndicator(
+          label: '尚未开始 0%',
+          kind: AppProgressKind.linear,
+          value: 0,
+        ),
+        SizedBox(height: tokens.space16),
+        const AppProgressIndicator(
+          label: '已完成 45%',
+          kind: AppProgressKind.linear,
+          value: 0.45,
+        ),
+        SizedBox(height: tokens.space16),
+        const AppProgressIndicator(
+          label: '已完成 100%',
+          kind: AppProgressKind.linear,
+          value: 1,
+        ),
+        SizedBox(height: tokens.space16),
+        AppBottomNavigation(
+          selectedIndex: _selectedIndex,
+          onDestinationSelected: (value) =>
+              setState(() => _selectedIndex = value),
+          destinations: const [
+            AppNavigationDestination(
+              label: '工作台首页',
+              icon: AppIconRole.home,
+              selectedIcon: AppIconRole.homeSelected,
+            ),
+            AppNavigationDestination(
+              label: '个人中心',
+              icon: AppIconRole.account,
+              selectedIcon: AppIconRole.accountSelected,
+            ),
+          ],
+        ),
+        SizedBox(height: tokens.space16),
+        Wrap(
+          spacing: tokens.space8,
+          runSpacing: tokens.space8,
+          children: [
+            FilledButton(
+              onPressed: () => AppFeedbackHost.of(context).show(
+                const AppFeedbackRequest(message: '信息已更新', tone: AppTone.info),
+              ),
+              child: const Text('信息'),
+            ),
+            FilledButton(
+              onPressed: () => AppFeedbackHost.of(context).show(
+                const AppFeedbackRequest(
+                  message: '操作已完成',
+                  tone: AppTone.success,
+                ),
+              ),
+              child: const Text('成功反馈'),
+            ),
+            OutlinedButton(
+              onPressed: () => AppFeedbackHost.of(context).show(
+                AppFeedbackRequest(
+                  message: '可以撤销这次操作',
+                  tone: AppTone.warning,
+                  actionLabel: '撤销',
+                  onAction: () {},
+                ),
+              ),
+              child: const Text('警告与撤销'),
+            ),
+            OutlinedButton(
+              onPressed: () => AppFeedbackHost.of(context).show(
+                const AppFeedbackRequest(
+                  message: '操作失败，请检查后重试。',
+                  tone: AppTone.error,
+                ),
+              ),
+              child: const Text('错误'),
+            ),
+            TextButton(
+              onPressed: () {
+                AppFeedbackHost.of(context).show(
+                  const AppFeedbackRequest(
+                    message: '新消息已替换上一条反馈，长文本将按内容增长。',
+                    tone: AppTone.info,
+                  ),
+                );
+              },
+              child: const Text('替换为长文本'),
+            ),
+            TextButton(
+              onPressed: () => AppFeedbackHost.of(context).dismiss(),
+              child: const Text('关闭反馈'),
+            ),
+            OutlinedButton(
+              onPressed: () => Navigator.of(context).push<void>(
+                MaterialPageRoute(
+                  builder: (_) => const AppPage(
+                    title: 'AppPage 子页',
+                    parentLabel: 'Gallery',
+                    navigationMode: AppPageNavigationMode.child,
+                    actions: [
+                      AppPageAction(
+                        label: '很长的可用页面操作名称',
+                        icon: AppIconRole.info,
+                        onPressed: _galleryNoop,
+                      ),
+                      AppPageAction(
+                        label: '禁用页面操作',
+                        icon: AppIconRole.more,
+                        onPressed: _galleryNoop,
+                        enabled: false,
+                      ),
+                    ],
+                    body: Text('页面栏、安全区、滚动与返回映射。'),
+                  ),
+                ),
+              ),
+              child: const Text('打开 AppPage 样例'),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+void _galleryNoop() {}
 
 class _TokenSample extends StatelessWidget {
   const _TokenSample();

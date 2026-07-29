@@ -75,11 +75,15 @@ const _fixtureExpectedViolation = <String, String>{
 };
 
 const publicBarrelExports = <String>{
+  'core/design_system/components/app_bottom_navigation.dart',
+  'core/design_system/components/app_page.dart',
+  'core/design_system/components/app_progress_indicator.dart',
   'core/design_system/foundation/app_contracts.dart',
   'core/design_system/foundation/app_design_tokens.dart',
 };
 
 const _appCoreInternalImportAllowlist = <String>{
+  'lib/app/admin9_app.dart|lib/core/design_system/components/app_feedback.dart',
   'lib/app/admin9_app.dart|lib/core/design_system/foundation/app_theme.dart',
   'lib/app/app_routes.dart|lib/core/design_system/foundation/app_theme.dart',
   'lib/app/app_routes.dart|lib/core/design_system/gallery/app_gallery_page.dart',

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../admin9_ui.dart';
+import '../core/design_system/components/app_feedback.dart';
 import '../core/design_system/foundation/app_theme.dart';
 import '../core/lifecycle/app_lifecycle_controller.dart';
 import '../core/preferences/app_preferences.dart';
@@ -26,6 +27,10 @@ class Admin9App extends StatefulWidget {
 }
 
 class _Admin9AppState extends State<Admin9App> with WidgetsBindingObserver {
+  final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
+  final AppFeedbackPresenterController _feedbackController =
+      AppFeedbackPresenterController();
+
   @override
   void initState() {
     super.initState();
@@ -72,6 +77,7 @@ class _Admin9AppState extends State<Admin9App> with WidgetsBindingObserver {
             appearance: appearance,
           );
           return MaterialApp(
+            navigatorKey: _navigatorKey,
             debugShowCheckedModeBanner: false,
             title: AppIdentity.name,
             locale: const Locale('zh', 'CN'),
@@ -118,6 +124,11 @@ class _Admin9AppState extends State<Admin9App> with WidgetsBindingObserver {
                 child: child ?? const SizedBox.shrink(),
               );
               content = Theme(data: resolved.material, child: content);
+              content = AppFeedback(
+                controller: _feedbackController,
+                navigatorKey: _navigatorKey,
+                child: content,
+              );
               content = AppDesignScope(tokens: resolved.tokens, child: content);
               if (effective.grayscale) {
                 content = ColorFiltered(

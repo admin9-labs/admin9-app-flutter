@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../admin9_ui.dart';
 import '../../../../app/app_route_names.dart';
 import '../../../../core/widgets/settings_section.dart';
 import '../view_models/session_controller.dart';
@@ -11,10 +12,12 @@ class AccountPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final session = context.watch<SessionController>();
-    return Scaffold(
-      appBar: AppBar(title: const Text('我的')),
-      body: SafeArea(
-        top: false,
+    return AppPage(
+      title: '我的',
+      navigationMode: AppPageNavigationMode.root,
+      scrollable: false,
+      body: Material(
+        type: MaterialType.transparency,
         child: ListView(
           key: const Key('account-page-list'),
           children: [
@@ -140,9 +143,9 @@ class AccountPage extends StatelessWidget {
     SessionController session,
   ) async {
     if (!session.isAuthenticated) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('当前没有可退出的会话。')));
+      AppFeedbackHost.of(context).show(
+        const AppFeedbackRequest(message: '当前没有可退出的会话。', tone: AppTone.info),
+      );
       return;
     }
     final confirmed = await showDialog<bool>(

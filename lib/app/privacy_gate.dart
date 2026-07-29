@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../admin9_ui.dart';
 import '../core/preferences/app_preferences.dart';
 import 'app_route_names.dart';
 import 'app_identity.dart';
@@ -92,11 +93,12 @@ class _PrivacyConsentPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   TextButton(
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('未同意前无法进入应用。')),
-                      );
-                    },
+                    onPressed: () => AppFeedbackHost.of(context).show(
+                      const AppFeedbackRequest(
+                        message: '未同意前无法进入应用。',
+                        tone: AppTone.warning,
+                      ),
+                    ),
                     child: const Text('暂不同意'),
                   ),
                 ],

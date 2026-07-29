@@ -313,7 +313,7 @@ void main() {
         onGenerateRoute: AppRouteFactory.onGenerateRoute,
       ),
     );
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 300));
 
     if (kReleaseMode) {
       expect(find.byType(AppGalleryPage), findsNothing);
@@ -349,11 +349,11 @@ void main() {
         ),
       ),
     );
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 300));
     await tester.tap(find.byKey(const Key('gallery-font-scale')));
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 300));
     await tester.tap(find.text('特大 1.24').last);
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 300));
     expect(tester.takeException(), isNull);
     expect(find.byType(Scrollable), findsWidgets);
   });
@@ -391,10 +391,10 @@ void main() {
           ),
         ),
       );
-      await tester.pumpAndSettle();
+      await tester.pump(const Duration(milliseconds: 300));
       await tester.dragUntilVisible(
         find.text('成功'),
-        find.byType(ListView),
+        find.byKey(const Key('gallery-scroll')),
         const Offset(0, -240),
       );
       expect(find.text('成功'), findsOneWidget);

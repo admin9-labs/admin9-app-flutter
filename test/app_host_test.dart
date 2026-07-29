@@ -31,6 +31,24 @@ void main() {
     expect(preferences.getBool('admin9.privacy.accepted'), isTrue);
   });
 
+  testWidgets(
+    'privacy decline uses global iOS feedback inside token scope',
+    (tester) async {
+      SharedPreferences.setMockInitialValues({});
+      final preferences = await SharedPreferences.getInstance();
+
+      await tester.pumpWidget(Admin9App(preferences: preferences));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('暂不同意'));
+      await tester.pump();
+
+      expect(tester.takeException(), isNull);
+      expect(find.text('未同意前无法进入应用。'), findsOneWidget);
+      expect(find.bySemanticsLabel('关闭'), findsOneWidget);
+    },
+    variant: TargetPlatformVariant.only(TargetPlatform.iOS),
+  );
+
   testWidgets('appearance preferences are applied and persisted', (
     tester,
   ) async {
