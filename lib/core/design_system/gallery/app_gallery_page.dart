@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../theme/app_appearance.dart';
 import '../components/app_bottom_navigation.dart';
+import '../components/app_form_components.dart';
+import '../components/app_notice.dart';
 import '../components/app_page.dart';
 import '../components/app_progress_indicator.dart';
 import '../components/app_settings_components.dart';
@@ -152,12 +154,125 @@ class _AppGalleryPageState extends State<AppGalleryPage> {
                   const _Phase2Sample(),
                   const SizedBox(height: 24),
                   const _Phase3Sample(),
+                  const SizedBox(height: 24),
+                  const _Phase4Sample(),
                 ],
               ),
             ),
           ),
         ),
       ),
+    );
+  }
+}
+
+class _Phase4Sample extends StatefulWidget {
+  const _Phase4Sample();
+
+  @override
+  State<_Phase4Sample> createState() => _Phase4SampleState();
+}
+
+class _Phase4SampleState extends State<_Phase4Sample> {
+  final TextEditingController _account = TextEditingController();
+  final TextEditingController _password = TextEditingController();
+
+  @override
+  void dispose() {
+    _account.dispose();
+    _password.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = AppDesignScope.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text('表单与动作', style: tokens.sectionTitleTextStyle),
+        SizedBox(height: tokens.space12),
+        AppTextField(
+          controller: _account,
+          label: '用于验证长中文持续标签的账号字段',
+          forceErrorText: '账号格式不正确，错误出现后内容区域按需增长。',
+          autofillHints: const [AutofillHints.username],
+          prefixIcon: AppIconRole.account,
+        ),
+        SizedBox(height: tokens.space12),
+        AppTextField(
+          controller: _password,
+          label: '密码',
+          obscureText: true,
+          showObscureToggle: true,
+          autofillHints: const [AutofillHints.password],
+        ),
+        SizedBox(height: tokens.space12),
+        Wrap(
+          spacing: tokens.space8,
+          runSpacing: tokens.space8,
+          children: [
+            AppButton(label: '主要操作', onPressed: _galleryNoop),
+            AppButton(
+              label: '次要操作',
+              variant: AppButtonVariant.secondary,
+              onPressed: _galleryNoop,
+            ),
+            AppButton(
+              label: '低优先级操作',
+              variant: AppButtonVariant.tertiary,
+              onPressed: _galleryNoop,
+            ),
+            AppButton(
+              label: '危险操作',
+              variant: AppButtonVariant.destructive,
+              onPressed: _galleryNoop,
+            ),
+            AppButton(label: '提交中', loading: true, onPressed: _galleryNoop),
+            AppButton(label: '不可用', enabled: false, onPressed: _galleryNoop),
+          ],
+        ),
+        SizedBox(height: tokens.space16),
+        const AppNotice(tone: AppTone.info, message: '信息状态不只依赖颜色表达。'),
+        SizedBox(height: tokens.space8),
+        const AppNotice(tone: AppTone.success, message: '操作已完成。'),
+        SizedBox(height: tokens.space8),
+        const AppNotice(tone: AppTone.warning, message: '请检查当前设置。'),
+        SizedBox(height: tokens.space8),
+        AppNotice(
+          tone: AppTone.error,
+          title: '操作失败',
+          message: '错误说明允许多行增长，恢复动作保持可达。',
+          actionLabel: '重试',
+          onAction: _galleryNoop,
+        ),
+        SizedBox(height: tokens.space12),
+        AppButton(
+          label: '打开确认对话框',
+          variant: AppButtonVariant.secondary,
+          onPressed: () => AppInteractionHost.of(context).showConfirmation(
+            title: '确认操作',
+            message: '确认继续执行此示例操作吗？',
+            confirmLabel: '继续',
+          ),
+        ),
+        SizedBox(height: tokens.space8),
+        AppButton(
+          label: '打开六项动作菜单',
+          variant: AppButtonVariant.secondary,
+          onPressed: () => AppInteractionHost.of(context).showActionMenu<int>(
+            title: '示例动作',
+            items: const [
+              AppActionMenuItem(value: 1, label: '查看'),
+              AppActionMenuItem(value: 2, label: '编辑'),
+              AppActionMenuItem(value: 3, label: '复制'),
+              AppActionMenuItem(value: 4, label: '分享'),
+              AppActionMenuItem(value: 5, label: '不可用', enabled: false),
+              AppActionMenuItem(value: 6, label: '删除', destructive: true),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

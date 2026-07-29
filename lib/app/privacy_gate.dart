@@ -68,38 +68,44 @@ class _PrivacyConsentPage extends StatelessWidget {
                   const SizedBox(height: 20),
                   Wrap(
                     alignment: WrapAlignment.center,
+                    spacing: 8,
                     children: [
-                      TextButton(
+                      AppButton(
+                        variant: AppButtonVariant.tertiary,
+                        label: '用户协议',
                         onPressed: () => Navigator.pushNamed(
                           context,
                           AppRoutes.userAgreement,
+                          arguments: '隐私保护提示',
                         ),
-                        child: const Text('用户协议'),
                       ),
-                      TextButton(
+                      AppButton(
+                        variant: AppButtonVariant.tertiary,
+                        label: '隐私政策',
                         onPressed: () => Navigator.pushNamed(
                           context,
                           AppRoutes.privacyPolicy,
+                          arguments: '隐私保护提示',
                         ),
-                        child: const Text('隐私政策'),
                       ),
                     ],
                   ),
                   const SizedBox(height: 20),
-                  FilledButton(
+                  AppButton(
                     key: const Key('privacy-accept-button'),
+                    label: '同意并继续',
                     onPressed: context.read<PrivacyController>().accept,
-                    child: const Text('同意并继续'),
                   ),
                   const SizedBox(height: 8),
-                  TextButton(
+                  AppButton(
+                    variant: AppButtonVariant.tertiary,
+                    label: '暂不同意',
                     onPressed: () => AppFeedbackHost.of(context).show(
                       const AppFeedbackRequest(
                         message: '未同意前无法进入应用。',
                         tone: AppTone.warning,
                       ),
                     ),
-                    child: const Text('暂不同意'),
                   ),
                 ],
               ),

@@ -10,20 +10,29 @@ const _fixtureRoot = 'tool/design_system/fixtures/import_boundaries';
 const _baselinePath = 'tool/design_system/import_boundary_baseline.json';
 const _allowedFeatureWidgetDeclarations = <String>{
   'Align',
+  'AutofillGroup',
+  'AutovalidateMode',
   'Builder',
   'BuildContext',
   'Center',
   'Column',
   'ConstrainedBox',
+  'CrossAxisAlignment',
   'CustomScrollView',
+  'EdgeInsets',
   'Expanded',
   'Flex',
   'Flexible',
   'FocusTraversalGroup',
+  'FocusManager',
+  'FocusNode',
   'Form',
+  'FormState',
+  'GlobalKey',
   'Key',
   'LayoutBuilder',
   'ListView',
+  'MainAxisSize',
   'MediaQuery',
   'MediaQueryData',
   'Navigator',
@@ -36,8 +45,12 @@ const _allowedFeatureWidgetDeclarations = <String>{
   'SliverList',
   'SliverPadding',
   'Stack',
+  'State',
+  'StatefulWidget',
   'StatelessWidget',
   'Text',
+  'TextEditingController',
+  'TextInputType',
   'Widget',
   'Wrap',
 };
@@ -81,6 +94,8 @@ const _fixtureExpectedViolation = <String, String>{
 
 const publicBarrelExports = <String>{
   'core/design_system/components/app_bottom_navigation.dart',
+  'core/design_system/components/app_form_components.dart',
+  'core/design_system/components/app_notice.dart',
   'core/design_system/components/app_page.dart',
   'core/design_system/components/app_progress_indicator.dart',
   'core/design_system/components/app_settings_components.dart',
@@ -90,6 +105,7 @@ const publicBarrelExports = <String>{
 
 const _appCoreInternalImportAllowlist = <String>{
   'lib/app/admin9_app.dart|lib/core/design_system/components/app_feedback.dart',
+  'lib/app/admin9_app.dart|lib/core/design_system/components/app_interaction.dart',
   'lib/app/admin9_app.dart|lib/core/design_system/foundation/app_theme.dart',
   'lib/app/app_routes.dart|lib/core/design_system/foundation/app_theme.dart',
   'lib/app/app_routes.dart|lib/core/design_system/gallery/app_gallery_page.dart',
@@ -274,25 +290,32 @@ List<String> _validateFile(
       );
     }
 
+    final shown = directive.combinators
+        .whereType<ShowCombinator>()
+        .expand((combinator) => combinator.shownNames)
+        .map((identifier) => identifier.name)
+        .toSet();
+    final selectableTextPrimitive =
+        uri == 'package:flutter/material.dart' &&
+        shown.length == 1 &&
+        shown.contains('SelectableText');
+
     if (phase == _PolicyPhase.finalPhase &&
         isBusiness &&
         (uri == 'package:flutter/material.dart' ||
-            uri == 'package:flutter/cupertino.dart')) {
+            uri == 'package:flutter/cupertino.dart') &&
+        !selectableTextPrimitive) {
       errors.add('$location Business imports an interactive platform library');
     } else if (phase == _PolicyPhase.phase0d &&
         isBusiness &&
         (uri == 'package:flutter/material.dart' ||
             uri == 'package:flutter/cupertino.dart') &&
+        !selectableTextPrimitive &&
         !baseline.legacyFeaturePlatformImports.contains('$policyPath|$uri')) {
       errors.add('$location new interactive platform import: $uri');
     }
 
     if (isBusiness && uri == 'package:flutter/widgets.dart') {
-      final shown = directive.combinators
-          .whereType<ShowCombinator>()
-          .expand((combinator) => combinator.shownNames)
-          .map((identifier) => identifier.name)
-          .toSet();
       if (shown.isEmpty ||
           shown.difference(_allowedFeatureWidgetDeclarations).isNotEmpty) {
         errors.add(

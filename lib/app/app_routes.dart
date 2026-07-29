@@ -24,20 +24,32 @@ abstract final class AppRouteFactory {
         page: AppGalleryPage(resolveTheme: _resolveGalleryTheme),
       );
     }
+    final requestedParent = settings.arguments;
+    assert(requestedParent == null || requestedParent is String);
     final page = switch (settings.name) {
-      AppRoutes.login => const AuthFormPage(flow: AuthFlow.login),
-      AppRoutes.register => const AuthFormPage(flow: AuthFlow.register),
-      AppRoutes.forgotPassword => const AuthFormPage(
+      AppRoutes.login => AuthFormPage(
+        flow: AuthFlow.login,
+        parentLabel: _parentLabel(requestedParent, '我的'),
+      ),
+      AppRoutes.register => AuthFormPage(
+        flow: AuthFlow.register,
+        parentLabel: _parentLabel(requestedParent, '我的'),
+      ),
+      AppRoutes.forgotPassword => AuthFormPage(
         flow: AuthFlow.forgotPassword,
+        parentLabel: _parentLabel(requestedParent, '登录'),
       ),
-      AppRoutes.resetPassword => const AuthFormPage(
+      AppRoutes.resetPassword => AuthFormPage(
         flow: AuthFlow.resetPassword,
+        parentLabel: _parentLabel(requestedParent, '忘记密码'),
       ),
-      AppRoutes.changePassword => const AuthFormPage(
+      AppRoutes.changePassword => AuthFormPage(
         flow: AuthFlow.changePassword,
+        parentLabel: _parentLabel(requestedParent, '账号安全'),
       ),
-      AppRoutes.accountRecovery => const AuthFormPage(
+      AppRoutes.accountRecovery => AuthFormPage(
         flow: AuthFlow.accountRecovery,
+        parentLabel: _parentLabel(requestedParent, '我的'),
       ),
       AppRoutes.profile => const ProfilePage(),
       AppRoutes.accountSecurity => const AccountSecurityPage(),
@@ -45,11 +57,13 @@ abstract final class AppRouteFactory {
       AppRoutes.settings => const SettingsPage(),
       AppRoutes.theme => const SettingsThemePage(),
       AppRoutes.fontScale => const SettingsFontScalePage(),
-      AppRoutes.userAgreement => const LegalDocumentPage(
+      AppRoutes.userAgreement => LegalDocumentPage(
         document: LegalDocument(type: LegalDocumentType.userAgreement),
+        parentLabel: _parentLabel(requestedParent, '我的'),
       ),
-      AppRoutes.privacyPolicy => const LegalDocumentPage(
+      AppRoutes.privacyPolicy => LegalDocumentPage(
         document: LegalDocument(type: LegalDocumentType.privacyPolicy),
+        parentLabel: _parentLabel(requestedParent, '我的'),
       ),
       AppRoutes.about => const AboutPage(),
       AppRoutes.contact => const ContactPage(),
@@ -63,6 +77,11 @@ abstract final class AppRouteFactory {
     required RouteSettings settings,
     required Widget page,
   }) => MaterialPageRoute<void>(settings: settings, builder: (_) => page);
+
+  static String _parentLabel(Object? requested, String fallback) {
+    if (requested case final String value when value.isNotEmpty) return value;
+    return fallback;
+  }
 
   static AppResolvedTheme _resolveGalleryTheme({
     required Brightness brightness,

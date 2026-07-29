@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../admin9_ui.dart';
 import '../core/design_system/components/app_feedback.dart';
+import '../core/design_system/components/app_interaction.dart';
 import '../core/design_system/foundation/app_theme.dart';
 import '../core/lifecycle/app_lifecycle_controller.dart';
 import '../core/preferences/app_preferences.dart';
@@ -30,6 +31,8 @@ class _Admin9AppState extends State<Admin9App> with WidgetsBindingObserver {
   final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
   final AppFeedbackPresenterController _feedbackController =
       AppFeedbackPresenterController();
+  late final AppInteractionPresenterController _interactionController =
+      AppInteractionPresenterController(navigatorKey: _navigatorKey);
 
   @override
   void initState() {
@@ -127,6 +130,10 @@ class _Admin9AppState extends State<Admin9App> with WidgetsBindingObserver {
               content = AppFeedback(
                 controller: _feedbackController,
                 navigatorKey: _navigatorKey,
+                child: content,
+              );
+              content = AppInteractionHost(
+                controller: _interactionController,
                 child: content,
               );
               content = AppDesignScope(tokens: resolved.tokens, child: content);

@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 
 import '../../../../admin9_ui.dart';
 import '../../../../app/app_route_names.dart';
-import '../../../../core/widgets/settings_section.dart';
 import '../view_models/session_controller.dart';
 
 class AccountPage extends StatelessWidget {
@@ -57,80 +56,43 @@ class AccountPage extends StatelessWidget {
             if (!session.isAuthenticated)
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 12, 20, 4),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: FilledButton(
-                        onPressed: () =>
-                            Navigator.pushNamed(context, AppRoutes.login),
-                        child: const Text('登录'),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () =>
-                            Navigator.pushNamed(context, AppRoutes.register),
-                        child: const Text('注册'),
-                      ),
-                    ),
-                  ],
+                child: _GuestActions(
+                  compact: MediaQuery.sizeOf(context).width <= 320,
                 ),
               ),
-            SettingsSection(
+            AppSection(
               title: '账号',
               children: [
-                _RouteTile(
-                  icon: Icons.badge_outlined,
-                  title: '账号资料',
-                  route: AppRoutes.profile,
-                ),
-                _RouteTile(
-                  icon: Icons.security_outlined,
-                  title: '账号安全',
-                  route: AppRoutes.accountSecurity,
-                ),
-                _RouteTile(
-                  icon: Icons.manage_search_outlined,
-                  title: '账号找回',
-                  route: AppRoutes.accountRecovery,
-                ),
-                ListTile(
-                  leading: const Icon(Icons.logout),
-                  title: const Text('退出登录'),
-                  subtitle: session.isAuthenticated
-                      ? null
-                      : const Text('当前为游客状态'),
-                  trailing: const Icon(Icons.chevron_right),
-                  onTap: () => _handleSignOut(context, session),
-                ),
+                if (session.isAuthenticated) ...[
+                  const _RouteTile(title: '账号资料', route: AppRoutes.profile),
+                  const _RouteTile(
+                    title: '账号安全',
+                    route: AppRoutes.accountSecurity,
+                  ),
+                ],
+                _RouteTile(title: '账号找回', route: AppRoutes.accountRecovery),
               ],
             ),
-            const SettingsSection(
+            const AppSection(
               title: '应用',
               children: [
-                _RouteTile(
-                  icon: Icons.settings_outlined,
-                  title: '设置',
-                  route: AppRoutes.settings,
-                ),
-                _RouteTile(
-                  icon: Icons.description_outlined,
-                  title: '用户协议',
-                  route: AppRoutes.userAgreement,
-                ),
-                _RouteTile(
-                  icon: Icons.privacy_tip_outlined,
-                  title: '隐私政策',
-                  route: AppRoutes.privacyPolicy,
-                ),
-                _RouteTile(
-                  icon: Icons.info_outline,
-                  title: '关于',
-                  route: AppRoutes.about,
-                ),
+                _RouteTile(title: '设置', route: AppRoutes.settings),
+                _RouteTile(title: '用户协议', route: AppRoutes.userAgreement),
+                _RouteTile(title: '隐私政策', route: AppRoutes.privacyPolicy),
+                _RouteTile(title: '关于', route: AppRoutes.about),
               ],
             ),
+            if (session.isAuthenticated)
+              AppSection(
+                title: '会话',
+                children: [
+                  AppListTile(
+                    title: '退出登录',
+                    leadingIcon: AppIconRole.warning,
+                    onTap: () => _handleSignOut(context, session),
+                  ),
+                ],
+              ),
             const SizedBox(height: 24),
           ],
         ),
@@ -148,44 +110,60 @@ class AccountPage extends StatelessWidget {
       );
       return;
     }
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('退出登录'),
-        content: const Text('确定退出当前会话吗？'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('取消'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('退出'),
-          ),
-        ],
-      ),
+    final confirmed = await AppInteractionHost.of(context).showConfirmation(
+      title: '退出登录',
+      message: '确定退出当前会话吗？',
+      confirmLabel: '退出',
     );
-    if (confirmed == true) session.signOut();
+    if (confirmed) session.signOut();
+  }
+}
+
+class _GuestActions extends StatelessWidget {
+  const _GuestActions({required this.compact});
+
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    final login = AppButton(
+      label: '登录',
+      onPressed: () => Navigator.pushNamed(context, AppRoutes.login),
+    );
+    final register = AppButton(
+      label: '注册',
+      variant: AppButtonVariant.secondary,
+      onPressed: () => Navigator.pushNamed(context, AppRoutes.register),
+    );
+    if (compact) {
+      return Column(
+        key: const Key('guest-actions-column'),
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [login, const SizedBox(height: 12), register],
+      );
+    }
+    return Row(
+      key: const Key('guest-actions-row'),
+      children: [
+        Expanded(child: login),
+        const SizedBox(width: 12),
+        Expanded(child: register),
+      ],
+    );
   }
 }
 
 class _RouteTile extends StatelessWidget {
-  const _RouteTile({
-    required this.icon,
-    required this.title,
-    required this.route,
-  });
+  const _RouteTile({required this.title, required this.route});
 
-  final IconData icon;
   final String title;
   final String route;
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: Icon(icon),
-      title: Text(title),
-      trailing: const Icon(Icons.chevron_right),
+    return AppListTile(
+      title: title,
+      disclosure: true,
       onTap: () => Navigator.pushNamed(context, route),
     );
   }

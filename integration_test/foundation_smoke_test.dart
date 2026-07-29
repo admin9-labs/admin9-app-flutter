@@ -28,13 +28,13 @@ void main() {
 
     await tester.tap(find.text('用户协议'));
     await tester.pumpAndSettle();
-    expect(find.widgetWithText(AppBar, '用户协议'), findsOneWidget);
+    expect(find.text('用户协议'), findsWidgets);
     expect(find.text('正式内容尚未提供'), findsOneWidget);
     await _systemBack(tester);
 
     await tester.tap(find.text('隐私政策'));
     await tester.pumpAndSettle();
-    expect(find.widgetWithText(AppBar, '隐私政策'), findsOneWidget);
+    expect(find.text('隐私政策'), findsWidgets);
     await _systemBack(tester);
 
     await tester.tap(find.byKey(const Key('privacy-accept-button')));
@@ -54,7 +54,10 @@ void main() {
       find.byKey(const Key('auth-account-field')),
       'user@example.com',
     );
-    await tester.enterText(find.byType(TextFormField).at(1), 'password123');
+    await tester.enterText(
+      find.byKey(const Key('auth-password-field')),
+      'password123',
+    );
     await tester.pump(const Duration(milliseconds: 800));
     await _screenshot(binding, '${platform}_03_login_form');
     await tester.tap(find.byKey(const Key('auth-submit-button')));
@@ -86,7 +89,7 @@ void main() {
     ).pushNamed(AppRoutes.about);
     await tester.pumpAndSettle();
     expect(find.text('1.0.0'), findsOneWidget);
-    await _iosEdgeBackOrSystemBack(tester);
+    await _systemBack(tester);
 
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pump();
@@ -121,7 +124,7 @@ Future<void> _openAndReturn(
 ) async {
   Navigator.of(tester.element(find.byType(Admin9Shell))).pushNamed(route);
   await tester.pumpAndSettle();
-  expect(find.widgetWithText(AppBar, title), findsOneWidget);
+  expect(find.text(title), findsWidgets);
   expect(tester.takeException(), isNull);
   await _systemBack(tester);
 }
@@ -164,21 +167,6 @@ Future<void> _openSettingsAndChangeAppearance(
   expect(appearance.highContrast, isTrue);
   expect(appearance.reduceMotion, isTrue);
   await _screenshot(binding, '${platform}_04_settings_accessibility');
-  await _systemBack(tester);
-}
-
-Future<void> _iosEdgeBackOrSystemBack(WidgetTester tester) async {
-  if (Platform.isIOS) {
-    final size = tester.view.physicalSize / tester.view.devicePixelRatio;
-    await tester.timedDragFrom(
-      Offset(2, size.height / 2),
-      Offset(size.width * 0.8, 0),
-      const Duration(milliseconds: 600),
-    );
-    await tester.pump(const Duration(milliseconds: 800));
-    if (find.byType(Admin9Shell).evaluate().isEmpty) await _systemBack(tester);
-    return;
-  }
   await _systemBack(tester);
 }
 

@@ -1,8 +1,10 @@
 import 'package:admin9_app_flutter/app/admin9_app.dart';
 import 'package:admin9_app_flutter/app/admin9_shell.dart';
 import 'package:admin9_app_flutter/app/app_route_names.dart';
+import 'package:admin9_app_flutter/admin9_ui.dart';
 import 'package:admin9_app_flutter/ui/features/account/view_models/session_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -32,6 +34,20 @@ void main() {
       'user@example.com',
     );
     await tester.enterText(find.byType(TextFormField).at(1), 'password123');
+    final textInputCalls = <MethodCall>[];
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      SystemChannels.textInput,
+      (call) async {
+        textInputCalls.add(call);
+        return null;
+      },
+    );
+    addTearDown(
+      () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+        SystemChannels.textInput,
+        null,
+      ),
+    );
     await tester.tap(find.byKey(const Key('auth-submit-button')));
     await tester.pumpAndSettle();
 
@@ -41,5 +57,48 @@ void main() {
       preferences.getKeys(),
       isNot(containsAll(<String>['token', 'user', 'session'])),
     );
+    expect(
+      textInputCalls.where(
+        (call) => call.method == 'TextInput.finishAutofillContext',
+      ),
+      hasLength(1),
+    );
+    expect(
+      textInputCalls
+          .singleWhere(
+            (call) => call.method == 'TextInput.finishAutofillContext',
+          )
+          .arguments,
+      isFalse,
+    );
+  });
+
+  testWidgets('auth flows expose the correct existing or new password role', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({'admin9.privacy.accepted': true});
+    final preferences = await SharedPreferences.getInstance();
+    await tester.pumpWidget(Admin9App(preferences: preferences));
+    await tester.pumpAndSettle();
+    final shellContext = tester.element(find.byType(Admin9Shell));
+    const cases = <String, String>{
+      AppRoutes.login: AutofillHints.password,
+      AppRoutes.register: AutofillHints.newPassword,
+      AppRoutes.resetPassword: AutofillHints.newPassword,
+      AppRoutes.changePassword: AutofillHints.newPassword,
+    };
+
+    for (final entry in cases.entries) {
+      Navigator.of(shellContext).pushNamed(entry.key);
+      await tester.pumpAndSettle();
+      final field = tester.widget<AppTextField>(
+        find.byKey(const Key('auth-password-field')),
+      );
+      expect(field.autofillHints, contains(entry.value));
+      Navigator.of(
+        tester.element(find.byKey(const Key('auth-password-field'))),
+      ).pop();
+      await tester.pumpAndSettle();
+    }
   });
 }

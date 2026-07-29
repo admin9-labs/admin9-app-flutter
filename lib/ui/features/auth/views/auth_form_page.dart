@@ -1,9 +1,29 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart'
+    show
+        AutofillGroup,
+        AutovalidateMode,
+        BuildContext,
+        Column,
+        CrossAxisAlignment,
+        FocusManager,
+        FocusNode,
+        Form,
+        FormState,
+        GlobalKey,
+        Key,
+        Navigator,
+        SizedBox,
+        State,
+        StatefulWidget,
+        StatelessWidget,
+        TextEditingController,
+        TextInputType,
+        Widget;
 import 'package:provider/provider.dart';
 
+import '../../../../admin9_ui.dart';
 import '../../../../app/app_route_names.dart';
-import '../../../../core/widgets/foundation_page.dart';
-import '../../../../core/widgets/unavailable_notice.dart';
 import '../view_models/auth_form_view_model.dart';
 
 enum AuthFlow {
@@ -21,23 +41,29 @@ enum AuthFlow {
 }
 
 class AuthFormPage extends StatelessWidget {
-  const AuthFormPage({super.key, required this.flow});
+  const AuthFormPage({
+    super.key,
+    required this.flow,
+    required this.parentLabel,
+  });
 
   final AuthFlow flow;
+  final String parentLabel;
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => AuthFormViewModel(),
-      child: _AuthFormView(flow: flow),
+      child: _AuthFormView(flow: flow, parentLabel: parentLabel),
     );
   }
 }
 
 class _AuthFormView extends StatefulWidget {
-  const _AuthFormView({required this.flow});
+  const _AuthFormView({required this.flow, required this.parentLabel});
 
   final AuthFlow flow;
+  final String parentLabel;
 
   @override
   State<_AuthFormView> createState() => _AuthFormViewState();
@@ -49,6 +75,10 @@ class _AuthFormViewState extends State<_AuthFormView> {
   final _currentPasswordController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmationController = TextEditingController();
+  final _accountFocus = FocusNode();
+  final _currentPasswordFocus = FocusNode();
+  final _passwordFocus = FocusNode();
+  final _confirmationFocus = FocusNode();
 
   @override
   void dispose() {
@@ -56,15 +86,21 @@ class _AuthFormViewState extends State<_AuthFormView> {
     _currentPasswordController.dispose();
     _passwordController.dispose();
     _confirmationController.dispose();
+    _accountFocus.dispose();
+    _currentPasswordFocus.dispose();
+    _passwordFocus.dispose();
+    _confirmationFocus.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<AuthFormViewModel>();
-    return FoundationPage(
+    return AppPage(
       title: widget.flow.title,
-      child: SingleChildScrollView(
+      navigationMode: AppPageNavigationMode.child,
+      parentLabel: widget.parentLabel,
+      body: AutofillGroup(
         child: Form(
           key: _formKey,
           autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -73,57 +109,82 @@ class _AuthFormViewState extends State<_AuthFormView> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               if (_needsAccount)
-                TextFormField(
+                AppTextField(
                   key: const Key('auth-account-field'),
                   controller: _accountController,
+                  label: '手机号或邮箱',
+                  focusNode: _accountFocus,
                   keyboardType: TextInputType.emailAddress,
-                  textInputAction: TextInputAction.next,
+                  textInputAction: _needsPassword
+                      ? TextInputAction.next
+                      : TextInputAction.done,
                   autofillHints: const [AutofillHints.username],
-                  decoration: const InputDecoration(
-                    labelText: '手机号或邮箱',
-                    prefixIcon: Icon(Icons.person_outline),
-                  ),
                   validator: _validateAccount,
+                  onFieldSubmitted: (_) => _focusAfterAccount(),
                 ),
               if (_needsAccount) const SizedBox(height: 16),
               if (widget.flow == AuthFlow.changePassword) ...[
-                _PasswordField(
+                AppTextField(
                   controller: _currentPasswordController,
                   label: '当前密码',
+                  focusNode: _currentPasswordFocus,
                   validator: _validatePassword,
+                  obscureText: true,
+                  showObscureToggle: true,
+                  textInputAction: TextInputAction.next,
+                  autofillHints: const [AutofillHints.password],
+                  onFieldSubmitted: (_) => _passwordFocus.requestFocus(),
                 ),
                 const SizedBox(height: 16),
               ],
               if (_needsPassword) ...[
-                _PasswordField(
+                AppTextField(
                   key: const Key('auth-password-field'),
                   controller: _passwordController,
                   label: _passwordLabel,
+                  focusNode: _passwordFocus,
                   validator: _validatePassword,
+                  obscureText: true,
+                  showObscureToggle: true,
+                  textInputAction: _needsConfirmation
+                      ? TextInputAction.next
+                      : TextInputAction.done,
+                  autofillHints: [_passwordAutofillHint],
+                  onFieldSubmitted: (_) => _needsConfirmation
+                      ? _confirmationFocus.requestFocus()
+                      : _submit(),
                 ),
                 const SizedBox(height: 16),
               ],
               if (_needsConfirmation) ...[
-                _PasswordField(
+                AppTextField(
                   key: const Key('auth-confirmation-field'),
                   controller: _confirmationController,
                   label: '确认新密码',
+                  focusNode: _confirmationFocus,
                   textInputAction: TextInputAction.done,
+                  obscureText: true,
+                  showObscureToggle: true,
+                  autofillHints: const [AutofillHints.newPassword],
                   validator: (value) {
                     if (value != _passwordController.text) return '两次输入的密码不一致';
                     return _validatePassword(value);
                   },
+                  onFieldSubmitted: (_) => _submit(),
                 ),
                 const SizedBox(height: 16),
               ],
               if (viewModel.state == AuthSubmissionState.unavailable) ...[
-                const UnavailableNotice(),
+                const AppNotice(
+                  tone: AppTone.info,
+                  message: '服务尚未接入，当前操作不会提交或保存。',
+                ),
                 const SizedBox(height: 16),
               ],
-              FilledButton(
+              AppButton(
                 key: const Key('auth-submit-button'),
+                label: widget.flow.actionLabel,
                 onPressed: _submit,
-                child: Text(widget.flow.actionLabel),
               ),
               const SizedBox(height: 12),
               ..._secondaryActions(context),
@@ -162,6 +223,14 @@ class _AuthFormViewState extends State<_AuthFormView> {
     _ => '新密码',
   };
 
+  String get _passwordAutofillHint => switch (widget.flow) {
+    AuthFlow.login => AutofillHints.password,
+    AuthFlow.register ||
+    AuthFlow.resetPassword ||
+    AuthFlow.changePassword => AutofillHints.newPassword,
+    _ => AutofillHints.password,
+  };
+
   String? _validateAccount(String? value) {
     final normalized = value?.trim() ?? '';
     if (normalized.isEmpty) return '请输入手机号或邮箱';
@@ -179,81 +248,75 @@ class _AuthFormViewState extends State<_AuthFormView> {
 
   void _submit() {
     FocusManager.instance.primaryFocus?.unfocus();
-    if (!(_formKey.currentState?.validate() ?? false)) return;
+    if (!(_formKey.currentState?.validate() ?? false)) {
+      _focusFirstInvalid();
+      return;
+    }
+    TextInput.finishAutofillContext(shouldSave: false);
     context.read<AuthFormViewModel>().submitValidatedForm();
+  }
+
+  void _focusAfterAccount() {
+    if (widget.flow == AuthFlow.changePassword) {
+      _currentPasswordFocus.requestFocus();
+    } else if (_needsPassword) {
+      _passwordFocus.requestFocus();
+    } else {
+      _submit();
+    }
+  }
+
+  void _focusFirstInvalid() {
+    if (_needsAccount && _validateAccount(_accountController.text) != null) {
+      _accountFocus.requestFocus();
+    } else if (widget.flow == AuthFlow.changePassword &&
+        _validatePassword(_currentPasswordController.text) != null) {
+      _currentPasswordFocus.requestFocus();
+    } else if (_needsPassword &&
+        _validatePassword(_passwordController.text) != null) {
+      _passwordFocus.requestFocus();
+    } else if (_needsConfirmation) {
+      _confirmationFocus.requestFocus();
+    }
   }
 
   List<Widget> _secondaryActions(BuildContext context) => switch (widget.flow) {
     AuthFlow.login => [
-      TextButton(
-        onPressed: () => Navigator.pushNamed(context, AppRoutes.forgotPassword),
-        child: const Text('忘记密码'),
+      AppButton(
+        variant: AppButtonVariant.tertiary,
+        label: '忘记密码',
+        onPressed: () => Navigator.pushNamed(
+          context,
+          AppRoutes.forgotPassword,
+          arguments: '登录',
+        ),
       ),
-      TextButton(
+      AppButton(
+        variant: AppButtonVariant.tertiary,
+        label: '注册账号',
         onPressed: () =>
             Navigator.pushReplacementNamed(context, AppRoutes.register),
-        child: const Text('注册账号'),
       ),
     ],
     AuthFlow.register => [
-      TextButton(
+      AppButton(
+        variant: AppButtonVariant.tertiary,
+        label: '返回登录',
         onPressed: () =>
             Navigator.pushReplacementNamed(context, AppRoutes.login),
-        child: const Text('返回登录'),
       ),
     ],
     AuthFlow.forgotPassword => [
-      TextButton(
-        onPressed: () => Navigator.pushNamed(context, AppRoutes.resetPassword),
-        child: const Text('已有重置凭据'),
+      AppButton(
+        variant: AppButtonVariant.tertiary,
+        label: '已有重置凭据',
+        onPressed: () => Navigator.pushNamed(
+          context,
+          AppRoutes.resetPassword,
+          arguments: '忘记密码',
+        ),
       ),
     ],
     _ => const [],
   };
-}
-
-class _PasswordField extends StatefulWidget {
-  const _PasswordField({
-    super.key,
-    required this.controller,
-    required this.label,
-    required this.validator,
-    this.textInputAction = TextInputAction.next,
-  });
-
-  final TextEditingController controller;
-  final String label;
-  final FormFieldValidator<String> validator;
-  final TextInputAction textInputAction;
-
-  @override
-  State<_PasswordField> createState() => _PasswordFieldState();
-}
-
-class _PasswordFieldState extends State<_PasswordField> {
-  bool _obscure = true;
-
-  @override
-  Widget build(BuildContext context) {
-    return TextFormField(
-      controller: widget.controller,
-      obscureText: _obscure,
-      textInputAction: widget.textInputAction,
-      autofillHints: const [AutofillHints.password],
-      decoration: InputDecoration(
-        labelText: widget.label,
-        prefixIcon: const Icon(Icons.lock_outline),
-        suffixIcon: IconButton(
-          tooltip: _obscure ? '显示密码' : '隐藏密码',
-          onPressed: () => setState(() => _obscure = !_obscure),
-          icon: Icon(
-            _obscure
-                ? Icons.visibility_outlined
-                : Icons.visibility_off_outlined,
-          ),
-        ),
-      ),
-      validator: widget.validator,
-    );
-  }
 }

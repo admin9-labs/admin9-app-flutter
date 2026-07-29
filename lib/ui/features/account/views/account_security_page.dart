@@ -1,41 +1,43 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart'
+    show BuildContext, ListView, Navigator, StatelessWidget, Widget;
 
+import '../../../../admin9_ui.dart';
 import '../../../../app/app_route_names.dart';
-import '../../../../core/widgets/foundation_page.dart';
 
 class AccountSecurityPage extends StatelessWidget {
   const AccountSecurityPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return FoundationPage(
+    return AppPage(
       title: '账号安全',
-      padding: EdgeInsets.zero,
-      child: ListView(
+      navigationMode: AppPageNavigationMode.child,
+      parentLabel: '我的',
+      scrollable: false,
+      body: ListView(
         children: [
-          ListTile(
-            leading: const Icon(Icons.password_outlined),
-            title: const Text('修改密码'),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () => Navigator.pushNamed(context, AppRoutes.changePassword),
-          ),
-          ListTile(
-            leading: const Icon(Icons.manage_search_outlined),
-            title: const Text('账号找回'),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () =>
-                Navigator.pushNamed(context, AppRoutes.accountRecovery),
-          ),
-          ListTile(
-            leading: Icon(
-              Icons.person_remove_outlined,
-              color: Theme.of(context).colorScheme.error,
+          AppListTile(
+            title: '修改密码',
+            disclosure: true,
+            onTap: () => Navigator.pushNamed(
+              context,
+              AppRoutes.changePassword,
+              arguments: '账号安全',
             ),
-            title: Text(
-              '账号注销',
-              style: TextStyle(color: Theme.of(context).colorScheme.error),
+          ),
+          AppListTile(
+            title: '账号找回',
+            disclosure: true,
+            onTap: () => Navigator.pushNamed(
+              context,
+              AppRoutes.accountRecovery,
+              arguments: '账号安全',
             ),
-            trailing: const Icon(Icons.chevron_right),
+          ),
+          AppListTile(
+            title: '账号注销（不可逆）',
+            leadingIcon: AppIconRole.warning,
+            disclosure: true,
             onTap: () =>
                 Navigator.pushNamed(context, AppRoutes.accountDeletion),
           ),

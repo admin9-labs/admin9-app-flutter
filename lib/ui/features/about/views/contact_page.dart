@@ -1,22 +1,28 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart'
+    show
+        BuildContext,
+        Center,
+        Column,
+        MainAxisSize,
+        StatelessWidget,
+        Text,
+        Widget;
 
-import '../../../../core/widgets/foundation_page.dart';
+import '../../../../admin9_ui.dart';
 
 class ContactPage extends StatelessWidget {
   const ContactPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const FoundationPage(
+    return const AppPage(
       title: '联系方式',
-      child: Center(
+      navigationMode: AppPageNavigationMode.child,
+      parentLabel: '关于',
+      body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.contact_mail_outlined, size: 44),
-            SizedBox(height: 16),
-            Text('正式联系方式尚未提供'),
-          ],
+          children: [Text('正式联系方式尚未提供')],
         ),
       ),
     );

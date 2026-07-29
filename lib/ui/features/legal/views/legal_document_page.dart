@@ -1,31 +1,43 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart'
+    show
+        BuildContext,
+        Center,
+        Column,
+        MainAxisSize,
+        SizedBox,
+        StatelessWidget,
+        Text,
+        Widget;
+import 'package:flutter/material.dart' show SelectableText;
 
-import '../../../../core/widgets/foundation_page.dart';
+import '../../../../admin9_ui.dart';
 import '../models/legal_document.dart';
 
 class LegalDocumentPage extends StatelessWidget {
-  const LegalDocumentPage({super.key, required this.document});
+  const LegalDocumentPage({
+    super.key,
+    required this.document,
+    required this.parentLabel,
+  });
 
   final LegalDocument document;
+  final String parentLabel;
 
   @override
   Widget build(BuildContext context) {
-    return FoundationPage(
+    return AppPage(
       title: document.type.title,
-      child: document.hasContent
-          ? SingleChildScrollView(child: SelectableText(document.content!))
+      navigationMode: AppPageNavigationMode.child,
+      parentLabel: parentLabel,
+      body: document.hasContent
+          ? SelectableText(document.content!)
           : Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.description_outlined, size: 44),
-                  const SizedBox(height: 16),
                   const Text('正式内容尚未提供'),
                   const SizedBox(height: 8),
-                  Text(
-                    '资源标识：${document.type.resourceKey}',
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
+                  Text('资源标识：${document.type.resourceKey}'),
                 ],
               ),
             ),
