@@ -28,6 +28,10 @@ const feedbackRequest = AppFeedbackRequest(
   message: '状态已更新',
   tone: AppTone.info,
 );
+const appearanceContract = AppAppearance(
+  theme: AppThemePreference.system,
+  fontScale: AppFontScale.extraLarge,
+);
 
 const brandContract = appBrandTheme;
 
@@ -38,5 +42,6 @@ void main() {
   assert(navigationDestination.label.isNotEmpty);
   assert(actionMenuItem.value == 1);
   assert(feedbackRequest.actionLabel == null);
+  assert(appearanceContract.fontScale.factor == 1.24);
   assert(brandContract.radiusDelta == 0);
 }

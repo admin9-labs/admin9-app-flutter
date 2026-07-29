@@ -1,8 +1,16 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart'
+    show
+        BuildContext,
+        Column,
+        CrossAxisAlignment,
+        SizedBox,
+        StatelessWidget,
+        Widget;
 import 'package:provider/provider.dart';
 
 import '../../../../admin9_ui.dart';
 import '../view_models/session_controller.dart';
+import '../widgets/account_identity_mark.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -17,10 +25,7 @@ class ProfilePage extends StatelessWidget {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const CircleAvatar(
-            radius: 40,
-            child: Icon(Icons.person_outline, size: 36),
-          ),
+          const AccountIdentityMark(size: 80, label: '账号身份'),
           const SizedBox(height: 24),
           const AppSection(
             title: '身份信息',

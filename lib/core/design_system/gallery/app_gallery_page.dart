@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../theme/app_appearance.dart';
 import '../components/app_bottom_navigation.dart';
 import '../components/app_form_components.dart';
 import '../components/app_notice.dart';
@@ -8,6 +7,8 @@ import '../components/app_page.dart';
 import '../components/app_progress_indicator.dart';
 import '../components/app_settings_components.dart';
 import '../foundation/app_contracts.dart';
+import '../foundation/app_appearance.dart';
+import '../foundation/app_appearance_resolution.dart';
 import '../foundation/app_theme.dart';
 import '../foundation/app_design_tokens.dart';
 

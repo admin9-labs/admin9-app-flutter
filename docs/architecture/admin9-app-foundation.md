@@ -9,13 +9,14 @@ app/
   admin9_shell.dart
   privacy_gate.dart
 core/
-  branding/
+  design_system/
+    components/
+    foundation/
+    gallery/
   errors/
   lifecycle/
   navigation/
   preferences/
-  theme/
-  widgets/
 ui/features/
   home/
   auth/
@@ -29,14 +30,15 @@ ui/features/
 
 - `main.dart` 初始化 Flutter、SharedPreferences 和全局错误捕获。
 - `app/` 是 Provider 组合根、隐私门禁和一级导航宿主。
-- `core/` 只放跨页面且已有消费者的宿主能力。
+- `core/design_system/` 持有已冻结的 Core 组件、Token、平台映射和内部 Gallery；feature 只通过 `lib/admin9_ui.dart` 使用公共合同。
+- `core/` 其他目录只放跨页面且已有消费者的宿主能力。
 - 每个 feature 只包含实际页面及其必要 ViewModel/模型。
 - `AppPreferences` 是唯一持久化入口；仅保存外观、无障碍和隐私同意。
 - `SessionController` 不持久化用户或会话，当前永远不会由认证表单切换为已登录。
 
 ## Navigation
 
-底部 `NavigationBar` 仅有“首页”和“我的”。二级页面通过命名路由进入，统一使用 `FoundationPage`。路由表是静态、显式、可审计的页面映射。
+一级导航通过 `AppBottomNavigation` 映射为 Android `NavigationBar` 和 iOS `CupertinoTabBar`，仅有“首页”和“我的”。二级页面通过命名路由进入，统一使用 `AppPage` 的 child 模式。路由表是静态、显式、可审计的页面映射。
 
 ## Delivery Gates
 

@@ -96,7 +96,7 @@ lib/
     └── admin9_ui_gallery_page.dart
 ```
 
-`lib/admin9_ui.dart` 是 feature 唯一允许导入的 Admin9 UI 出口，只导出稳定组件、公共枚举和主题读取 API。它不导出 Gallery、平台图标表、主题构建器内部实现和迁移兼容层。
+`lib/admin9_ui.dart` 是 feature 唯一允许导入的 Admin9 UI 出口，只导出稳定组件、公共枚举、只读 Token，以及 `AppThemePreference`、`AppFontScale`、`AppAppearance`、`AppAppearanceController` 外观偏好合同。它不导出 `ThemeMode` 映射、系统偏好合并、`AppTextScaler`、持久化实现、Gallery、平台图标表、主题构建器内部实现和迁移兼容层。
 
 `BrandMark` 继续属于应用 branding 层，不从 `admin9_ui.dart` 导出。`AppNotice` 只接收调用方文案和 tone，不内置“服务尚未接入”等业务文字。
 

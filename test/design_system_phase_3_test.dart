@@ -8,8 +8,7 @@ import 'package:admin9_app_flutter/app/brand/app_brand_theme.dart';
 import 'package:admin9_app_flutter/core/design_system/components/app_feedback.dart';
 import 'package:admin9_app_flutter/core/design_system/foundation/app_theme.dart';
 import 'package:admin9_app_flutter/core/preferences/app_preferences.dart';
-import 'package:admin9_app_flutter/core/theme/app_appearance.dart';
-import 'package:admin9_app_flutter/core/theme/appearance_controller.dart';
+import 'package:admin9_app_flutter/core/design_system/foundation/appearance_controller.dart';
 import 'package:admin9_app_flutter/ui/features/settings/views/settings_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -217,7 +216,7 @@ void main() {
     await tester.pumpAndSettle();
     final restored = tester
         .element(find.byType(MaterialApp))
-        .read<AppearanceController>()
+        .read<AppAppearanceController>()
         .appearance;
     expect(restored.theme, AppThemePreference.dark);
     expect(restored.fontScale, AppFontScale.extraLarge);
@@ -297,7 +296,7 @@ void main() {
         theme: resolved.material,
         home: AppDesignScope(
           tokens: resolved.tokens,
-          child: ChangeNotifierProvider<AppearanceController>.value(
+          child: ChangeNotifierProvider<AppAppearanceController>.value(
             value: controller,
             child: AppFeedback(
               controller: feedback,
@@ -347,7 +346,7 @@ void main() {
       brandSecondary: appBrandTheme.secondaryLight,
     );
     await tester.pumpWidget(
-      ChangeNotifierProvider<AppearanceController>.value(
+      ChangeNotifierProvider<AppAppearanceController>.value(
         value: controller,
         child: AppDesignScope(
           tokens: resolved.tokens,

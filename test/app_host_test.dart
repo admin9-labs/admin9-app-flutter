@@ -1,7 +1,6 @@
 import 'package:admin9_app_flutter/app/admin9_app.dart';
 import 'package:admin9_app_flutter/core/lifecycle/app_lifecycle_controller.dart';
-import 'package:admin9_app_flutter/core/theme/app_appearance.dart';
-import 'package:admin9_app_flutter/core/theme/appearance_controller.dart';
+import 'package:admin9_app_flutter/admin9_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
@@ -59,7 +58,7 @@ void main() {
     await tester.pumpAndSettle();
 
     final context = tester.element(find.byType(MaterialApp));
-    final controller = context.read<AppearanceController>();
+    final controller = context.read<AppAppearanceController>();
     await controller.setTheme(AppThemePreference.dark);
     await controller.setFontScale(AppFontScale.large);
     await controller.setGrayscale(true);

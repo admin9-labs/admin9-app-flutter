@@ -33,7 +33,7 @@ class AppButton extends StatelessWidget {
       icon: icon,
       loading: loading,
       platform: platform,
-      progressColor: _progressColor(tokens),
+      progressColor: tokens.onSurface,
     );
     final button = platform == TargetPlatform.iOS
         ? _cupertinoButton(tokens, callback, content)
@@ -49,12 +49,6 @@ class AppButton extends StatelessWidget {
       child: ExcludeSemantics(child: button),
     );
   }
-
-  Color _progressColor(AppDesignTokens tokens) => switch (variant) {
-    AppButtonVariant.primary => tokens.onPrimary,
-    AppButtonVariant.destructive => tokens.onDanger,
-    AppButtonVariant.secondary || AppButtonVariant.tertiary => tokens.primary,
-  };
 
   Widget _materialButton(
     AppDesignTokens tokens,

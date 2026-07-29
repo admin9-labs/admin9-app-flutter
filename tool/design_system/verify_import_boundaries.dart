@@ -15,12 +15,15 @@ const _allowedFeatureWidgetDeclarations = <String>{
   'Builder',
   'BuildContext',
   'Center',
+  'ClipOval',
+  'ColoredBox',
   'Column',
   'ConstrainedBox',
   'CrossAxisAlignment',
   'CustomScrollView',
   'EdgeInsets',
   'Expanded',
+  'ExcludeSemantics',
   'Flex',
   'Flexible',
   'FocusTraversalGroup',
@@ -29,6 +32,7 @@ const _allowedFeatureWidgetDeclarations = <String>{
   'Form',
   'FormState',
   'GlobalKey',
+  'Image',
   'Key',
   'LayoutBuilder',
   'ListView',
@@ -100,6 +104,7 @@ const publicBarrelExports = <String>{
   'core/design_system/components/app_progress_indicator.dart',
   'core/design_system/components/app_settings_components.dart',
   'core/design_system/foundation/app_contracts.dart',
+  'core/design_system/foundation/app_appearance.dart',
   'core/design_system/foundation/app_design_tokens.dart',
 };
 
@@ -107,6 +112,8 @@ const _appCoreInternalImportAllowlist = <String>{
   'lib/app/admin9_app.dart|lib/core/design_system/components/app_feedback.dart',
   'lib/app/admin9_app.dart|lib/core/design_system/components/app_interaction.dart',
   'lib/app/admin9_app.dart|lib/core/design_system/foundation/app_theme.dart',
+  'lib/app/admin9_app.dart|lib/core/design_system/foundation/app_appearance_resolution.dart',
+  'lib/app/admin9_app.dart|lib/core/design_system/foundation/appearance_controller.dart',
   'lib/app/app_routes.dart|lib/core/design_system/foundation/app_theme.dart',
   'lib/app/app_routes.dart|lib/core/design_system/gallery/app_gallery_page.dart',
   'lib/app/app_routes.dart|lib/core/design_system/gallery/app_gallery_registry.dart',
@@ -204,7 +211,11 @@ List<String> _validateRepository(_PolicyPhase phase) {
     }
   }
   errors.addAll(verifyPublicBarrel(File('lib/admin9_ui.dart')));
-  if (phase == _PolicyPhase.phase0d) {
+  if (phase == _PolicyPhase.finalPhase &&
+      (baseline.legacyFeaturePlatformImports.isNotEmpty ||
+          baseline.legacyFeatureCoreImports.isNotEmpty)) {
+    errors.add('final import boundary requires an empty legacy debt baseline');
+  } else if (phase == _PolicyPhase.phase0d) {
     final stale = <String>{
       ...baseline.legacyFeaturePlatformImports,
       ...baseline.legacyFeatureCoreImports,

@@ -15,15 +15,13 @@ import 'package:provider/provider.dart';
 
 import '../../../../admin9_ui.dart';
 import '../../../../app/app_route_names.dart';
-import '../../../../core/theme/app_appearance.dart';
-import '../../../../core/theme/appearance_controller.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final controller = context.watch<AppearanceController>();
+    final controller = context.watch<AppAppearanceController>();
     final appearance = controller.appearance;
     final system = MediaQuery.of(context);
     return AppPage(
@@ -125,7 +123,7 @@ class SettingsPage extends StatelessWidget {
 
   Future<void> _saveBoolean(
     BuildContext context,
-    AppearanceController controller,
+    AppAppearanceController controller,
     Future<void> Function() save,
   ) async {
     await save();
@@ -139,7 +137,7 @@ class SettingsThemePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = context.watch<AppearanceController>();
+    final controller = context.watch<AppAppearanceController>();
     return AppSingleChoiceList<AppThemePreference>(
       title: '主题',
       value: controller.appearance.theme,
@@ -153,7 +151,7 @@ class SettingsThemePage extends StatelessWidget {
 
   Future<void> _saveTheme(
     BuildContext context,
-    AppearanceController controller,
+    AppAppearanceController controller,
     AppThemePreference value,
   ) async {
     await controller.setTheme(value);
@@ -167,7 +165,7 @@ class SettingsFontScalePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = context.watch<AppearanceController>();
+    final controller = context.watch<AppAppearanceController>();
     return AppSingleChoiceList<AppFontScale>(
       title: 'App 字号',
       value: controller.appearance.fontScale,
@@ -182,7 +180,7 @@ class SettingsFontScalePage extends StatelessWidget {
 
   Future<void> _saveFontScale(
     BuildContext context,
-    AppearanceController controller,
+    AppAppearanceController controller,
     AppFontScale value,
   ) async {
     await controller.setFontScale(value);
@@ -191,14 +189,14 @@ class SettingsFontScalePage extends StatelessWidget {
   }
 }
 
-void _showRetry(BuildContext context, AppearanceController controller) {
+void _showRetry(BuildContext context, AppAppearanceController controller) {
   final feedback = AppFeedbackHost.of(context);
   feedback.show(_retryRequest(feedback, controller));
 }
 
 AppFeedbackRequest _retryRequest(
   AppFeedbackController feedback,
-  AppearanceController controller,
+  AppAppearanceController controller,
 ) => AppFeedbackRequest(
   message: '设置暂未保存。',
   tone: AppTone.error,
@@ -208,7 +206,7 @@ AppFeedbackRequest _retryRequest(
 
 Future<void> _retryPersistence(
   AppFeedbackController feedback,
-  AppearanceController controller,
+  AppAppearanceController controller,
 ) async {
   await controller.retryPersistence();
   if (controller.persistenceFailed) {
@@ -218,7 +216,7 @@ Future<void> _retryPersistence(
 
 Future<void> _retryFromSettings(
   BuildContext context,
-  AppearanceController controller,
+  AppAppearanceController controller,
 ) async {
   await controller.retryPersistence();
   if (!context.mounted || !controller.persistenceFailed) return;

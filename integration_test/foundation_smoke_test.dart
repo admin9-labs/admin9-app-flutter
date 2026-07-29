@@ -3,8 +3,7 @@ import 'dart:io';
 import 'package:admin9_app_flutter/app/admin9_app.dart';
 import 'package:admin9_app_flutter/app/admin9_shell.dart';
 import 'package:admin9_app_flutter/app/app_route_names.dart';
-import 'package:admin9_app_flutter/core/theme/app_appearance.dart';
-import 'package:admin9_app_flutter/core/theme/appearance_controller.dart';
+import 'package:admin9_app_flutter/admin9_ui.dart';
 import 'package:admin9_app_flutter/ui/features/account/view_models/session_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -100,7 +99,7 @@ void main() {
     expect(find.text('暂无内容'), findsOneWidget);
     final appearance = tester
         .element(find.byType(MaterialApp))
-        .read<AppearanceController>()
+        .read<AppAppearanceController>()
         .appearance;
     expect(appearance.theme, AppThemePreference.dark);
     expect(appearance.fontScale, AppFontScale.extraLarge);
@@ -159,7 +158,7 @@ Future<void> _openSettingsAndChangeAppearance(
 
   final appearance = tester
       .element(find.byType(MaterialApp))
-      .read<AppearanceController>()
+      .read<AppAppearanceController>()
       .appearance;
   expect(appearance.theme, AppThemePreference.dark);
   expect(appearance.fontScale, AppFontScale.extraLarge);

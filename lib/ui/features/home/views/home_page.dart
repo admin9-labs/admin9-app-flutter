@@ -1,4 +1,15 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart'
+    show
+        BuildContext,
+        Center,
+        Column,
+        EdgeInsets,
+        MainAxisSize,
+        Padding,
+        SizedBox,
+        StatelessWidget,
+        Text,
+        Widget;
 
 import '../../../../admin9_ui.dart';
 import '../../../../app/app_identity.dart';
@@ -9,6 +20,7 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tokens = AppDesignScope.of(context);
     return AppPage(
       title: AppIdentity.name,
       navigationMode: AppPageNavigationMode.root,
@@ -21,7 +33,7 @@ class HomePage extends StatelessWidget {
             children: [
               const BrandMark(size: 72, showName: false),
               const SizedBox(height: 24),
-              Text('暂无内容', style: Theme.of(context).textTheme.titleMedium),
+              Text('暂无内容', style: tokens.sectionTitleTextStyle),
             ],
           ),
         ),

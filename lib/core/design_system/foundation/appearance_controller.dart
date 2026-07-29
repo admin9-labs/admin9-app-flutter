@@ -1,9 +1,7 @@
-import 'package:flutter/foundation.dart';
-
-import '../preferences/app_preferences.dart';
+import '../../preferences/app_preferences.dart';
 import 'app_appearance.dart';
 
-class AppearanceController extends ChangeNotifier {
+class AppearanceController extends AppAppearanceController {
   AppearanceController(this._preferences)
     : _appearance = AppAppearance(
         theme: AppThemePreference.parse(_preferences.themeMode),
@@ -20,9 +18,12 @@ class AppearanceController extends ChangeNotifier {
   final Map<_AppearancePreferenceKey, _FailedAppearanceWrite> _failedWrites =
       {};
 
+  @override
   AppAppearance get appearance => _appearance;
+  @override
   bool get persistenceFailed => _failedWrites.isNotEmpty;
 
+  @override
   Future<void> setTheme(AppThemePreference value) async {
     _appearance = _appearance.copyWith(theme: value);
     notifyListeners();
@@ -32,6 +33,7 @@ class AppearanceController extends ChangeNotifier {
     );
   }
 
+  @override
   Future<void> setFontScale(AppFontScale value) async {
     _appearance = _appearance.copyWith(fontScale: value);
     notifyListeners();
@@ -41,6 +43,7 @@ class AppearanceController extends ChangeNotifier {
     );
   }
 
+  @override
   Future<void> setGrayscale(bool value) async {
     _appearance = _appearance.copyWith(grayscale: value);
     notifyListeners();
@@ -50,6 +53,7 @@ class AppearanceController extends ChangeNotifier {
     );
   }
 
+  @override
   Future<void> setHighContrast(bool value) async {
     _appearance = _appearance.copyWith(highContrast: value);
     notifyListeners();
@@ -59,6 +63,7 @@ class AppearanceController extends ChangeNotifier {
     );
   }
 
+  @override
   Future<void> setReduceMotion(bool value) async {
     _appearance = _appearance.copyWith(reduceMotion: value);
     notifyListeners();
@@ -68,6 +73,7 @@ class AppearanceController extends ChangeNotifier {
     );
   }
 
+  @override
   Future<void> retryPersistence() async {
     for (final entry in _failedWrites.entries.toList(growable: false)) {
       final failure = entry.value;

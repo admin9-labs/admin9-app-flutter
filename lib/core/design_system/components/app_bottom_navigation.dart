@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -21,7 +23,10 @@ class AppBottomNavigation extends StatelessWidget {
   Widget build(BuildContext context) {
     final platform = Theme.of(context).platform;
     if (platform == TargetPlatform.iOS) {
+      final scaler = MediaQuery.textScalerOf(context);
+      final contentHeight = scaler.scale(24) + scaler.scale(10) + 12;
       return CupertinoTabBar(
+        height: math.max(50, contentHeight),
         currentIndex: selectedIndex,
         onTap: onDestinationSelected,
         items: destinations

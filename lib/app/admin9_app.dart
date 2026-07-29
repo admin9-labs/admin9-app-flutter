@@ -7,10 +7,10 @@ import '../admin9_ui.dart';
 import '../core/design_system/components/app_feedback.dart';
 import '../core/design_system/components/app_interaction.dart';
 import '../core/design_system/foundation/app_theme.dart';
+import '../core/design_system/foundation/app_appearance_resolution.dart';
+import '../core/design_system/foundation/appearance_controller.dart';
 import '../core/lifecycle/app_lifecycle_controller.dart';
 import '../core/preferences/app_preferences.dart';
-import '../core/theme/app_appearance.dart';
-import '../core/theme/appearance_controller.dart';
 import '../ui/features/account/view_models/session_controller.dart';
 import 'admin9_shell.dart';
 import 'app_routes.dart';
@@ -56,7 +56,7 @@ class _Admin9AppState extends State<Admin9App> with WidgetsBindingObserver {
     final appPreferences = AppPreferences(widget.preferences);
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(
+        ChangeNotifierProvider<AppAppearanceController>(
           create: (_) => AppearanceController(appPreferences),
         ),
         ChangeNotifierProvider(
@@ -68,7 +68,7 @@ class _Admin9AppState extends State<Admin9App> with WidgetsBindingObserver {
         ),
         ChangeNotifierProvider(create: (_) => SessionController()),
       ],
-      child: Consumer<AppearanceController>(
+      child: Consumer<AppAppearanceController>(
         builder: (context, controller, _) {
           final appearance = controller.appearance;
           final light = _resolveTheme(
@@ -92,7 +92,7 @@ class _Admin9AppState extends State<Admin9App> with WidgetsBindingObserver {
             ],
             theme: light.material,
             darkTheme: dark.material,
-            themeMode: appearance.theme.themeMode,
+            themeMode: _themeMode(appearance.theme),
             themeAnimationDuration:
                 (appearance.reduceMotion ||
                     WidgetsBinding
@@ -195,3 +195,9 @@ class _Admin9AppState extends State<Admin9App> with WidgetsBindingObserver {
     brandRadiusDelta: appBrandTheme.radiusDelta,
   );
 }
+
+ThemeMode _themeMode(AppThemePreference preference) => switch (preference) {
+  AppThemePreference.system => ThemeMode.system,
+  AppThemePreference.light => ThemeMode.light,
+  AppThemePreference.dark => ThemeMode.dark,
+};
