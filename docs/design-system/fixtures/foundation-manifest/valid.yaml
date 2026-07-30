@@ -1,11 +1,11 @@
 {
   "schemaVersion": "1.0.0",
   "foundation": {
-    "commit": "1c91f21eaee511f081d5addbe765151f27a53fb9",
+    "commit": "54d139c70d6e4b873d7bc97b445e10b0264d450d",
     "tag": null,
     "upstreamRemote": null
   },
-  "designSystem": { "version": "1.0.1", "sourceTag": "design-system-v1.0.1" },
+  "designSystem": { "version": "1.0.2", "sourceTag": "design-system-v1.0.2" },
   "app": {
     "name": "Admin9 derived app",
     "version": "1.0.0",

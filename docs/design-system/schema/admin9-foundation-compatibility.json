@@ -8,6 +8,14 @@
       "flutter": "3.44.1",
       "dart": "3.12.1",
       "status": "approved"
+    },
+    {
+      "foundationCommit": "54d139c70d6e4b873d7bc97b445e10b0264d450d",
+      "designSystemVersion": "1.0.2",
+      "designSystemSourceTag": "design-system-v1.0.2",
+      "flutter": "3.44.1",
+      "dart": "3.12.1",
+      "status": "approved"
     }
   ]
 }

@@ -279,16 +279,18 @@ blocked decision is retained only as history.
 
 - Current committed implementation HEAD before the Phase 6 working tree:
   `a31227b014ac5d5564735552c4e30851eca8707e`.
+- Final Phase 6 implementation commit:
+  `54d139c70d6e4b873d7bc97b445e10b0264d450d`.
 - Phase 0D through Phase 5 commits are local and have not been pushed.
-- The system-UI fix, tests, evidence, and final Go report remain unstaged and
-  uncommitted.
+- The system-UI fix, tests, tools, evidence and Go report are frozen in that
+  focused implementation commit.
 - The repository-wide `*.log` ignore rule also matches Phase 6 evidence logs.
   The eventual focused Phase 6 commit MUST force-add the exact reviewed log
   files and verify them with `git ls-files`; ordinary directory staging is not
   sufficient.
-- The Phase 6 implementation and acceptance commits and annotated final tag are
-  created only after the final serial mechanical checks and fresh independent
-  review pass.
+- A separate provenance commit records this exact implementation SHA in the
+  v1.0.2 machine compatibility contract; the annotated final tag points to that
+  provenance commit so no commit attempts to name itself.
 - Phase 6 runtime changes are limited to the App-host system-UI overlay, the
   release-only production plugin registry, stable root Grayscale filtering,
   the one-time privacy transition announcement, and the authentication
