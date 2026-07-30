@@ -1,0 +1,62 @@
+Date: 2026-07-30
+Device: Xiaomi M2007J22C, Android 10 / API 29, 1080x2340 at 440dpi
+Release APK SHA-256: 192d27fd82585d4a47cc06e8e7b8259c088ed7346d7e17d3c5030fa9642d2a80
+
+Observed checks:
+
+1. Standard system font scale 1.0, light appearance
+   - Home and guest account pages rendered without visible overlap or clipping.
+   - Status icons remained dark on the light top surface.
+   - Evidence: physical-android-api29-release-light.png and
+     physical-android-api29-account.png.
+
+2. System font scale 2.0
+   - Home, guest account, and login pages used content-driven growth.
+   - The account page required scrolling for later rows; no entry was treated
+     as missing merely because it was below the first viewport.
+   - Login labels, input outlines, password visibility control, primary action,
+     and secondary actions remained present without overlap.
+   - Evidence: physical-android-api29-font-scale-2x-home.png,
+     physical-android-api29-font-scale-2x-account.png, and
+     physical-android-api29-font-scale-2x-login.png.
+
+3. Real IME and password boundary at system font scale 2.0
+   - Focusing the account field showed the installed Xiaomi Sogou IME.
+   - dumpsys reported mInputShown=true and mIsInputViewShown=true.
+   - The keyboard showed a visible Next action and the App resized without the
+     focused field being obscured.
+   - Moving to the password field changed the active IME to MIUI's security
+     keyboard (`com.miui.securityinputmethod/.latin.LatinIME`). That keyboard
+     blocked screen capture. The zero-byte capture was discarded; after hiding
+     the keyboard, the filled account and obscured password remained in place.
+   - Evidence: physical-android-api29-font-scale-2x-login-ime.png and
+     physical-android-api29-font-scale-2x-login-filled.png.
+
+4. App appearance preference
+   - Settings showed a Material single-choice theme page and current-value row.
+   - Selecting Dark updated the Settings page immediately.
+   - Force-stopping and cold-starting the App retained Dark appearance.
+   - Evidence: physical-android-api29-settings-light.png,
+     physical-android-api29-theme-picker.png,
+     physical-android-api29-settings-dark.png, and
+     physical-android-api29-dark-persisted-restart.png.
+
+5. Clean release first launch
+   - App data was cleared after the persistence check.
+   - The next cold launch returned to the privacy gate in light appearance.
+   - The privacy copy, legal links, primary action, and decline action were all
+     visible without clipping.
+   - Evidence: physical-android-api29-clean-release-privacy-gate.png.
+
+Temporary device settings were restored after the run:
+  system font scale: 1.0
+  stay_on_while_plugged_in: 0
+
+Evidence boundary:
+  - Screen captures were inspected by the test operator, not by TalkBack or
+    Switch Access users.
+  - This API 29 phone cannot prove current-version Android behavior or
+    predictive back.
+  - No claim is made for TalkBack speech, Switch Access scanning, autofill or a
+    password manager, external keyboard, physical hit-target measurement, or
+    the complete human reference tasks.

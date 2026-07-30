@@ -1,0 +1,20 @@
+Admin9 Phase 6 API 36 gesture post-system-UI-fix smoke environment
+Started: 2026-07-30T00:56:04Z
+Completed: 2026-07-30T00:57:02Z
+Target: emulator-5554 / Admin9_API_36
+Android release: 16
+API: 36
+Build fingerprint: google/sdk_gphone64_arm64/emu64a:16/BE2A.250530.026.F3/13894323:userdebug/dev-keys
+navigation_mode: 2
+enabled navigation overlay: com.android.internal.systemui.navbar.gestural
+disabled navigation overlay: com.android.internal.systemui.navbar.threebutton
+Command: flutter test integration_test/foundation_smoke_test.dart -d emulator-5554 -r expanded
+Result: All tests passed, 1 integration test
+Smoke log SHA-256: b2aa065189bf5a0ac154e792d7e8fe34d4b347fc8d60179cb1ae62b10940d319
+Debug APK SHA-256: 9815617c8ba80266b402aebaf81605162b8cabbf741862107368b95da6d1bc07
+App host source SHA-256: 89b50e88dcc697bc1b37e555f603eba0ca96370c8aa431cab8554fbf956c80d1
+Host test source SHA-256: ddfb5a94bf4c4fb5ebd79ce0b2b9c3d95d3ecc8dec33512440775977e079887a
+
+This proves application-state smoke on the recorded gesture-navigation AVD.
+It does not prove predictive-back start, progress, cancellation, completion, or
+human system-UI behavior.

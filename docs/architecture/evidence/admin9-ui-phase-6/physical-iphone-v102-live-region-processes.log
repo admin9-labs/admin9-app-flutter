@@ -1,0 +1,8 @@
+02:34:56  Acquired tunnel connection to device.
+02:34:56  Enabling developer disk image services.
+02:34:56  Acquired usage assertion.
+PID     Executable Path
+-----   -------------------------------------------------------------------------------------------------
+25105   /private/var/containers/Bundle/Application/6FD5480A-5D74-4AA0-80E6-F0D891AC3532/Runner.app/Runner
+25377   /private/var/containers/Bundle/Application/CF1D524A-4F8A-4A68-A9C0-9D904D5F4509/Runner.app/Runner
+26841   /private/var/containers/Bundle/Application/1C76A6A7-9C97-482B-9FE3-95409111BD20/Runner.app/Runner

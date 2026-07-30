@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -137,35 +138,18 @@ class _Admin9AppState extends State<Admin9App> with WidgetsBindingObserver {
                 child: content,
               );
               content = AppDesignScope(tokens: resolved.tokens, child: content);
-              if (effective.grayscale) {
-                content = ColorFiltered(
-                  key: const Key('global-grayscale-filter'),
-                  colorFilter: const ColorFilter.matrix([
-                    0.2126,
-                    0.7152,
-                    0.0722,
-                    0,
-                    0,
-                    0.2126,
-                    0.7152,
-                    0.0722,
-                    0,
-                    0,
-                    0.2126,
-                    0.7152,
-                    0.0722,
-                    0,
-                    0,
-                    0,
-                    0,
-                    0,
-                    1,
-                    0,
-                  ]),
-                  child: content,
-                );
-              }
-              return content;
+              content = ColorFiltered(
+                key: const Key('global-grayscale-filter'),
+                colorFilter: effective.grayscale
+                    ? _grayscaleColorFilter
+                    : _identityColorFilter,
+                child: content,
+              );
+              return AnnotatedRegion<SystemUiOverlayStyle>(
+                key: const Key('global-system-ui-style'),
+                value: _systemUiStyle(effective.brightness),
+                child: content,
+              );
             },
             home: const PrivacyGate(child: Admin9Shell()),
           );
@@ -193,6 +177,67 @@ class _Admin9AppState extends State<Admin9App> with WidgetsBindingObserver {
         : appBrandTheme.secondaryLight,
     brandFontFamily: appBrandTheme.fontFamily,
     brandRadiusDelta: appBrandTheme.radiusDelta,
+  );
+}
+
+const _identityColorFilter = ColorFilter.matrix([
+  1,
+  0,
+  0,
+  0,
+  0,
+  0,
+  1,
+  0,
+  0,
+  0,
+  0,
+  0,
+  1,
+  0,
+  0,
+  0,
+  0,
+  0,
+  1,
+  0,
+]);
+
+const _grayscaleColorFilter = ColorFilter.matrix([
+  0.2126,
+  0.7152,
+  0.0722,
+  0,
+  0,
+  0.2126,
+  0.7152,
+  0.0722,
+  0,
+  0,
+  0.2126,
+  0.7152,
+  0.0722,
+  0,
+  0,
+  0,
+  0,
+  0,
+  1,
+  0,
+]);
+
+SystemUiOverlayStyle _systemUiStyle(Brightness brightness) {
+  final iconBrightness = brightness == Brightness.dark
+      ? Brightness.light
+      : Brightness.dark;
+  return SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+    statusBarIconBrightness: iconBrightness,
+    statusBarBrightness: brightness,
+    systemNavigationBarColor: Colors.transparent,
+    systemNavigationBarDividerColor: Colors.transparent,
+    systemNavigationBarIconBrightness: iconBrightness,
+    systemNavigationBarContrastEnforced: true,
   );
 }
 

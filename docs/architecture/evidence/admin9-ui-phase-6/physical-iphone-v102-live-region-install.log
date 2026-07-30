@@ -1,0 +1,10 @@
+02:34:48  Acquired tunnel connection to device.
+02:34:48  Enabling developer disk image services.
+02:34:49  Acquired usage assertion.
+App installed:
+• bundleID: com.admin9.app.foundation
+• installationURL: file:///private/var/containers/Bundle/Application/1C76A6A7-9C97-482B-9FE3-95409111BD20/Runner.app/
+• launchServicesIdentifier: unknown
+• databaseUUID: 04171244-5F23-4181-8FCE-8B7687D8F7FB
+• databaseSequenceNumber: 3092
+• options:

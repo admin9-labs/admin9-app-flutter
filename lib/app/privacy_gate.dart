@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:provider/provider.dart';
 
 import '../admin9_ui.dart';
@@ -24,15 +25,36 @@ class PrivacyController extends ChangeNotifier {
   }
 }
 
-class PrivacyGate extends StatelessWidget {
+class PrivacyGate extends StatefulWidget {
   const PrivacyGate({super.key, required this.child});
 
   final Widget child;
 
   @override
+  State<PrivacyGate> createState() => _PrivacyGateState();
+}
+
+class _PrivacyGateState extends State<PrivacyGate> {
+  bool? _wasAccepted;
+  bool _announcementScheduled = false;
+
+  @override
   Widget build(BuildContext context) {
     final accepted = context.watch<PrivacyController>().accepted;
-    return accepted ? child : const _PrivacyConsentPage();
+    if (_wasAccepted == false && accepted && !_announcementScheduled) {
+      _announcementScheduled = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _announcementScheduled = false;
+        if (!mounted || !MediaQuery.supportsAnnounceOf(context)) return;
+        SemanticsService.sendAnnouncement(
+          View.of(context),
+          '已进入首页',
+          Directionality.of(context),
+        );
+      });
+    }
+    _wasAccepted = accepted;
+    return accepted ? widget.child : const _PrivacyConsentPage();
   }
 }
 

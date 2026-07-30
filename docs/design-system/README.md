@@ -1,6 +1,6 @@
 # Admin9 Design System
 
-> Version: v1.0.1
+> Version: v1.0.2
 > Status: frozen normative baseline
 > Scope: Android and iOS Flutter apps derived from Admin9 App Foundation
 
@@ -8,7 +8,11 @@
 
 Admin9 Design System is the single specification source for shared product semantics, platform behavior, visual foundations, public `App*` component contracts, page patterns, accessibility, and quality gates. `Admin9 UI` means its Flutter implementation layer; it is not a competing system.
 
-The Design System version, Foundation Git version, Foundation tag, app version, and customer business version are independent. Design System v1.0.1 does not imply app version 1.0.0 or completed runtime implementation.
+The Design System version, Foundation Git version, Foundation tag, app version,
+and customer business version are independent. Design System v1.0.2 does not
+imply app version 1.0.0. This Foundation's Phase 0D-6 runtime implementation is
+complete, but derived projects must still record and verify their own exact
+Foundation commit and compatibility tuple.
 
 Normative words are fixed:
 
@@ -93,6 +97,22 @@ dart run tool/design_system/verify_rule_links.dart
 node tool/design_system/verify_documentation.mjs
 ```
 
+After the Phase 6 implementation commit exists and the v1.0.2 compatibility
+tuple is updated, the final provenance gate is mandatory:
+
+```bash
+phase6_implementation_commit="$(git rev-parse HEAD)"
+dart run tool/design_system/verify_design_system_release.dart \
+  --version=1.0.2 \
+  --foundation-commit="$phase6_implementation_commit"
+```
+
+The command intentionally fails while README, CHANGELOG, the derived-project
+contract, schema, valid fixture or compatibility registry disagree. A commit
+cannot name itself: Phase 6 implementation is committed first, then a separate
+acceptance/provenance commit records that exact SHA and the final annotated tag
+points to the provenance commit.
+
 The declaration probe is non-exported and contains abstract declarations/value objects only. It proves Dart syntax, generic bounds, nullability, `Key`, callback, and state-owner shapes; it does not claim a runtime implementation.
 
 ## 7. v1.0.1 implementation boundary
@@ -100,3 +120,23 @@ The declaration probe is non-exported and contains abstract declarations/value o
 v1.0.1 makes one non-product clarification to v1.0.0: Phase 0D implements and exports only honest non-visual contracts and mechanisms. It proves value-object construction, immutable token lookup, Brand input, App-host route ownership, analyzer-AST import boundaries, and the debug/profile Gallery registry with a release guard. A concrete visual `App*` Widget is implemented, instantiated, tested, and exported only in its assigned Phase 1-4; `AppSelect` and `AppSegmentedControl` still wait for real consumers. This clarification changes no frozen token, public API shape, platform mapping, or product decision.
 
 Phase 0D does not claim theme rendering, component rendering, Gallery page reachability, device gestures, readers, IME, or platform accessibility behavior. Those remain assigned to Phase 1-6 and are Unknown until their stated gates pass.
+
+## 8. v1.0.2 evidence-policy patch
+
+v1.0.2 changes evidence responsibility and release severity only. It does not
+change tokens, public component APIs, platform mappings, page patterns or
+product behavior. Deterministic states, focus requests, Semantics, validation,
+responsive behavior, tokens, platform mapping, hit targets, contrast and
+business truth are automation/code-review responsibilities. Human device review
+uses one representative flow per platform only for actual reader output,
+system gestures, real IME behavior, safe areas and release install/cold launch.
+
+P0/P1 block release. P2/P3 remain owned, trigger-based backlog and are never
+reported as `Pass` without evidence. The Phase 6 claim is limited to a minimum
+usable accessibility baseline on representative Android/iOS flows. It is not a
+WCAG conformance statement, accessibility certification or proof of every
+assistive technology and page combination.
+
+Phase 6 closes with no open P0/P1. The accepted Android and iOS artifacts,
+representative human observations, emulator system gates and P2/P3 backlog are
+owned by the [Phase 6 report](../architecture/admin9-ui-phase-6-acceptance-report.md).

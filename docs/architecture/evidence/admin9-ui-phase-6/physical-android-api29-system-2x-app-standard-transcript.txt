@@ -1,0 +1,7 @@
+2026-07-30T13:29:52+0800
+device=r8ovcmxwberwtoau
+system_font_scale=
+2.0
+stay_on_while_plugged_in=
+2
+screen_capture=physical-android-api29-system-2x-app-standard-settings.png

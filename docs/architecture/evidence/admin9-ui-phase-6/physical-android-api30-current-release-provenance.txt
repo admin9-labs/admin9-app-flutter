@@ -1,0 +1,41 @@
+Admin9 physical Android API 30 current-release provenance
+
+captured_at=2026-07-30T22:47:42+0800
+device_model=M2007J22C
+adb_serial=r8ovcmxwberwtoau
+android_release=11
+api_level=30
+build_fingerprint=Redmi/cannon/cannon:11/RP1A.200720.011/V12.5.9.0.RJECNXM:user/release-keys
+physical_size=1080x2340
+physical_density=440
+system_font_scale=1.0
+enabled_accessibility_service=com.google.android.marvin.talkback/.TalkBackService
+accessibility_enabled=1
+package_name=com.admin9.app.foundation
+version_code=1
+min_sdk=24
+target_sdk=36
+package_path=package:/data/app/~~et3bWNWKlZP8ccgTVAr4SA==/com.admin9.app.foundation-nmtswvUxdIM_rt_LTbIJ5A==/base.apk
+
+local_release_bytes=51598161
+installed_base_apk_bytes=51598161
+local_release_sha256=d6765958320a271272fe68437113e4db9e35537e348de884f3009d1f456f1326
+installed_base_apk_sha256=d6765958320a271272fe68437113e4db9e35537e348de884f3009d1f456f1326
+artifact_identity=pass
+
+state_reset=adb shell pm clear com.admin9.app.foundation
+state_reset_result=Success
+launch_command=adb shell am start -W -n com.admin9.app.foundation/.MainActivity
+launch_status=ok
+launch_state=COLD
+launch_activity=com.admin9.app.foundation/.MainActivity
+launch_total_time_ms=1599
+launch_wait_time_ms=1602
+launch_process_pid=8945
+launch_result=pass
+
+privacy_gate_screenshot=physical-android-api30-current-release-privacy-gate.png
+privacy_gate_screenshot_sha256=6beca6108976325b3d59edb3974637dca6ce371946d588e930e6a61d6088bbb8
+
+scope=Current release artifact identity, clean-state install provenance, cold launch, and visible privacy gate.
+not_claimed=TalkBack flow completion, Switch Access, Android 14+ hardware, predictive back, external keyboard, autofill, or full physical acceptance.

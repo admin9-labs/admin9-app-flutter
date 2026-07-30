@@ -6,6 +6,7 @@ import 'package:flutter/widgets.dart'
         BuildContext,
         Column,
         CrossAxisAlignment,
+        ExcludeSemantics,
         FocusManager,
         FocusNode,
         Form,
@@ -13,6 +14,7 @@ import 'package:flutter/widgets.dart'
         GlobalKey,
         Key,
         Navigator,
+        Semantics,
         SizedBox,
         State,
         StatefulWidget,
@@ -175,9 +177,15 @@ class _AuthFormViewState extends State<_AuthFormView> {
                 const SizedBox(height: 16),
               ],
               if (viewModel.state == AuthSubmissionState.unavailable) ...[
-                const AppNotice(
-                  tone: AppTone.info,
-                  message: '服务尚未接入，当前操作不会提交或保存。',
+                Semantics(
+                  liveRegion: true,
+                  label: '信息，服务尚未接入，当前操作不会提交或保存。',
+                  child: ExcludeSemantics(
+                    child: const AppNotice(
+                      tone: AppTone.info,
+                      message: '服务尚未接入，当前操作不会提交或保存。',
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 16),
               ],

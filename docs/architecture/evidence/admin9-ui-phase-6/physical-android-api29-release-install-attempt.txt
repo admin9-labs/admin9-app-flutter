@@ -1,0 +1,15 @@
+Recorded during the 2026-07-30 Phase 6 session; the exact command timestamp was
+not preserved.
+Device: r8ovcmxwberwtoau
+Package: com.admin9.app.foundation
+APK: build/app/outputs/flutter-apk/app-release.apk
+APK bytes: 51598161
+APK SHA-256: 192d27fd82585d4a47cc06e8e7b8259c088ed7346d7e17d3c5030fa9642d2a80
+Command: adb -s r8ovcmxwberwtoau install -r build/app/outputs/flutter-apk/app-release.apk
+
+Performing Streamed Install
+adb: failed to install build/app/outputs/flutter-apk/app-release.apk: Failure [INSTALL_FAILED_USER_RESTRICTED: Install canceled by user]
+
+Result of this attempt: not passed. The user later authorized USB installation,
+and a separate successful release-install and provenance record is preserved in
+`physical-android-api29-release-provenance.txt`.

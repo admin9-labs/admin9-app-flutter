@@ -80,6 +80,10 @@ void main() {
       await tester.tap(find.byKey(const Key('auth-submit-button')));
       await tester.pumpAndSettle();
       expect(find.text('服务尚未接入，当前操作不会提交或保存。'), findsOneWidget);
+      final unavailableResult = tester.getSemantics(
+        find.bySemanticsLabel('信息，服务尚未接入，当前操作不会提交或保存。'),
+      );
+      expect(unavailableResult.flagsCollection.isLiveRegion, isTrue);
       final shellContext = tester.element(
         find.byType(Admin9Shell, skipOffstage: false),
       );

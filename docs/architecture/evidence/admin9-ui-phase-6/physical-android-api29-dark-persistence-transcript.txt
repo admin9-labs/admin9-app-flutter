@@ -1,0 +1,27 @@
+2026-07-30T13:39:31+0800
+$ adb -s r8ovcmxwberwtoau shell settings get system font_scale
+2.0
+$ adb -s r8ovcmxwberwtoau shell am force-stop com.admin9.app.foundation
+$ adb -s r8ovcmxwberwtoau shell am start -W -n com.admin9.app.foundation/.MainActivity
+Starting: Intent { cmp=com.admin9.app.foundation/.MainActivity }
+Status: ok
+LaunchState: COLD
+Activity: com.miui.home/.launcher.Launcher
+TotalTime: 21
+WaitTime: 22
+Complete
+$ adb -s r8ovcmxwberwtoau shell pidof com.admin9.app.foundation
+25401
+$ adb -s r8ovcmxwberwtoau shell dumpsys activity activities
+    * TaskRecord{7561b61 #3257 I=com.admin9.app.foundation/.MainActivity U=0 StackId=38 sz=1}
+      intent={flg=0x10000000 cmp=com.admin9.app.foundation/.MainActivity}
+      mActivityComponent=com.admin9.app.foundation/.MainActivity
+      Activities=[ActivityRecord{50ad23 u0 com.admin9.app.foundation/.MainActivity t3257}]
+      mRootProcess=ProcessRecord{a076686 25401:com.admin9.app.foundation/u0a225}
+      * Hist #0: ActivityRecord{50ad23 u0 com.admin9.app.foundation/.MainActivity t3257}
+          packageName=com.admin9.app.foundation processName=com.admin9.app.foundation
+          app=ProcessRecord{a076686 25401:com.admin9.app.foundation/u0a225}
+          Intent { flg=0x10000000 cmp=com.admin9.app.foundation/.MainActivity }
+          frontOfTask=true task=TaskRecord{7561b61 #3257 I=com.admin9.app.foundation/.MainActivity U=0 StackId=38 sz=1}
+          mActivityComponent=com.admin9.app.foundation/.MainActivity
+          baseDir=/data/app/com.admin9.app.foundation-2As7cgk5B8P3qStOKCqntA==/base.apk

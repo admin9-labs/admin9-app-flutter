@@ -1,0 +1,11 @@
+02:06:48  Acquired tunnel connection to device.
+02:06:48  Enabling developer disk image services.
+02:06:48  Acquired usage assertion.
+App installed:
+• bundleID: com.admin9.app.foundation
+• installationURL: file:///private/var/containers/Bundle/Application/5F4DB1C7-61E8-4931-98C8-D8E3BBBEE674/Runner.app/
+• launchServicesIdentifier: unknown
+• databaseUUID: 04171244-5F23-4181-8FCE-8B7687D8F7FB
+• databaseSequenceNumber: 3084
+• options:
+Saving JSON output file to /Users/fengqiyue/web/admin9-labs/admin9-app-workspace/admin9-app-flutter/docs/architecture/evidence/admin9-ui-phase-6/physical-iphone-v102-install.json

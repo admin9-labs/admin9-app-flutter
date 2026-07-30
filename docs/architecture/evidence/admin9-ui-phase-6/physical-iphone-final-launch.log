@@ -1,0 +1,15 @@
+11:47:22  Acquired tunnel connection to device.
+11:47:22  Enabling developer disk image services.
+11:47:22  Acquired usage assertion.
+ERROR: The application failed to launch. (com.apple.dt.CoreDeviceError error 10002 (0x2712))
+       BundleIdentifier = com.admin9.app.foundation
+       ----------------------------------------
+           The request to open "com.admin9.app.foundation" failed. (FBSOpenApplicationServiceErrorDomain error 1 (0x01))
+           BSErrorCodeDescription = RequestDenied
+           NSLocalizedFailureReason = The request was denied by service delegate (SBMainWorkspace) for reason: Locked ("Unable to launch com.admin9.app.foundation because the device was not, or could not be, unlocked").
+           FBSOpenApplicationRequestID = 0xc263
+       ----------------------------------------
+               The operation couldn’t be completed. Unable to launch com.admin9.app.foundation because the device was not, or could not be, unlocked. (FBSOpenApplicationErrorDomain error 7 (0x07))
+               NSLocalizedFailureReason = Unable to launch com.admin9.app.foundation because the device was not, or could not be, unlocked.
+               BSErrorCodeDescription = Locked
+Saving JSON output file to /Users/fengqiyue/web/admin9-labs/admin9-app-workspace/admin9-app-flutter/docs/architecture/evidence/admin9-ui-phase-6/physical-iphone-final-launch.json

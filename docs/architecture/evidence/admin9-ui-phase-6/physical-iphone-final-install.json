@@ -1,0 +1,39 @@
+{
+  "info" : {
+    "arguments" : [
+      "devicectl",
+      "device",
+      "install",
+      "app",
+      "--device",
+      "44C6E299-C645-56DD-8A6F-6E03EE2B631E",
+      "--json-output",
+      "docs/architecture/evidence/admin9-ui-phase-6/physical-iphone-final-install.json",
+      "--log-output",
+      "docs/architecture/evidence/admin9-ui-phase-6/physical-iphone-final-install.log",
+      "build/ios/iphoneos/Runner.app"
+    ],
+    "commandType" : "devicectl.device.install.app",
+    "environment" : {
+      "TERM" : "dumb"
+    },
+    "jsonVersion" : 3,
+    "outcome" : "success",
+    "version" : "518.33"
+  },
+  "result" : {
+    "deviceIdentifier" : "44C6E299-C645-56DD-8A6F-6E03EE2B631E",
+    "installedApplications" : [
+      {
+        "bundleID" : "com.admin9.app.foundation",
+        "databaseSequenceNumber" : 2980,
+        "databaseUUID" : "04171244-5F23-4181-8FCE-8B7687D8F7FB",
+        "installationURL" : "file:///private/var/containers/Bundle/Application/7A9BB743-46E3-4D0C-8025-3F1A67F4F7C3/Runner.app/",
+        "launchServicesIdentifier" : "unknown",
+        "options" : {
+
+        }
+      }
+    ]
+  }
+}

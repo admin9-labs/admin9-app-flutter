@@ -1,0 +1,59 @@
+{
+  "info" : {
+    "arguments" : [
+      "devicectl",
+      "device",
+      "process",
+      "launch",
+      "--device",
+      "44C6E299-C645-56DD-8A6F-6E03EE2B631E",
+      "--terminate-existing",
+      "--json-output",
+      "docs/architecture/evidence/admin9-ui-phase-6/physical-iphone-final-launch-unlocked.json",
+      "--log-output",
+      "docs/architecture/evidence/admin9-ui-phase-6/physical-iphone-final-launch-unlocked.log",
+      "com.admin9.app.foundation"
+    ],
+    "commandType" : "devicectl.device.process.launch",
+    "environment" : {
+      "TERM" : "dumb"
+    },
+    "jsonVersion" : 3,
+    "outcome" : "success",
+    "version" : "518.33"
+  },
+  "result" : {
+    "deviceIdentifier" : "44C6E299-C645-56DD-8A6F-6E03EE2B631E",
+    "launchOptions" : {
+      "activatedWhenStarted" : true,
+      "arguments" : [
+
+      ],
+      "environmentVariables" : {
+        "TERM" : "dumb"
+      },
+      "platformSpecificOptions" : {
+
+      },
+      "startStopped" : false,
+      "terminateExistingInstances" : true,
+      "user" : {
+        "active" : true
+      }
+    },
+    "process" : {
+      "auditToken" : [
+        4294967295,
+        501,
+        501,
+        501,
+        501,
+        24728,
+        0,
+        67543
+      ],
+      "executable" : "file:///private/var/containers/Bundle/Application/7A9BB743-46E3-4D0C-8025-3F1A67F4F7C3/Runner.app/Runner",
+      "processIdentifier" : 24728
+    }
+  }
+}

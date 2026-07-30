@@ -157,13 +157,27 @@ void main() {
           findsNWidgets(2),
         );
       }
-      final selectedSemantics = tester
-          .getSemantics(find.bySemanticsLabel('跟随系统'))
-          .flagsCollection;
+      final selectedSemantics = tester.getSemantics(
+        find.bySemanticsLabel('跟随系统'),
+      );
       if (platform == TargetPlatform.iOS) {
-        expect(selectedSemantics.isSelected, ui.Tristate.isTrue);
+        expect(
+          selectedSemantics,
+          matchesSemantics(
+            label: '跟随系统',
+            isButton: true,
+            hasEnabledState: true,
+            isEnabled: true,
+            hasSelectedState: true,
+            isSelected: true,
+            hasTapAction: true,
+          ),
+        );
       } else {
-        expect(selectedSemantics.isChecked, ui.CheckedState.isTrue);
+        expect(
+          selectedSemantics.flagsCollection.isChecked,
+          ui.CheckedState.isTrue,
+        );
       }
       await tester.tap(find.text('深色'));
       await tester.pump();

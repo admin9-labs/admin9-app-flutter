@@ -8,11 +8,11 @@
 | Area | MUST pass | Evidence |
 | --- | --- | --- |
 | contrast | ordinary text 4.5:1; large text and critical non-text boundaries 3:1 | reproducible color-pair table plus rendered review |
-| hit targets | Android 48x48dp; iOS 44x44pt | Widget geometry plus device spot check; visual and hit bounds separate |
-| system text | nonlinear system scaling preserved; App options only add growth | 320/360/390/600 and landscape Widget matrix; Android 200%; iOS max accessibility size |
-| semantics | correct name, role, value, enabled, selected/toggled, error, action, live region | semantics tests and reader walkthrough |
-| focus/keyboard | visual, focus, and reading order match; visible focus; next/done; first error | Widget/integration plus hardware/software keyboard |
-| system appearance | brightness, Bold Text, high contrast, reduce motion, grayscale merge correctly | effective-state tests and device settings |
+| hit targets | Android 48x48dp; iOS 44x44pt | Widget geometry for every control plus physical operability in the representative flow; visual and hit bounds separate |
+| system text | nonlinear system scaling preserved; App options only add growth | 320/360/390/600 and landscape Widget matrix plus one representative large/max-size physical smoke per platform |
+| semantics | correct name, role, value, enabled, selected/toggled, error, action, live region | semantics tests plus one representative reader walkthrough per platform |
+| focus/keyboard | visual, focus, and reading order match; visible focus; next/done; first error | Widget/integration plus one real software-keyboard Next/Done flow; external-keyboard repetition is P2 |
+| system appearance | brightness, Bold Text, high contrast, reduce motion, grayscale merge correctly | effective-state tests plus representative Dark or large/max-size device observation; exhaustive system-setting combinations are P2 |
 | state meaning | not color-only; errors and unavailable states explain recovery/boundary | Widget/visual review |
 
 Theme brightness is: when App preference is `system`, use current system brightness; when App preference is explicit `light` or `dark`, use that App choice. Only the App theme enum persists. System Bold Text always takes effect and has no App off switch; any approved Brand font must respond to it. High contrast effective value is `system OR App`. Reduce motion effective value is `system OR App`; it does not replace platform navigation builders. Grayscale controls only the App filter and cannot negate OS display adjustments. Only App preferences persist; all system values are transient inputs.
@@ -54,15 +54,76 @@ Widget tests cover info/success 3-second and warning/error 5-second dismissal wh
 
 ## 4. Platform device gates
 
+Severity is fixed for this release:
+
+| Severity | Meaning | Release treatment |
+| --- | --- | --- |
+| P0 | crash, privacy bypass, or a critical flow is wholly inoperable | block and fix |
+| P1 | core task cannot complete; focus traps or is permanently lost; critical state is undiscoverable; system return or installation fails | block and fix |
+| P2 | one extra gesture/refocus reveals state; non-critical announcement is delayed; an alternative assistive technology is not sampled | tracked backlog |
+| P3 | wording, pause, repetition or similar reader polish | tracked backlog |
+
+Device acceptance is risk-tiered without weakening the non-negotiable outcomes
+in section 1. Automation and code review own deterministic component states,
+focus requests, Semantics, validation, responsive layout, tokens, platform
+mapping and business boundaries. Human evidence owns only actual reader output,
+system gestures, real IME behavior, safe areas and release install/cold launch.
+Each human-only capability uses one representative flow per platform; equivalent
+controls are not repeated on every page.
+
+A contemporaneous device-owner transcript is acceptable human evidence when it
+records the exact device/artifact, system setting, scenario, expected result and
+actual observation. Screenshots, audio and video strengthen provenance but are
+not mandatory when the observed fact is spoken output or a gesture outcome and
+the transcript is explicit. A transcript MUST NOT be described as media and a
+generic unbound `passed` statement is insufficient.
+
+P0/P1 failures and missing P0/P1 human-only evidence block release. Switch
+Access/Control repetition, password-manager and external-keyboard sampling,
+every-page reader traversal and every Dialog/Notice/AppFeedback variant are P2
+by default after their automated contracts pass. They remain explicit backlog,
+not inferred passes, and become blockers when a real consumer, observed failure
+or user report raises their risk. The representative accessibility evidence set
+MUST still cover privacy entry, primary navigation/back, one choice, one switch,
+first form error, password visibility state and the truthful unavailable-service
+boundary on both platforms. It MAY combine one human reader traversal, the
+real-IME task result and deterministic Semantics/focus tests; it MUST identify
+which evidence proves each fact and MUST NOT describe machine evidence as spoken
+output. A later artifact may reuse the human traversal only when the intervening
+reader-sensitive source delta is enumerated, automatically regressed and limited
+to an additive fix whose final artifact is separately build/install bound.
+
 Android API 34+ predictive back is a manual hard gate: record gesture start, visible progress, cancellation, and completion; cancellation preserves state and completion pops once. Repeat core regression on API 36. Integration tests only assert application state before/after back and MUST NOT claim system-gesture evidence.
 
-iOS requires current Xcode-available small and regular simulators with model, runtime, and logical width recorded; do not invent a 320pt simulator. Record short edge swipe cancel and full completion, route state, keyboard, picker/dialog, and safe areas.
+iOS uses current Xcode-available small and regular simulators with model,
+runtime and logical width recorded; do not invent a 320pt simulator. Simulator
+automation proves route state, keyboard-driven layout, Picker/Dialog mapping and
+safe-area constraints. One human edge-swipe cancellation/completion and one
+physical safe-area observation remain the device gate; repeating every mapped
+control on simulators is not a second human hard gate.
 
-Device walkthroughs include:
+The complete long-horizon device backlog includes:
 
 - Android: TalkBack, Switch Access, 200% text, hardware keyboard, IME/autofill, gesture/three-button navigation, cutout, edge-to-edge and system-bar contrast.
 - iOS: VoiceOver, Switch Control, maximum Dynamic Type, Bold Text, Increase Contrast, Reduce Motion, software/hardware keyboard, autofill/password manager, home indicator and edge back.
 - Both: light/dark, grayscale, high contrast, reduced motion, hit-target spot checks, both reference flows, scroll endpoints, errors, dialogs, notices, and feedback.
+
+Phase 6 release blocking uses the representative P0/P1 subset above; remaining
+items retain an owner and trigger in backlog. This evidence policy does not
+permit lowering contrast, hit targets, system text, Semantics, focus, platform
+navigation or truthful business-state requirements.
+
+| P2/P3 backlog | Owner | Upgrade trigger | Review stage |
+| --- | --- | --- | --- |
+| Switch Access / Switch Control representative sampling | Admin9 Core accessibility owner | real business adoption, user cannot complete a task, second derived project reproduces, Flutter upgrade, or customer contract | adopting project gate or SDK-upgrade review |
+| external-keyboard full flow and password-manager behavior | Admin9 Core accessibility owner with Business flow owner | same triggers | adopting project authentication/input gate |
+| every-page maximum text and every Dialog/Notice/AppFeedback reader variant | Admin9 Core component owner | same triggers | component change or adopting project release |
+| password-toggle immediate announcement | Admin9 Core input owner | focus/state becomes undiscoverable or task completion fails | next input-component review |
+
+These entries are non-blocking only while automated contracts pass and the
+representative Android/iOS flows remain usable. They are `Backlog`, not `Pass`.
+Passing Phase 6 establishes a minimum usable accessibility baseline only; it is
+not WCAG conformance or complete assistive-technology certification.
 
 ## 5. SDK upgrade review
 
@@ -91,4 +152,19 @@ A deviation includes rule ID, reason, affected platforms/apps, owner, approving 
 
 Phase 1 has verified Flutter token resolution, nonlinear TextScaler composition, runtime system-preference merging, debug/profile Gallery reachability, and Gallery exclusion from the installed Android release package. These results are no longer Unknown and remain protected by the Phase 1 automated and release-package gates.
 
-Concrete component bounds and Semantics, full-page maximum-size layout, device appearance, screen readers/Switch Access/Switch Control, IME/autofill, Android predictive back, iOS edge back, and cutout/system-bar behavior remain Unknown until their owning implementation and device phases. Static assets and documents do not satisfy those gates.
+Runtime component bounds, Semantics, A-L layout, effective appearance,
+first-error focus, feedback lifecycle and business boundaries now have automated
+implementation evidence. The hash-bound Android release passes representative
+TalkBack, privacy announcement, appearance/persistence and real-IME evidence.
+Native-mouse API 34/API 36 predictive back and API 36 gesture/three-button
+cutout, edge-to-edge, safe-area and visible-IME review also pass on the named
+emulators; Android 14+ physical hardware remains separately Unknown.
+Final-source iPhone signing, install, unlocked cold launch and process binding
+pass. The representative iPhone VoiceOver flow, real-IME Next/Done path, App
+Extra Large safe-area endpoint and human edge-back cancellation/completion also
+pass on the hash-bound final candidate. The P2/P3 table above remains explicit
+backlog. Static assets and documents did not substitute for those device-only
+observations. Phase 6 therefore establishes the minimum usable accessibility
+baseline on representative Android/iOS flows only; Android 14+ physical
+hardware and the named alternative-technology samples remain non-blocking
+Unknown/backlog rather than inferred passes.

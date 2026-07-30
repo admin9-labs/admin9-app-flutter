@@ -1,0 +1,21 @@
+Admin9 Phase 6 API 36 three-button post-system-UI-fix environment
+Date: 2026-07-30
+Target: emulator-5554 / Admin9_API_36
+Android release: 16
+API: 36
+Build fingerprint: google/sdk_gphone64_arm64/emu64a:16/BE2A.250530.026.F3/13894323:userdebug/dev-keys
+Physical display: 1080x2400
+Physical density: 420
+navigation_mode: 0
+enabled navigation overlay: com.android.internal.systemui.navbar.threebutton
+disabled navigation overlay: com.android.internal.systemui.navbar.gestural
+Light capture: android-api36-three-button-release-post-fix-light.png
+Dark capture: android-api36-three-button-release-post-fix-dark.png
+Release APK bytes: 51598161
+Release APK SHA-256: 192d27fd82585d4a47cc06e8e7b8259c088ed7346d7e17d3c5030fa9642d2a80
+
+Observed result: the light capture has dark status/navigation icons on light
+surfaces; the dark capture has light status/navigation icons on dark surfaces.
+Both captures show the Back, Home, and Overview buttons. This is emulator
+visual evidence, not physical-device, human-accessibility, cutout, IME, or
+predictive-back four-stage evidence.

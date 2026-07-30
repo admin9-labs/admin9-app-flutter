@@ -47,21 +47,27 @@ class AppSingleChoiceList<T extends Object> extends StatelessWidget {
                               ? () => onChanged(choice.value)
                               : null;
                           return Semantics(
+                            container: true,
+                            label: choice.label,
+                            button: true,
                             selected: choice.value == value,
                             enabled: enabled,
-                            child: pressured
-                                ? _CupertinoPressuredRow(
-                                    key: ValueKey<Object>(choice.value),
-                                    content: Text(choice.label),
-                                    trailing: trailing,
-                                    onPressed: tap,
-                                  )
-                                : CupertinoListTile(
-                                    key: ValueKey<Object>(choice.value),
-                                    title: Text(choice.label),
-                                    trailing: trailing,
-                                    onTap: tap,
-                                  ),
+                            onTap: tap,
+                            child: ExcludeSemantics(
+                              child: pressured
+                                  ? _CupertinoPressuredRow(
+                                      key: ValueKey<Object>(choice.value),
+                                      content: Text(choice.label),
+                                      trailing: trailing,
+                                      onPressed: tap,
+                                    )
+                                  : CupertinoListTile(
+                                      key: ValueKey<Object>(choice.value),
+                                      title: Text(choice.label),
+                                      trailing: trailing,
+                                      onTap: tap,
+                                    ),
+                            ),
                           );
                         })
                         .toList(growable: false),

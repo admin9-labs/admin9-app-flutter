@@ -1,0 +1,27 @@
+captured_at=2026-07-30T10:43:19Z
+device_model=M2007J22C
+adb_serial=r8ovcmxwberwtoau
+android_release=11
+api_level=30
+build_fingerprint=Redmi/cannon/cannon:11/RP1A.200720.011/V12.5.9.0.RJECNXM:user/release-keys
+package_name=com.admin9.app.foundation
+package_path=package:/data/app/~~Wjj30nGqjTZgdlbaZ3wjYA==/com.admin9.app.foundation-8oG6TY5hA_Ee-Dh0psg1iQ==/base.apk
+
+release_artifact=build/app/outputs/flutter-apk/app-release.apk
+local_release_sha256=279f44977c21a8b7aa9e060e97f66c65bea8c0bd1667b125ef67052d39a41dd9
+installed_base_apk_sha256=279f44977c21a8b7aa9e060e97f66c65bea8c0bd1667b125ef67052d39a41dd9
+artifact_identity=pass
+
+state_reset=adb shell pm clear com.admin9.app.foundation
+state_reset_result=Success
+launch_command=adb shell am start -W -n com.admin9.app.foundation/.MainActivity
+launch_status=ok
+launch_state=COLD
+launch_activity=com.admin9.app.foundation/.MainActivity
+launch_total_time_ms=1475
+launch_wait_time_ms=1479
+launch_process_pid=426
+launch_result=pass
+
+scope=Release artifact identity, clean-state install provenance, and cold launch only.
+not_claimed=TalkBack, Switch Access, Android 14+ hardware, predictive back, external keyboard, or autofill acceptance.

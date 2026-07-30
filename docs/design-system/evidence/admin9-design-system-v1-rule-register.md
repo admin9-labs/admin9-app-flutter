@@ -20,8 +20,8 @@ Stable IDs are never reused. Each ID links to exactly one explicit HTML anchor i
 | [DS-PAT-001](../04-page-patterns.md#ds-pat-001) | Core+Business/both | page patterns, not templates, schemas, or DSL | reference flows, responsive fixtures, device tasks |
 | [DS-DER-001](../05-derived-project-contract.md#ds-der-001) | all/both | provenance, fixed paths/export, exact source policy | schema fields `foundation`, `designSystem`, `app`, `brandConfiguration`, `toolchain`, `ownership`, `exports`, `compatibility`, `provenance`, `deviations`; compatibility registry |
 | [DS-SHR-001](../05-derived-project-contract.md#ds-shr-001) | Business then Core/both | feature -> `lib/ui/shared/` -> evidence-based Core request | consumer inventory and DS owner review |
-| [DS-ACC-001](../06-accessibility-quality.md#ds-acc-001) | Core/Android | 48dp, WCAG 4.5/3, system text and assistive tech | Widget geometry/semantics; TalkBack/Switch Access |
-| [DS-ACC-002](../06-accessibility-quality.md#ds-acc-002) | Core/iOS | 44pt, WCAG 4.5/3, Dynamic Type and assistive tech | Widget geometry/semantics; VoiceOver/Switch Control |
+| [DS-ACC-001](../06-accessibility-quality.md#ds-acc-001) | Core/Android | 48dp, WCAG 4.5/3, system text and assistive-tech semantics | automated geometry/semantics plus one TalkBack/system/IME P0/P1 representative flow; P2 backlog table |
+| [DS-ACC-002](../06-accessibility-quality.md#ds-acc-002) | Core/iOS | 44pt, WCAG 4.5/3, Dynamic Type and assistive-tech semantics | automated geometry/semantics plus one VoiceOver/system/IME P0/P1 representative flow; P2 backlog table |
 | [DS-RSP-001](../06-accessibility-quality.md#ds-rsp-001) | Core/both | canonical automated rows A-L | exact matrix coverage report; device actual-width record |
 | [DS-GAL-001](../06-accessibility-quality.md#ds-gal-001) | Core/both | Gallery debug/profile only; release absent | AST route test, profile reachability, release build/device denial |
 | [DS-UPG-001](../06-accessibility-quality.md#ds-upg-001) | all/both | SDK/DS compatibility must be revalidated | manifest compatibility fields; upgrade checklist |

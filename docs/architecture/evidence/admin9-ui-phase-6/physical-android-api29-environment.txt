@@ -1,0 +1,22 @@
+Captured: 2026-07-30T12:57:31+0800
+Transport ID: r8ovcmxwberwtoau
+Manufacturer: Xiaomi
+Model: M2007J22C
+Product device: cannon
+Android release / API: 10 / 29
+Build fingerprint: Redmi/cannon/cannon:10/QP1A.190711.020/V12.0.11.0.QJECNXM:user/release-keys
+Physical display: 1080x2340
+Physical density: 440
+System font scale: 1.0
+Default IME: com.sohu.inputmethod.sogou.xiaomi/.SogouIME
+Accessibility touch exploration: false
+Accessibility bound services: none
+Accessibility enabled services: none
+Navigation mode setting: unavailable on this MIUI build (settings returned null)
+USB debugging security setting: user reported enabled during the session; App
+input injection then succeeded.
+
+Evidence boundary: this is a physical Android device and a real installed IME,
+but it is not a current-version Android device. Accessibility services were
+disabled, and this record does not prove TalkBack, Switch Access, IME display,
+autofill, physical keyboard, touch-target, or system-gesture behavior.

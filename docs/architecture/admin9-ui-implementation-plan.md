@@ -1,19 +1,19 @@
 # Admin9 Design System Flutter 实施计划
 
-> 状态：v1.2 下游实施基线，尚未授权开始运行时代码实施
+> 状态：v1.2 下游实施基线；Phase 0D-6 已实施并通过验收
 > 版本：v1.2
 > 建立日期：2026-07-29
-> 修订日期：2026-07-29
+> 修订日期：2026-07-31
 > 适用范围：Admin9 App Foundation Flutter（Android / iOS）
 > SDK 基线：Flutter 3.44.1、Dart 3.12.1、Android min SDK 24 / target SDK 36、iOS 13.0
 
 ## 1. 文档目的与授权边界
 
-本文是 [Admin9 Design System v1.0](../design-system/README.md) 的下游 Flutter 实施计划。Design System 决定产品语义、Token、平台映射、公共合同和质量门禁；本文只决定在当前 Foundation 中如何分阶段实现。两者冲突时以 Design System v1.0 为准，本文不得成为竞争规范来源。
+本文是 [Admin9 Design System v1.0.2](../design-system/README.md) 的下游 Flutter 实施计划。Design System 决定产品语义、Token、平台映射、公共合同和质量门禁；本文只决定在当前 Foundation 中如何分阶段实现。两者冲突时以 Design System v1.0.2 为准，本文不得成为竞争规范来源。
 
 本文已经关闭首期架构和产品表现的选择题。实施者不得在 feature 页面自行改用另一套 Material、Cupertino、自绘控件、路由转场、反馈形式或页面容器。发现 Flutter SDK 限制时，应先记录复现、影响范围和候选修正，经计划变更评审后再调整本基线。
 
-本文定稿不代表已经授权修改主题、组件、页面、依赖、测试或导航。代码实施、Git 提交、push、发布和部署均需单独授权。
+本文本身不构成新的运行时修改授权。Phase 0D-6 已在明确 Goal 内完成；任何新增产品能力、依赖、后端、假会话、push、发布或部署仍需单独授权。
 
 ## 2. 固定架构决策
 
@@ -299,9 +299,9 @@ Android `Scaffold` 和 iOS `CupertinoPageScaffold` 都启用键盘避让。子�
 
 - 实现 `AppPage`、`AppBottomNavigation`、`AppFeedback`、`AppProgressIndicator` 和平台图标映射。
 - 将 Shell、顶部标题栏、底部导航和现有反馈接入 Admin9 UI。
-- 覆盖 iOS 边缘返回完成/取消、普通系统返回前后的路由与 Tab 状态；在 Android API 34+ 模拟器或真机完成人工 predictive back 开始、可见进度、取消和完成硬门禁。
+- 自动化覆盖普通系统返回前后的路由与 Tab 状态，并保留平台默认返回 builder；iOS 边缘返回完成/取消和 Android API 34+ predictive back 四阶段作为 Phase 6 真人系统手势硬门禁。
 
-退出门禁：首页与我的双端导航、安全区、edge-to-edge 和状态恢复通过自动化；integration test 证明普通返回事件前后的路由结果、选中 Tab、页面状态和无重复 pop；Android predictive back 四阶段通过第 12.3、12.4 节规定的设备人工证据后方可退出。
+Phase 2 实现退出门禁：首页与我的双端导航、安全区、edge-to-edge 和状态恢复通过自动化；integration test 证明普通返回事件前后的路由结果、选中 Tab、页面状态和无重复 pop。真实系统手势不是 Phase 2 的退出条件，也不伪装成 Phase 2 自动化结果；它们统一延迟到 Phase 6，并已按第 12.3、12.4 节关闭。
 
 ### Phase 3：设置页端到端试点
 
@@ -310,7 +310,7 @@ Android `Scaffold` 和 iOS `CupertinoPageScaffold` 都启用键盘避让。子�
 - 验证重启后偏好持久化，返回后 Tab 和页面状态正确。
 - 在 Gallery 展示每个组件的 variants、states、平台、主题、高对比度和字号。
 
-退出门禁：Android 与 iOS 的截图、VoiceOver/TalkBack、最大字号、减少动态效果和真机交互全部通过，才允许迁移其余页面。
+退出门禁：A-L 自动化、持久化和双端映射通过；设备阶段仅对自动化不能证明的真实读屏、系统手势、真实输入法、安全区和 release 安装进行代表流程取证。
 
 ### Phase 4：按钮、弹窗、输入与通用页面
 
@@ -333,10 +333,11 @@ Android `Scaffold` 和 iOS `CupertinoPageScaffold` 都启用键盘避让。子�
 ### Phase 6：交付验收
 
 - 运行第 12 节全部静态检查、单元测试、Widget 测试、设备集成测试和 release 构建。
-- 完成双端无障碍、edge-to-edge、预测性返回和视觉验收。
-- 将失败、豁免和设备环境阻塞记录到验收报告；未批准的失败不得标记通过。
+- 自动化与代码审查固定覆盖组件状态、焦点请求、Semantics、表单校验、响应式、Token、平台映射和业务边界。
+- 人工仅验证自动化不能证明的真实读屏、系统手势、真实输入法、安全区和 release 安装冷启动；每类能力每平台一条代表流程，不遍历所有等价页面。
+- P0/P1 必须在交付前关闭；P2/P3 记录责任人、触发条件和 backlog，待真实业务采用、观测到失败或用户反馈后升级。非阻塞项不得伪称已通过。
 
-退出门禁：自动化命令全绿，人工矩阵签字，计划与实现差异为零。
+退出门禁：自动化命令全绿，人工 P0/P1 代表矩阵签字，无未关闭 P0/P1，P2/P3 全部进入可追踪 backlog，计划与实现差异为零。
 
 ## 12. 测试与量化验收
 
@@ -350,8 +351,8 @@ Android `Scaffold` 和 iOS `CupertinoPageScaffold` 都启用键盘避让。子�
 - App `1.00/1.12/1.24` 与 synthetic system scaler `1.0/2.0/3.0` 的精确组合；synthetic case 不冒充真实 Android/iOS 最大字号。
 - Semantics 的 label、role、value/state、enabled、selected/toggled 和 action。
 - Widget 测试按 A-L 固定 320、360、390、600 与 844x390，断言无 overflow、裁切、重叠、操作入口或滚动终点丢失。
-- 减少动态效果开启后不播放非必要动画；Android/iOS integration test 只验证普通返回事件前后的应用状态。iOS edge-back 的开始、进度、取消、完成和 Android predictive back 四阶段都由对应模拟器/真机人工录像硬门禁证明，自动化不得冒充系统手势证据。
-- 系统 bold text 开启后不截字、不改变语义顺序，外接键盘 Tab/Shift+Tab、Enter/Space 和 Escape 行为符合组件角色。
+- 减少动态效果开启后不播放非必要动画；Android/iOS integration test 只验证普通返回事件前后的应用状态。iOS edge-back 的开始、进度、取消、完成和 Android predictive back 四阶段都由对应模拟器/真机的人类真实手势硬门禁证明，自动化不得冒充系统手势证据。优先保存连续录像；若系统录屏无法捕获合成层转场，必须保留失败录像、原生输入方法、同步观察记录及取消/完成前后截图，且不得把失败录像标为通过。
+- 系统 bold text 开启后不截字、不改变语义顺序；Widget 测试固定焦点顺序与 Enter/Space/Escape 行为。外接键盘实机采样为 P2，只在真实业务采用或出现焦点回归时升级为阻塞项。
 - `AppFeedback` Widget 测试覆盖：无操作且 `accessibleNavigation == false` 时 3 秒/5 秒到期；存在操作按钮或 `accessibleNavigation == true` 时持久显示；关闭控件、操作回调仅一次、回调后关闭和新消息原子替换；同时断言 live region、焦点不被抢走、消息标签、关闭/操作语义以及替换时只公告新消息。
 - `AppActionMenu` 覆盖 2/6 项、disabled、destructive、取消、焦点、一次选择与两端 sheet 类型；`AppProgressIndicator` 覆盖 circular/linear、indeterminate、0/45/100%、label/value Semantics 和 reduced motion。
 
@@ -375,8 +376,12 @@ dart format --output=none --set-exit-if-changed tool
 dart run tool/design_system/validate_foundation_manifest.dart --fixtures
 flutter analyze tool/design_system/design_system_contract_probe.dart
 dart run tool/design_system/verify_rule_links.dart
+phase6_implementation_commit="$(git rev-parse HEAD)"
+dart run tool/design_system/verify_design_system_release.dart --version=1.0.2 --foundation-commit="$phase6_implementation_commit"
 node tool/design_system/verify_documentation.mjs
 node docs/design-system/evidence/sources/verify_visual_references.mjs docs/design-system/evidence/visual-references
+dart run tool/design_system/verify_android_release_plugins.dart --self-test
+dart run tool/design_system/verify_android_release_plugins.dart
 flutter analyze
 flutter test -r expanded
 
@@ -401,9 +406,9 @@ git diff --check
 | --- | --- | --- |
 | Android API 34 模拟器 | 手势导航 | 人工 predictive back 开始、可见进度、取消、完成硬门禁；IME 与表单 |
 | Android API 36 模拟器 | 手势导航和三键导航各一次 | 人工 predictive back 四阶段回归；强制 edge-to-edge、状态栏/导航栏图标对比度、显示缺口、安全区、底栏与 IME |
-| Android 当前版本真机 | 至少一台 | TalkBack、Switch Access、200% 字号、深浅色、返回、触控目标和完整试点任务 |
-| iOS 当前版本模拟器 | Xcode 实际可用的一种小屏和一种常规屏 | 记录具体型号、runtime 与实测逻辑宽度；验证键盘、Picker、Dialog、边缘返回完成与取消 |
-| iPhone 真机 | 至少一台 | VoiceOver、Switch Control、最大辅助字号、深浅色、高对比度、Bold Text、Reduce Motion、完整试点任务 |
+| Android 可用真机 | 至少一台；本期 API 30 覆盖非版本限定项 | release 安装/冷启动、TalkBack 代表流程、一个单选、一个开关、字号持久化、真实 IME、深浅色/大字号冒烟；Android 14+ 真机缺失单独记 Unknown |
+| iOS 当前版本模拟器 | Xcode 实际可用的一种小屏和一种常规屏 | 记录具体型号、runtime 与实测逻辑宽度；自动化验证路由状态、键盘避让、Picker/Dialog 映射与安全区约束；边缘返回真人硬门禁只在 iPhone 完成 |
+| iPhone 真机 | 至少一台 | 最终源码签名安装/冷启动、VoiceOver 代表流程、真实 IME、边缘返回、安全区、深浅色/最大字号冒烟 |
 
 iOS 13.0 作为构建兼容下限保留；若当前 Xcode 不提供 iOS 13 runtime，以 deployment target、release build 和编译结果作为下限证据，不伪造旧系统真机结论。
 
@@ -411,16 +416,14 @@ iOS 13.0 作为构建兼容下限保留；若当前 Xcode 不提供 iOS 13 runti
 
 ### 12.4 人工验收任务
 
-1. 首次启动阅读隐私协议、返回、接受隐私提示并进入首页。
-2. 首页与我的来回切换，进入设置，修改主题、字号、灰度、高对比度和减少动态效果，返回并重启确认持久化。
-3. 打开认证表单，完成焦点遍历、键盘下一项、错误提交、密码隐藏、autofill 和返回。
-4. 打开确认型和 destructive Dialog，验证焦点、取消、确认、遮罩和读屏顺序。
-5. 开启 VoiceOver/TalkBack，完成底部导航、设置选择、表单错误和返回流程；再用 Switch Control/Switch Access 与外接键盘验证同一交互顺序。
-6. 在 Android API 36 验证状态栏、导航栏、显示缺口、手势导航、三键导航和 IME 不遮挡内容。
-7. 在 Android API 34+ 手势导航模拟器或真机，从可返回页面执行 predictive back：分别记录开始、可见进度、取消后留在原页、完成后返回且只 pop 一次。证据必须包含设备或模拟器型号、API level、导航模式、屏幕录像编号，以及四阶段各自的预期与实际结果；任一阶段缺失即失败。
-8. 在 VoiceOver 和 TalkBack 下分别触发带操作按钮的 `AppFeedback`，确认反馈不会自动消失、出现时不抢走当前焦点、消息与操作只公告一次，并能通过操作按钮或可见关闭控件关闭；再触发新消息确认旧消息被替换且只公告新消息。
+1. 双端各完成一次首次启动隐私门禁、接受并进入首页，记录 release 冷启动和实际读屏公告。
+2. 双端各用一条代表读屏流程覆盖一级导航、返回、一个设置单选、一个开关、认证首错聚焦、密码显示状态和未接入真实边界。
+3. 双端真实输入法各验证一次 Next 和 Done/提交；其余键盘、autofill、表单状态由自动化负责。
+4. 双端各冒烟一次浅色、深色和大字号代表页；记录安全区、滚动终点和主操作可达性。
+5. Android API 36 人工检查代表页的手势/三键、edge-to-edge、状态/导航栏、缺口和 IME；iOS 人工记录一次边缘返回取消与完成。
+6. Android API 34 与 API 36 分别记录 predictive back 开始、可见进度、取消和完成；证据包含设备/模拟器、API、导航模式、录像和四阶段结果。
 
-每项必须记录设备、OS、主题、字号、辅助功能、结果和截图编号；第 7 项必须额外记录导航模式、屏幕录像编号和四阶段逐项结果。截图正常但操作、读屏、对比度或布局失败时，整体仍判失败。
+每项 P0/P1 记录设备、OS/API、设置、预期、实际和证据编号。Switch Access/Control、外接键盘、密码管理器、逐页面读屏、全部 Dialog/Notice/AppFeedback 变体的人工重复为 P2 backlog；自动化或代表流程发现真实失败时立即重新定级。
 
 ## 13. Gallery 与发布隔离
 
@@ -497,3 +500,4 @@ Flutter SDK 升级后必须重新核对默认 `PageTransitionsTheme`、Android t
 - 2026-07-29：依据六角色终审和对抗式复查修订为 v1.1；固定平台组件映射与产品基线，补齐系统辅助功能合并、字体缩放、gesture-preserving reduced motion、Android edge-to-edge/predictive back、组件契约、阶段顺序、设备测试命令和量化验收标准。
 - 2026-07-29：收口 v1.1 侧边验收；固定 `AppFeedback` 无障碍持久态、Android predictive back 人工硬门禁证据和 Widget/iOS 模拟器宽度职责。
 - 2026-07-29：同步 Admin9 Design System v1.0，形成 v1.2 下游计划；替换旧 Token，补齐 schema/validator、declaration probe、`AppSingleChoiceList`、`AppActionMenu`、`AppProgressIndicator`、A-L 自动化矩阵、Gallery release 门禁和 31-47 工作日工期。
+- 2026-07-31：同步 Design System v1.0.2 风险分层证据政策与实际阶段状态；固定 P0/P1 代表流程硬门禁、P2/P3 backlog、系统手势失败录像边界和 Phase 6 验收责任。
