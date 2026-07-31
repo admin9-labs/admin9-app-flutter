@@ -11,7 +11,7 @@ The full Foundation commit is mandatory. `tag` contains the exact source tag whe
 | Field | Required value |
 | --- | --- |
 | Foundation source | full commit SHA and exact tag or `null` |
-| Design System | exact specification version `1.0.2` and source tag `design-system-v1.0.2` |
+| Design System | exact specification version `1.0.3` and source tag `design-system-v1.0.3` |
 | App identity | app name/version, Android application ID, iOS bundle ID |
 | Brand evidence | theme version/hash, actual primary/secondary light-dark pairs, Logo and launch asset paths |
 | Toolchain | Flutter and Dart versions |
@@ -73,8 +73,9 @@ Each approved Design System release adds a compatibility row before a derived pr
 | --- | --- | --- | --- |
 | v1.0.1 Phase 0D contract | `1c91f21eaee511f081d5addbe765151f27a53fb9` Foundation source baseline | 3.44.1 / 3.12.1 | specification plus non-visual boundary mechanisms; visual runtime remains unavailable |
 | v1.0.2 Phase 6 delivery | `54d139c70d6e4b873d7bc97b445e10b0264d450d` Foundation implementation | 3.44.1 / 3.12.1 | approved runtime, release and representative-device baseline; named P2/P3 backlog and Android 14+ physical Unknown remain explicit |
+| v1.0.3 Foundation closure | `05f61f6302f251cf6565dbb7334f84efe074f43f` Foundation implementation | 3.44.1 / 3.12.1 | approved runtime and derived-project baseline after the selected P1/P2 closure; v1.0.2 device evidence remains historical and current device repetition is Unknown |
 
-An app is specification-conforming only when its manifest passes the validator and its exact tuple appears as `approved` in the machine compatibility registry. The validator rejects merely format-valid unapproved commits, unknown rule IDs, expired/invalid deviations, reversed date ranges, invalid UTC provenance timestamps, asset-subtree escapes, extra fields, and unauthorized overrides. It is runtime-conforming only after a compatibility row names an implemented Foundation commit and all required implementation/device gates pass. Arbitrary version mixing is prohibited; v1.0.1 does not claim that Phase 0D implements visual components, while v1.0.2 is approved only for the exact Phase 6 implementation commit above.
+An app is specification-conforming only when its manifest passes the validator and its exact tuple appears as `approved` in the machine compatibility registry. The validator rejects merely format-valid unapproved commits, unknown rule IDs, expired/invalid deviations, reversed date ranges, invalid UTC provenance timestamps, asset-subtree escapes, extra fields, and unauthorized overrides. It is runtime-conforming only after a compatibility row names an implemented Foundation commit and all required implementation/device gates pass. Arbitrary version mixing is prohibited; v1.0.1 does not claim that Phase 0D implements visual components, v1.0.2 is approved only for its exact Phase 6 implementation commit, and v1.0.3 is approved only for the exact Foundation closure commit above.
 
 1. Record current Foundation and Design System sources.
 2. Configure and verify the read-only source, then fetch it: `git remote add foundation https://github.com/admin9-labs/admin9-app-flutter.git`, `git remote set-url --push foundation DISABLED`, `dart run tool/design_system/verify_repository_governance.dart --derived-root .`, and `git fetch foundation --tags`.

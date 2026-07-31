@@ -34,8 +34,8 @@
       "additionalProperties": false,
       "required": ["version", "sourceTag"],
       "properties": {
-        "version": { "const": "1.0.2" },
-        "sourceTag": { "const": "design-system-v1.0.2" }
+        "version": { "const": "1.0.3" },
+        "sourceTag": { "const": "design-system-v1.0.3" }
       }
     },
     "app": {

@@ -1,6 +1,6 @@
 # Admin9 Design System
 
-> Version: v1.0.2
+> Version: v1.0.3
 > Status: frozen normative baseline
 > Scope: Android and iOS Flutter apps derived from Admin9 App Foundation
 
@@ -9,7 +9,7 @@
 Admin9 Design System is the single specification source for shared product semantics, platform behavior, visual foundations, public `App*` component contracts, page patterns, accessibility, and quality gates. `Admin9 UI` means its Flutter implementation layer; it is not a competing system.
 
 The Design System version, Foundation Git version, Foundation tag, app version,
-and customer business version are independent. Design System v1.0.2 does not
+and customer business version are independent. Design System v1.0.3 does not
 imply app version 1.0.0. This Foundation's Phase 0D-6 runtime implementation is
 complete, but derived projects must still record and verify their own exact
 Foundation commit and compatibility tuple.
@@ -99,14 +99,14 @@ dart run tool/design_system/verify_rule_links.dart
 node tool/design_system/verify_documentation.mjs
 ```
 
-After the Phase 6 implementation commit exists and the v1.0.2 compatibility
+After the v1.0.3 implementation commit exists and its compatibility
 tuple is updated, the final provenance gate is mandatory:
 
 ```bash
-phase6_implementation_commit="$(git rev-parse 'design-system-v1.0.2^{commit}^')"
+foundation_implementation_commit="$(git rev-parse 'design-system-v1.0.3^{commit}^')"
 dart run tool/design_system/verify_design_system_release.dart \
-  --version=1.0.2 \
-  --foundation-commit="$phase6_implementation_commit"
+  --version=1.0.3 \
+  --foundation-commit="$foundation_implementation_commit"
 ```
 
 The command intentionally fails while README, CHANGELOG, the derived-project
@@ -142,3 +142,18 @@ assistive technology and page combination.
 Phase 6 closes with no open P0/P1. The accepted Android and iOS artifacts,
 representative human observations, emulator system gates and P2/P3 backlog are
 owned by the [Phase 6 report](../architecture/admin9-ui-phase-6-acceptance-report.md).
+
+## 9. v1.0.3 Foundation closure
+
+v1.0.3 closes the two P1 and four blocking P2 findings selected by the final
+Foundation review. It fails closed when privacy consent cannot persist, removes
+the empty lifecycle owner, makes current-tab reselection explicit, restores
+constructor-contract completeness, generates manifest-derived Dart and native
+identity without rewriting derived Business native sources, and binds
+governance to the canonical repository and named maintainer. iOS AppIcons are
+generated as opaque RGB, and the Brand verifier covers that release property.
+
+The v1.0.2 Phase 6 device records remain historical, hash-bound evidence for
+their named artifacts and source. v1.0.3 does not relabel those records as a
+fresh device run; current physical-device and assistive-technology repetition
+remains Unknown until separately executed and recorded.

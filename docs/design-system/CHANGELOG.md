@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.0.3 - 2026-07-31
+
+- Closed privacy persistence, lifecycle ownership, public constructor parity,
+  repository governance, Android package migration, and native Brand identity
+  blockers identified by the final Foundation review.
+- Added manifest-driven Dart, Android and iOS identity generation and read-only
+  drift verification, including opaque RGB iOS AppIcons and preservation of
+  derived native Business sources and target bundle suffixes.
+- Approved the exact v1.0.3 implementation commit for derived-project use while
+  retaining the v1.0.2 device evidence as historical, limited evidence rather
+  than claiming a new physical-device or assistive-technology run.
+
 ## 1.0.2 - 2026-07-31
 
 - Clarified risk-tiered Phase 6 evidence ownership: deterministic contracts are

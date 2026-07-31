@@ -16,6 +16,14 @@
       "flutter": "3.44.1",
       "dart": "3.12.1",
       "status": "approved"
+    },
+    {
+      "foundationCommit": "05f61f6302f251cf6565dbb7334f84efe074f43f",
+      "designSystemVersion": "1.0.3",
+      "designSystemSourceTag": "design-system-v1.0.3",
+      "flutter": "3.44.1",
+      "dart": "3.12.1",
+      "status": "approved"
     }
   ]
 }

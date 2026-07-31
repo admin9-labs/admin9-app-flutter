@@ -1,11 +1,11 @@
 {
   "schemaVersion": "1.0.0",
   "foundation": {
-    "commit": "54d139c70d6e4b873d7bc97b445e10b0264d450d",
+    "commit": "05f61f6302f251cf6565dbb7334f84efe074f43f",
     "tag": null,
     "upstreamRemote": "https://github.com/admin9-labs/admin9-app-flutter.git"
   },
-  "designSystem": { "version": "1.0.2", "sourceTag": "design-system-v1.0.2" },
+  "designSystem": { "version": "1.0.3", "sourceTag": "design-system-v1.0.3" },
   "app": {
     "name": "Admin9 derived app",
     "version": "1.0.0",

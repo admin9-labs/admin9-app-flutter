@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "foundation": { "commit": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "tag": null, "upstreamRemote": "https://github.com/admin9-labs/admin9-app-flutter.git" },
-  "designSystem": { "version": "1.0.1", "sourceTag": "design-system-v1.0.1" },
+  "designSystem": { "version": "1.0.3", "sourceTag": "design-system-v1.0.3" },
   "app": { "name": "Incompatible app", "version": "1.0.0", "androidApplicationId": "com.example.invalid", "iosBundleId": "com.example.invalid" },
   "brandConfiguration": { "themeVersion": "1.0.0", "themeSha256": "f49ce1ce1d9deebab58c88b16f5bdd33514cb1aad1cced1b4aae3b55ef3d959f", "primaryPair": { "light": "#315C66", "dark": "#9CCBD5" }, "secondaryPair": { "light": "#67587A", "dark": "#D1BCE4" }, "approvedFont": null, "radiusDelta": 0, "logoPath": "assets/brand/logo.png", "logoSha256": "54d07a9b2f8bb0dd4d05e384aac5c9d0e7e35b65158c0076c170494b2188f32b", "launchAssetPath": "assets/brand/launch.png", "launchAssetSha256": "b957a1fa5560a67d387a9c073cc7984b82d388581096c474860cd0d1e89e9f90" },
   "toolchain": { "flutter": "3.44.1", "dart": "3.12.1" },
