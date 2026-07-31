@@ -33,7 +33,7 @@ enum AppFontScale {
   );
 }
 
-class AppAppearance {
+final class AppAppearance {
   const AppAppearance({
     this.theme = AppThemePreference.system,
     this.fontScale = AppFontScale.standard,
