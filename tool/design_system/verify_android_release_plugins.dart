@@ -31,13 +31,8 @@ void main(List<String> arguments) {
     'android/app/src/main/java/io/flutter/plugins/'
     'GeneratedPluginRegistrant.java',
   );
-  final registryFile = File(
-    'android/app/src/main/kotlin/com/admin9/app/foundation/'
-    'ReleasePluginRegistry.kt',
-  );
-  final activityFile = File(
-    'android/app/src/main/kotlin/com/admin9/app/foundation/MainActivity.kt',
-  );
+  final registryFile = _findAndroidSource('ReleasePluginRegistry.kt');
+  final activityFile = _findAndroidSource('MainActivity.kt');
   final gradleFile = File('android/app/build.gradle.kts');
   final inputs = [
     dependenciesFile,
@@ -76,6 +71,21 @@ void main(List<String> arguments) {
     generatedRegistryFile,
   ).toList()..sort((left, right) => left.name.compareTo(right.name));
   stdout.writeln('Android release plugins verified: $expected');
+}
+
+File _findAndroidSource(String filename) {
+  final root = Directory('android/app/src/main');
+  final matches = root
+      .listSync(recursive: true)
+      .whereType<File>()
+      .where((file) => file.uri.pathSegments.last == filename)
+      .toList();
+  if (matches.length != 1) {
+    throw FormatException(
+      'Expected exactly one Android $filename, found ${matches.length}.',
+    );
+  }
+  return matches.single;
 }
 
 Set<PluginRegistration> _expectedRegistrations(

@@ -26,7 +26,7 @@
       "properties": {
         "commit": { "type": "string", "pattern": "^[0-9a-f]{40}$" },
         "tag": { "type": ["string", "null"], "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*$" },
-        "upstreamRemote": { "type": ["string", "null"], "pattern": "^https://[^ ]+$" }
+        "upstreamRemote": { "const": "https://github.com/admin9-labs/admin9-app-flutter.git" }
       }
     },
     "designSystem": {
@@ -60,9 +60,9 @@
         "secondaryPair": { "$ref": "#/$defs/colorPair" },
         "approvedFont": { "type": ["string", "null"], "minLength": 1 },
         "radiusDelta": { "type": "integer", "minimum": -2, "maximum": 2 },
-        "logoPath": { "type": "string", "pattern": "^assets/(?!\\.{1,2}(?:/|$))[A-Za-z0-9_.-]+(?:/(?!\\.{1,2}(?:/|$))[A-Za-z0-9_.-]+)*$" },
+        "logoPath": { "type": "string", "pattern": "^assets/(?!\\.{1,2}(?:/|$))[A-Za-z0-9_.-]+(?:/(?!\\.{1,2}(?:/|$))[A-Za-z0-9_.-]+)*\\.png$" },
         "logoSha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
-        "launchAssetPath": { "type": "string", "pattern": "^assets/(?!\\.{1,2}(?:/|$))[A-Za-z0-9_.-]+(?:/(?!\\.{1,2}(?:/|$))[A-Za-z0-9_.-]+)*$" },
+        "launchAssetPath": { "type": "string", "pattern": "^assets/(?!\\.{1,2}(?:/|$))[A-Za-z0-9_.-]+(?:/(?!\\.{1,2}(?:/|$))[A-Za-z0-9_.-]+)*\\.png$" },
         "launchAssetSha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
       }
     },

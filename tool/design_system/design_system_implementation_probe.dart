@@ -1,5 +1,6 @@
 import 'package:admin9_app_flutter/admin9_ui.dart';
 import 'package:admin9_app_flutter/app/brand/app_brand_theme.dart';
+import 'package:admin9_app_flutter/core/design_system/components/app_feedback.dart';
 import 'package:flutter/widgets.dart';
 
 Widget instantiateDesignScope(AppDesignTokens tokens) =>
@@ -7,6 +8,15 @@ Widget instantiateDesignScope(AppDesignTokens tokens) =>
 
 Widget instantiateFeedbackHost(AppFeedbackController controller) =>
     AppFeedbackHost(controller: controller, child: const SizedBox.shrink());
+
+Widget instantiateFeedback(
+  AppFeedbackController controller,
+  GlobalKey<NavigatorState> navigatorKey,
+) => AppFeedback(
+  controller: controller,
+  navigatorKey: navigatorKey,
+  child: const SizedBox.shrink(),
+);
 
 Widget instantiateInteractionHost(AppInteractionController controller) =>
     AppInteractionHost(controller: controller, child: const SizedBox.shrink());

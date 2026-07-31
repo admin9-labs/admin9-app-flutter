@@ -1,6 +1,8 @@
 import 'package:admin9_app_flutter/app/admin9_app.dart';
-import 'package:admin9_app_flutter/core/lifecycle/app_lifecycle_controller.dart';
+import 'package:admin9_app_flutter/app/privacy_gate.dart';
 import 'package:admin9_app_flutter/admin9_ui.dart';
+import 'package:admin9_app_flutter/core/design_system/foundation/app_theme.dart';
+import 'package:admin9_app_flutter/core/preferences/app_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -24,11 +26,6 @@ void main() {
 
     expect(find.text('隐私保护提示'), findsOneWidget);
     expect(find.text('暂无内容'), findsNothing);
-    expect(
-      tester.element(find.byType(MaterialApp)).read<AppLifecycleController>(),
-      isA<AppLifecycleController>(),
-    );
-
     await tester.tap(find.byKey(const Key('privacy-accept-button')));
     await tester.pumpAndSettle();
 
@@ -38,6 +35,45 @@ void main() {
       tester.takeAnnouncements().map((announcement) => announcement.message),
       ['已进入首页'],
     );
+  });
+
+  testWidgets('privacy persistence failure keeps the host locked', (
+    tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    final sharedPreferences = await SharedPreferences.getInstance();
+    final controller = PrivacyController(
+      AppPreferences(sharedPreferences, (key, value) async => false),
+    );
+
+    await tester.pumpWidget(
+      ChangeNotifierProvider.value(
+        value: controller,
+        child: MaterialApp(
+          home: AppDesignScope(
+            tokens: AppTheme.resolve(
+              brightness: Brightness.light,
+              highContrast: false,
+              reduceMotion: false,
+              boldText: false,
+              brandPrimary: const Color(0xff2457a7),
+              brandSecondary: const Color(0xff52606d),
+            ).tokens,
+            child: const PrivacyGate(child: Text('HOST')),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(await controller.accept(), isFalse);
+    await tester.pump();
+
+    expect(controller.accepted, isFalse);
+    expect(controller.saveFailed, isTrue);
+    expect(find.text('HOST'), findsNothing);
+    expect(find.text('隐私选择尚未保存，应用仍保持锁定。'), findsOneWidget);
+    expect(sharedPreferences.getBool('admin9.privacy.accepted'), isNull);
   });
 
   testWidgets('accepted cold launch does not repeat the privacy announcement', (

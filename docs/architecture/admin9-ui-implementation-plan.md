@@ -25,7 +25,7 @@
 6. 不引入 `flutter_platform_widgets` 等全局第三方 UI 套件。图表、富文本和媒体能力按独立需求评估。
 7. Core 实现固定保留在当前应用仓库的 `lib/core/design_system/`，只经 `lib/admin9_ui.dart` 导出；品牌只经 `lib/app/brand/app_brand_theme.dart` 输入。首期不拆独立 package。
 8. 只封装具有平台差异、统一状态、无障碍或稳定复用价值的组件，不包装 `Row`、`Column`、`Text`、`Icon`、`Padding`、`SizedBox`、`Expanded` 和 `Flexible`。
-9. App Shell 固定持有一级导航、Tab 页面实例、页面保活和全局资源生命周期；各 feature 固定持有本页滚动控制器、表单状态、业务状态和页面级资源。公共组件只接收值、展示数据和回调。
+9. App Shell 固定持有一级导航、Tab 页面实例和页面保活；各 feature 固定持有本页滚动控制器、表单状态、业务状态和页面级资源。只有真实资源 owner 才观察系统生命周期；当前无后台资源的 Foundation 不创建空转全局 controller。公共组件只接收值、展示数据和回调。
 10. 媒体、频道、直播、积分、客户身份、Logo、法务资料和构建配置不进入 Admin9 UI。
 11. v1.2 首期只支持中文简体界面，固定配置 `zh_CN` 和 Flutter 的 Material、Cupertino、Widgets 本地化代理；日期、时间和 24 小时制尊重系统设置。
 12. 首期不启用 Android 动态颜色。两端使用 Design System 默认语义主题；派生项目只可通过 Brand Theme 覆盖已批准的 primary/secondary 对、品牌资产、批准字体和受限圆角性格。
@@ -121,7 +121,7 @@ Phase 1 必须增加 analyzer AST 导入边界测试及正反 fixtures：公共�
 | `AppListTile` | `ListTile` | `CupertinoListTile` | 平台原生按压反馈和尾部箭头 |
 | `AppSection` | `Column` + section title + unframed children + row `Divider` | `CupertinoListSection.insetGrouped` | 只负责标题、footer 和 children |
 | `AppPage` | `Scaffold` + `AppBar` | `CupertinoPageScaffold` + `CupertinoNavigationBar` | 标题栏固定使用平台原生结构 |
-| `AppBottomNavigation` | `NavigationBar` | `CupertinoTabBar` | Shell 持有 index、页面实例和生命周期 |
+| `AppBottomNavigation` | `NavigationBar` | `CupertinoTabBar` | Shell 持有 index 和页面实例；资源 owner 持有所需生命周期 |
 | `AppFeedback` | 瞬时态固定使用 `SnackBar`；持久态固定使用 `MaterialBanner` | 顶部 `OverlayEntry` 通知条；持久态增加关闭控件 | 无操作且未启用无障碍导航时 info/success 3 秒、warning/error 5 秒；其余情况持久显示并即时公告 |
 | `AppActionMenu<T>` | Material modal bottom sheet | `CupertinoActionSheet` | 只用于 2 至 6 个离散命令，不承担字段/设置选择；取消不提交 |
 | `AppProgressIndicator` | `CircularProgressIndicator` / `LinearProgressIndicator` | 未知进度使用 `CupertinoActivityIndicator`，确定进度使用 Core semantic bar | 必须有可读标签；确定值为 0...1；不伪造百分比 |
@@ -190,7 +190,7 @@ Cupertino 主题固定从同一套 semantic Token 生成 `cupertinoOverrideTheme
 | 组件 | 必需输入与状态 | 固定约束 |
 | --- | --- | --- |
 | `AppPage` / `AppPageAction` | title/body/navigationMode/actions/parentLabel/scrollable | root 禁止 back 且 parentLabel 为空；child 要求非空 parentLabel；Core 持有 page bar、安全区与滚动合同 |
-| `AppBottomNavigation` / `AppNavigationDestination` | destinations/selectedIndex/onDestinationSelected | Shell 持有 index、页面和生命周期；底栏只渲染与单次回调 |
+| `AppBottomNavigation` / `AppNavigationDestination` | destinations/selectedIndex/onDestinationSelected | Shell 持有 index 和页面；底栏只渲染与单次回调 |
 | `AppButton` | label/onPressed/variant/icon/enabled/loading | caller 持有任务幂等和 loading 迁移；Core 在 disabled/loading 时不派发，每次激活最多一次 |
 | `AppTextField` | controller/label/focus/validator/error/input/autofill/password/callback/icon | Business 持有文本、焦点、校验与提交；Core 只持有密码可见展示态 |
 | `AppSelect<T extends Object>` | label/value/options/onChanged/enabled/validator/error | 2-20 项字段选择；iOS Cancel 不提交，Done 回调一次；无搜索/远程/多选 |
@@ -258,7 +258,7 @@ Phase 0 必须用 `rg` 查清当前仓库内消费者。没有仓库外消费者
 
 ## 10. 导航与 Shell 契约
 
-1. `Admin9Shell` 继续持有当前 Tab、页面实例、页面保活、重复点击 Tab、滚动到顶部和资源启停。
+1. `Admin9Shell` 持有当前 Tab、页面实例和页面保活。重复点击已选 Tab 明确保持当前状态，不伪造滚顶或资源启停；真实业务出现滚顶或媒体资源需求时，由对应 feature/resource owner 提供并测试该行为。
 2. Android Shell 固定使用 `Scaffold(body: IndexedStack, bottomNavigationBar: AppBottomNavigation)`；iOS Shell 固定使用 `CupertinoPageScaffold`，在纵向布局中依次放置 `Expanded(IndexedStack)` 和 `AppBottomNavigation`。`CupertinoTabScaffold` 不进入首期，避免把页面所有权交给底栏组件。
 3. `AppBottomNavigation` 只渲染平台底栏并上报选择事件。
 4. Android 和 iOS 都保留当前两个一级目的地“首页”“我的”；两个目的地是已确认产品结构，不为迎合组件建议增加占位 Tab。
@@ -376,8 +376,10 @@ dart format --output=none --set-exit-if-changed tool
 dart run tool/design_system/validate_foundation_manifest.dart --fixtures
 flutter analyze tool/design_system/design_system_contract_probe.dart
 dart run tool/design_system/verify_rule_links.dart
-phase6_implementation_commit="$(git rev-parse HEAD)"
+phase6_implementation_commit="$(git rev-parse 'design-system-v1.0.2^{commit}^')"
 dart run tool/design_system/verify_design_system_release.dart --version=1.0.2 --foundation-commit="$phase6_implementation_commit"
+dart run tool/design_system/verify_repository_governance.dart
+dart run tool/design_system/verify_public_api_parity.dart --self-test
 node tool/design_system/verify_documentation.mjs
 node docs/design-system/evidence/sources/verify_visual_references.mjs docs/design-system/evidence/visual-references
 dart run tool/design_system/verify_android_release_plugins.dart --self-test

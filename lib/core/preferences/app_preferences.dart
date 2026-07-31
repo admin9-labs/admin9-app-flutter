@@ -1,7 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AppPreferences {
-  AppPreferences(this._preferences);
+  AppPreferences(this._preferences, [this._boolWriter]);
 
   static const _privacyAcceptedKey = 'admin9.privacy.accepted';
   static const _themeModeKey = 'admin9.appearance.theme_mode';
@@ -11,6 +11,7 @@ class AppPreferences {
   static const _reduceMotionKey = 'admin9.accessibility.reduce_motion';
 
   final SharedPreferences _preferences;
+  final Future<bool> Function(String key, bool value)? _boolWriter;
 
   bool get privacyAccepted =>
       _preferences.getBool(_privacyAcceptedKey) ?? false;
@@ -20,7 +21,8 @@ class AppPreferences {
   bool get highContrast => _preferences.getBool(_highContrastKey) ?? false;
   bool get reduceMotion => _preferences.getBool(_reduceMotionKey) ?? false;
 
-  Future<void> setPrivacyAccepted(bool value) =>
+  Future<bool> setPrivacyAccepted(bool value) =>
+      _boolWriter?.call(_privacyAcceptedKey, value) ??
       _preferences.setBool(_privacyAcceptedKey, value);
   Future<bool> setThemeMode(String value) =>
       _preferences.setString(_themeModeKey, value);

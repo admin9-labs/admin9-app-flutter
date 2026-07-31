@@ -29,6 +29,11 @@ class _Admin9ShellState extends State<Admin9Shell> {
     ),
   ];
 
+  void _selectDestination(int value) {
+    if (value == _selectedIndex) return;
+    setState(() => _selectedIndex = value);
+  }
+
   @override
   Widget build(BuildContext context) {
     final body = Align(
@@ -41,7 +46,7 @@ class _Admin9ShellState extends State<Admin9Shell> {
     final navigation = AppBottomNavigation(
       destinations: _destinations,
       selectedIndex: _selectedIndex,
-      onDestinationSelected: (value) => setState(() => _selectedIndex = value),
+      onDestinationSelected: _selectDestination,
     );
     if (Theme.of(context).platform == TargetPlatform.iOS) {
       return CupertinoPageScaffold(

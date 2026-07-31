@@ -10,7 +10,6 @@ import '../core/design_system/components/app_interaction.dart';
 import '../core/design_system/foundation/app_theme.dart';
 import '../core/design_system/foundation/app_appearance_resolution.dart';
 import '../core/design_system/foundation/appearance_controller.dart';
-import '../core/lifecycle/app_lifecycle_controller.dart';
 import '../core/preferences/app_preferences.dart';
 import '../ui/features/account/view_models/session_controller.dart';
 import 'admin9_shell.dart';
@@ -62,10 +61,6 @@ class _Admin9AppState extends State<Admin9App> with WidgetsBindingObserver {
         ),
         ChangeNotifierProvider(
           create: (_) => PrivacyController(appPreferences),
-        ),
-        ChangeNotifierProvider(
-          lazy: false,
-          create: (_) => AppLifecycleController(),
         ),
         ChangeNotifierProvider(create: (_) => SessionController()),
       ],

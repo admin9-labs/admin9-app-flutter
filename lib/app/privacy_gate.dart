@@ -14,14 +14,30 @@ class PrivacyController extends ChangeNotifier {
 
   final AppPreferences _preferences;
   bool _accepted;
+  bool _isSaving = false;
+  bool _saveFailed = false;
 
   bool get accepted => _accepted;
+  bool get isSaving => _isSaving;
+  bool get saveFailed => _saveFailed;
 
-  Future<void> accept() async {
-    if (_accepted) return;
-    await _preferences.setPrivacyAccepted(true);
-    _accepted = true;
+  Future<bool> accept() async {
+    if (_accepted) return true;
+    if (_isSaving) return false;
+    _isSaving = true;
+    _saveFailed = false;
     notifyListeners();
+    bool persisted;
+    try {
+      persisted = await _preferences.setPrivacyAccepted(true);
+    } on Object {
+      persisted = false;
+    }
+    _isSaving = false;
+    _saveFailed = !persisted;
+    if (persisted) _accepted = true;
+    notifyListeners();
+    return persisted;
   }
 }
 
@@ -63,6 +79,7 @@ class _PrivacyConsentPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = context.watch<PrivacyController>();
     return Scaffold(
       body: SafeArea(
         child: Center(
@@ -115,9 +132,18 @@ class _PrivacyConsentPage extends StatelessWidget {
                   const SizedBox(height: 20),
                   AppButton(
                     key: const Key('privacy-accept-button'),
-                    label: '同意并继续',
-                    onPressed: context.read<PrivacyController>().accept,
+                    label: controller.isSaving ? '正在保存' : '同意并继续',
+                    enabled: !controller.isSaving,
+                    loading: controller.isSaving,
+                    onPressed: () => _accept(context),
                   ),
+                  if (controller.saveFailed) ...[
+                    const SizedBox(height: 8),
+                    const AppNotice(
+                      tone: AppTone.error,
+                      message: '隐私选择尚未保存，应用仍保持锁定。',
+                    ),
+                  ],
                   const SizedBox(height: 8),
                   AppButton(
                     variant: AppButtonVariant.tertiary,
@@ -136,5 +162,14 @@ class _PrivacyConsentPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _accept(BuildContext context) async {
+    final saved = await context.read<PrivacyController>().accept();
+    if (!saved && context.mounted) {
+      AppFeedbackHost.of(context).show(
+        const AppFeedbackRequest(message: '无法保存隐私选择，请重试。', tone: AppTone.error),
+      );
+    }
   }
 }

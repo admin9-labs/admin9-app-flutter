@@ -16,7 +16,7 @@ Never _usage() {
     'usage: dart run tool/design_system/verify_brand_contract.dart\n'
     '   or: dart run tool/design_system/verify_brand_contract.dart --fixtures\n'
     '   or: dart run tool/design_system/verify_brand_contract.dart '
-    '<manifest> <brand-entry.dart> <app-identity.dart>',
+    '<manifest> <derived-repository-root>',
   );
   exit(64);
 }
@@ -25,10 +25,9 @@ void main(List<String> arguments) {
   final errors = switch (arguments) {
     [] => _verifyFoundation(),
     ['--fixtures'] => _verifyFixtures(),
-    [final manifest, final brand, final identity] => _verifyDerived(
+    [final manifest, final repositoryRoot] => _verifyDerivedRepository(
       manifest,
-      brand,
-      identity,
+      repositoryRoot,
     ),
     _ => _usage(),
   };
@@ -43,6 +42,8 @@ List<String> _verifyFoundation() {
   const data = BrandContractData(
     appName: 'Admin9',
     appVersion: '1.0.0',
+    androidApplicationId: 'com.admin9.app.foundation',
+    iosBundleId: 'com.admin9.app.foundation',
     primaryLight: '#2457A7',
     primaryDark: '#AFC6FF',
     secondaryLight: '#52606D',
@@ -66,7 +67,7 @@ List<String> _verifyFoundation() {
   ];
 }
 
-List<String> _verifyDerived(
+List<String> _verifyDerivedDart(
   String manifest,
   String brandEntry,
   String identity,
@@ -78,16 +79,21 @@ List<String> _verifyDerived(
   ];
 }
 
+List<String> _verifyDerivedRepository(String manifest, String repositoryRoot) {
+  final data = readBrandContract(manifest);
+  return synchronizeDerivedBrand(data, repositoryRoot, write: false);
+}
+
 List<String> _verifyFixtures() {
   final errors = <String>[];
-  final valid = _verifyDerived(
+  final valid = _verifyDerivedDart(
     _manifestFixture,
     '$_fixtureRoot/valid/app_brand_theme.dart',
     '$_fixtureRoot/valid/app_identity.dart',
   );
   if (valid.isNotEmpty) errors.add('valid fixture failed: ${valid.join('; ')}');
   for (final name in ['extra-field', 'value-drift']) {
-    final invalid = _verifyDerived(
+    final invalid = _verifyDerivedDart(
       _manifestFixture,
       '$_fixtureRoot/$name/app_brand_theme.dart',
       '$_fixtureRoot/$name/app_identity.dart',

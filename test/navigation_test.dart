@@ -25,6 +25,19 @@ void main() {
     expect(find.text('注册'), findsOneWidget);
   });
 
+  testWidgets('reselecting the active root tab preserves its page instance', (
+    tester,
+  ) async {
+    await _pumpAcceptedApp(tester);
+
+    final shellBefore = tester.state(find.byType(Admin9Shell));
+    await tester.tap(find.text('首页'));
+    await tester.pump();
+
+    expect(tester.state(find.byType(Admin9Shell)), same(shellBefore));
+    expect(find.text('暂无内容'), findsOneWidget);
+  });
+
   testWidgets('all foundation routes open and return', (tester) async {
     await _pumpAcceptedApp(tester);
     final shellContext = tester.element(find.byType(Admin9Shell));

@@ -29,8 +29,8 @@ const appBrandTheme = AppBrandTheme(
   primaryDark: Color(0xff9ccbd5),
   secondaryLight: Color(0xff67587a),
   secondaryDark: Color(0xffd1bce4),
-  logoAsset: 'assets/brand/logo.svg',
-  launchAsset: 'assets/brand/launch.svg',
+  logoAsset: 'assets/brand/logo.png',
+  launchAsset: 'assets/brand/launch.png',
   fontFamily: null,
   radiusDelta: 0,
 );

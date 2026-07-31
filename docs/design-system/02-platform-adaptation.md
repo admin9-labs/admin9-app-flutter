@@ -14,7 +14,7 @@ The root remains one `MaterialApp` for Navigator, localization, and theme infras
 | --- | --- | --- | --- |
 | app root | `MaterialApp`, Material 3 | shared `MaterialApp` host + Cupertino theme bridge | one route tree and localization source |
 | route | `MaterialPageRoute`, default Android builder | `MaterialPageRoute`, default Cupertino builder | no custom no-transition builder |
-| shell | `Scaffold + IndexedStack + NavigationBar` | `CupertinoPageScaffold + IndexedStack + CupertinoTabBar` | Shell owns index, pages, and lifecycle |
+| shell | `Scaffold + IndexedStack + NavigationBar` | `CupertinoPageScaffold + IndexedStack + CupertinoTabBar` | Shell owns index and page instances; a real resource owner observes lifecycle when required |
 | page/bar | `Scaffold + AppBar` | `CupertinoPageScaffold + CupertinoNavigationBar` | root no back; child back names parent |
 | primary button | `FilledButton` | `CupertinoButton.filled` | one primary action region |
 | secondary button | `OutlinedButton` | `CupertinoButton.tinted` | no elevation |

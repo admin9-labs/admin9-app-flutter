@@ -5,7 +5,7 @@ import 'brand_contract_support.dart';
 Never _usage() {
   stderr.writeln(
     'usage: dart run tool/design_system/generate_brand_entry.dart '
-    '<admin9-foundation.yaml> <output-lib-app-directory>',
+    '<admin9-foundation.yaml> <derived-repository-root>',
   );
   exit(64);
 }
@@ -13,7 +13,7 @@ Never _usage() {
 void main(List<String> arguments) {
   if (arguments.length != 2) _usage();
   final manifestPath = arguments[0];
-  final outputAppDirectory = Directory(arguments[1]);
+  final repositoryRoot = Directory(arguments[1]);
   final validation = Process.runSync(Platform.resolvedExecutable, [
     'run',
     'tool/design_system/validate_foundation_manifest.dart',
@@ -24,13 +24,14 @@ void main(List<String> arguments) {
     exit(validation.exitCode);
   }
   final data = readBrandContract(manifestPath);
-  final brandDirectory = Directory('${outputAppDirectory.path}/brand')
-    ..createSync(recursive: true);
-  File(
-    '${brandDirectory.path}/app_brand_theme.dart',
-  ).writeAsStringSync(renderBrandTheme(data));
-  File(
-    '${outputAppDirectory.path}/app_identity.dart',
-  ).writeAsStringSync(renderAppIdentity(data));
-  stdout.writeln('Brand entry generated from validated manifest');
+  final errors = synchronizeDerivedBrand(
+    data,
+    repositoryRoot.path,
+    write: true,
+  );
+  if (errors.isNotEmpty) {
+    errors.forEach(stderr.writeln);
+    exit(1);
+  }
+  stdout.writeln('Derived brand and native identity generated from manifest');
 }

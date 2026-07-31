@@ -84,12 +84,14 @@ dart run tool/design_system/validate_foundation_manifest.dart --fixtures
 # Derived-project repository only:
 dart run tool/design_system/validate_foundation_manifest.dart admin9-foundation.yaml
 # Derived-project generation and drift check:
-dart run tool/design_system/generate_brand_entry.dart admin9-foundation.yaml lib/app
-dart run tool/design_system/verify_brand_contract.dart admin9-foundation.yaml lib/app/brand/app_brand_theme.dart lib/app/app_identity.dart
+dart run tool/design_system/generate_brand_entry.dart admin9-foundation.yaml .
+dart run tool/design_system/verify_brand_contract.dart admin9-foundation.yaml .
+dart run tool/design_system/verify_repository_governance.dart --derived-root .
 flutter analyze tool/design_system/design_system_contract_probe.dart
 flutter analyze tool/design_system/design_system_implementation_probe.dart
+dart run tool/design_system/verify_public_api_parity.dart --self-test
 dart run tool/design_system/verify_import_boundaries.dart --fixtures
-dart run tool/design_system/verify_import_boundaries.dart --phase=0d
+dart run tool/design_system/verify_import_boundaries.dart --phase=final
 dart run tool/design_system/verify_gallery_boundary.dart
 dart run tool/design_system/verify_brand_contract.dart
 dart run tool/design_system/verify_brand_contract.dart --fixtures
@@ -101,7 +103,7 @@ After the Phase 6 implementation commit exists and the v1.0.2 compatibility
 tuple is updated, the final provenance gate is mandatory:
 
 ```bash
-phase6_implementation_commit="$(git rev-parse HEAD)"
+phase6_implementation_commit="$(git rev-parse 'design-system-v1.0.2^{commit}^')"
 dart run tool/design_system/verify_design_system_release.dart \
   --version=1.0.2 \
   --foundation-commit="$phase6_implementation_commit"
@@ -113,7 +115,7 @@ cannot name itself: Phase 6 implementation is committed first, then a separate
 acceptance/provenance commit records that exact SHA and the final annotated tag
 points to the provenance commit.
 
-The declaration probe is non-exported and contains abstract declarations/value objects only. It proves Dart syntax, generic bounds, nullability, `Key`, callback, and state-owner shapes; it does not claim a runtime implementation.
+The declaration probe is non-exported and contains abstract declarations/value objects only. It proves Dart syntax, generic bounds, nullability, `Key`, callback, and state-owner shapes; it does not claim a runtime implementation. The implementation probe instantiates the real public API, while `verify_public_api_parity.dart` compares declaration and implementation constructors through analyzer AST and runs a mandatory negative mutation self-test.
 
 ## 7. v1.0.1 implementation boundary
 

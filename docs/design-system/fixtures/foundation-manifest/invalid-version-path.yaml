@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "foundation": { "commit": "not-a-sha", "tag": null, "upstreamRemote": null },
+  "foundation": { "commit": "not-a-sha", "tag": null, "upstreamRemote": "https://github.com/admin9-labs/admin9-app-flutter.git" },
   "designSystem": { "version": "one", "sourceTag": "design-system-v1.0.1" },
   "app": { "name": "Invalid paths", "version": "one", "androidApplicationId": "invalid", "iosBundleId": "invalid" },
   "brandConfiguration": { "themeVersion": "one", "themeSha256": "bad", "primaryPair": { "light": "blue", "dark": "blue" }, "secondaryPair": { "light": "red", "dark": "red" }, "logoPath": "logo.png", "launchAssetPath": "launch.png" },

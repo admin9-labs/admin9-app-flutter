@@ -444,9 +444,15 @@ typedef AppInteractionControllerOf =
     AppInteractionController Function(BuildContext context);
 
 abstract class AppFeedback extends StatelessWidget {
-  const AppFeedback({super.key, required this.controller, required this.child});
+  const AppFeedback({
+    super.key,
+    required this.controller,
+    required this.navigatorKey,
+    required this.child,
+  });
 
   final AppFeedbackController controller;
+  final GlobalKey<NavigatorState> navigatorKey;
   final Widget child;
 }
 

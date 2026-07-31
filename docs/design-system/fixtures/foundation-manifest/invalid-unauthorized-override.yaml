@@ -1,9 +1,9 @@
 {
   "schemaVersion": "1.0.0",
-  "foundation": { "commit": "1c91f21eaee511f081d5addbe765151f27a53fb9", "tag": null, "upstreamRemote": null },
+  "foundation": { "commit": "1c91f21eaee511f081d5addbe765151f27a53fb9", "tag": null, "upstreamRemote": "https://github.com/admin9-labs/admin9-app-flutter.git" },
   "designSystem": { "version": "1.0.1", "sourceTag": "design-system-v1.0.1" },
   "app": { "name": "Unauthorized override", "version": "1.0.0", "androidApplicationId": "com.example.override", "iosBundleId": "com.example.override" },
-  "brandConfiguration": { "themeVersion": "1.0.0", "themeSha256": "70f89b817ff82091354db30771c793ba5471a84650ead1366022e0a598b29703", "primaryPair": { "light": "#315C66", "dark": "#9CCBD5" }, "secondaryPair": { "light": "#67587A", "dark": "#D1BCE4" }, "approvedFont": null, "radiusDelta": 0, "logoPath": "assets/brand/logo.svg", "logoSha256": "bbe187bea05fce88088c9bd19feb8d0ae660402a585f06bccac5da0dd6bef622", "launchAssetPath": "assets/brand/launch.svg", "launchAssetSha256": "9ed5811babdecd35a7e7d580d2529ea5034537b703c1daf62efe8ff3e6fe0b6f" },
+  "brandConfiguration": { "themeVersion": "1.0.0", "themeSha256": "f49ce1ce1d9deebab58c88b16f5bdd33514cb1aad1cced1b4aae3b55ef3d959f", "primaryPair": { "light": "#315C66", "dark": "#9CCBD5" }, "secondaryPair": { "light": "#67587A", "dark": "#D1BCE4" }, "approvedFont": null, "radiusDelta": 0, "logoPath": "assets/brand/logo.png", "logoSha256": "54d07a9b2f8bb0dd4d05e384aac5c9d0e7e35b65158c0076c170494b2188f32b", "launchAssetPath": "assets/brand/launch.png", "launchAssetSha256": "b957a1fa5560a67d387a9c073cc7984b82d388581096c474860cd0d1e89e9f90" },
   "toolchain": { "flutter": "3.44.1", "dart": "3.12.1" },
   "ownership": {
     "core": { "owner": "Core", "path": "lib/core/design_system/" },
