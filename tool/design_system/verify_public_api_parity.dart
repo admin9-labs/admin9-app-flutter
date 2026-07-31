@@ -6,6 +6,8 @@ import 'package:analyzer/dart/ast/ast.dart';
 
 const _contractPath = 'tool/design_system/design_system_contract_probe.dart';
 const _implementationRoot = 'lib/core/design_system';
+const _deferredImplementations = <String>{'AppSelect', 'AppSegmentedControl'};
+const _contractOnlyHelpers = <String>{'AppPlatformIconPair'};
 
 void main(List<String> arguments) {
   if (arguments.length > 1 ||
@@ -34,6 +36,20 @@ void main(List<String> arguments) {
     final mutationErrors = _verify(mutated);
     if (!mutationErrors.any((error) => error.contains('AppFeedback'))) {
       stderr.writeln('parity self-test failed to detect AppFeedback drift');
+      exit(1);
+    }
+    const missingImplementation = '''
+abstract class AppUnimplemented extends StatelessWidget {
+  const AppUnimplemented({super.key});
+}
+''';
+    final missingErrors = _verify('$contractSource\n$missingImplementation');
+    if (!missingErrors.any(
+      (error) => error.contains('AppUnimplemented implementation is missing'),
+    )) {
+      stderr.writeln(
+        'parity self-test failed to detect a missing implementation',
+      );
       exit(1);
     }
     stdout.writeln('Public API parity mutation self-test: PASS');
@@ -73,7 +89,13 @@ List<String> _verify(String contractSource) {
   for (final entry in contract.entries) {
     if (entry.value.constructors.isEmpty) continue;
     final actual = implementations[entry.key];
-    if (actual == null) continue;
+    if (actual == null) {
+      if (!_deferredImplementations.contains(entry.key) &&
+          !_contractOnlyHelpers.contains(entry.key)) {
+        errors.add('${entry.key} implementation is missing');
+      }
+      continue;
+    }
     compared += 1;
     if (!_sameConstructors(entry.value.constructors, actual.constructors)) {
       errors.add(

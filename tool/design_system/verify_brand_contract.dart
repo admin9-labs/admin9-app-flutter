@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
+import 'package:image/image.dart' as image;
 
 import 'brand_contract_support.dart';
 
@@ -99,6 +100,19 @@ List<String> _verifyFixtures() {
       '$_fixtureRoot/$name/app_identity.dart',
     );
     if (invalid.isEmpty) errors.add('$name fixture unexpectedly passed');
+  }
+  final logo = image.decodePng(
+    File(
+      'docs/design-system/fixtures/foundation-manifest/assets/brand/logo.png',
+    ).readAsBytesSync(),
+  );
+  if (logo == null) {
+    errors.add('valid Logo fixture is not a PNG');
+  } else {
+    final appIcon = image.decodePng(renderIosAppIconPng(logo, 1024, '#315C66'));
+    if (appIcon == null || appIcon.numChannels != 3) {
+      errors.add('generated iOS AppIcon must be opaque RGB');
+    }
   }
   return errors;
 }

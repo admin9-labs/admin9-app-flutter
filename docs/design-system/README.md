@@ -115,7 +115,7 @@ cannot name itself: Phase 6 implementation is committed first, then a separate
 acceptance/provenance commit records that exact SHA and the final annotated tag
 points to the provenance commit.
 
-The declaration probe is non-exported and contains abstract declarations/value objects only. It proves Dart syntax, generic bounds, nullability, `Key`, callback, and state-owner shapes; it does not claim a runtime implementation. The implementation probe instantiates the real public API, while `verify_public_api_parity.dart` compares declaration and implementation constructors through analyzer AST and runs a mandatory negative mutation self-test.
+The declaration probe is non-exported and contains abstract declarations/value objects only. It proves Dart syntax, generic bounds, nullability, `Key`, callback, and state-owner shapes; it does not claim a runtime implementation. The implementation probe instantiates the frozen implementations, while `verify_public_api_parity.dart` compares declaration and implementation constructors through analyzer AST, excludes only the probe-local icon-map helper, permits only the explicitly deferred `AppSelect` and `AppSegmentedControl`, and runs mandatory drift and missing-implementation mutation self-tests.
 
 ## 7. v1.0.1 implementation boundary
 

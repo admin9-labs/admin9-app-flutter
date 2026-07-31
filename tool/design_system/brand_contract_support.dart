@@ -240,12 +240,23 @@ List<String> synchronizeDerivedBrand(
   if (bundleMatches.isEmpty) {
     throw FormatException('$projectPath contains no bundle identifiers');
   }
+  final existingBundleIds =
+      bundleMatches.map((match) => match.group(1)!).toSet().toList()
+        ..sort((left, right) => left.length.compareTo(right.length));
+  final existingMainBundleId = existingBundleIds.first;
+  if (existingBundleIds.any(
+    (value) =>
+        value != existingMainBundleId &&
+        !value.startsWith('$existingMainBundleId.'),
+  )) {
+    throw FormatException(
+      '$projectPath bundle identifiers must share one main app prefix',
+    );
+  }
   final expectedProject = projectSource.replaceAllMapped(bundlePattern, (
     match,
   ) {
-    final suffix = match.group(1)!.endsWith('.RunnerTests')
-        ? '.RunnerTests'
-        : '';
+    final suffix = match.group(1)!.substring(existingMainBundleId.length);
     return 'PRODUCT_BUNDLE_IDENTIFIER = ${data.iosBundleId}$suffix;';
   });
   syncText('ios/Runner.xcodeproj/project.pbxproj', expectedProject);
@@ -282,7 +293,7 @@ List<String> synchronizeDerivedBrand(
     final scale = int.parse((record['scale'] as String).replaceFirst('x', ''));
     syncBytes(
       'ios/Runner/Assets.xcassets/AppIcon.appiconset/$filename',
-      _resizePng(logo, (size * scale).round()),
+      renderIosAppIconPng(logo, (size * scale).round(), data.primaryLight),
     );
   }
   for (final entry in const <String, int>{
@@ -306,44 +317,33 @@ void _synchronizeAndroidSources(
   required bool write,
   required List<String> errors,
 }) {
-  for (final language in ['kotlin', 'java']) {
-    final sourceRoot = Directory('${root.path}/android/app/src/main/$language');
-    if (!sourceRoot.existsSync()) continue;
-    final candidates = sourceRoot
-        .listSync(recursive: true)
-        .whereType<File>()
-        .where(
-          (file) => file.path.endsWith('.kt') || file.path.endsWith('.java'),
-        )
-        .where(
-          (file) => file.readAsStringSync().contains('package $oldNamespace'),
-        )
-        .toList();
-    for (final source in candidates) {
-      final expected = source.readAsStringSync().replaceFirst(
-        'package $oldNamespace',
-        'package $newNamespace',
-      );
-      final filename = source.uri.pathSegments.last;
-      final destination = File(
-        '${sourceRoot.path}/${newNamespace.replaceAll('.', '/')}/$filename',
-      );
-      if (write) {
-        destination.parent.createSync(recursive: true);
-        destination.writeAsStringSync(expected);
-        if (source.path != destination.path) source.deleteSync();
-      } else {
-        if (!destination.existsSync() ||
-            destination.readAsStringSync() != expected) {
-          errors.add(
-            'android app source $filename does not use the manifest application ID',
-          );
-        }
-        if (source.path != destination.path && source.existsSync()) {
-          errors.add(
-            'android app source $filename remains in the old namespace',
-          );
-        }
+  final sourceRoot = Directory('${root.path}/android/app/src/main/kotlin');
+  final oldPackagePath = oldNamespace.replaceAll('.', '/');
+  final newPackagePath = newNamespace.replaceAll('.', '/');
+  for (final filename in ['MainActivity.kt', 'ReleasePluginRegistry.kt']) {
+    final source = _requiredFile(
+      '${sourceRoot.path}/$oldPackagePath/$filename',
+    );
+    final expected = _replaceExactlyOnce(
+      source.readAsStringSync(),
+      RegExp('^package ${RegExp.escape(oldNamespace)}\\s*\$', multiLine: true),
+      (_) => 'package $newNamespace',
+      source.path,
+    );
+    final destination = File('${sourceRoot.path}/$newPackagePath/$filename');
+    if (write) {
+      destination.parent.createSync(recursive: true);
+      destination.writeAsStringSync(expected);
+      if (source.path != destination.path) source.deleteSync();
+    } else {
+      if (!destination.existsSync() ||
+          destination.readAsStringSync() != expected) {
+        errors.add(
+          'android app source $filename does not use the manifest application ID',
+        );
+      }
+      if (source.path != destination.path && source.existsSync()) {
+        errors.add('android app source $filename remains in the old namespace');
       }
     }
   }
@@ -418,6 +418,29 @@ Uint8List _resizePng(image.Image source, int size) => image.encodePng(
   ),
   level: 9,
 );
+
+Uint8List renderIosAppIconPng(
+  image.Image source,
+  int size,
+  String backgroundColor,
+) {
+  final rgb = int.parse(backgroundColor.substring(1), radix: 16);
+  final output = image.Image(width: size, height: size, numChannels: 3);
+  image.fill(
+    output,
+    color: image.ColorRgb8(rgb >> 16, (rgb >> 8) & 0xff, rgb & 0xff),
+  );
+  image.compositeImage(
+    output,
+    image.copyResize(
+      source,
+      width: size,
+      height: size,
+      interpolation: image.Interpolation.cubic,
+    ),
+  );
+  return image.encodePng(output, level: 9);
+}
 
 String _replaceExactlyOnce(
   String source,
