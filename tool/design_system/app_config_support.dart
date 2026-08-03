@@ -6,8 +6,8 @@ import 'package:image/image.dart' as image;
 import 'package:yaml/yaml.dart';
 import 'package:yaml_edit/yaml_edit.dart';
 
-final class BrandContractData {
-  const BrandContractData({
+final class AppConfigData {
+  const AppConfigData({
     required this.appName,
     required this.appVersion,
     required this.androidApplicationId,
@@ -20,6 +20,7 @@ final class BrandContractData {
     required this.launchAsset,
     required this.fontFamily,
     required this.radiusDelta,
+    this.assetSourceRoot,
   });
 
   final String appName;
@@ -34,18 +35,19 @@ final class BrandContractData {
   final String launchAsset;
   final String? fontFamily;
   final int radiusDelta;
+  final String? assetSourceRoot;
 }
 
-BrandContractData readBrandContract(String manifestPath) {
-  final value = jsonDecode(File(manifestPath).readAsStringSync());
+AppConfigData readAppConfig(String configPath) {
+  final value = jsonDecode(File(configPath).readAsStringSync());
   if (value is! Map<String, Object?>) {
-    throw const FormatException('manifest root must be an object');
+    throw const FormatException('app config root must be an object');
   }
   final app = value['app'] as Map<String, Object?>;
-  final brand = value['brandConfiguration'] as Map<String, Object?>;
+  final brand = value['brand'] as Map<String, Object?>;
   final primary = brand['primaryPair'] as Map<String, Object?>;
   final secondary = brand['secondaryPair'] as Map<String, Object?>;
-  return BrandContractData(
+  return AppConfigData(
     appName: app['name'] as String,
     appVersion: app['version'] as String,
     androidApplicationId: app['androidApplicationId'] as String,
@@ -56,12 +58,13 @@ BrandContractData readBrandContract(String manifestPath) {
     secondaryDark: secondary['dark'] as String,
     logoAsset: brand['logoPath'] as String,
     launchAsset: brand['launchAssetPath'] as String,
-    fontFamily: brand['approvedFont'] as String?,
+    fontFamily: brand['fontFamily'] as String?,
     radiusDelta: brand['radiusDelta'] as int,
+    assetSourceRoot: File(configPath).absolute.parent.path,
   );
 }
 
-String renderBrandTheme(BrandContractData data) =>
+String renderBrandTheme(AppConfigData data) =>
     '''import 'package:flutter/foundation.dart';
 import 'package:flutter/painting.dart';
 
@@ -100,7 +103,7 @@ const appBrandTheme = AppBrandTheme(
 );
 ''';
 
-String renderAppIdentity(BrandContractData data) =>
+String renderAppIdentity(AppConfigData data) =>
     '''abstract final class AppIdentity {
   static const name = ${_stringLiteral(data.appName)};
   static const productName = ${_stringLiteral(data.appName)};
@@ -111,17 +114,30 @@ String renderAppIdentity(BrandContractData data) =>
 
 String _colorLiteral(String value) => '0xff${value.substring(1).toLowerCase()}';
 
-String _stringLiteral(String value) =>
-    "'${value.replaceAll(r'\\', r'\\\\').replaceAll("'", r"\\'")}'";
+String _stringLiteral(String value) {
+  final encoded = jsonEncode(value);
+  final body = encoded
+      .substring(1, encoded.length - 1)
+      .replaceAll("'", r"\'")
+      .replaceAll(r'$', r'\$');
+  return "'$body'";
+}
 
-List<String> synchronizeDerivedBrand(
-  BrandContractData data,
+List<String> synchronizeAppConfig(
+  AppConfigData data,
   String repositoryRoot, {
   required bool write,
 }) {
   final root = Directory(repositoryRoot).absolute;
   final errors = <String>[];
   if (!root.existsSync()) return ['${root.path} is not a directory'];
+  final assetSourceRoot = Directory(data.assetSourceRoot ?? root.path).absolute;
+  final logoSource = _readSquarePng(
+    assetSourceRoot,
+    data.logoAsset,
+    minimumSize: 1024,
+  );
+  final launchSource = _readSquarePng(assetSourceRoot, data.launchAsset);
 
   void syncText(String relativePath, String expected) {
     final file = File('${root.path}/$relativePath');
@@ -129,7 +145,7 @@ List<String> synchronizeDerivedBrand(
       file.parent.createSync(recursive: true);
       file.writeAsStringSync(expected);
     } else if (!file.existsSync() || file.readAsStringSync() != expected) {
-      errors.add('$relativePath differs from the manifest-derived output');
+      errors.add('$relativePath differs from the app config output');
     }
   }
 
@@ -140,7 +156,7 @@ List<String> synchronizeDerivedBrand(
       file.writeAsBytesSync(expected);
     } else if (!file.existsSync() ||
         !_sameBytes(file.readAsBytesSync(), expected)) {
-      errors.add('$relativePath differs from the manifest-derived output');
+      errors.add('$relativePath differs from the app config output');
     }
   }
 
@@ -165,6 +181,7 @@ List<String> synchronizeDerivedBrand(
     data.logoAsset,
     data.launchAsset,
   }.toList()..sort();
+  pubspecEditor.update(['description'], '${data.appName} for Android and iOS.');
   pubspecEditor.update(['version'], data.appVersion);
   pubspecEditor.update(['flutter', 'assets'], assets);
   syncText('pubspec.yaml', pubspecEditor.toString());
@@ -261,8 +278,10 @@ List<String> synchronizeDerivedBrand(
   });
   syncText('ios/Runner.xcodeproj/project.pbxproj', expectedProject);
 
-  final logo = _readSquarePng(root, data.logoAsset, minimumSize: 1024);
-  final launch = _readSquarePng(root, data.launchAsset);
+  syncBytes(data.logoAsset, logoSource.bytes);
+  syncBytes(data.launchAsset, launchSource.bytes);
+  final logo = logoSource.decoded;
+  final launch = launchSource.decoded;
   const androidIcons = <String, int>{
     'android/app/src/main/res/mipmap-mdpi/ic_launcher.png': 48,
     'android/app/src/main/res/mipmap-hdpi/ic_launcher.png': 72,
@@ -339,7 +358,7 @@ void _synchronizeAndroidSources(
       if (!destination.existsSync() ||
           destination.readAsStringSync() != expected) {
         errors.add(
-          'android app source $filename does not use the manifest application ID',
+          'android app source $filename does not use the configured application ID',
         );
       }
       if (source.path != destination.path && source.existsSync()) {
@@ -367,7 +386,7 @@ void _verifyAndroidSource(
   if (matches.length != 1 ||
       matches.single.absolute.path != expected.absolute.path) {
     errors.add(
-      'android app source $filename must exist exactly once at the manifest application ID path',
+      'android app source $filename must exist exactly once at the configured application ID path',
     );
     return;
   }
@@ -377,7 +396,7 @@ void _verifyAndroidSource(
   );
   if (!packagePattern.hasMatch(matches.single.readAsStringSync())) {
     errors.add(
-      'android app source $filename does not declare the manifest application ID package',
+      'android app source $filename does not declare the configured application ID package',
     );
   }
 }
@@ -388,7 +407,7 @@ File _requiredFile(String path) {
   return file;
 }
 
-image.Image _readSquarePng(
+({Uint8List bytes, image.Image decoded}) _readSquarePng(
   Directory root,
   String relativePath, {
   int minimumSize = 1,
@@ -397,7 +416,8 @@ image.Image _readSquarePng(
   if (!relativePath.toLowerCase().endsWith('.png')) {
     throw FormatException('$relativePath must be a PNG asset');
   }
-  final decoded = image.decodePng(file.readAsBytesSync());
+  final bytes = file.readAsBytesSync();
+  final decoded = image.decodePng(bytes);
   if (decoded == null) {
     throw FormatException('$relativePath is not a valid PNG');
   }
@@ -406,7 +426,7 @@ image.Image _readSquarePng(
       '$relativePath must be square and at least ${minimumSize}x$minimumSize',
     );
   }
-  return decoded;
+  return (bytes: bytes, decoded: decoded);
 }
 
 Uint8List _resizePng(image.Image source, int size) => image.encodePng(

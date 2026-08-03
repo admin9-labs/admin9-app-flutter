@@ -289,7 +289,7 @@ void main() {
         tester.view.resetDevicePixelRatio();
         tester.view.resetPhysicalSize();
       });
-      final controller = TextEditingController(text: 'admin9-foundation');
+      final controller = TextEditingController(text: 'admin9-starter');
       final focusNode = FocusNode();
       addTearDown(controller.dispose);
       addTearDown(focusNode.dispose);

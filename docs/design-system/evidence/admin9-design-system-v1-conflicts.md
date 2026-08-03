@@ -1,5 +1,9 @@
 # Admin9 Design System v1.0 Conflict Register
 
+> **Historical evidence:** This v1.0 snapshot preserves its original decisions.
+> It is not a current Admin9 App Starter specification, compatibility promise,
+> or rule for independent forks.
+
 All specification conflicts below have one v1.0 ruling. A runtime conflict may remain an explicitly assigned implementation/device Unknown, but no row reopens the product decision.
 
 | Source/state | Conflict | v1.0 ruling | Downstream change | Verification/status |

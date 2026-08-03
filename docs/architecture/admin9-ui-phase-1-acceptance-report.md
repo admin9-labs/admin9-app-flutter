@@ -1,5 +1,8 @@
 # Admin9 Design System Phase 1 验收报告
 
+> **历史记录：** 本文保留 Foundation 阶段当时的验收结论，不是当前 Starter 规范，
+> 也不构成对任何 fork 的认证、兼容或支持承诺。
+
 > 结论：Go
 > 验收日期：2026-07-29
 > 基线：`design-system-v1.0.1` / `e3701a4e0257539228a8922ccfbfd089a7fb2072`

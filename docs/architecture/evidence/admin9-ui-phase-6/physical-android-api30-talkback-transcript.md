@@ -1,5 +1,9 @@
 # Xiaomi API 30 TalkBack transcript
 
+> **Historical evidence:** This file preserves phase- and date-bound evidence.
+> It is not a current Admin9 App Starter specification, compatibility promise,
+> or rule for independent forks.
+
 Date: 2026-07-30
 
 ## Environment

@@ -359,7 +359,7 @@ void main() {
   });
 
   for (final fixture in _matrix) {
-    testWidgets('Gallery foundation matrix ${fixture.id}', (tester) async {
+    testWidgets('Gallery starter matrix ${fixture.id}', (tester) async {
       await tester.binding.setSurfaceSize(fixture.size);
       addTearDown(() => tester.binding.setSurfaceSize(null));
       await tester.pumpWidget(

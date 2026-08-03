@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "1.0.0",
+  "app": {
+    "name": "Example App",
+    "version": "1.0.0",
+    "androidApplicationId": "com.example.app",
+    "iosBundleId": "com.example.app",
+    "unsupportedField": "not-used"
+  },
+  "brand": {
+    "primaryPair": { "light": "#315C66", "dark": "#9CCBD5" },
+    "secondaryPair": { "light": "#67587A", "dark": "#D1BCE4" },
+    "fontFamily": null,
+    "radiusDelta": 0,
+    "logoPath": "assets/brand/logo.png",
+    "launchAssetPath": "assets/brand/launch.png"
+  }
+}

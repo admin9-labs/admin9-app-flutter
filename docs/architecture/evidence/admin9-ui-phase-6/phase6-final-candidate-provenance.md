@@ -1,5 +1,9 @@
 # Phase 6 final candidate provenance
 
+> **Historical evidence:** This file preserves phase- and date-bound evidence.
+> It is not a current Admin9 App Starter specification, compatibility promise,
+> or rule for independent forks.
+
 Recorded: 2026-07-31; final iOS artifact and human gate updated after the
 selected-state Semantics fix
 

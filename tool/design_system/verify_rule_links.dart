@@ -1,11 +1,7 @@
-import 'dart:convert';
 import 'dart:io';
 
 const _registerPath =
     'docs/design-system/evidence/admin9-design-system-v1-rule-register.md';
-const _schemaPath = 'docs/design-system/schema/admin9-foundation.schema.json';
-const _compatibilityPath =
-    'docs/design-system/schema/admin9-foundation-compatibility.json';
 
 void main() {
   final register = File(_registerPath).readAsStringSync();
@@ -57,77 +53,6 @@ void main() {
   }
   for (final id in ids.difference(declaredIds)) {
     errors.add('$id has a register row but no normative anchor');
-  }
-
-  final schema = jsonDecode(File(_schemaPath).readAsStringSync());
-  if (schema is! Map<String, Object?>) {
-    errors.add('schema root is not an object');
-  } else {
-    final properties = schema['properties'];
-    for (final field in [
-      'foundation',
-      'designSystem',
-      'app',
-      'brandConfiguration',
-      'toolchain',
-      'ownership',
-      'exports',
-      'compatibility',
-      'provenance',
-      'deviations',
-    ]) {
-      if (properties is! Map<String, Object?> ||
-          !properties.containsKey(field)) {
-        errors.add('schema missing rule-linked field: $field');
-      }
-      if (!register.contains('`$field')) {
-        errors.add('rule register does not link schema field: $field');
-      }
-    }
-  }
-
-  final compatibility = jsonDecode(File(_compatibilityPath).readAsStringSync());
-  if (compatibility is! Map<String, Object?> ||
-      compatibility['schemaVersion'] != '1.0.0' ||
-      compatibility['approved'] is! List<Object?> ||
-      (compatibility['approved'] as List<Object?>).isEmpty) {
-    errors.add('compatibility registry has no approved v1 entries');
-  } else {
-    const expectedKeys = <String>{
-      'foundationCommit',
-      'designSystemVersion',
-      'designSystemSourceTag',
-      'flutter',
-      'dart',
-      'status',
-    };
-    final tuples = <String>{};
-    for (final entry in compatibility['approved'] as List<Object?>) {
-      if (entry is! Map<String, Object?> ||
-          entry.keys.toSet().difference(expectedKeys).isNotEmpty ||
-          expectedKeys.difference(entry.keys.toSet()).isNotEmpty) {
-        errors.add('compatibility registry entry has an invalid field set');
-        continue;
-      }
-      final commit = entry['foundationCommit'];
-      if (commit is! String || !RegExp(r'^[0-9a-f]{40}$').hasMatch(commit)) {
-        errors.add('compatibility registry has an invalid Foundation commit');
-      }
-      if (entry['designSystemVersion'] is! String ||
-          entry['designSystemSourceTag'] is! String ||
-          entry['flutter'] is! String ||
-          entry['dart'] is! String ||
-          entry['status'] != 'approved') {
-        errors.add('compatibility registry entry has invalid values');
-      }
-      final tuple = expectedKeys
-          .where((key) => key != 'status')
-          .map((key) => entry[key])
-          .join('|');
-      if (!tuples.add(tuple)) {
-        errors.add('compatibility registry contains duplicate tuple: $tuple');
-      }
-    }
   }
 
   for (final gate in [

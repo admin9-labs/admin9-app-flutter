@@ -2,9 +2,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const roots = [
-  'docs/design-system',
-  'docs/architecture/admin9-ui-implementation-plan.md',
-  'docs/architecture/admin9-ui-phase-0d-acceptance-report.md',
+  'README.md',
+  'CONTRIBUTING.md',
+  'DESIGN.md',
+  'TRADEMARKS.md',
+  'docs',
 ];
 const files = roots.flatMap((root) => {
   const stat = fs.statSync(root);

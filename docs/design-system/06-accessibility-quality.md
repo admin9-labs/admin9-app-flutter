@@ -1,5 +1,9 @@
 # Accessibility, Quality, and Governance
 
+> Scope: normative terms in this module apply only to implementations and
+> contributions proposed for inclusion in the upstream Admin9 App Starter
+> repository. They do not govern independent forks or add license conditions.
+
 ## 1. Non-negotiable gates
 
 <a id="ds-acc-001"></a>
@@ -115,9 +119,9 @@ navigation or truthful business-state requirements.
 
 | P2/P3 backlog | Owner | Upgrade trigger | Review stage |
 | --- | --- | --- | --- |
-| Switch Access / Switch Control representative sampling | Admin9 Core accessibility owner | real business adoption, user cannot complete a task, second derived project reproduces, Flutter upgrade, or customer contract | adopting project gate or SDK-upgrade review |
-| external-keyboard full flow and password-manager behavior | Admin9 Core accessibility owner with Business flow owner | same triggers | adopting project authentication/input gate |
-| every-page maximum text and every Dialog/Notice/AppFeedback reader variant | Admin9 Core component owner | same triggers | component change or adopting project release |
+| Switch Access / Switch Control representative sampling | Admin9 Core accessibility owner | upstream feature adoption, user report, reproduced upstream failure, Flutter upgrade, or release scope | upstream feature or SDK-upgrade review |
+| external-keyboard full flow and password-manager behavior | Admin9 Core accessibility owner with Business flow owner | same triggers | upstream authentication/input review |
+| every-page maximum text and every Dialog/Notice/AppFeedback reader variant | Admin9 Core component owner | same triggers | upstream component or release review |
 | password-toggle immediate announcement | Admin9 Core input owner | focus/state becomes undiscoverable or task completion fails | next input-component review |
 
 These entries are non-blocking only while automated contracts pass and the
@@ -131,7 +135,7 @@ not WCAG conformance or complete assistive-technology certification.
 
 After every Flutter SDK upgrade, recheck Material/Cupertino constructor signatures and defaults, PageTransitionsTheme, predictive-back integration, edge-to-edge/target SDK behavior, deprecations, nonlinear TextScaler, Semantics, hit-target defaults, locale delegates, Gallery release exclusion, Goldens, and all declaration probes. Upgrade evidence names Flutter/Dart versions and device runtimes.
 
-## 6. PR and derived-project checklist
+## 6. Upstream PR checklist
 
 - change belongs to Core, Brand, or Business and follows ownership/import rules;
 - public contract and changelog updated when applicable;
@@ -139,16 +143,14 @@ After every Flutter SDK upgrade, recheck Material/Cupertino constructor signatur
 - Android/iOS mapping, semantics, responsive, contrast, and hit bounds tested;
 - Gallery state added only for shared component/pattern behavior;
 - required device gates run or recorded Unknown with an owner and phase;
-- deviation record added/updated; no expired deviations;
-- source provenance and Design System version remain accurate.
+- any requested exception is resolved in upstream review without weakening
+  accessibility or platform navigation;
+- tested source, artifact, and Design System version remain accurate.
 
-## 7. Deviation record
+This checklist governs only upstream pull requests. There is no downstream
+deviation registry, expiry record, provenance contract, or release approval.
 
-<a id="ds-dev-001"></a>
-
-A deviation includes rule ID, reason, affected platforms/apps, owner, approving Core maintainer, evidence, user/accessibility impact, start date, expiry, and removal condition. Expired deviations fail acceptance. A deviation cannot lower system accessibility or platform navigation requirements.
-
-## 8. Current Unknowns
+## 7. Current Unknowns
 
 Phase 1 has verified Flutter token resolution, nonlinear TextScaler composition, runtime system-preference merging, debug/profile Gallery reachability, and Gallery exclusion from the installed Android release package. These results are no longer Unknown and remain protected by the Phase 1 automated and release-package gates.
 

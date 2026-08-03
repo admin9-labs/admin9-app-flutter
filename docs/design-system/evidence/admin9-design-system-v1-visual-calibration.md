@@ -1,5 +1,9 @@
 # Admin9 Design System v1.0 Visual Calibration
 
+> **Historical evidence:** This v1.0 snapshot preserves its original values.
+> It is not a current Admin9 App Starter specification, compatibility promise,
+> or rule for independent forks.
+
 ## 1. Asset entry
 
 Each board is a 2400x1200 PNG with matching generated SVG source. It contains four 390 logical-pixel fixtures: light/Standard baseline, dark/Standard of the same baseline state, light/App Extra Large `1.24 x system standard`, and one light/Standard page-specific alternate state. Every asset says “design reference” and is not a current App, simulator, or device screenshot.

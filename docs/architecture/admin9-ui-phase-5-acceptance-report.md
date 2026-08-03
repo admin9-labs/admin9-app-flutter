@@ -1,5 +1,8 @@
 # Admin9 UI Phase 5 Acceptance Report
 
+> **Historical record:** This report preserves its Foundation-era findings. It
+> is not a current Starter specification or certification of any fork.
+
 Status: Go for Phase 5 implementation; Phase 6 physical-device and human accessibility gates remain open
 
 Date: 2026-07-29

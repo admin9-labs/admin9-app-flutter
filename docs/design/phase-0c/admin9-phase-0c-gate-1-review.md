@@ -1,5 +1,8 @@
 # Admin9 Phase 0C Gate 1 只读验收报告
 
+> **历史记录：** 本文保留 Foundation 阶段当时的验收结论，不是当前 Starter 规范，
+> 也不构成对任何 fork 的认证、兼容或支持承诺。
+
 > 日期：2026-07-29
 > 结论：Go，仅进入用户结构接受判断
 > 边界：Phase 0C 第一门；不是 Phase 0C 完成、v1.2、Phase 0D 或 Phase 1 授权

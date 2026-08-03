@@ -1,5 +1,9 @@
 # Phase 2 device evidence
 
+> **Historical evidence:** This file preserves phase- and date-bound evidence.
+> It is not a current Admin9 App Starter specification, compatibility promise,
+> or rule for independent forks.
+
 This directory contains device observations for the Phase 2 platform shell. Files are evidence, not Design System reference art.
 
 ## Android API 36

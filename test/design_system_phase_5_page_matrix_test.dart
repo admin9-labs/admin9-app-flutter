@@ -26,7 +26,7 @@ void main() {
       });
 
       try {
-        await _pumpFoundation(tester, row);
+        await _pumpStarter(tester, row);
         await tester.tap(find.text('我的').last);
         await tester.pumpAndSettle();
         expect(find.text('游客'), findsOneWidget);
@@ -55,7 +55,7 @@ void main() {
         await _verifyRegistrationStress(tester, row);
         expect(tester.takeException(), isNull);
 
-        await _pumpFoundation(tester, row);
+        await _pumpStarter(tester, row);
         await tester.tap(find.text('我的').last);
         await tester.pumpAndSettle();
         await tester.scrollUntilVisible(
@@ -191,7 +191,7 @@ Finder get _accountScrollable => find.descendant(
   matching: find.byType(Scrollable),
 );
 
-Future<void> _pumpFoundation(WidgetTester tester, _MatrixRow row) async {
+Future<void> _pumpStarter(WidgetTester tester, _MatrixRow row) async {
   SharedPreferences.setMockInitialValues({
     'admin9.privacy.accepted': true,
     'admin9.appearance.theme_mode': row.brightness == Brightness.dark

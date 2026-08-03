@@ -1,5 +1,8 @@
 # Admin9 UI Phase 0 验收报告
 
+> **历史记录：** 本文保留 Foundation 阶段当时的验收结论，不是当前 Starter 规范，
+> 也不构成对任何 fork 的认证、兼容或支持承诺。
+
 > 结论：Revise，Phase 0 尚未通过退出门禁
 > 证据基线：`main@606938f3b0d1287a3ec3c7fe9791f8e737e52707`
 > 计划基线：Admin9 UI v1.1，SHA-256 `8479729b26a4ec81d227838d24a3cde71eb2d51a63e87d85eb03b50afb0d20e5`

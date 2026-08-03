@@ -1,5 +1,9 @@
 # Page Patterns
 
+> Scope: normative terms in this module apply only to implementations and
+> contributions proposed for inclusion in the upstream Admin9 App Starter
+> repository. They do not govern independent forks.
+
 <a id="ds-pat-001"></a>
 
 Page patterns describe information and behavior. They are not configurable page widgets, business schemas, or a DSL.
@@ -10,9 +14,9 @@ Page patterns describe information and behavior. They are not configurable page 
 | standard secondary page | one title, content, optional actions | back returns once; scroll and safe areas explicit | AppBar vs CupertinoNavigationBar with parent label | Business supplies content/actions; gesture device gate |
 | personal center | identity + primary auth/action, account, settings, legal/about, danger in that order | guest/signed-in/missing-field; final danger reachable; no repeated auth | Material rows/groups vs inset-grouped iOS lists | identity, capabilities and session are Business; three reference states |
 | authentication form | one credential task, persistent labels, local errors, one primary submit | keyboard, first error, unavailable result, route-local draft, back | Material field/feedback vs Cupertino field/top notice | fields, validation, service and session are Business; register/login references only |
-| settings list | current values and controlled App preferences | choice subpage, immediate update, persistence; system OR App effective states | radio list + Switch vs checkmark list + CupertinoSwitch | actual preferences/data owner are Business/Foundation host; settings reference |
+| settings list | current values and controlled App preferences | choice subpage, immediate update, persistence; system OR App effective states | radio list + Switch vs checkmark list + CupertinoSwitch | actual preferences/data owner are Business/App Host; settings reference |
 | ordinary list/detail | scan/select then inspect one item | loading/empty/error/pagination belong to feature; selection survives return when required | platform rows, page bars and disclosure | item model, query, filters, actions are Business |
-| privacy gate | understand consent before entering host | accept/reject/legal round trip, durable decision, accessible long text | platform dialog/page actions and back conventions | legal text/decision owner is Foundation/Business; not a reusable dialog DSL |
+| privacy gate | understand consent before entering host | accept/reject/legal round trip, durable decision, accessible long text | platform dialog/page actions and back conventions | legal text/decision owner is App Host/Business; not a reusable dialog DSL |
 | state presentation | empty, loading, error, success, unavailable are mutually meaningful | user sees what happened and next action; state survives/retries by feature contract | platform loading/feedback containers | Core supplies Notice/Feedback presentation only; Business decides state/copy |
 | long text/legal | read and return | scroll endpoint, selection/readability, no fixed bottom action obscuring text | native page bar/back | Business supplies verified content/version |
 
@@ -28,7 +32,7 @@ Page patterns describe information and behavior. They are not configurable page 
 
 ## 2. Reference scope
 
-The account, auth, and settings visual references calibrate shared color, type, spacing, platform mapping, hit bounds, and state treatment. Derived apps MAY replace content and page-specific composition while respecting the pattern. They MUST NOT copy sample identity data, validation rules, legal content, routes, or unavailable results as product truth.
+The account, auth, and settings visual references calibrate shared color, type, spacing, platform mapping, hit bounds, and state treatment. Upstream feature contributions MAY replace content and page-specific composition while respecting the pattern. They MUST NOT copy sample identity data, validation rules, legal content, routes, or unavailable results as product truth.
 
 ## 3. Gallery and device evidence
 

@@ -1,5 +1,8 @@
 # Admin9 Design System Phase 2 Acceptance Report
 
+> **Historical record:** This report preserves its Foundation-era findings. It
+> is not a current Starter specification or certification of any fork.
+
 Date: 2026-07-30
 
 ## Decision

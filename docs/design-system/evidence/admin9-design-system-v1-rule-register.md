@@ -1,6 +1,10 @@
 # Admin9 Design System v1.0 Normative Rule Register
 
-Stable IDs are never reused. Each ID links to exactly one explicit HTML anchor in the normative module. Verification and deviation records MUST cite the ID, not only a heading or prose fragment. Run `dart run tool/design_system/verify_rule_links.dart` to check ID uniqueness, target files, anchors, schema-field links, and test-gate links.
+This is the current rule index for implementations and contributions proposed
+to the upstream Admin9 App Starter repository. It does not govern independent
+forks.
+
+Stable IDs are never reused. Each active ID links to exactly one explicit HTML anchor in the normative module. Upstream verification records MUST cite the ID, not only a heading or prose fragment. Run `dart run tool/design_system/verify_rule_links.dart` to check ID uniqueness, target files, anchors, and test-gate links.
 
 | Rule | Layer/platform | Frozen default and override boundary | Machine/test association |
 | --- | --- | --- | --- |
@@ -18,11 +22,9 @@ Stable IDs are never reused. Each ID links to exactly one explicit HTML anchor i
 | [DS-CMP-002](../03-components.md#ds-cmp-002) | Core/both | `AppActionMenu<T>` is 2-6 commands, not selection | declaration probe; Gallery menu states; sheet device gate |
 | [DS-CMP-003](../03-components.md#ds-cmp-003) | Core/both | labelled determinate/indeterminate progress | declaration probe; semantics/Golden/reduced-motion tests |
 | [DS-PAT-001](../04-page-patterns.md#ds-pat-001) | Core+Business/both | page patterns, not templates, schemas, or DSL | reference flows, responsive fixtures, device tasks |
-| [DS-DER-001](../05-derived-project-contract.md#ds-der-001) | all/both | provenance, fixed paths/export, exact source policy | schema fields `foundation`, `designSystem`, `app`, `brandConfiguration`, `toolchain`, `ownership`, `exports`, `compatibility`, `provenance`, `deviations`; compatibility registry |
-| [DS-SHR-001](../05-derived-project-contract.md#ds-shr-001) | Business then Core/both | feature -> `lib/ui/shared/` -> evidence-based Core request | consumer inventory and DS owner review |
+| [DS-SHR-001](../05-upstream-contribution-boundaries.md#ds-shr-001) | Business then Core/both | upstream feature -> `lib/ui/shared/` -> evidence-based Core proposal | upstream consumer inventory and Design System review |
 | [DS-ACC-001](../06-accessibility-quality.md#ds-acc-001) | Core/Android | 48dp, WCAG 4.5/3, system text and assistive-tech semantics | automated geometry/semantics plus one TalkBack/system/IME P0/P1 representative flow; P2 backlog table |
 | [DS-ACC-002](../06-accessibility-quality.md#ds-acc-002) | Core/iOS | 44pt, WCAG 4.5/3, Dynamic Type and assistive-tech semantics | automated geometry/semantics plus one VoiceOver/system/IME P0/P1 representative flow; P2 backlog table |
 | [DS-RSP-001](../06-accessibility-quality.md#ds-rsp-001) | Core/both | canonical automated rows A-L | exact matrix coverage report; device actual-width record |
 | [DS-GAL-001](../06-accessibility-quality.md#ds-gal-001) | Core/both | Gallery debug/profile only; release absent | AST route test, profile reachability, release build/device denial |
-| [DS-UPG-001](../06-accessibility-quality.md#ds-upg-001) | all/both | SDK/DS compatibility must be revalidated | manifest compatibility fields; upgrade checklist |
-| [DS-DEV-001](../06-accessibility-quality.md#ds-dev-001) | all/both | documented expiring deviations; no downward accessibility deviation | schema `deviations[]`; PR expiry gate |
+| [DS-UPG-001](../06-accessibility-quality.md#ds-upg-001) | upstream/both | SDK behavior and Design System gates must be revalidated | upstream upgrade checklist and tests |

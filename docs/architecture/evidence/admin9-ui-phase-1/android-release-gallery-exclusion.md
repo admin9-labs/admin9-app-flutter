@@ -1,5 +1,9 @@
 # Android release Gallery exclusion evidence
 
+> **Historical evidence:** This file preserves phase- and date-bound evidence.
+> It is not a current Admin9 App Starter specification, compatibility promise,
+> or rule for independent forks.
+
 > Evidence date: 2026-07-29
 > Device: Android Emulator `sdk_gphone64_arm64`, Android 16 / API 36, `emulator-5554`
 > Artifact: `build/app/outputs/flutter-apk/app-release.apk`

@@ -1,5 +1,9 @@
 # Physical Android API 30 v1.0.2 final provenance
 
+> **Historical evidence:** This file preserves phase- and date-bound evidence.
+> It is not a current Admin9 App Starter specification, compatibility promise,
+> or rule for independent forks.
+
 Recorded: 2026-07-31
 
 - Device: Xiaomi M2007J22C

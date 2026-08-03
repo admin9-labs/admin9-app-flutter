@@ -1,5 +1,9 @@
 # Admin9 Design System v1.0 Source and Evidence Ledger
 
+> **Historical evidence:** This v1.0 snapshot preserves its original sources.
+> It is not a current Admin9 App Starter specification, compatibility promise,
+> or rule for independent forks.
+
 This ledger separates external requirements, framework capability, Admin9 product decisions, static design evidence, and implementation-stage Unknowns. An external link does not by itself prove the current App implementation. Runtime and device claims remain Unknown until the gate named in the normative module passes.
 
 | Evidence class | Official source | Used for | Admin9 interpretation |

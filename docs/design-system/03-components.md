@@ -1,5 +1,9 @@
 # Components
 
+> Scope: normative terms in this module apply only to implementations and
+> contributions proposed for inclusion in the upstream Admin9 App Starter
+> repository. They do not govern independent forks.
+
 ## 1. Shared contract rules
 
 All components belong to Core, accept semantic data, and expose controlled state unless explicitly stated. They do not read ViewModels, entities, repositories, services, session, permissions, or business copy. `Key` is supported through normal Widget construction. Feature tests locate behavior by stable keys, visible text, semantics, and result state; only Design System tests assert Material/Cupertino implementation types.

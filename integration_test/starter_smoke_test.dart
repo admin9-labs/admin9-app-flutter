@@ -15,7 +15,7 @@ void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
   final platform = Platform.isIOS ? 'ios' : 'android';
 
-  testWidgets('Admin9 mobile foundation smoke', (tester) async {
+  testWidgets('Admin9 App Starter smoke', (tester) async {
     final preferences = await SharedPreferences.getInstance();
     await preferences.clear();
     await tester.pumpWidget(Admin9App(preferences: preferences));

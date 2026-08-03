@@ -1,5 +1,9 @@
 # Admin9 UI Phase 3 device evidence
 
+> **Historical evidence:** This file preserves phase- and date-bound evidence.
+> It is not a current Admin9 App Starter specification, compatibility promise,
+> or rule for independent forks.
+
 Date: 2026-07-30
 
 These files are runtime evidence from the normal debug App. They are not design

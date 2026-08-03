@@ -38,7 +38,7 @@ void main() {
     expect(find.text('暂无内容'), findsOneWidget);
   });
 
-  testWidgets('all foundation routes open and return', (tester) async {
+  testWidgets('all starter routes open and return', (tester) async {
     await _pumpAcceptedApp(tester);
     final shellContext = tester.element(find.byType(Admin9Shell));
     const routes = <String, String>{

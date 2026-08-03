@@ -1,5 +1,9 @@
 # Physical iPhone v1.0.2 human acceptance
 
+> **Historical evidence:** This file preserves phase- and date-bound evidence.
+> It is not a current Admin9 App Starter specification, compatibility promise,
+> or rule for independent forks.
+
 Recorded: 2026-07-31
 
 Reviewer: device owner, reporting contemporaneously in the active Codex task.

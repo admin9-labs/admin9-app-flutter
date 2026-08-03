@@ -1,5 +1,8 @@
 # Admin9 UI Phase 0D Acceptance Report
 
+> **Historical record:** This report preserves its Foundation-era findings. It
+> is not a current Starter specification or certification of any fork.
+
 > Date: 2026-07-29
 > Design System: v1.0.1
 > Input baseline: `design-system-v1.0.0` / `67c3b12a71fbb0bbed9621e4cd5c7a0a3775cff0`

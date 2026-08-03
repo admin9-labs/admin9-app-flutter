@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:admin9_app_flutter/admin9_ui.dart';
 import 'package:admin9_app_flutter/app/admin9_app.dart';
+import 'package:admin9_app_flutter/app/app_identity.dart';
 import 'package:admin9_app_flutter/app/brand/app_brand_theme.dart';
 import 'package:admin9_app_flutter/core/design_system/components/app_feedback.dart';
 import 'package:admin9_app_flutter/core/design_system/components/app_interaction.dart';
@@ -554,6 +555,12 @@ Future<void> _pumpAppGolden(
     ),
   );
   await tester.pump();
+  await tester.runAsync(
+    () => precacheImage(
+      const AssetImage(AppIdentity.logoAsset),
+      tester.element(find.byType(Admin9App)),
+    ),
+  );
   await tester.pump(const Duration(milliseconds: 300));
 }
 

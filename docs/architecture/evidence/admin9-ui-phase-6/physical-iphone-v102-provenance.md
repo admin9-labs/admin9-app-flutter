@@ -1,5 +1,9 @@
 # Final-source physical iPhone delivery provenance
 
+> **Historical evidence:** This file preserves phase- and date-bound evidence.
+> It is not a current Admin9 App Starter specification, compatibility promise,
+> or rule for independent forks.
+
 - Date: 2026-07-31 (Asia/Shanghai)
 - Foundation base HEAD: `a31227b014ac5d5564735552c4e30851eca8707e`
   plus the reviewed unstaged Phase 6 fixes

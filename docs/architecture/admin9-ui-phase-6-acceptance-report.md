@@ -1,5 +1,8 @@
 # Admin9 UI Phase 6 Acceptance Report
 
+> **Historical record:** This report preserves its Foundation-era findings. It
+> is not a current Starter specification or certification of any fork.
+
 Status: Go - Phase 6 representative P0/P1 gates pass
 
 Date: 2026-07-31

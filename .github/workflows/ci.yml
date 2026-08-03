@@ -47,14 +47,13 @@ jobs:
 
       - name: Verify Design System contracts
         run: |
-          git remote set-url origin https://github.com/admin9-labs/admin9-app-flutter.git
-          dart run tool/design_system/validate_foundation_manifest.dart --fixtures
-          dart run tool/design_system/verify_repository_governance.dart
+          dart run tool/design_system/validate_app_config.dart --fixtures
+          dart run tool/design_system/verify_upstream_ownership.dart
           dart run tool/design_system/verify_public_api_parity.dart --self-test
           dart run tool/design_system/verify_import_boundaries.dart --fixtures
           dart run tool/design_system/verify_import_boundaries.dart --phase=final
           dart run tool/design_system/verify_gallery_boundary.dart
-          dart run tool/design_system/verify_brand_contract.dart
-          dart run tool/design_system/verify_brand_contract.dart --fixtures
+          dart run tool/design_system/verify_app_config.dart
+          dart run tool/design_system/verify_app_config.dart --fixtures
           dart run tool/design_system/verify_rule_links.dart
           node tool/design_system/verify_documentation.mjs

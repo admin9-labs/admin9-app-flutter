@@ -1,31 +1,30 @@
 import 'dart:io';
 
-import 'brand_contract_support.dart';
+import 'app_config_support.dart';
 
 Never _usage() {
   stderr.writeln(
-    'usage: dart run tool/design_system/generate_brand_entry.dart '
-    '<admin9-foundation.yaml> <derived-repository-root>',
+    'usage: dart run tool/design_system/apply_app_config.dart '
+    '<app-config.yaml> <repository-root>',
   );
   exit(64);
 }
 
 void main(List<String> arguments) {
   if (arguments.length != 2) _usage();
-  final manifestPath = arguments[0];
+  final configPath = arguments[0];
   final repositoryRoot = Directory(arguments[1]);
   final validation = Process.runSync(Platform.resolvedExecutable, [
     'run',
-    'tool/design_system/validate_foundation_manifest.dart',
-    manifestPath,
+    'tool/design_system/validate_app_config.dart',
+    configPath,
   ]);
   if (validation.exitCode != 0) {
     stderr.write(validation.stderr);
     exit(validation.exitCode);
   }
-  final data = readBrandContract(manifestPath);
-  final errors = synchronizeDerivedBrand(
-    data,
+  final errors = synchronizeAppConfig(
+    readAppConfig(configPath),
     repositoryRoot.path,
     write: true,
   );
@@ -33,5 +32,5 @@ void main(List<String> arguments) {
     errors.forEach(stderr.writeln);
     exit(1);
   }
-  stdout.writeln('Derived brand and native identity generated from manifest');
+  stdout.writeln('App identity, brand, and native resources generated');
 }

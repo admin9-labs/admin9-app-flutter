@@ -1,5 +1,9 @@
 # Admin9 Phase 6 manual device acceptance checklist
 
+> **Historical evidence:** This file preserves phase- and date-bound evidence.
+> It is not a current Admin9 App Starter specification, compatibility promise,
+> or rule for independent forks.
+
 Status: Complete - Phase 6 representative P0/P1 gates pass
 
 Date: 2026-07-31

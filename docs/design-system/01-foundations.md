@@ -1,5 +1,9 @@
 # Foundations
 
+> Scope: normative terms in this module apply only to implementations and
+> contributions proposed for inclusion in the upstream Admin9 App Starter
+> repository. They do not govern independent forks.
+
 ## 1. Color
 
 <a id="ds-clr-001"></a>
@@ -79,7 +83,7 @@ The Core spacing scale is frozen as `4, 8, 12, 16, 24, 32, 48`. `20` is not a re
 - section gap: 24; major task boundary: 32;
 - readable content max width: 640; forms max width: 480.
 
-These values are v1.0 implementation requirements. Feature pages MUST NOT invent adjacent reusable values to imitate them; a page exception requires a rule-linked deviation or remains Business-owned content geometry.
+These values are v1.0 upstream implementation requirements. Feature pages proposed upstream MUST NOT invent adjacent reusable values to imitate them; product-specific geometry remains Business-owned unless an upstream Design System change is accepted.
 
 Visual bounds and hit bounds are separate records. Android hit targets MUST be at least 48x48dp; iOS at least 44x44pt. Buttons and fields are not forced equal. Interactive containers use minimum constraints and content-driven growth. The former fixed 56 row and 72 navigation heights are rejected as universal tokens.
 
@@ -113,4 +117,4 @@ Platform navigation transitions, Android predictive-back, and iOS edge-back buil
 
 <a id="ds-tok-001"></a>
 
-Palette calculations, three-page repetition, exact `1.24` text sizes, and asset dimensions are machine-reproducible. Widget tests use the single matrix in Accessibility and Quality to verify semantic token resolution, nonlinear scaling composition, hit bounds, and responsive layout. Device gates verify platform rendering, grayscale/high contrast, Bold Text, keyboard, and system gestures. Any Brand override repeats the same checks and records the derived theme hash.
+Palette calculations, three-page repetition, exact `1.24` text sizes, and asset dimensions are machine-reproducible. Widget tests use the single matrix in Accessibility and Quality to verify semantic token resolution, nonlinear scaling composition, hit bounds, and responsive layout. Device gates verify platform rendering, grayscale/high contrast, Bold Text, keyboard, and system gestures. Any Brand change proposed upstream repeats the same checks.

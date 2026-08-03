@@ -1,5 +1,8 @@
 # Admin9 Design System v1.0 Acceptance Report
 
+> **Historical record:** This report preserves its Foundation-era findings. It
+> is not a current Starter specification or certification of any fork.
+
 > Decision: Go
 > Date: 2026-07-29
 > Scope: specification, evidence, downstream plan, and non-runtime validators only

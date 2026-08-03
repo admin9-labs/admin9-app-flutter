@@ -1,5 +1,8 @@
 # Admin9 UI Phase 3 Acceptance Report
 
+> **Historical record:** This report preserves its Foundation-era findings. It
+> is not a current Starter specification or certification of any fork.
+
 Status: Go for Phase 3 implementation; Phase 6 device gates remain open
 
 Date: 2026-07-30

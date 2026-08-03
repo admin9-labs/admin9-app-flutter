@@ -1,5 +1,9 @@
 # Platform Adaptation
 
+> Scope: normative terms in this module apply only to implementations and
+> contributions proposed for inclusion in the upstream Admin9 App Starter
+> repository. They do not govern independent forks.
+
 ## 1. Ownership and host
 
 <a id="ds-plt-001"></a>

@@ -1,5 +1,9 @@
 # Android Phase 3 process-restart persistence evidence
 
+> **Historical evidence:** This file preserves phase- and date-bound evidence.
+> It is not a current Admin9 App Starter specification, compatibility promise,
+> or rule for independent forks.
+
 Date: 2026-07-30 (Asia/Shanghai)
 
 This is device evidence from the normal debug application, not an integration-test host reconstruction and not release-package evidence.

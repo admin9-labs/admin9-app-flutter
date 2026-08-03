@@ -1,5 +1,9 @@
 # Admin9 App Foundation 产品体验基线
 
+> **历史记录：** 本文保留 Phase 0A 时的 Foundation 产品体验决策，不是当前
+> Admin9 App Starter 规范，也不约束任何 fork。当前入口见
+> [Starter 架构](../architecture/admin9-app-starter.md)。
+
 > 版本：Phase 0A
 > 日期：2026-07-29
 > 状态：已通过 Phase 0A/0B 验收；用于指导 Phase 0C，不直接授权源码实施

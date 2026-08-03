@@ -1,5 +1,21 @@
 # Changelog
 
+## Unreleased
+
+- Repositioned the upstream project as Admin9 App Starter and unified the
+  default Dart, Android, and iOS display identity.
+- Retired the downstream manifest, compatibility registry, exact-source tuple,
+  remote, ownership, deviation, expiry, provenance, conformance, and clone-
+  acceptance mechanisms.
+- Replaced the derived-project Brand contract with an optional App/Brand
+  configuration convenience that has no certification or compatibility role.
+- Limited normative Design System language to implementations and
+  contributions proposed for inclusion in this upstream repository.
+
+The entries below are immutable historical release records. Their original
+Foundation-era terminology describes those releases; it does not govern current
+Starter work or independent forks.
+
 ## 1.0.3 - 2026-07-31
 
 - Closed privacy persistence, lifecycle ownership, public constructor parity,

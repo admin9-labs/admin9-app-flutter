@@ -1,5 +1,8 @@
 # Admin9 Design System Flutter 实施计划
 
+> **历史记录：** 本文保留 Foundation 阶段的实施计划，不是当前 Admin9 App Starter
+> 规范，也不约束任何 fork。当前规则见 [Starter 架构](admin9-app-starter.md)。
+
 > 状态：v1.2 下游实施基线；Phase 0D-6 已实施并通过验收
 > 版本：v1.2
 > 建立日期：2026-07-29
