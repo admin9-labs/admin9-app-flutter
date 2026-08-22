@@ -6,8 +6,9 @@ const root = process.argv[2] ?? 'docs/design-system/evidence/visual-references';
 const write = process.argv.includes('--write');
 const manifestPath = path.join(root, 'visual-assets.json');
 const expected = [];
+const svgSources = new Map();
 for (const platform of ['android', 'ios']) {
-  for (const page of ['account', 'auth', 'settings']) {
+  for (const page of ['account', 'auth', 'settings', 'feedback']) {
     for (const extension of ['svg', 'png']) {
       expected.push(path.join(platform, `${page}.${extension}`));
     }
@@ -29,11 +30,12 @@ const assets = expected.map((relativePath) => {
     ({ width, height } = pngSize(buffer));
   } else {
     const source = buffer.toString('utf8');
+    svgSources.set(relativePath, source);
     const match = source.match(/<svg[^>]*width="(\d+)"[^>]*height="(\d+)"/);
     if (!match) throw new Error(`${relativePath}: missing SVG dimensions`);
     width = Number(match[1]);
     height = Number(match[2]);
-    for (const label of ['设计参考，非当前 App / 模拟器 / 设备截图', 'App 特大 1.24 × 系统标准', '同一基准态', '390lp', '19.84', '17.36', '13.64']) {
+    for (const label of ['设计参考，非当前 App / 模拟器 / 设备截图', 'App 特大 1.24 × 系统标准', '同一基准态', '390lp', '同一 Admin9 可见契约', '系统交互差异单独验收']) {
       if (!source.includes(label)) throw new Error(`${relativePath}: missing label ${label}`);
     }
   }
@@ -42,6 +44,25 @@ const assets = expected.map((relativePath) => {
   }
   return { path: relativePath, width, height, bytes: buffer.length, sha256: sha256(buffer) };
 });
+
+const normalizeAllowedPlatformDifferences = (source) => source
+  .replaceAll('Android', 'Platform')
+  .replaceAll('iOS', 'Platform')
+  .replaceAll('48dp', 'platform-hit')
+  .replaceAll('44pt', 'platform-hit')
+  .replaceAll('platform-hit+', 'platform-hit')
+  .replaceAll('←', 'back-glyph')
+  .replaceAll('‹', 'back-glyph')
+  .replaceAll('系统返回', 'platform-back')
+  .replaceAll('边缘返回', 'platform-back');
+
+for (const page of ['account', 'auth', 'settings', 'feedback']) {
+  const android = normalizeAllowedPlatformDifferences(svgSources.get(`android/${page}.svg`));
+  const ios = normalizeAllowedPlatformDifferences(svgSources.get(`ios/${page}.svg`));
+  if (android !== ios) {
+    throw new Error(`${page}: visible Android/iOS structure drifted outside allowed annotations`);
+  }
+}
 
 const manifest = {
   schemaVersion: '1.0.0',

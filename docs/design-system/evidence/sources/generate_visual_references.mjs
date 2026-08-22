@@ -20,10 +20,12 @@ function chrome(p, platform, title, large = false, parent = '') {
   let s = rect(0, 0, 390, 844, p.bg);
   s += rect(0, 0, 390, 44, p.surface);
   s += text(195, 28, '9:41', 12, p.text, 600, 'middle');
-  s += rect(0, 44, 390, platform === 'ios' ? 54 : 64, p.surface);
-  if (parent) s += text(18, platform === 'ios' ? 79 : 84, platform === 'ios' ? `‹ ${parent}` : '←', typeSize(16, large), p.primary, 600);
-  s += text(platform === 'ios' ? 195 : 20, platform === 'ios' ? 80 : 85, title, titleSize, p.text, 700, platform === 'ios' ? 'middle' : 'start');
-  s += line(0, platform === 'ios' ? 98 : 108, 390, platform === 'ios' ? 98 : 108, p.outline, 0.6);
+  s += rect(0, 44, 390, 64, p.surface);
+  if (parent) {
+    s += text(18, 84, platform === 'ios' ? `‹ ${parent}` : `← ${parent}`, typeSize(14, large), p.primary, 650);
+  }
+  s += text(parent ? 132 : 20, 85, title, titleSize, p.text, 700);
+  s += line(0, 108, 390, 108, p.outline, 0.6);
   return s;
 }
 
@@ -36,22 +38,20 @@ function button(x, y, w, label, p, variant = 'primary', large = false, platform 
   const fill = variant === 'primary' ? p.primary : variant === 'danger' ? p.danger : p.surface;
   const fg = variant === 'primary' ? p.onPrimary : variant === 'danger' ? (p === palettes.light ? '#FFFFFF' : '#111418') : p.primary;
   const stroke = variant === 'secondary' ? p.outline : 'none';
-  const platformStroke = platform === 'ios' && variant === 'primary' ? p.primary : stroke;
-  return rect(x, y, w, h, fill, platformStroke, 8) + text(x + w / 2, y + (large ? 37 : 31), label, typeSize(16, large), fg, 650, 'middle') + hit(x, y, w, h, p, 'hit');
+  return rect(x, y, w, h, fill, stroke, 8) + text(x + w / 2, y + (large ? 37 : 31), label, typeSize(16, large), fg, 650, 'middle') + hit(x, y, w, h, p, 'hit');
 }
 
 function field(x, y, w, label, value, p, large = false, error = '', platform = 'android') {
   const h = large ? 62 : 54;
   let s = text(x, y - 8, label, typeSize(14, large), p.text, 600);
-  const fill = platform === 'ios' ? p.container : p.surface;
-  const outline = error ? p.danger : platform === 'ios' ? p.muted : p.outline;
-  s += rect(x, y, w, h, fill, outline, 6);
+  const outline = error ? p.danger : p.outline;
+  s += rect(x, y, w, h, p.surface, outline, 6);
   s += text(x + 14, y + (large ? 40 : 34), value, typeSize(16, large), value ? p.text : p.muted);
   if (error) s += text(x, y + h + (large ? 25 : 20), error, typeSize(13, large), p.danger, 600);
   return s;
 }
 
-function androidRow(y, label, trailing, p, large = false, danger = false) {
+function brandRow(y, label, trailing, p, large = false, danger = false) {
   const h = large ? 72 : 56;
   let s = rect(20, y, 350, h, p.surface);
   s += text(36, y + (large ? 45 : 35), label, typeSize(16, large), danger ? p.danger : p.text, 500);
@@ -60,8 +60,8 @@ function androidRow(y, label, trailing, p, large = false, danger = false) {
   return s;
 }
 
-function iosGroup(y, rows, p, large = false) {
-  const h = large ? 72 : 52;
+function brandGroup(y, rows, p, large = false) {
+  const h = large ? 72 : 56;
   let s = rect(20, y, 350, rows.length * h, p.surface, 'none', 8);
   rows.forEach((row, i) => {
     s += text(36, y + i * h + (large ? 45 : 33), row[0], typeSize(16, large), row[2] ? p.danger : p.text, 500);
@@ -72,8 +72,8 @@ function iosGroup(y, rows, p, large = false) {
 }
 
 function switchControl(x, y, p, on = true, platform = 'android') {
-  const w = platform === 'ios' ? 50 : 48;
-  const h = platform === 'ios' ? 30 : 28;
+  const w = 48;
+  const h = 28;
   let s = rect(x, y, w, h, on ? p.primary : p.outline, 'none', h / 2);
   s += `<circle cx="${on ? x + w - h / 2 : x + h / 2}" cy="${y + h / 2}" r="${h / 2 - 3}" fill="${p.surface}"/>`;
   s += hit(x - 2, y - 9, Math.max(52, w + 4), 48, p, platform === 'ios' ? '44pt+' : '48dp');
@@ -84,9 +84,9 @@ function bottomNavigation(platform, p, large = false) {
   const y = 790;
   let s = rect(0, y, 390, 54, p.surface);
   s += line(0, y, 390, y, p.outline, 0.6);
-  s += text(98, y + 24, platform === 'ios' ? '⌂' : '○', typeSize(17, large), p.muted, 600, 'middle');
+  s += text(98, y + 24, '⌂', typeSize(17, large), p.muted, 600, 'middle');
   s += text(98, y + 43, '首页', typeSize(11, large), p.muted, 500, 'middle');
-  s += text(292, y + 24, platform === 'ios' ? '●' : '●', typeSize(17, large), p.primary, 600, 'middle');
+  s += text(292, y + 24, '●', typeSize(17, large), p.primary, 600, 'middle');
   s += text(292, y + 43, '我的', typeSize(11, large), p.primary, 650, 'middle');
   s += hit(50, y + 3, 96, 48, p, platform === 'ios' ? '44pt+' : '48dp');
   s += hit(244, y + 3, 96, 48, p, platform === 'ios' ? '44pt+' : '48dp');
@@ -96,7 +96,7 @@ function bottomNavigation(platform, p, large = false) {
 function account(platform, theme, large, variant = 'guest') {
   const p = palettes[theme];
   let s = chrome(p, platform, '我的', large);
-  let y = platform === 'ios' ? 122 : 132;
+  let y = 132;
   const signedIn = variant !== 'guest';
   const missing = variant === 'missing';
   s += text(20, y, signedIn ? (missing ? '已登录用户' : '林晓') : '访客', typeSize(21, large), p.text, 700);
@@ -111,17 +111,17 @@ function account(platform, theme, large, variant = 'guest') {
     y += 56;
   } else {
     const accountRows = [['账号资料', '›'], ['账号安全', '›']];
-    s += platform === 'ios' ? iosGroup(y, accountRows, p, large) : accountRows.map((r, i) => androidRow(y + i * (large ? 72 : 56), r[0], r[1], p, large)).join('');
+    s += brandGroup(y, accountRows, p, large);
     y += (large ? 72 : 56) * 2 + 24;
   }
   s += text(20, y, '应用', typeSize(13, large), p.muted, 650);
   y += 12;
-  s += platform === 'ios' ? iosGroup(y, [['设置', '›']], p, large) : androidRow(y, '设置', '›', p, large);
+  s += brandGroup(y, [['设置', '›']], p, large);
   y += large ? 92 : 72;
   s += text(20, y, '支持与法务', typeSize(13, large), p.muted, 650);
   y += 12;
   const rows = [['用户协议', '›'], ['隐私政策', '›'], ['关于', '›']];
-  s += platform === 'ios' ? iosGroup(y, rows, p, large) : rows.map((r, i) => androidRow(y + i * (large ? 72 : 56), r[0], r[1], p, large)).join('');
+  s += brandGroup(y, rows, p, large);
   if (signedIn) {
     s += rect(20, 724, 350, 52, p.surface, p.danger, 8);
     s += text(195, 756, '退出登录（滚动终点）', typeSize(14, large), p.danger, 650, 'middle');
@@ -135,7 +135,7 @@ function auth(platform, theme, large, variant = 'register') {
   const login = variant === 'login';
   const errorState = variant === 'error';
   let s = chrome(p, platform, login ? '登录' : '注册', large, '我的');
-  let y = platform === 'ios' ? 140 : 150;
+  let y = 150;
   s += text(20, y, login ? '欢迎回来' : '创建账号', typeSize(22, large), p.text, 700);
   s += text(20, y + (large ? 32 : 28), '当前版本仅验证表单，服务尚未接入', typeSize(14, large), p.muted);
   y += 72;
@@ -167,37 +167,29 @@ function settings(platform, theme, large, variant = 'main') {
   const p = palettes[theme];
   const selection = variant === 'selection';
   let s = chrome(p, platform, selection ? '主题' : '设置', large, selection ? '设置' : '我的');
-  const rowH = large ? 78 : (platform === 'ios' ? 52 : 56);
-  let y = platform === 'ios' ? 126 : 132;
+  const rowH = large ? 78 : 56;
+  let y = 132;
   if (selection) {
     s += text(20, y, '选择主题', 13, p.muted, 650); y += 12;
-    const options = [['跟随系统', platform === 'ios' ? '✓' : '◉'], ['浅色', platform === 'ios' ? '' : '○'], ['深色', platform === 'ios' ? '' : '○']];
-    s += platform === 'ios' ? iosGroup(y, options, p, false) : options.map((r, i) => androidRow(y + i * rowH, r[0], r[1], p, false)).join('');
+    const options = [['跟随系统', '✓'], ['浅色', ''], ['深色', '']];
+    s += brandGroup(y, options, p, false);
     s += text(24, y + rowH * 3 + 34, '选择立即生效；当前项具有 selected 语义', 13, p.muted);
     s += text(195, 820, '用户主动返回设置；焦点恢复到主题行', typeSize(11, large), p.muted, 500, 'middle');
     return s;
   }
   s += text(20, y, '外观', typeSize(13, large), p.muted, 650); y += 12;
   const appearance = [['主题', '跟随系统  ›'], ['App 字号', '标准  ›']];
-  s += platform === 'ios' ? iosGroup(y, appearance, p, large) : appearance.map((r, i) => androidRow(y + i * rowH, r[0], r[1], p, large)).join('');
+  s += brandGroup(y, appearance, p, large);
   y += rowH * 2 + 34;
   s += text(20, y, '辅助功能', typeSize(13, large), p.muted, 650); y += 12;
   const labels = ['灰度', '高对比度', '减少动态效果'];
-  if (platform === 'ios') {
-    s += rect(20, y, 350, rowH * 3, p.surface, 'none', 8);
-    labels.forEach((label, i) => {
-      const yy = y + i * rowH;
-      s += text(36, yy + (large ? 45 : 33), label, typeSize(16, large), p.text, 500);
-      s += switchControl(300, yy + (large ? 23 : 11), p, i === 1, platform);
-      if (i < 2) s += line(36, yy + rowH, 370, yy + rowH, p.outline, 0.5);
-    });
-  } else {
-    labels.forEach((label, i) => {
-      const yy = y + i * rowH;
-      s += androidRow(yy, label, '', p, large);
-      s += switchControl(300, yy + (large ? 25 : 14), p, i === 1, platform);
-    });
-  }
+  s += rect(20, y, 350, rowH * 3, p.surface, 'none', 8);
+  labels.forEach((label, i) => {
+    const yy = y + i * rowH;
+    s += text(36, yy + (large ? 45 : 35), label, typeSize(16, large), p.text, 500);
+    s += switchControl(300, yy + (large ? 25 : 14), p, i === 1, platform);
+    if (i < 2) s += line(36, yy + rowH, 370, yy + rowH, p.outline, 0.5);
+  });
   y += rowH * 3 + 18;
   s += rect(20, y, 350, large ? 104 : 78, p.container, p.info, 6);
   s += text(36, y + (large ? 29 : 25), '系统已开启高对比度，当前仍有效', typeSize(14, large), p.text, 650);
@@ -207,12 +199,57 @@ function settings(platform, theme, large, variant = 'main') {
   return s;
 }
 
+function feedback(platform, theme, large, variant = 'dialog') {
+  const p = palettes[theme];
+  let s = chrome(p, platform, '状态与反馈', large, '首页');
+  let y = 136;
+  const message = large ? '无法载入当前内容，请检查网络后重试。' : '无法载入当前内容，请重试。';
+  s += text(20, y, '业务状态', typeSize(13, large), p.muted, 650);
+  y += 16;
+  s += rect(20, y, 350, large ? 126 : 104, p.surface, p.danger, 8);
+  s += text(38, y + 30, '操作失败', typeSize(17, large), p.text, 700);
+  s += text(38, y + (large ? 66 : 56), message, typeSize(14, large), p.text);
+  s += text(350, y + (large ? 106 : 86), '重试', typeSize(14, large), p.primary, 650, 'end');
+  y += large ? 150 : 128;
+  s += text(20, y, '空状态', typeSize(13, large), p.muted, 650);
+  y += 16;
+  s += rect(20, y, 350, large ? 122 : 104, p.surface, p.outline, 8);
+  s += text(195, y + 40, '暂无内容', typeSize(17, large), p.text, 700, 'middle');
+  s += text(195, y + (large ? 78 : 68), '有可执行下一步时才显示操作', typeSize(13, large), p.muted, 400, 'middle');
+  y += large ? 148 : 130;
+  s += text(20, y, '加载状态', typeSize(13, large), p.muted, 650);
+  y += 18;
+  s += rect(20, y, 350, 74, p.surface, 'none', 8);
+  s += `<circle cx="48" cy="${y + 37}" r="11" fill="none" stroke="${p.primary}" stroke-width="3" stroke-dasharray="45 20"/>`;
+  s += text(72, y + 33, '正在载入', typeSize(15, large), p.text, 650);
+  s += text(72, y + 55, '状态变化可被读屏识别', typeSize(12, large), p.muted);
+  if (variant === 'dialog') {
+    s += rect(0, 108, 390, 682, '#00000066');
+    const dialogY = large ? 244 : 264;
+    const dialogH = large ? 260 : 224;
+    s += rect(36, dialogY, 318, dialogH, p.surface, p.outline, 8);
+    s += text(60, dialogY + 42, '确认提交', typeSize(20, large), p.text, 700);
+    s += text(60, dialogY + (large ? 88 : 78), '提交后将更新当前设置，是否继续？', typeSize(14, large), p.text);
+    s += line(60, dialogY + dialogH - 70, 330, dialogY + dialogH - 70, p.outline, 0.5);
+    s += text(184, dialogY + dialogH - 28, '取消', typeSize(14, large), p.muted, 650, 'end');
+    s += text(326, dialogY + dialogH - 28, '继续', typeSize(14, large), p.primary, 700, 'end');
+    s += hit(74, dialogY + dialogH - 62, 120, 48, p);
+    s += hit(218, dialogY + dialogH - 62, 120, 48, p);
+  } else {
+    s += rect(20, 690, 350, large ? 86 : 72, p.container, p.info, 8);
+    s += text(38, 720, variant === 'disabled' ? '命令暂不可用' : '设置已更新', typeSize(14, large), p.text, 700);
+    s += text(350, large ? 758 : 750, variant === 'disabled' ? '不可用' : '关闭', typeSize(13, large), variant === 'disabled' ? p.muted : p.primary, 650, 'end');
+  }
+  s += text(195, 820, platform === 'ios' ? '保留 iOS 模态焦点、边缘返回与安全区' : '保留 Android 模态焦点、系统返回与安全区', typeSize(11, large), p.muted, 500, 'middle');
+  return s;
+}
+
 function board(platform, page) {
-  const title = { account: '个人中心', auth: '认证表单', settings: '设置' }[page];
-  const render = { account, auth, settings }[page];
-  const alternate = { account: 'signed', auth: 'login', settings: 'selection' }[page];
-  const extraLarge = { account: 'missing', auth: 'error', settings: 'main' }[page];
-  const base = { account: 'guest', auth: 'register', settings: 'main' }[page];
+  const title = { account: '主导航与列表', auth: '登录与注册', settings: '设置表单', feedback: '弹窗与反馈' }[page];
+  const render = { account, auth, settings, feedback }[page];
+  const alternate = { account: 'signed', auth: 'login', settings: 'selection', feedback: 'disabled' }[page];
+  const extraLarge = { account: 'missing', auth: 'error', settings: 'main', feedback: 'dialog' }[page];
+  const base = { account: 'guest', auth: 'register', settings: 'main', feedback: 'dialog' }[page];
   const states = [
     { x: 65, theme: 'light', large: false, variant: base, label: '浅色 · 标准字号 · 390lp · 基准态' },
     { x: 625, theme: 'dark', large: false, variant: base, label: '深色 · 标准字号 · 390lp · 同一基准态' },
@@ -221,8 +258,9 @@ function board(platform, page) {
   ];
   let s = `<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="1200" viewBox="0 0 2400 1200">`;
   s += rect(0, 0, 2400, 1200, '#E9EDF2');
-  s += text(70, 54, `Admin9 Design System · ${platform === 'android' ? 'Android / Material 3' : 'iOS / Cupertino'} · ${title}`, 26, '#171A1F', 750);
+  s += text(70, 54, `Admin9 Design System · ${platform === 'android' ? 'Android' : 'iOS'} · ${title}`, 26, '#171A1F', 750);
   s += text(70, 84, '设计参考，非当前 App / 模拟器 / 设备截图', 15, '#4B5563', 500);
+  s += text(2330, 84, '同一 Admin9 可见契约', 15, '#2457A7', 650, 'end');
   for (const state of states) {
     s += text(state.x + 195, 112, state.label, 14, '#334155', 650, 'middle');
     s += `<g transform="translate(${state.x},130)">${render(platform, state.theme, state.large, state.variant)}</g>`;
@@ -231,7 +269,7 @@ function board(platform, page) {
   s += text(94, 1042, '校准标注', 16, '#171A1F', 700);
   s += text(94, 1072, '虚线 = hit bounds；实线容器 = visual bounds。Android ≥48×48dp，iOS ≥44×44pt。', 14, '#334155');
   s += text(94, 1100, '关键状态：按下使用语义 state layer；焦点使用 2px ring；禁用保留文字/形状；错误、未接入、系统强制状态均有文字说明。', 14, '#334155');
-  s += text(94, 1128, '第三画布字体 = 标准语义字号 × 1.24；容器按内容增长。320/360/600、横屏、设备读屏和系统手势由后续门禁验证。', 14, '#334155');
+  s += text(94, 1128, '第三画布字体 = 标准语义字号 × 1.24；容器按内容增长。系统交互差异单独验收；320/360/600、横屏与设备读屏由后续门禁验证。', 14, '#334155');
   s += '</svg>';
   return s;
 }
@@ -239,7 +277,7 @@ function board(platform, page) {
 for (const platform of ['android', 'ios']) {
   const dir = path.join(outRoot, platform);
   fs.mkdirSync(dir, { recursive: true });
-  for (const page of ['account', 'auth', 'settings']) {
+  for (const page of ['account', 'auth', 'settings', 'feedback']) {
     fs.writeFileSync(path.join(dir, `${page}.svg`), board(platform, page));
   }
 }
