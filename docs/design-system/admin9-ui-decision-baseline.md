@@ -190,6 +190,11 @@ every comparison object must rerun against the same new reference commit.
 
 ## Change log
 
+- 2026-08-23: closed G3 Go at `d6adb41` after product/brand, Flutter
+  architecture and QA/accessibility reviewers independently found no remaining
+  direct P0/P1. Prepared hash-bound Android and development-signed iOS packages
+  plus a shared physical-device checklist; final brand and device acceptance
+  remain user-owned.
 - 2026-08-23: closed G2 Go at `06a398a`, selected the first-party route for the
   Demo, and removed Forui from G3 production integration while retaining the
   package-neutral `App*` boundary.

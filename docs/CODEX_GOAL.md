@@ -16,13 +16,13 @@ areas, and accessibility keep their platform behavior.
 
 G1 is closed Go at `cf68a24844e45c16d983d29fb4878ad2f14bfd41` and must not
 be reopened or expanded. G2 is closed Go at
-`06a398a747178e1aaed4933f96806ced3c498ad8`. G3 implements the selected
-first-party route in the Demo: the Forui candidate and complete G2 POC are
-removed, while the existing `App*` API, one route tree, App host and
-system-owned behavior remain intact. Initial G3 commit `3b9ea41` received
-architecture Go plus three product/QA P1 findings. All three are closed in one
-bounded revision with same-title, executable feedback semantics, large-label
-and paired-page evidence, ready for final closure review.
+`06a398a747178e1aaed4933f96806ced3c498ad8`. G3 is closed Go at
+`d6adb419dfa6935868b37621fc530e942fd13988` after the product/brand,
+Flutter architecture and QA/accessibility reviewers independently found no
+remaining direct P0/P1. The Demo now uses the selected first-party route while
+retaining the existing `App*` API, one route tree, App host and system-owned
+behavior. The current stage is Android/iOS real-device acceptance; implementation
+and unattended work stop before Starter migration.
 
 ## Completed
 
@@ -84,6 +84,12 @@ and paired-page evidence, ready for final closure review.
 - Added paired Android/iOS production component Goldens and corrected the
   production notice semantics so one shared tone/title/message node does not
   consume the independent action.
+- Closed all three G3 supervision findings in `d6adb41`: shared centered page
+  titles, executable feedback semantics and complete large-field labels.
+- Received final Go from the product/brand, Flutter architecture and
+  QA/accessibility reviewers on the same G3 revision.
+- Prepared the exact Android Release APK and a development-signed iOS IPA for
+  physical-device acceptance, together with one shared, fillable checklist.
 
 ## Verification evidence
 
@@ -128,8 +134,13 @@ and paired-page evidence, ready for final closure review.
   configuration/import/candidate/Gallery/visual/documentation gates, Android
   Release APK 51,005,113 bytes and iOS no-codesign Release app 17.1 MB.
 - 2026-08-23: final Android/iOS asset scans contain no Forui, Inter or Lucide
-  candidate artifacts. Manual review of all 21 production Goldens found no
+  candidate artifacts. Manual review of all 23 production Goldens found no
   incoherent overlap or cross-platform component-family drift.
+- 2026-08-23: the development-signed iOS export passed strict code-sign
+  verification and IPA archive integrity. It targets
+  `com.admin9.app.foundation`, contains the connected iPhone UDID in its
+  provisioning profile and expires on 2027-06-05. This proves packaging and
+  signing only, not installation or real-device acceptance.
 
 ## Provisional decisions
 
@@ -159,9 +170,11 @@ POCs, or Demo implementation.
 
 ## Next
 
-1. Commit one fixed G3 SHA with the implementation and local evidence.
-2. Run exactly three independent G3 reviews for product/brand, Flutter
-   architecture and QA/accessibility. Fix only direct P0/P1 regressions.
-3. After all three return Go, hand the Android/iOS builds and shared checklist
-   to the user for real-device acceptance.
-4. Stop before Starter migration, versioning, release, push or publication.
+1. Install the exact APK and development-signed IPA identified in
+   `docs/design-system/admin9-ui-g3-device-acceptance.md`.
+2. The user runs the shared checklist on one supported Android device and one
+   supported iPhone and records Pass/Fail plus device facts.
+3. Continue only after the user explicitly accepts or rejects the Admin9 brand
+   direction and both real-device experiences.
+4. Do not migrate Starter, assign a Design System version, push, publish or
+   release before that explicit acceptance.

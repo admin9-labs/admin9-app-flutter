@@ -3,17 +3,17 @@
 Date: 2026-08-23
 G2 gate commit: `06a398a747178e1aaed4933f96806ced3c498ad8`
 Initial implementation commit: `3b9ea41540440f8b518546110fdbd3e7fc2def7d`
-Supervision revision: this document's commit
+Supervision revision: `d6adb419dfa6935868b37621fc530e942fd13988`
 Gate: Demo implementation and local delivery evidence
-Status: three supervision P1 findings closed; ready for bounded closure review
+Status: G3 Go; three final closure reviewers found no direct P0/P1
 
 ## Result
 
 G3 implements the first-party route selected by G2 for the Demo. Android and
 iOS now use one Admin9-owned visible component language behind the unchanged
-`App*` API. This local result is ready for independent review; it is not
-real-device acceptance, Starter migration, a release, or final brand-art
-approval.
+`App*` API. Three independent reviewers accepted the fixed revision. This local
+result is not real-device acceptance, Starter migration, a release, or final
+brand-art approval.
 
 Forui 0.25.0, `forui_assets`, `sugar`, the candidate adapter, the two POC
 renderers, their harness/tests and all 110 candidate-only Goldens are removed.
@@ -40,23 +40,24 @@ remain platform-owned.
 | --- | --- | --- |
 | Static analysis | `flutter analyze` passes with no issues | Source-level only |
 | Business and component regression | `flutter test --exclude-tags golden` passes 146 tests | Includes both platform variants and the added semantics-action closure; not real-device proof |
-| Production Golden compare | 23 tests pass | 19 migrated production views plus paired Android/iOS component and AppPage scenarios |
+| Production Golden compare | 23 images match; the tagged test file passes 25 cases | 19 migrated production views plus paired Android/iOS component and AppPage scenarios |
 | Manual Golden review | All 23 images reviewed | No incoherent overlap or component-family drift; 3.72x samples retain ordered, scrollable content |
 | Candidate boundary | One positive and 22 exact negative fixtures plus repository scan pass | Candidate package list is empty |
 | Import boundary | Four positive and 19 exact negative fixtures plus final-phase scan pass | Public `App*`, App host and route ownership remain intact |
 | Other repository gates | App configuration, upstream ownership, public API parity, Gallery, 16 visual references, 20 stable rules, Android plugins and documentation pass | Local deterministic evidence |
 | Android build | Release APK builds, 51,005,113 bytes | Not installed on a physical device in G3 |
-| iOS build | Release no-codesign `Runner.app` builds, 17.1 MB | Not signed or installed in G3 |
+| iOS compile build | Release no-codesign `Runner.app` builds, 17.1 MB | G3 compilation evidence only; later replaced by the signed handoff build |
+| iOS handoff export | Development-signed arm64 IPA builds, 7,211,488 bytes; strict code-sign and archive integrity pass | Provisioned local-device package, not App Store/Ad Hoc distribution or installation evidence |
 | Package exit | Source, package configuration and both release asset trees contain no Forui, Inter or Lucide candidate artifact | Confirms the G2 package footprint is removed |
 
 Local handoff artifacts for this revision:
 
 - Android: `build/app/outputs/flutter-apk/app-release.apk`, 51,005,113 bytes,
   SHA-256 `033da5010261a37bc0d62c188e7596a2fb82cdf7a8a6cfb8bfea7c65a26b5bc8`.
-- iOS: `build/ios/iphoneos/Runner.app`, 16,804 KiB on disk. The sorted
-  per-file SHA-256 manifest digest is
-  `3acf0a47d54924b49c5088a32562f9b40e8deced452a2c93bf027e55db7a418d`.
-  This is an unsigned app bundle, not an IPA or installable release signature.
+- iOS: `build/ios/ipa/Admin9 App Starter.ipa`, development-signed for team
+  `J25XZRW743`, 7,211,488 bytes, SHA-256
+  `4280712752943f402ce23d5e23cbdefc4f4ed1b719dae244b713db71d1f8ddf3`.
+  The profile contains the currently detected iPhone and expires on 2027-06-05.
 
 The paired production Goldens use identical content, state, brightness, text
 scale and 390x844 viewport inputs for both platform variants. They cover both
@@ -102,10 +103,25 @@ No business content, route, App host, system capability or dependency changed
 in this revision. Final review is bounded to these closures and direct P0/P1
 regressions.
 
+The bounded final reviews all returned Go on `d6adb41`:
+
+- product/brand confirmed the paired centered page hierarchy and no direct
+  product regression;
+- Flutter architecture confirmed no public API, dependency, route, App host or
+  system-behavior regression;
+- QA/accessibility confirmed executable feedback actions, complete large labels
+  and all 23 production Golden images.
+
+The reviewers recorded only evidence-wording P2s: the old 21-image count and
+the ambiguous phrase `23 tests`. Both are corrected in the handoff documents;
+the reviewed implementation SHA is unchanged.
+
 ## Real-device handoff checklist
 
-Run the same representative flow on one supported Android device and one
-supported iPhone:
+Use the fillable, artifact-bound
+[physical-device acceptance record](admin9-ui-g3-device-acceptance.md). Run the
+same representative flow on one supported Android device and one supported
+iPhone:
 
 1. Confirm the app is immediately recognizable as the same Admin9 product:
    page hierarchy, buttons, fields, rows, navigation, dialogs, menus, loading,
@@ -139,7 +155,8 @@ supported iPhone:
 
 ## Stop condition
 
-After three independent reviewers return Go on one fixed G3 commit, hand these
-builds and this checklist to the user. Do not migrate Starter, assign a Design
-System version, push, publish or release until the user explicitly accepts both
-real-device experiences.
+Three independent reviewers have returned Go on fixed G3 commit `d6adb41`; the
+exact Android/iOS packages and shared checklist are prepared. Unattended work
+stops here. Do not migrate Starter, assign a Design System version, push,
+publish or release until the user explicitly accepts both real-device
+experiences.
