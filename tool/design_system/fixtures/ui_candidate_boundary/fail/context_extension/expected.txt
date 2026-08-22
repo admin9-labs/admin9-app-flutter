@@ -1,0 +1,1 @@
+candidate adapters must not declare public context extensions

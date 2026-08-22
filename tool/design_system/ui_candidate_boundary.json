@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "1.0.0",
+  "candidatePackages": [],
+  "adapterRoots": [
+    "lib/core/design_system/adapters/"
+  ],
+  "publicBarrel": "lib/admin9_ui.dart",
+  "rootThemeFiles": [
+    "lib/app/admin9_app.dart",
+    "lib/core/design_system/foundation/app_theme.dart"
+  ]
+}

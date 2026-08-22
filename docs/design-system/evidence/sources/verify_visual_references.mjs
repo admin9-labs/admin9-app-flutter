@@ -5,6 +5,12 @@ import path from 'node:path';
 const root = process.argv[2] ?? 'docs/design-system/evidence/visual-references';
 const write = process.argv.includes('--write');
 const manifestPath = path.join(root, 'visual-assets.json');
+const requiredScenarioLabels = {
+  account: ['已登录列表', '暂无可用账号能力', '列表载入失败', '重试'],
+  auth: ['键盘焦点', '请输入手机号或邮箱', '内容不会被裁切', '登录替代态'],
+  settings: ['设置基准态', '设置暂未保存', '持久化错误', '重试'],
+  feedback: ['动作菜单', '删除账号', '确认弹窗', '已完成 45%', '按下状态', '禁用操作', '键盘焦点操作', '不确定进度'],
+};
 const expected = [];
 const svgSources = new Map();
 for (const platform of ['android', 'ios']) {
@@ -24,6 +30,7 @@ const pngSize = (buffer) => {
 const assets = expected.map((relativePath) => {
   const filePath = path.join(root, relativePath);
   const buffer = fs.readFileSync(filePath);
+  const page = path.basename(relativePath, path.extname(relativePath));
   let width;
   let height;
   if (relativePath.endsWith('.png')) {
@@ -35,7 +42,7 @@ const assets = expected.map((relativePath) => {
     if (!match) throw new Error(`${relativePath}: missing SVG dimensions`);
     width = Number(match[1]);
     height = Number(match[2]);
-    for (const label of ['设计参考，非当前 App / 模拟器 / 设备截图', 'App 特大 1.24 × 系统标准', '同一基准态', '390lp', '同一 Admin9 可见契约', '系统交互差异单独验收']) {
+    for (const label of ['设计参考，非当前 App / 模拟器 / 设备截图', '浅色', '深色', 'App 特大 1.24 × 系统标准', '390lp', '同一 Admin9 可见契约', '系统交互差异单独验收', ...requiredScenarioLabels[page]]) {
       if (!source.includes(label)) throw new Error(`${relativePath}: missing label ${label}`);
     }
   }

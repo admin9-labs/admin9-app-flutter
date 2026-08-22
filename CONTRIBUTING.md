@@ -43,6 +43,8 @@ dart run tool/design_system/validate_app_config.dart --fixtures
 dart run tool/design_system/verify_public_api_parity.dart --self-test
 dart run tool/design_system/verify_import_boundaries.dart --fixtures
 dart run tool/design_system/verify_import_boundaries.dart --phase=final
+dart run tool/design_system/verify_ui_candidate_boundary.dart --fixtures
+dart run tool/design_system/verify_ui_candidate_boundary.dart
 dart run tool/design_system/verify_gallery_boundary.dart
 dart run tool/design_system/verify_app_config.dart
 dart run tool/design_system/verify_app_config.dart --fixtures

@@ -101,21 +101,65 @@ improve; they are not frozen tokens.
 
 Three routes remain eligible:
 
-| Route | Evidence required before recommendation |
-| --- | --- |
-| Existing/self-built `App*` | Meets paired references and state matrix with acceptable implementation size, accessibility, performance, and maintenance cost |
-| Third party inside `App*` | Clear delivery or quality advantage; compatible Flutter version; acceptable license/security/maintenance; full theming and testability; no leaked package types |
-| Mixed | A named, measured gap in either single route; explicit ownership per component; lower total cost than closing the gap in one route |
+| Comparison object | Role | Evidence required before recommendation |
+| --- | --- | --- |
+| Current `App*` implementation | Control only | Records old-contract behavior, implementation size, test baseline, and the visible Material/Cupertino split; it cannot win unchanged |
+| First-party candidate behind `App*` | Candidate | Meets paired references and state matrix with acceptable implementation size, accessibility, performance, and maintenance cost |
+| Third party adapted behind `App*` | Candidate | Clear delivery or quality advantage; compatible Flutter version; acceptable license/security/maintenance; full theming and testability; no leaked package types |
+| Mixed | Conditional candidate | A named, measured gap in both single routes; explicit ownership per component; lower total cost than closing the gap in one route |
 
-Evaluation order is current `App*` baseline, one primary package candidate, and
-at most one backup. A third-party Theme, Controller, Router, state model, or
-enum must not cross `App*` into business code. Removal must leave business APIs
-and the route tree intact.
+Evaluation order is the control, the first-party candidate, one primary package
+candidate, and at most one backup package. The backup receives implementation
+work only after the primary is eliminated or a material evidence gap requires a
+second package. A third-party Theme, Controller, Router, state model, enum,
+callback, style, or context extension must not cross `App*` into business code.
+Removal must leave business APIs and the route tree intact.
+
+`App*` owns visible, business-neutral component presentation. It does not own
+permissions, sharing, system pickers, keyboard services, autofill, or other
+platform capabilities. Those remain in the existing capability/service or
+navigation layer. A component may display the explanation and result of a
+capability, but must not become the capability implementation.
+
+Candidate imports and indirect public-type leakage are mechanically checked by
+`tool/design_system/verify_ui_candidate_boundary.dart` using
+`tool/design_system/ui_candidate_boundary.json`. Candidate package imports are
+allowed only in the configured Design System adapter root and must use a
+prefix. The gate rejects candidate exports, candidate types in adapter public
+signatures, public adapter context extensions, adapter types in exported
+`App*` signatures, and root Theme/app-host imports of adapters. G2 adds the
+chosen exact package names to the policy before candidate code is accepted.
 
 Golden tests protect each platform's approved rendering. Cross-platform unity
 is evaluated with shared structure/token assertions, paired human review, and
 Android/iOS real-device acceptance, not pixel equality between operating
 systems.
+
+## Accessibility unity contract
+
+Brand and business semantics are shared: accessible name, role, value, reading
+order, validation error, state meaning, recovery action, and destructive
+meaning must match on Android and iOS.
+
+For state announcements, the contract is the visible result message announced
+once after the state becomes visible. Rebuilds, theme changes, layout changes,
+and route restoration must not repeat it. An announcement must not move focus;
+modal dismissal restores the prior valid focus target. Widget tests assert the
+message, count, timing relative to the visible state, and focus result. Device
+tests observe the actual TalkBack/VoiceOver delivery.
+
+The OS may use different live-region scheduling, focus highlights, rotor or
+accessibility actions, Switch Access/Control mechanics, and announcement
+delivery. Those mechanism differences are allowed; different business content
+or repeated/missing announcements are not.
+
+## Stage protocol
+
+Entry, exit, severity, ownership, resource limits, fixed-reference rules, and
+elimination criteria are defined in
+[admin9-ui-stage-gates.md](admin9-ui-stage-gates.md). A reference-source or
+manifest change invalidates all candidate evidence from the previous round;
+every comparison object must rerun against the same new reference commit.
 
 ## Undecided
 
@@ -128,6 +172,10 @@ systems.
 
 ## Change log
 
+- 2026-08-22: revised G1 after independent review. Separated the current
+  implementation control from first-party and third-party candidates, narrowed
+  `App*` to visible UI, added executable candidate leakage gates, froze the
+  accessibility announcement contract, and added staged entry/exit rules.
 - 2026-08-22: established the Demo-first baseline after real-device evidence
   showed the broad Material/Cupertino visible mapping does not meet product
   unity. Retained `App*`, system behavior adaptation, and the single route tree.

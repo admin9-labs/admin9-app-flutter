@@ -1,0 +1,1 @@
+root Theme and app host files must not depend on candidate adapters

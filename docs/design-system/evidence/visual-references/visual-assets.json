@@ -11,113 +11,113 @@
       "path": "android/account.svg",
       "width": 2400,
       "height": 1200,
-      "bytes": 28364,
-      "sha256": "86f0fdef2794f8a61a1835d25d3c217c27208fdd73377e570ff7b16c0421325b"
+      "bytes": 22571,
+      "sha256": "c7b1b2749a049e1207d59eac003837da60cc819b3201734d8a753e5da77ce316"
     },
     {
       "path": "android/account.png",
       "width": 2400,
       "height": 1200,
-      "bytes": 264971,
-      "sha256": "603be684762cfc373daaaffc26134421e83f28e14827cf4b970b624711e738f0"
+      "bytes": 243253,
+      "sha256": "5fb0ddd2fe5d5e4d8012f439b6b98680cef0edfe0a80a973714bcad9a508b4c5"
     },
     {
       "path": "android/auth.svg",
       "width": 2400,
       "height": 1200,
-      "bytes": 22811,
-      "sha256": "944b9569f44d307dc72ee197d8c2c7ee53e05f07466842373eb778bbe76aa704"
+      "bytes": 23405,
+      "sha256": "6839558605b624bb54eb3c7d0bbe173fca95d69aa4b4c6ec72e6280f1037091e"
     },
     {
       "path": "android/auth.png",
       "width": 2400,
       "height": 1200,
-      "bytes": 286369,
-      "sha256": "2d56fadc57f0f722f5539e7bb6a8e17c3e755b41c91050c26f123b7b0e277c01"
+      "bytes": 301361,
+      "sha256": "dd80614217c32483b38ba8ac2d08a9f8b648ce7a9db300298778dc14761e5bd9"
     },
     {
       "path": "android/settings.svg",
       "width": 2400,
       "height": 1200,
-      "bytes": 21944,
-      "sha256": "2d755ed3ee466a7ee18f4938ca2f64bf0f7e89369664db86f5e70a0f0826889b"
+      "bytes": 22136,
+      "sha256": "a1d61a9162649ea79f20ebf07bdc946f5cf6e209cbdc0bdf458018d59026bb2a"
     },
     {
       "path": "android/settings.png",
       "width": 2400,
       "height": 1200,
-      "bytes": 295829,
-      "sha256": "2198d130c5e98b881b0c7dd3cbb8b6c66399d4131fe4dade972d5fbd26a88c37"
+      "bytes": 292152,
+      "sha256": "75d2b8aa219c745c2c14715ce33a7c5a1e9c0c9eff7198dd2b58d9a6c3d20467"
     },
     {
       "path": "android/feedback.svg",
       "width": 2400,
       "height": 1200,
-      "bytes": 22352,
-      "sha256": "55c8dcc29eb168d288da4eb5431ced961091db09a80020a6e38fe88b9c217ab0"
+      "bytes": 16037,
+      "sha256": "6ec1c92f21578195b2ead6ac2e3ef0ef7f0fd6c7dd9ebdd50f965b67834f8afc"
     },
     {
       "path": "android/feedback.png",
       "width": 2400,
       "height": 1200,
-      "bytes": 245984,
-      "sha256": "0aacd5c24f89354a410b6424bc4fde5bea99a617d2eefcd1ab9ff657a09e594b"
+      "bytes": 256197,
+      "sha256": "3f7a46fcee4e875b4ec954f0aa80855c895d6c735215fefab05015acc7000639"
     },
     {
       "path": "ios/account.svg",
       "width": 2400,
       "height": 1200,
-      "bytes": 28368,
-      "sha256": "83cd7f7fcff1747a8a4a27945888d7083c6cfee2ae3f46e67d64f475609403b2"
+      "bytes": 22575,
+      "sha256": "5b65fcdc29275ab95fdcd64e3f4215d4b99dffb870c72e0c8205b8655ac3d786"
     },
     {
       "path": "ios/account.png",
       "width": 2400,
       "height": 1200,
-      "bytes": 264249,
-      "sha256": "18fc875459d3bfa342746c74bb685e2c63940e116871e063ea3d6173cd2d03e1"
+      "bytes": 242628,
+      "sha256": "ee7d4cac616ec71a7e739f79df0bd6456d606f7b0fdbaccfd346d30e966f9911"
     },
     {
       "path": "ios/auth.svg",
       "width": 2400,
       "height": 1200,
-      "bytes": 22807,
-      "sha256": "7a354717d3ed467cc00ff319fc4e7fbf609f27f9844f4718dc218edad66b65c8"
+      "bytes": 23401,
+      "sha256": "1bf9554287df0a12d34de0265a525211079b4814b260c9101a93fd9f396d93ed"
     },
     {
       "path": "ios/auth.png",
       "width": 2400,
       "height": 1200,
-      "bytes": 285644,
-      "sha256": "d3b6fb1e757b6e4b79529f8802cb58d0adf4f9d561b03c02d0980e78244631bc"
+      "bytes": 300710,
+      "sha256": "36348f14d1b562c8be0fd43166cc69889eb4663977f1d5801ba77994603baf17"
     },
     {
       "path": "ios/settings.svg",
       "width": 2400,
       "height": 1200,
-      "bytes": 21949,
-      "sha256": "3b5dfcc11e63bad87e4edd72729d99c25425f05ab8f57fe2deb9d18ac66e72ef"
+      "bytes": 22141,
+      "sha256": "499e4916867750ad2d7be05f475247bdb6733f3e213f3bc9fcccecccf7d22a44"
     },
     {
       "path": "ios/settings.png",
       "width": 2400,
       "height": 1200,
-      "bytes": 294952,
-      "sha256": "076108a7b2f806d027fc4fe87516c9353bbdc1c502089a8daf0268a912014e3c"
+      "bytes": 290832,
+      "sha256": "397661dc16bedda0cb3d3c787f978142fe96914778418687403da8c0ff7294d4"
     },
     {
       "path": "ios/feedback.svg",
       "width": 2400,
       "height": 1200,
-      "bytes": 22332,
-      "sha256": "b4fc4cdd62292839fb51a664a1153895dd65e51d87b2f47366cc3f34ea1369a2"
+      "bytes": 16017,
+      "sha256": "8cf6486babf0454c48862660bce0d35242e5f20fc58cd600319143fa16cb72d9"
     },
     {
       "path": "ios/feedback.png",
       "width": 2400,
       "height": 1200,
-      "bytes": 244561,
-      "sha256": "9b279104069a990bbe8e25de38d7e404091b0c9da2eaffcb6278a7aab2d47d11"
+      "bytes": 254483,
+      "sha256": "15af20b2241eba4e3485ec6ac2e1009466eb084603763a12f469d37cb37cac1f"
     }
   ]
 }

@@ -1,0 +1,1 @@
+adapter types must not appear in the App* public API

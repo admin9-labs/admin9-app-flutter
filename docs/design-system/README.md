@@ -95,6 +95,7 @@ local consistency checks, not compatibility approval or certification.
 | format/analyze/test | Dart style, static analysis, Widget and unit behavior |
 | contract probes | public declaration and implementation shape |
 | import boundaries | Core/App/Brand/Business dependency direction and public barrel |
+| UI candidate boundary | candidate package adapter isolation, public API leakage, and root Theme independence |
 | Gallery boundary | debug/profile reachability and release isolation |
 | App configuration | optional schema fixtures, default identity, native display names, and generated drift |
 | rule links | stable IDs, module anchors, and named quality gates |
