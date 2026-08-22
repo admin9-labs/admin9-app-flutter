@@ -117,11 +117,12 @@ Removal must leave business APIs and the route tree intact.
 
 G2 implemented Forui 0.25.0 as the primary package candidate and retained
 `shadcn_ui` 0.56.1 as an evidence-only backup. The same-scenario comparison
-provisionally recommends the first-party unified route: it met the POC contract
-without a named capability gap, while Forui required a larger adapter, bundled
-font/license handling, extra semantics and typography compatibility work, and
-still lacked progress parity. This is a provisional implementation decision
-until the three fixed-SHA G2 reviews return Go; it does not approve final visual
+recommends the first-party unified route: it met the fixed POC contract without
+a named package-only capability gap, while Forui required substantial wrappers,
+bundled font/license handling, semantics and typography compatibility work,
+pressure-layout exceptions, and still lacked progress parity. The first review
+round returned Revise; its confirmed P1 findings are closed in the supervision
+revision and await a bounded closure review. This does not approve final visual
 tokens, Demo acceptance, or Starter migration.
 
 `App*` owns visible, business-neutral component presentation. It does not own
@@ -178,14 +179,19 @@ every comparison object must rerun against the same new reference commit.
 ## Undecided
 
 - Final brand art direction and approver acceptance.
-- Final production implementation route; G2 currently recommends first-party
-  pending fixed-SHA supervision.
+- Final production implementation route; G2 recommends first-party pending the
+  bounded closure review and G3 production evidence.
 - Final font, type metrics, icon family, spacing, radii, and component geometry.
 - Design System release/version naming.
 - Starter migration scope and migration sequence.
 
 ## Change log
 
+- 2026-08-23: closed the G2 supervision P1 set with a fixed baseline/alternate
+  scenario matrix, executable semantics, announcement timing/focus checks, 110
+  Golden images, real pressed pixels, a regenerated CJK subset, pressure-layout
+  fixes and a full-POC removal drill. Recorded Forui truncation/progress limits
+  and non-gating performance evidence without expanding G2.
 - 2026-08-23: recorded the G2 candidate identities and provisional first-party
   recommendation without treating it as final visual or Starter approval.
 - 2026-08-23: closed the fixed-commit P1 review findings. Distinguished legal

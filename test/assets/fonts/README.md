@@ -11,9 +11,10 @@ the runtime typography system.
 - Upstream SHA-256:
   `2c76254f6fc379fddfce0a7e84fb5385bb135d3e399294f6eeb6680d0365b74b`
 - Subset SHA-256:
-  `5eae14cab5d184fef3bc9bc522661bbb7c0b0603df79228ff09df26b7f15a314`
+  `6c6f8964c79de069e6dadd48f5c0016ffaa83b713ef2b03c0ad9076815aa3769`
 - Subset coverage: ASCII, common CJK punctuation, and Han glyphs present in
-  `lib/` and `test/` when the Phase 5 fixture was generated.
+  `lib/` and `test/` when the G2 supervision fixture was generated.
+- Subset tool: FontTools `4.59.1`.
 - License: SIL Open Font License 1.1, in `OFL.txt`.
 
 The subset was generated with FontTools `pyftsubset`; regenerate it whenever a

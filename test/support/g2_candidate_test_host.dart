@@ -41,10 +41,12 @@ Future<void> pumpG2Candidate(
   required G2CandidateKind candidate,
   required G2CandidateScenario scenario,
   required TargetPlatform platform,
+  G2CandidateEvidenceState evidenceState = G2CandidateEvidenceState.baseline,
   Size size = const Size(390, 844),
   Brightness brightness = Brightness.light,
   double textScale = 1,
   bool highContrast = false,
+  bool focusAuth = false,
 }) async {
   tester.view.devicePixelRatio = 1;
   tester.view.physicalSize = size;
@@ -80,13 +82,26 @@ Future<void> pumpG2Candidate(
           child: AppDesignScope(tokens: resolved.tokens, child: child!),
         ),
         home: Scaffold(
-          body: G2CandidateHarness(candidate: candidate, scenario: scenario),
+          body: G2CandidateHarness(
+            key: ValueKey((candidate, scenario, platform, evidenceState)),
+            candidate: candidate,
+            scenario: scenario,
+            evidenceState: evidenceState,
+          ),
         ),
       ),
     ),
   );
   await tester.pump();
   await tester.pump(const Duration(milliseconds: 250));
+  if (focusAuth && scenario == G2CandidateScenario.auth) {
+    final editable = find.descendant(
+      of: find.byKey(const Key('g2-account-field')),
+      matching: find.byType(EditableText),
+    );
+    tester.widget<EditableText>(editable).focusNode.requestFocus();
+    await tester.pump();
+  }
 }
 
 void resetG2TestView(WidgetTester tester) {

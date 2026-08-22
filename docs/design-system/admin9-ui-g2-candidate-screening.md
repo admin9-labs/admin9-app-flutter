@@ -53,6 +53,18 @@ not a recommendation to adopt it. It can be eliminated for public API leakage,
 system-font failure, semantics/focus regression, insufficient visual control,
 material performance cost, or a failed removal drill.
 
+### Post-POC assessment
+
+Forui remained removable and did not leak through `App*`, but the package did
+not provide a lower-ownership production route for this scope. Bottom
+navigation, dialog and action-menu surfaces were testable, while the Admin9
+adapter still had to rebuild typography, replace merged switch semantics,
+separate feedback announcements from actions, branch pressure layouts and
+retain first-party progress behavior. A long settings subtitle truncates at the
+390-wide baseline, and determinate circular/reduced-motion progress parity is
+still absent. These are selection evidence, not security or package-quality
+claims.
+
 ## Backup evidence: shadcn_ui 0.56.1
 
 | Check | Evidence | Assessment |

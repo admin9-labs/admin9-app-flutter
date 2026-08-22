@@ -159,6 +159,7 @@ class ForuiCandidateTextField extends StatelessWidget {
     this.keyboardType,
     this.textInputAction,
     this.autofillHints,
+    this.obscureText = false,
     this.onChanged,
     this.onSubmitted,
   });
@@ -171,6 +172,7 @@ class ForuiCandidateTextField extends StatelessWidget {
   final TextInputType? keyboardType;
   final TextInputAction? textInputAction;
   final Iterable<String>? autofillHints;
+  final bool obscureText;
   final ValueChanged<String>? onChanged;
   final ValueChanged<String>? onSubmitted;
 
@@ -187,6 +189,7 @@ class ForuiCandidateTextField extends StatelessWidget {
     keyboardType: keyboardType,
     textInputAction: textInputAction,
     autofillHints: autofillHints,
+    obscureText: obscureText,
     onSubmit: onSubmitted,
   );
 }
@@ -206,13 +209,22 @@ class ForuiCandidateSwitch extends StatelessWidget {
   final bool enabled;
 
   @override
-  Widget build(BuildContext context) => forui.FSwitch(
-    leadingLabel: true,
-    semanticsLabel: label,
-    label: Text(label),
-    value: value,
+  Widget build(BuildContext context) => Semantics(
+    container: true,
+    label: label,
+    toggled: value,
     enabled: enabled,
-    onChange: enabled ? onChanged : null,
+    onTap: enabled ? () => onChanged(!value) : null,
+    child: ExcludeSemantics(
+      child: forui.FSwitch(
+        leadingLabel: true,
+        semanticsLabel: label,
+        label: Text(label),
+        value: value,
+        enabled: enabled,
+        onChange: enabled ? onChanged : null,
+      ),
+    ),
   );
 }
 
@@ -259,27 +271,44 @@ class ForuiCandidateFeedback extends StatelessWidget {
     required this.title,
     required this.message,
     required this.tone,
-  });
+    this.actionLabel,
+    this.onAction,
+  }) : assert((actionLabel == null) == (onAction == null));
 
   final String title;
   final String message;
   final AppTone tone;
+  final String? actionLabel;
+  final VoidCallback? onAction;
 
   @override
-  Widget build(BuildContext context) => Semantics(
-    container: true,
-    liveRegion: tone == AppTone.error,
-    label: '${_toneLabel(tone)}，$title，$message',
-    child: ExcludeSemantics(
-      child: forui.FAlert(
-        title: Text(title),
-        subtitle: Text(message),
-        variant: tone == AppTone.error
-            ? forui.FAlertVariant.destructive
-            : forui.FAlertVariant.primary,
-        liveRegion: false,
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      Semantics(
+        container: true,
+        liveRegion: tone == AppTone.error,
+        label: '${_toneLabel(tone)}，$title，$message',
+        child: ExcludeSemantics(
+          child: forui.FAlert(
+            title: Text(title),
+            subtitle: Text(message),
+            variant: tone == AppTone.error
+                ? forui.FAlertVariant.destructive
+                : forui.FAlertVariant.primary,
+            liveRegion: false,
+          ),
+        ),
       ),
-    ),
+      if (actionLabel != null) ...[
+        const SizedBox(height: 8),
+        ForuiCandidateButton(
+          label: actionLabel!,
+          variant: AppButtonVariant.tertiary,
+          onPressed: onAction!,
+        ),
+      ],
+    ],
   );
 
   String _toneLabel(AppTone value) => switch (value) {
@@ -291,19 +320,15 @@ class ForuiCandidateFeedback extends StatelessWidget {
 }
 
 class ForuiCandidateProgress extends StatelessWidget {
-  const ForuiCandidateProgress({
-    super.key,
-    required this.label,
-    required this.value,
-  });
+  const ForuiCandidateProgress({super.key, required this.label, this.value});
 
   final String label;
-  final double value;
+  final double? value;
 
   @override
   Widget build(BuildContext context) => Semantics(
     label: label,
-    value: '${(value * 100).round()}%',
+    value: value == null ? null : '${(value! * 100).round()}%',
     liveRegion: true,
     child: ExcludeSemantics(
       child: Column(
@@ -311,9 +336,130 @@ class ForuiCandidateProgress extends StatelessWidget {
         children: [
           Text(label),
           const SizedBox(height: 8),
-          forui.FDeterminateProgress(value: value),
+          if (value == null)
+            const forui.FProgress()
+          else
+            forui.FDeterminateProgress(value: value!),
         ],
       ),
     ),
   );
+}
+
+class ForuiCandidateBottomNavigation extends StatelessWidget {
+  const ForuiCandidateBottomNavigation({
+    super.key,
+    required this.selectedIndex,
+    required this.onSelected,
+  });
+
+  final int selectedIndex;
+  final ValueChanged<int> onSelected;
+
+  @override
+  Widget build(BuildContext context) => forui.FBottomNavigationBar(
+    index: selectedIndex,
+    onChange: onSelected,
+    children: const [
+      forui.FBottomNavigationBarItem(
+        semanticsLabel: '首页',
+        icon: Icon(Icons.home_outlined),
+        label: Text('首页'),
+      ),
+      forui.FBottomNavigationBarItem(
+        semanticsLabel: '我的',
+        icon: Icon(Icons.person_outline),
+        label: Text('我的'),
+      ),
+    ],
+  );
+}
+
+class ForuiCandidateDialogPanel extends StatelessWidget {
+  const ForuiCandidateDialogPanel({
+    super.key,
+    required this.title,
+    required this.message,
+    required this.onCancel,
+    required this.onConfirm,
+  });
+
+  final String title;
+  final String message;
+  final VoidCallback onCancel;
+  final VoidCallback onConfirm;
+
+  @override
+  Widget build(BuildContext context) => forui.FDialog(
+    semanticsLabel: title,
+    constraints: const BoxConstraints(minWidth: 280, maxWidth: 560),
+    builder: (context, style) => Padding(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(title, style: style.titleTextStyle),
+          const SizedBox(height: 8),
+          Text(message, style: style.bodyTextStyle),
+          const SizedBox(height: 20),
+          ForuiCandidateButton(
+            label: '取消',
+            variant: AppButtonVariant.secondary,
+            onPressed: onCancel,
+          ),
+          const SizedBox(height: 8),
+          ForuiCandidateButton(label: '确认', onPressed: onConfirm),
+        ],
+      ),
+    ),
+  );
+}
+
+class ForuiCandidateActionMenu extends StatelessWidget {
+  const ForuiCandidateActionMenu({
+    super.key,
+    required this.items,
+    required this.onSelected,
+    required this.onCancel,
+  });
+
+  final List<({String label, bool enabled, bool destructive})> items;
+  final ValueChanged<int> onSelected;
+  final VoidCallback onCancel;
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens = AppDesignScope.of(context);
+    return forui.FDialog(
+      semanticsLabel: '选择操作',
+      constraints: const BoxConstraints(minWidth: 280, maxWidth: 560),
+      builder: (context, style) => Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text('选择操作', style: style.titleTextStyle),
+            const SizedBox(height: 8),
+            for (final (index, item) in items.indexed)
+              forui.FTile(
+                title: Text(
+                  item.label,
+                  style: item.destructive
+                      ? TextStyle(color: tokens.danger)
+                      : null,
+                ),
+                enabled: item.enabled,
+                onPress: item.enabled ? () => onSelected(index) : null,
+              ),
+            const Divider(),
+            ForuiCandidateButton(
+              label: '取消',
+              variant: AppButtonVariant.secondary,
+              onPressed: onCancel,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
