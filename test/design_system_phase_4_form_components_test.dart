@@ -307,6 +307,12 @@ void main() {
       expect(tester.getSize(field).height, greaterThanOrEqualTo(minimum));
       expect(
         tester
+            .renderObject<RenderParagraph>(find.text('用于验证最长中文持续标签的注册账号输入字段'))
+            .didExceedMaxLines,
+        isFalse,
+      );
+      expect(
+        tester
             .renderObject<RenderParagraph>(
               find.text('账号格式不正确，请检查后重新输入；错误出现后布局必须增长且不能遮挡后续操作。'),
             )

@@ -141,6 +141,7 @@ void main() {
         ),
       );
       expect(find.byType(CupertinoListSection), findsNothing);
+      expect(tester.widget<AppBar>(find.byType(AppBar)).centerTitle, isTrue);
       expect(find.byType(RadioGroup<AppThemePreference>), findsOneWidget);
       expect(find.byType(RadioListTile<AppThemePreference>), findsNWidgets(2));
       final selectedSemantics = tester.getSemantics(

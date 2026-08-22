@@ -73,6 +73,19 @@ void main() {
     }, tags: 'golden');
   }
 
+  for (final row in const [
+    _GoldenRow('g3_page_android', TargetPlatform.android, Size(390, 844), 1, 1),
+    _GoldenRow('g3_page_ios', TargetPlatform.iOS, Size(390, 844), 1, 1),
+  ]) {
+    testWidgets('G3 paired AppPage baseline ${row.name}', (tester) async {
+      await _pumpPageGolden(tester, row: row);
+      await expectLater(
+        find.byKey(const Key('page-pair-golden-boundary')),
+        matchesGoldenFile('goldens/${row.name}.png'),
+      );
+    }, tags: 'golden');
+  }
+
   testWidgets(
     'Phase 5 Home page golden',
     (tester) async {
@@ -534,6 +547,69 @@ Future<void> _pumpComponentGolden(
                     ],
                   ),
                 ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+  await tester.pump(const Duration(milliseconds: 200));
+}
+
+Future<void> _pumpPageGolden(
+  WidgetTester tester, {
+  required _GoldenRow row,
+}) async {
+  tester.view.devicePixelRatio = 1;
+  tester.view.physicalSize = row.size;
+  addTearDown(() {
+    tester.view.resetDevicePixelRatio();
+    tester.view.resetPhysicalSize();
+  });
+  final resolved = AppTheme.resolve(
+    brightness: row.brightness,
+    platform: row.platform,
+    highContrast: row.highContrast,
+    reduceMotion: false,
+    boldText: false,
+    brandPrimary: appBrandTheme.primaryLight,
+    brandSecondary: appBrandTheme.secondaryLight,
+  );
+  await tester.pumpWidget(
+    MaterialApp(
+      theme: resolved.material.copyWith(platform: row.platform),
+      home: MediaQuery(
+        data: MediaQueryData(
+          size: row.size,
+          devicePixelRatio: 1,
+          textScaler: TextScaler.linear(row.systemScale * row.appScale),
+        ),
+        child: AppDesignScope(
+          tokens: resolved.tokens,
+          child: RepaintBoundary(
+            key: const Key('page-pair-golden-boundary'),
+            child: AppPage(
+              title: '账号安全',
+              navigationMode: AppPageNavigationMode.child,
+              parentLabel: '个人中心',
+              body: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const AppNotice(
+                    tone: AppTone.info,
+                    title: '安全状态',
+                    message: '账号保护已启用。',
+                  ),
+                  const SizedBox(height: 16),
+                  const AppListTile(
+                    title: '登录密码',
+                    currentValue: '已设置',
+                    disclosure: true,
+                  ),
+                  const SizedBox(height: 16),
+                  AppButton(label: '更新密码', onPressed: () {}),
+                ],
               ),
             ),
           ),

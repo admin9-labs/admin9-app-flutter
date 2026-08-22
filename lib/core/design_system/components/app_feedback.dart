@@ -215,6 +215,7 @@ class _AppFeedbackState extends State<AppFeedback> {
           sortKey: const OrdinalSortKey(2),
           button: true,
           label: request.actionLabel,
+          onTap: _activateAction,
           child: ExcludeSemantics(
             child: TextButton(
               style: TextButton.styleFrom(minimumSize: const Size(48, 48)),
@@ -228,6 +229,7 @@ class _AppFeedbackState extends State<AppFeedback> {
         sortKey: const OrdinalSortKey(3),
         button: true,
         label: '关闭',
+        onTap: dismiss,
         child: ExcludeSemantics(
           child: IconButton(
             tooltip: '关闭',

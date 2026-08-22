@@ -35,6 +35,7 @@ class AppPage extends StatelessWidget {
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
         automaticallyImplyLeading: false,
+        centerTitle: true,
         leading: navigationMode == AppPageNavigationMode.child
             ? IconButton(
                 tooltip: '返回$parentLabel',

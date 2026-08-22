@@ -34,6 +34,7 @@ void main() {
         ),
       );
       expect(find.byType(AppBar), findsOneWidget);
+      expect(tester.widget<AppBar>(find.byType(AppBar)).centerTitle, isTrue);
       expect(find.byTooltip('搜索'), findsOneWidget);
       expect(
         tester.getSize(find.byTooltip('搜索')).shortestSide,
@@ -54,6 +55,7 @@ void main() {
       );
       final bar = tester.widget<AppBar>(find.byType(AppBar));
       expect(bar.automaticallyImplyLeading, isFalse);
+      expect(bar.centerTitle, isTrue);
       expect(find.byTooltip('返回我的'), findsOneWidget);
       expect(find.byType(CupertinoNavigationBar), findsNothing);
     },
@@ -392,14 +394,14 @@ void main() {
     final close = find.bySemanticsLabel('关闭');
     expect(action, findsOneWidget);
     expect(close, findsOneWidget);
-    expect(
-      tester.getSemantics(action),
-      matchesSemantics(label: '撤销', isButton: true),
-    );
-    expect(
-      tester.getSemantics(close),
-      matchesSemantics(label: '关闭', isButton: true),
-    );
+    final actionData = tester.getSemantics(action).getSemanticsData();
+    final closeData = tester.getSemantics(close).getSemanticsData();
+    expect(actionData.label, '撤销');
+    expect(actionData.flagsCollection.isButton, isTrue);
+    expect(actionData.hasAction(SemanticsAction.tap), isTrue);
+    expect(closeData.label, '关闭');
+    expect(closeData.flagsCollection.isButton, isTrue);
+    expect(closeData.hasAction(SemanticsAction.tap), isTrue);
     expect(
       tester.getSemantics(find.bySemanticsLabel('操作结果')).sortKey,
       const OrdinalSortKey(1),
@@ -423,6 +425,64 @@ void main() {
       ),
       findsOneWidget,
     );
+  });
+
+  testWidgets('persistent feedback semantics actions execute once', (
+    tester,
+  ) async {
+    final semantics = tester.ensureSemantics();
+    for (final platform in [TargetPlatform.android, TargetPlatform.iOS]) {
+      final controller = AppFeedbackPresenterController();
+      var actionCalls = 0;
+      await _pumpFeedback(tester, controller: controller, platform: platform);
+      controller.show(
+        AppFeedbackRequest(
+          message: '可撤销操作',
+          tone: AppTone.info,
+          actionLabel: '撤销',
+          onAction: () => actionCalls += 1,
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+
+      final action = find.bySemanticsLabel('撤销');
+      final close = find.bySemanticsLabel('关闭');
+      expect(
+        tester
+            .getSemantics(action)
+            .getSemanticsData()
+            .hasAction(SemanticsAction.tap),
+        isTrue,
+      );
+      expect(
+        tester
+            .getSemantics(close)
+            .getSemanticsData()
+            .hasAction(SemanticsAction.tap),
+        isTrue,
+      );
+      tester.semantics.tap(find.semantics.byLabel('撤销'));
+      await tester.pumpAndSettle();
+      expect(actionCalls, 1);
+      expect(find.text('可撤销操作'), findsNothing);
+
+      controller.show(
+        AppFeedbackRequest(
+          message: '可关闭操作',
+          tone: AppTone.info,
+          actionLabel: '撤销',
+          onAction: () => actionCalls += 1,
+        ),
+      );
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 300));
+      tester.semantics.tap(find.semantics.byLabel('关闭'));
+      await tester.pumpAndSettle();
+      expect(actionCalls, 1);
+      expect(find.text('可关闭操作'), findsNothing);
+    }
+    semantics.dispose();
   });
 
   testWidgets(

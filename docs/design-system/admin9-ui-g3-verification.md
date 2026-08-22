@@ -2,9 +2,10 @@
 
 Date: 2026-08-23
 G2 gate commit: `06a398a747178e1aaed4933f96806ced3c498ad8`
-Implementation commit: this document's commit
+Initial implementation commit: `3b9ea41540440f8b518546110fdbd3e7fc2def7d`
+Supervision revision: this document's commit
 Gate: Demo implementation and local delivery evidence
-Status: ready for fixed-SHA G3 supervision
+Status: three supervision P1 findings closed; ready for bounded closure review
 
 ## Result
 
@@ -38,9 +39,9 @@ remain platform-owned.
 | Evidence | Result | Boundary |
 | --- | --- | --- |
 | Static analysis | `flutter analyze` passes with no issues | Source-level only |
-| Business and component regression | `flutter test --exclude-tags golden` passes 145 tests | Includes both platform variants; not real-device proof |
-| Production Golden compare | 21 tests pass | 19 updated production views plus one paired Android/iOS component scenario |
-| Manual Golden review | All 21 images reviewed | No incoherent overlap or component-family drift; 3.72x samples retain ordered, scrollable content |
+| Business and component regression | `flutter test --exclude-tags golden` passes 146 tests | Includes both platform variants and the added semantics-action closure; not real-device proof |
+| Production Golden compare | 23 tests pass | 19 migrated production views plus paired Android/iOS component and AppPage scenarios |
+| Manual Golden review | All 23 images reviewed | No incoherent overlap or component-family drift; 3.72x samples retain ordered, scrollable content |
 | Candidate boundary | One positive and 22 exact negative fixtures plus repository scan pass | Candidate package list is empty |
 | Import boundary | Four positive and 19 exact negative fixtures plus final-phase scan pass | Public `App*`, App host and route ownership remain intact |
 | Other repository gates | App configuration, upstream ownership, public API parity, Gallery, 16 visual references, 20 stable rules, Android plugins and documentation pass | Local deterministic evidence |
@@ -48,10 +49,20 @@ remain platform-owned.
 | iOS build | Release no-codesign `Runner.app` builds, 17.1 MB | Not signed or installed in G3 |
 | Package exit | Source, package configuration and both release asset trees contain no Forui, Inter or Lucide candidate artifact | Confirms the G2 package footprint is removed |
 
-The paired production Golden uses identical content, state, brightness, text
-scale and 390x844 viewport inputs for both platform variants. Pixel equality is
-not required because system font rasterization may differ; visible hierarchy,
-component family, state meaning and action priority are the acceptance target.
+Local handoff artifacts for this revision:
+
+- Android: `build/app/outputs/flutter-apk/app-release.apk`, 51,005,113 bytes,
+  SHA-256 `033da5010261a37bc0d62c188e7596a2fb82cdf7a8a6cfb8bfea7c65a26b5bc8`.
+- iOS: `build/ios/iphoneos/Runner.app`, 16,804 KiB on disk. The sorted
+  per-file SHA-256 manifest digest is
+  `3acf0a47d54924b49c5088a32562f9b40e8deced452a2c93bf027e55db7a418d`.
+  This is an unsigned app bundle, not an IPA or installable release signature.
+
+The paired production Goldens use identical content, state, brightness, text
+scale and 390x844 viewport inputs for both platform variants. They cover both
+the component set and an `AppPage` top bar. Pixel equality is not required
+because system font rasterization may differ; visible hierarchy, component
+family, state meaning and action priority are the acceptance target.
 
 ## Accessibility and interaction
 
@@ -69,6 +80,27 @@ regression suite.
 These checks prove Flutter semantics contracts, not actual TalkBack or
 VoiceOver announcement timing. Assistive-technology delivery remains part of
 the physical-device handoff.
+
+## Supervision revision
+
+The architecture reviewer returned Go on `3b9ea41`. Product/brand and
+QA/accessibility review found three direct P1 issues; the revision is limited to
+their closure:
+
+1. `AppPage` and `AppSingleChoiceList` now explicitly center the brand-owned
+   page title on both platforms. A same-content Android/iOS `AppPage` Golden
+   pair covers the top bar instead of inferring it from component-only images.
+2. Persistent feedback action and close nodes expose executable semantic tap
+   actions. Android/iOS tests activate each through the semantics pipeline,
+   verify the recovery action fires exactly once and prove close does not fire
+   recovery.
+3. Long or highly scaled field labels move above the input as an unconstrained,
+   wrapping label. The 3.72x iOS Golden shows the complete label and the A-L
+   form matrix mechanically rejects exceeded label lines.
+
+No business content, route, App host, system capability or dependency changed
+in this revision. Final review is bounded to these closures and direct P0/P1
+regressions.
 
 ## Real-device handoff checklist
 

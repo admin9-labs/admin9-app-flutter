@@ -24,7 +24,7 @@ class AppSingleChoiceList<T extends Object> extends StatelessWidget {
   Widget build(BuildContext context) {
     assert(choices.length >= 2);
     return Scaffold(
-      appBar: AppBar(title: Text(title)),
+      appBar: AppBar(centerTitle: true, title: Text(title)),
       body: RadioGroup<T>(
         groupValue: value,
         onChanged: (next) {

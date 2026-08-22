@@ -265,27 +265,47 @@ class _AppTextFieldState extends State<AppTextField> {
       enabled: widget.enabled,
       builder: (field) {
         final errorText = field.errorText;
+        final labelFontSize = tokens.labelTextStyle.fontSize ?? 14;
+        final usesExternalLabel =
+            MediaQuery.textScalerOf(context).scale(labelFontSize) > 24 ||
+            widget.label.runes.length > 12;
+        final textField = TextField(
+          controller: widget.controller,
+          focusNode: widget.focusNode,
+          keyboardType: widget.keyboardType,
+          textInputAction: widget.textInputAction,
+          autofillHints: widget.autofillHints,
+          obscureText: _obscured,
+          enabled: widget.enabled,
+          onChanged: (value) => _handleChanged(value, field),
+          onSubmitted: widget.onFieldSubmitted,
+          decoration: InputDecoration(
+            labelText: usesExternalLabel ? null : widget.label,
+            floatingLabelBehavior: FloatingLabelBehavior.always,
+            error: errorText == null ? null : const SizedBox.shrink(),
+            prefixIcon: _prefix(context),
+            suffixIcon: _visibilityToggle(context),
+          ),
+        );
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextField(
-              controller: widget.controller,
-              focusNode: widget.focusNode,
-              keyboardType: widget.keyboardType,
-              textInputAction: widget.textInputAction,
-              autofillHints: widget.autofillHints,
-              obscureText: _obscured,
-              enabled: widget.enabled,
-              onChanged: (value) => _handleChanged(value, field),
-              onSubmitted: widget.onFieldSubmitted,
-              decoration: InputDecoration(
-                labelText: widget.label,
-                floatingLabelBehavior: FloatingLabelBehavior.always,
-                error: errorText == null ? null : const SizedBox.shrink(),
-                prefixIcon: _prefix(context),
-                suffixIcon: _visibilityToggle(context),
+            if (usesExternalLabel) ...[
+              ExcludeSemantics(
+                child: Text(
+                  widget.label,
+                  maxLines: null,
+                  overflow: TextOverflow.visible,
+                  softWrap: true,
+                  style: tokens.labelTextStyle,
+                ),
               ),
-            ),
+              SizedBox(height: tokens.space8),
+            ],
+            if (usesExternalLabel)
+              Semantics(label: widget.label, child: textField)
+            else
+              textField,
             if (errorText != null) ...[
               SizedBox(height: tokens.space4),
               Semantics(

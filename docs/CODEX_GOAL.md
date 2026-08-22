@@ -19,8 +19,10 @@ be reopened or expanded. G2 is closed Go at
 `06a398a747178e1aaed4933f96806ced3c498ad8`. G3 implements the selected
 first-party route in the Demo: the Forui candidate and complete G2 POC are
 removed, while the existing `App*` API, one route tree, App host and
-system-owned behavior remain intact. Local verification is complete and the
-implementation is ready for one fixed-SHA, three-reviewer G3 supervision pass.
+system-owned behavior remain intact. Initial G3 commit `3b9ea41` received
+architecture Go plus three product/QA P1 findings. All three are closed in one
+bounded revision with same-title, executable feedback semantics, large-label
+and paired-page evidence, ready for final closure review.
 
 ## Completed
 
@@ -121,8 +123,8 @@ implementation is ready for one fixed-SHA, three-reviewer G3 supervision pass.
   non-Golden tests, 129 tagged Goldens (110 G2 plus 19 existing), every CI
   Design System/documentation gate, Android Release APK 52.9 MB and iOS
   no-codesign Release app 19.7 MB.
-- 2026-08-23: the G3 production tree passed `flutter analyze`, all 145 original
-  non-Golden regressions, 21 production Goldens in compare mode, all
+- 2026-08-23: the G3 supervision revision passed `flutter analyze`, all 146
+  non-Golden regressions, 23 production Goldens in compare mode, all
   configuration/import/candidate/Gallery/visual/documentation gates, Android
   Release APK 51,005,113 bytes and iOS no-codesign Release app 17.1 MB.
 - 2026-08-23: final Android/iOS asset scans contain no Forui, Inter or Lucide
