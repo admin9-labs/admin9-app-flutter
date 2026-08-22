@@ -1,0 +1,1 @@
+app host files may depend on candidate adapters only through

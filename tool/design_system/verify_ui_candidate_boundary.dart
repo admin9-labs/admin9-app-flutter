@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/source/line_info.dart';
+import 'package:yaml/yaml.dart';
 
 const _policyPath = 'tool/design_system/ui_candidate_boundary.json';
 const _fixtureRoot = 'tool/design_system/fixtures/ui_candidate_boundary';
@@ -39,20 +40,25 @@ Never _finish(List<String> errors, String success) {
 
 void _verifyFixtures() {
   const fixturePolicy = _Policy(
+    baselinePackages: {'existing_ui'},
     candidatePackages: {'candidate_ui'},
     adapterRoots: ['lib/core/design_system/adapters/'],
     publicBarrel: 'lib/admin9_ui.dart',
-    rootThemeFiles: {
-      'lib/app/admin9_app.dart',
-      'lib/core/design_system/foundation/app_theme.dart',
-    },
+    appHostFiles: {'lib/app/admin9_app.dart'},
+    rootThemeFiles: {'lib/core/design_system/foundation/app_theme.dart'},
   );
   final passCases = _caseDirectories('$_fixtureRoot/pass');
   final failCases = _caseDirectories('$_fixtureRoot/fail');
   final failures = <String>[];
 
   for (final fixture in passCases) {
-    final errors = _validateTree(fixture.path, fixturePolicy);
+    final errors = _validateTree(
+      fixture.path,
+      fixturePolicy,
+      verifyDeclaredDependencies: File(
+        '${fixture.path}/pubspec.yaml',
+      ).existsSync(),
+    );
     if (errors.isNotEmpty) {
       failures.add('${fixture.path}: expected pass, got ${errors.join('; ')}');
     }
@@ -64,7 +70,13 @@ void _verifyFixtures() {
       continue;
     }
     final expected = expectedFile.readAsStringSync().trim();
-    final errors = _validateTree(fixture.path, fixturePolicy);
+    final errors = _validateTree(
+      fixture.path,
+      fixturePolicy,
+      verifyDeclaredDependencies: File(
+        '${fixture.path}/pubspec.yaml',
+      ).existsSync(),
+    );
     if (!errors.any((error) => error.contains(expected))) {
       failures.add(
         '${fixture.path}: expected violation "$expected", got '
@@ -229,14 +241,10 @@ List<String> _validateTree(
         }
       }
     }
-  }
-
-  for (final rootThemeFile in policy.rootThemeFiles) {
-    final path = _pathToAdapter(rootThemeFile, dependencyGraph, adapterFiles);
-    if (path != null) {
+    for (final signature in _implicitPublicTypeSignatures(source)) {
       errors.add(
-        '$rootThemeFile: root Theme and app host files must not depend on '
-        'candidate adapters: ${path.join(' -> ')}',
+        '${_location(path, source, signature.offset)} public adapter APIs must '
+        'declare explicit types',
       );
     }
   }
@@ -247,6 +255,36 @@ List<String> _validateTree(
     exportGraph,
     partGraph,
   );
+  final adapterDependentPublicFiles = _adapterDependentPublicFiles(
+    publicFiles,
+    dependencyGraph,
+    adapterFiles,
+    partGraph,
+  );
+  for (final rootThemeFile in policy.rootThemeFiles) {
+    final path = _pathToAdapter(rootThemeFile, dependencyGraph, adapterFiles);
+    if (path != null) {
+      errors.add(
+        '$rootThemeFile: root Theme files must not depend on '
+        'candidate adapters: ${path.join(' -> ')}',
+      );
+    }
+  }
+  for (final appHostFile in policy.appHostFiles) {
+    final path = _pathToAdapter(
+      appHostFile,
+      dependencyGraph,
+      adapterFiles,
+      stopAt: {policy.publicBarrel},
+    );
+    if (path != null) {
+      errors.add(
+        '$appHostFile: app host files may depend on candidate adapters only '
+        'through ${policy.publicBarrel}: ${path.join(' -> ')}',
+      );
+    }
+  }
+
   for (final path in publicFiles) {
     final source = parsed[path];
     if (source == null) continue;
@@ -262,21 +300,18 @@ List<String> _validateTree(
         }
       }
     }
-  }
-
-  if (verifyDeclaredDependencies) {
-    final pubspec = File('$root/pubspec.yaml');
-    final manifest = pubspec.existsSync() ? pubspec.readAsStringSync() : '';
-    for (final package in policy.candidatePackages) {
-      if (!RegExp(
-        '^  ${RegExp.escape(package)}:',
-        multiLine: true,
-      ).hasMatch(manifest)) {
+    if (adapterDependentPublicFiles.contains(path)) {
+      for (final signature in _implicitPublicTypeSignatures(source)) {
         errors.add(
-          '$_policyPath lists $package but pubspec.yaml does not declare it',
+          '${_location(path, source, signature.offset)} adapter-dependent '
+          'App* public APIs must declare explicit types',
         );
       }
     }
+  }
+
+  if (verifyDeclaredDependencies) {
+    _verifyDeclaredDependencies(root, policy, errors);
   }
 
   return errors;
@@ -285,8 +320,9 @@ List<String> _validateTree(
 List<String>? _pathToAdapter(
   String start,
   Map<String, Set<String>> graph,
-  Set<String> adapterFiles,
-) {
+  Set<String> adapterFiles, {
+  Set<String> stopAt = const <String>{},
+}) {
   final pending = <List<String>>[
     [start],
   ];
@@ -296,11 +332,72 @@ List<String>? _pathToAdapter(
     final current = path.last;
     if (!visited.add(current)) continue;
     if (current != start && adapterFiles.contains(current)) return path;
+    if (current != start && stopAt.contains(current)) continue;
     for (final next in graph[current] ?? const <String>{}) {
       pending.add([...path, next]);
     }
   }
   return null;
+}
+
+void _verifyDeclaredDependencies(
+  String root,
+  _Policy policy,
+  List<String> errors,
+) {
+  final pubspec = File('$root/pubspec.yaml');
+  if (!pubspec.existsSync()) {
+    errors.add('pubspec.yaml is required for dependency classification');
+    return;
+  }
+  final manifest = loadYaml(pubspec.readAsStringSync());
+  if (manifest is! YamlMap) {
+    errors.add('pubspec.yaml must contain a YAML map');
+    return;
+  }
+
+  final declaredPackages = <String>{};
+  for (final sectionName in ['dependencies', 'dev_dependencies']) {
+    final section = manifest[sectionName];
+    if (section == null) continue;
+    if (section is! YamlMap) {
+      errors.add('pubspec.yaml $sectionName must be a map');
+      continue;
+    }
+    for (final entry in section.entries) {
+      final name = entry.key;
+      if (name is! String) continue;
+      final declaration = entry.value;
+      if (declaration is YamlMap && declaration['sdk'] != null) continue;
+      declaredPackages.add(name);
+    }
+  }
+
+  final overlap = policy.baselinePackages.intersection(
+    policy.candidatePackages,
+  );
+  for (final package in overlap.toList()..sort()) {
+    errors.add(
+      '$_policyPath classifies $package as both baseline and candidate',
+    );
+  }
+  final classifiedPackages = {
+    ...policy.baselinePackages,
+    ...policy.candidatePackages,
+  };
+  for (final package
+      in declaredPackages.difference(classifiedPackages).toList()..sort()) {
+    errors.add(
+      'pubspec.yaml declares unregistered package $package; classify it in '
+      'baselinePackages or candidatePackages',
+    );
+  }
+  for (final package
+      in classifiedPackages.difference(declaredPackages).toList()..sort()) {
+    errors.add(
+      '$_policyPath lists $package but pubspec.yaml does not declare it',
+    );
+  }
 }
 
 Set<String> _publicApiFiles(
@@ -326,6 +423,29 @@ Set<String> _publicApiFiles(
     }
   }
   return publicFiles;
+}
+
+Set<String> _adapterDependentPublicFiles(
+  Set<String> publicFiles,
+  Map<String, Set<String>> dependencyGraph,
+  Set<String> adapterFiles,
+  Map<String, Set<String>> partGraph,
+) {
+  final result = publicFiles
+      .where(
+        (path) => _pathToAdapter(path, dependencyGraph, adapterFiles) != null,
+      )
+      .toSet();
+  var changed = true;
+  while (changed) {
+    changed = false;
+    for (final library in result.toList()) {
+      for (final part in partGraph[library] ?? const <String>{}) {
+        if (publicFiles.contains(part) && result.add(part)) changed = true;
+      }
+    }
+  }
+  return result;
 }
 
 Set<String> _publicAdapterNames(String source) {
@@ -441,6 +561,90 @@ List<_Signature> _publicSignatures(_ParsedSource source) {
   return signatures;
 }
 
+List<_Signature> _implicitPublicTypeSignatures(_ParsedSource source) {
+  final signatures = <_Signature>[];
+  for (final declaration in source.unit.declarations) {
+    if (declaration is ClassDeclaration) {
+      if (_isPrivate(declaration.namePart.typeName.lexeme)) continue;
+      final body = declaration.body;
+      if (body is BlockClassBody) {
+        _addImplicitPublicMemberTypes(source, body.members, signatures);
+      }
+    } else if (declaration is EnumDeclaration) {
+      final name = _namedDeclarationName(declaration.toSource(), 'enum');
+      if (name == null || _isPrivate(name)) continue;
+      _addImplicitPublicMemberTypes(
+        source,
+        declaration.body.members,
+        signatures,
+      );
+    } else if (declaration is MixinDeclaration) {
+      final name = _namedDeclarationName(declaration.toSource(), 'mixin');
+      if (name == null || _isPrivate(name)) continue;
+      _addImplicitPublicMemberTypes(
+        source,
+        declaration.body.members,
+        signatures,
+      );
+    } else if (declaration is ExtensionTypeDeclaration) {
+      final name = _extensionTypeName(declaration.toSource());
+      if (name == null || _isPrivate(name)) continue;
+      final body = declaration.body;
+      if (body is BlockClassBody) {
+        _addImplicitPublicMemberTypes(source, body.members, signatures);
+      }
+    } else if (declaration is ExtensionDeclaration) {
+      final name = declaration.name?.lexeme;
+      if (name != null && _isPrivate(name)) continue;
+      _addImplicitPublicMemberTypes(
+        source,
+        declaration.body.members,
+        signatures,
+      );
+    } else if (declaration is FunctionDeclaration &&
+        !_isPrivate(declaration.name.lexeme) &&
+        declaration.returnType == null) {
+      signatures.add(
+        _slice(
+          source.source,
+          declaration.offset,
+          declaration.functionExpression.body.offset,
+        ),
+      );
+    } else if (declaration is TopLevelVariableDeclaration &&
+        declaration.variables.type == null &&
+        declaration.variables.variables.any(
+          (variable) => !_isPrivate(variable.name.lexeme),
+        )) {
+      signatures.add(
+        _slice(source.source, declaration.offset, declaration.end),
+      );
+    }
+  }
+  return signatures;
+}
+
+void _addImplicitPublicMemberTypes(
+  _ParsedSource source,
+  Iterable<ClassMember> members,
+  List<_Signature> signatures,
+) {
+  for (final member in members) {
+    if (member is MethodDeclaration &&
+        !_isPrivate(member.name.lexeme) &&
+        !member.isSetter &&
+        member.returnType == null) {
+      signatures.add(_slice(source.source, member.offset, member.body.offset));
+    } else if (member is FieldDeclaration &&
+        member.fields.type == null &&
+        member.fields.variables.any(
+          (variable) => !_isPrivate(variable.name.lexeme),
+        )) {
+      signatures.add(_slice(source.source, member.offset, member.end));
+    }
+  }
+}
+
 void _addPublicMemberSignatures(
   _ParsedSource source,
   Iterable<ClassMember> members,
@@ -542,24 +746,30 @@ _Policy _readPolicy(File file) {
           .whereType<String>()
           .toSet();
   return _Policy(
+    baselinePackages: readSet('baselinePackages'),
     candidatePackages: readSet('candidatePackages'),
     adapterRoots: readSet('adapterRoots').toList()..sort(),
     publicBarrel: value['publicBarrel'] as String,
+    appHostFiles: readSet('appHostFiles'),
     rootThemeFiles: readSet('rootThemeFiles'),
   );
 }
 
 final class _Policy {
   const _Policy({
+    required this.baselinePackages,
     required this.candidatePackages,
     required this.adapterRoots,
     required this.publicBarrel,
+    required this.appHostFiles,
     required this.rootThemeFiles,
   });
 
+  final Set<String> baselinePackages;
   final Set<String> candidatePackages;
   final List<String> adapterRoots;
   final String publicBarrel;
+  final Set<String> appHostFiles;
   final Set<String> rootThemeFiles;
 }
 

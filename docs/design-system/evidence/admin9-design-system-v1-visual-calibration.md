@@ -15,10 +15,10 @@ runtime acceptance.
 
 | Page | Android | iOS | Covered states |
 | --- | --- | --- | --- |
-| Main navigation and list | [PNG](visual-references/android/account.png) / [SVG](visual-references/android/account.svg) | [PNG](visual-references/ios/account.png) / [SVG](visual-references/ios/account.svg) | guest, signed-in sample, missing identity field, selected navigation, large-text danger endpoint |
-| Login and registration | [PNG](visual-references/android/auth.png) / [SVG](visual-references/android/auth.svg) | [PNG](visual-references/ios/auth.png) / [SVG](visual-references/ios/auth.svg) | register, login comparison, field errors, unavailable notice, focus/hit annotations |
-| Settings form | [PNG](visual-references/android/settings.png) / [SVG](visual-references/android/settings.svg) | [PNG](visual-references/ios/settings.png) / [SVG](visual-references/ios/settings.svg) | defaults, selected choice, system/App conflict, switches |
-| Dialog and feedback | [PNG](visual-references/android/feedback.png) / [SVG](visual-references/android/feedback.svg) | [PNG](visual-references/ios/feedback.png) / [SVG](visual-references/ios/feedback.svg) | confirmation, long text, loading, empty, recoverable error, disabled command |
+| Main navigation and list | [PNG](visual-references/android/account.png) / [SVG](visual-references/android/account.svg) | [PNG](visual-references/ios/account.png) / [SVG](visual-references/ios/account.svg) | signed-in light/dark samples, large-text long Chinese reflow, empty list, recoverable list error, selected navigation |
+| Login and registration | [PNG](visual-references/android/auth.png) / [SVG](visual-references/android/auth.svg) | [PNG](visual-references/ios/auth.png) / [SVG](visual-references/ios/auth.svg) | focused registration field, dark registration baseline, large-text long field error, login alternative, unavailable notice |
+| Settings form | [PNG](visual-references/android/settings.png) / [SVG](visual-references/android/settings.svg) | [PNG](visual-references/ios/settings.png) / [SVG](visual-references/ios/settings.svg) | light/dark baselines, large-text persistence error, selected theme choice, system/App effective-state explanation |
+| Dialog and feedback | [PNG](visual-references/android/feedback.png) / [SVG](visual-references/android/feedback.svg) | [PNG](visual-references/ios/feedback.png) / [SVG](visual-references/ios/feedback.svg) | action menu with unavailable/destructive/cancel actions, confirmation dialog, large-text error/empty/determinate progress, pressed/disabled/focus/indeterminate/feedback states |
 
 ## 2. Repeated rules versus page exceptions
 
@@ -34,38 +34,52 @@ automatically become Tokens or generic components.
 
 ## 3. Contrast calculation
 
-Method: WCAG sRGB relative luminance as specified in Foundations. Values below are calculated from exact hex pairs; `Pass` means the frozen color pair meets the mathematical target, not that Flutter/device output has passed.
+Method: WCAG sRGB relative luminance as specified in Foundations. Values below
+are generated from the exact palette and foreground/background combinations
+used by the reference generator. Roles not rendered by these boards, including
+`secondary`, `warning`, and `success`, are deliberately excluded. `Pass` means
+the mathematical pair meets the target, not that Flutter/device output has
+passed. The asset verifier fails when this generated block drifts from the
+generator palette.
 
+<!-- BEGIN GENERATED CONTRAST TABLE -->
 | Pair | Ratio | Target | Result |
 | --- | --- | --- | --- |
 | light text/background | 16.41:1 | 4.5 | Pass |
 | light text/surface | 17.44:1 | 4.5 | Pass |
-| light primary/onPrimary | 7.01:1 | 4.5 | Pass |
-| light secondary/onSecondary | 6.46:1 | 4.5 | Pass |
+| light text/surfaceContainer | 15.39:1 | 4.5 | Pass |
+| light supporting/background | 7.11:1 | 4.5 | Pass |
+| light supporting/surface | 7.56:1 | 4.5 | Pass |
+| light disabled text/surfaceContainer | 6.67:1 | 4.5 | Pass |
+| light onPrimary/primary | 7.01:1 | 4.5 | Pass |
+| light danger/background | 6.15:1 | 4.5 | Pass |
+| light danger/surface | 6.54:1 | 4.5 | Pass |
+| light info/surfaceContainer | 6.57:1 | 4.5 | Pass |
 | light outline/surface | 4.76:1 | 3.0 | Pass |
-| light danger/onDanger | 6.54:1 | 4.5 | Pass |
-| light warning/onWarning | 7.75:1 | 4.5 | Pass |
-| light info/onInfo | 7.45:1 | 4.5 | Pass |
-| light success/onSuccess | 6.43:1 | 4.5 | Pass |
-| light disabled text/container | 4.98:1 | 4.5 | Pass |
+| light primary/background | 6.60:1 | 4.5 | Pass |
+| light primary/surface | 7.01:1 | 4.5 | Pass |
+| light primary/surfaceContainer | 6.18:1 | 4.5 | Pass |
 | dark text/background | 16.76:1 | 4.5 | Pass |
 | dark text/surface | 15.37:1 | 4.5 | Pass |
-| dark primary/onPrimary | 8.30:1 | 4.5 | Pass |
-| dark secondary/onSecondary | 9.20:1 | 4.5 | Pass |
+| dark text/surfaceContainer | 13.14:1 | 4.5 | Pass |
+| dark supporting/background | 10.86:1 | 4.5 | Pass |
+| dark supporting/surface | 9.96:1 | 4.5 | Pass |
+| dark disabled text/surfaceContainer | 8.51:1 | 4.5 | Pass |
+| dark onPrimary/primary | 8.30:1 | 4.5 | Pass |
+| dark danger/background | 10.88:1 | 4.5 | Pass |
+| dark danger/surface | 9.97:1 | 4.5 | Pass |
+| dark info/surfaceContainer | 8.96:1 | 4.5 | Pass |
 | dark outline/surface | 6.22:1 | 3.0 | Pass |
-| dark danger/onDanger | 7.71:1 | 4.5 | Pass |
-| dark warning/onWarning | 8.39:1 | 4.5 | Pass |
-| dark info/onInfo | 7.65:1 | 4.5 | Pass |
-| dark success/onSuccess | 7.31:1 | 4.5 | Pass |
-| dark disabled text/container | 6.15:1 | 4.5 | Pass |
-| light focus/background | 6.60:1 | 3.0 | Pass |
-| light focus/surface | 7.01:1 | 3.0 | Pass |
-| light focus/surfaceContainer | 6.18:1 | 3.0 | Pass |
-| dark focus/background | 10.86:1 | 3.0 | Pass |
-| dark focus/surface | 9.95:1 | 3.0 | Pass |
-| dark focus/surfaceContainer | 8.51:1 | 3.0 | Pass |
+| dark primary/background | 10.86:1 | 4.5 | Pass |
+| dark primary/surface | 9.95:1 | 4.5 | Pass |
+| dark primary/surfaceContainer | 8.51:1 | 4.5 | Pass |
+<!-- END GENERATED CONTRAST TABLE -->
 
-Pressed/focus state-layer composites require post-composite calculation in implementation and remain Unknown; the solid 2px focus-ring pairs above are calculated. High-contrast resolved colors, grayscale rendering, and device antialiasing remain Unknown.
+Pressed/focus state-layer composites require post-composite calculation in
+implementation and remain Unknown. The primary pairs above also cover the
+solid 2px focus ring where it is rendered, and use the stricter ordinary-text
+target because the same pairs render links and actions. High-contrast resolved
+colors, grayscale rendering, and device antialiasing remain Unknown.
 
 ## 4. Bounds and responsive calibration
 

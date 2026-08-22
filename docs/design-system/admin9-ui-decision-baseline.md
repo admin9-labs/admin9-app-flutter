@@ -127,8 +127,13 @@ Candidate imports and indirect public-type leakage are mechanically checked by
 allowed only in the configured Design System adapter root and must use a
 prefix. The gate rejects candidate exports, candidate types in adapter public
 signatures, public adapter context extensions, adapter types in exported
-`App*` signatures, and root Theme/app-host imports of adapters. G2 adds the
-chosen exact package names to the policy before candidate code is accepted.
+`App*` signatures, and inferred public types in adapters or adapter-dependent
+`App*` sources. Root Theme files cannot reach adapters; the App host can reach
+them only through the public `admin9_ui.dart` barrel. Every direct non-SDK
+dependency must be classified as either a checked baseline package or a named
+candidate, and the policy is checked in both directions against `pubspec.yaml`.
+G2 adds the chosen exact package names to the policy before candidate code is
+accepted.
 
 Golden tests protect each platform's approved rendering. Cross-platform unity
 is evaluated with shared structure/token assertions, paired human review, and
@@ -172,6 +177,10 @@ every comparison object must rerun against the same new reference commit.
 
 ## Change log
 
+- 2026-08-23: closed the fixed-commit P1 review findings. Distinguished legal
+  App-host/barrel encapsulation from root Theme leakage, added bidirectional
+  dependency classification and explicit public-type gates, repaired pressed
+  reference rendering, and bound calibration ratios to the generator palette.
 - 2026-08-22: revised G1 after independent review. Separated the current
   implementation control from first-party and third-party candidates, narrowed
   `App*` to visible UI, added executable candidate leakage gates, froze the

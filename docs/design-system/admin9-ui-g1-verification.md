@@ -1,8 +1,8 @@
 # Admin9 UI Unification G1 Verification
 
-Date: 2026-08-22
-Gate: revised paired references, ownership, and executable entry rules
-Result before independent re-review: Ready for fixed-commit review
+Date: 2026-08-23
+Gate: bounded closure of confirmed G1 P1 findings
+Result before final bounded re-review: Ready for fixed-commit review
 
 ## Fixed inputs
 
@@ -27,7 +27,7 @@ Result before independent re-review: Ready for fixed-commit review
 - Generated SVG source, PNG review assets, SHA-256 manifest, generator, and
   verifier.
 - Candidate boundary policy, repository validator, one positive fixture, and
-  18 exact negative fixtures.
+  22 exact negative fixtures.
 
 ## First-review revision closure
 
@@ -56,6 +56,16 @@ Result before independent re-review: Ready for fixed-commit review
 | Cover public declaration shapes | Candidate signatures cover classes, enums, mixins, extension types, functions, extensions, typedefs, top-level variables, fields, methods, and constructors |
 | Correct Golden classification and CI selection | Nineteen comparison tests are individually tagged; two ordinary layout/semantics stress tests remain in the 145-test default suite |
 
+## Fixed-commit review at `6c30ac4` revision closure
+
+| Confirmed P1 | Closure evidence |
+| --- | --- |
+| Legal host/barrel topology was rejected | App host and root Theme policies are distinct; the positive fixture now follows `MaterialApp host -> admin9_ui.dart -> App* -> private adapter`, while direct host and direct/indirect/re-exported root Theme paths remain negative |
+| Unregistered dependencies were fail-open | Structured `pubspec.yaml` parsing classifies every direct non-SDK dependency in exactly one of `baselinePackages` or `candidatePackages`, checks policy entries back against the manifest, and includes an unregistered-package negative fixture |
+| Inferred public API could evade source-signature checks | Public getters, methods, functions, variables, and fields in adapters and adapter-dependent exported `App*` libraries and parts require explicit source types; direct and `part` getter-based inferred-leak fixtures are rejected without relying on the disproved `dynamic` claim |
+| Pressed reference PNG rendered pure black | The generator now emits `fill="#000000" fill-opacity="0.1"`; the verifier rejects the old 8-digit SVG fill, regenerated feedback PNGs show a darkened blue state layer, and all eight boards were visually rechecked |
+| Visual calibration document was stale | Page-state descriptions now match the four current variants; the contrast table contains only actual generator foreground/background combinations and is mechanically recomputed from the exported generator palette |
+
 ## Checks
 
 | Check | Result | Meaning |
@@ -64,12 +74,12 @@ Result before independent re-review: Ready for fixed-commit review
 | `flutter test --exclude-tags golden` | Pass, 145 tests | Existing non-Golden old-contract behavior is stable; does not prove visual unity |
 | `flutter test --tags golden test/design_system_phase_5_golden_test.dart` | Pass, 19 tests | Existing v1 Flutter rendering remains stable; there is no G1 unified candidate rendering to prove |
 | Generator syntax | Pass | Reference generator and verifier parse on local Node.js |
-| Asset verification | Pass, 16 assets | SVG/PNG dimensions, required state labels, and recorded hashes match |
+| Asset verification | Pass, 16 assets | SVG/PNG dimensions, required state labels, pressed-overlay syntax, recorded hashes, and generated contrast table match |
 | Normalized paired structure | Pass, four scenarios | After removing only approved platform annotations, Android/iOS SVG sources are identical |
-| 2400x1200 visual inspection | Pass, eight boards after auth spacing and Account reflow/state corrections | No observed crop, overlap, missing required state, or platform color swap |
+| 2400x1200 visual inspection | Pass, all eight regenerated boards | No observed crop, overlap, missing required state, platform color swap, or black pressed-state block |
 | Existing import/public API/Gallery gates | Pass | Existing architecture gates remain intact |
-| UI candidate boundary fixtures | Pass, one positive and 18 negative | Import/export/part, conditional URI, public declaration, adapter, and root-host leakage paths fail before POC |
-| UI candidate repository scan | Pass with no configured candidate package | G1 has no hidden candidate dependency; G2 must add exact package names before code |
+| UI candidate boundary fixtures | Pass, one positive and 22 negative | Legal host/barrel encapsulation passes; imports/exports/parts, conditional URIs, inferred/explicit public types, unregistered dependencies, adapters, root Theme, and direct app-host leakage fail before POC |
+| UI candidate repository scan | Pass with no configured candidate package | All current direct non-SDK dependencies match the baseline; G2 must classify exact candidate packages before code |
 | Documentation verification | Pass, 63 Markdown files | Local links, anchors, tables, fences, and whitespace are valid |
 | Dart formatting and `git diff --check` | Pass | Source formatting and whitespace integrity |
 
@@ -94,7 +104,7 @@ Result before independent re-review: Ready for fixed-commit review
 
 ## G1 review rule
 
-Independent reviewers inspect only the fixed commit containing this report,
-the target/decision documents, generated reference assets, stage diff, and the
-checks above. Each returns Go, Revise, or Block with evidence locations and
-required work before POC selection.
+The final bounded review inspects only closure of the confirmed `6c30ac4` P1
+items above and direct P0/P1 regressions introduced by that closure. P2 findings
+are recorded for G2; reviewers do not reopen settled product direction, add new
+G1 scenarios, or expand the G1 evidence matrix.

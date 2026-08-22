@@ -14,10 +14,9 @@ areas, and accessibility keep their platform behavior.
 
 ## Current stage
 
-G1 revised candidate verified locally. The first fixed-commit review returned
-three Revise results; the required reference-state, ownership, boundary,
-accessibility, severity, resource, and stage-gate corrections are ready for a
-new fixed-commit review.
+The three fixed-SHA supervision reports for `6c30ac4` returned Revise with no
+P0 or Block. Their five confirmed P1 findings are closed locally as one bounded
+change set and are ready for one final fixed-commit closure/regression review.
 
 ## Completed
 
@@ -47,6 +46,10 @@ new fixed-commit review.
   context extensions, wrapper/controller leakage, and root Theme imports.
 - Added functional owners, P0/P1 definitions, candidate resource limits,
   fixed-reference rules, removal proof, and G1-G3 entry/exit gates.
+- Closed the `6c30ac4` P1 set without changing production UI: legal
+  host/barrel encapsulation, bidirectional dependency classification, explicit
+  adapter-dependent public types, compatible pressed-state SVG opacity, and
+  generator-bound visual calibration.
 
 ## Verification evidence
 
@@ -69,6 +72,9 @@ new fixed-commit review.
   paired-reference assets and manifest.
 - 2026-08-22: documentation links/structure, Dart formatting, and
   `git diff --check` passed.
+- 2026-08-23: candidate fixtures passed one legal topology and 22 focused
+  negative cases; repository dependency/boundary scanning and all 16 visual
+  assets passed, and all eight 2400x1200 boards were visually rechecked.
 - Current visible branching is present in `AppButton`, `AppTextField`,
   `AppPage`, `AppBottomNavigation`, `AppDialog`, `AppActionMenu`, `AppSwitch`,
   `AppListTile`, feedback, progress, icon mapping, and shell scaffolds.
@@ -98,9 +104,9 @@ POCs, or Demo implementation.
 
 ## Next
 
-1. Commit the verified G1 correction snapshot without amending the first G1
-   commit.
-2. Run three independent read-only G1 reviews against that exact commit and
-   revise until all return Go.
-3. After G1 Go, screen one primary and at most one backup package, then build
-   removable, `App*`-contained comparison POCs against the same reference SHA.
+1. Commit the bounded P1 closure as a new SHA without amending `6c30ac4`.
+2. Run one final review limited to existing-P1 closure and direct P0/P1
+   regressions; record P2 without expanding G1.
+3. Enter G2 to screen one primary and at most one evidence-triggered backup,
+   then build removable, `App*`-contained comparison POCs against the same
+   reference SHA.

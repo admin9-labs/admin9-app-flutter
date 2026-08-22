@@ -1,13 +1,28 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 
-const outRoot = process.argv[2];
-if (!outRoot) throw new Error('usage: node generate_visual_references.mjs <output-dir>');
-
-const palettes = {
+export const palettes = {
   light: { bg: '#F7F8FA', surface: '#FFFFFF', container: '#EEF1F4', text: '#171A1F', muted: '#4B5563', outline: '#687482', primary: '#2457A7', onPrimary: '#FFFFFF', danger: '#B3261E', warning: '#714B00', info: '#245A7A', success: '#246B45' },
   dark: { bg: '#111418', surface: '#191D22', container: '#242A31', text: '#F2F4F7', muted: '#C1C7D0', outline: '#929EAC', primary: '#AFC6FF', onPrimary: '#102A56', danger: '#FFB4AB', warning: '#F4C06A', info: '#A9D1EA', success: '#8FD5AA' },
 };
+
+export const calibrationPairs = [
+  { label: 'text/background', foreground: 'text', background: 'bg', target: 4.5 },
+  { label: 'text/surface', foreground: 'text', background: 'surface', target: 4.5 },
+  { label: 'text/surfaceContainer', foreground: 'text', background: 'container', target: 4.5 },
+  { label: 'supporting/background', foreground: 'muted', background: 'bg', target: 4.5 },
+  { label: 'supporting/surface', foreground: 'muted', background: 'surface', target: 4.5 },
+  { label: 'disabled text/surfaceContainer', foreground: 'muted', background: 'container', target: 4.5 },
+  { label: 'onPrimary/primary', foreground: 'onPrimary', background: 'primary', target: 4.5 },
+  { label: 'danger/background', foreground: 'danger', background: 'bg', target: 4.5 },
+  { label: 'danger/surface', foreground: 'danger', background: 'surface', target: 4.5 },
+  { label: 'info/surfaceContainer', foreground: 'info', background: 'container', target: 4.5 },
+  { label: 'outline/surface', foreground: 'outline', background: 'surface', target: 3.0 },
+  { label: 'primary/background', foreground: 'primary', background: 'bg', target: 4.5 },
+  { label: 'primary/surface', foreground: 'primary', background: 'surface', target: 4.5 },
+  { label: 'primary/surfaceContainer', foreground: 'primary', background: 'container', target: 4.5 },
+];
 
 const esc = (value) => String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
 const rect = (x, y, w, h, fill, stroke = 'none', r = 0, dash = '') => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r}" fill="${fill}" stroke="${stroke}"${dash ? ` stroke-dasharray="${dash}"` : ''}/>`;
@@ -280,7 +295,7 @@ function feedback(platform, theme, large, variant = 'dialog') {
   } else {
     s += text(20, 140, '交互状态', 13, p.muted, 650);
     s += rect(20, 166, 166, 48, p.primary, 'none', 8);
-    s += rect(20, 166, 166, 48, '#0000001A', 'none', 8);
+    s += `<rect x="20" y="166" width="166" height="48" rx="8" fill="#000000" fill-opacity="0.1" stroke="none"/>`;
     s += text(103, 197, '按下状态', 15, p.onPrimary, 650, 'middle');
     s += rect(204, 166, 166, 48, p.container, p.outline, 8);
     s += text(287, 197, '禁用操作', 15, p.muted, 650, 'middle');
@@ -338,10 +353,17 @@ function board(platform, page) {
   return s;
 }
 
-for (const platform of ['android', 'ios']) {
-  const dir = path.join(outRoot, platform);
-  fs.mkdirSync(dir, { recursive: true });
-  for (const page of ['account', 'auth', 'settings', 'feedback']) {
-    fs.writeFileSync(path.join(dir, `${page}.svg`), board(platform, page));
+export function generateVisualReferences(outRoot) {
+  if (!outRoot) throw new Error('usage: node generate_visual_references.mjs <output-dir>');
+  for (const platform of ['android', 'ios']) {
+    const dir = path.join(outRoot, platform);
+    fs.mkdirSync(dir, { recursive: true });
+    for (const page of ['account', 'auth', 'settings', 'feedback']) {
+      fs.writeFileSync(path.join(dir, `${page}.svg`), board(platform, page));
+    }
   }
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  generateVisualReferences(process.argv[2]);
 }

@@ -1,10 +1,18 @@
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+import { calibrationPairs, palettes } from './generate_visual_references.mjs';
 
 const root = process.argv[2] ?? 'docs/design-system/evidence/visual-references';
 const write = process.argv.includes('--write');
 const manifestPath = path.join(root, 'visual-assets.json');
+const calibrationPath = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  '..',
+  'admin9-design-system-v1-visual-calibration.md',
+);
 const requiredScenarioLabels = {
   account: ['已登录列表', '长中文重排', '这是用于验证长中文内容增长的', '暂无可用账号能力', '列表载入失败', '重试'],
   auth: ['键盘焦点', '注册基准态', '创建账号', '请输入手机号或邮箱', '两次密码不一致', '内容不会被裁切', '信息：服务未接入', '登录替代态'],
@@ -22,6 +30,19 @@ for (const platform of ['android', 'ios']) {
 }
 
 const sha256 = (buffer) => crypto.createHash('sha256').update(buffer).digest('hex');
+const linearize = (channel) => channel <= 0.04045
+  ? channel / 12.92
+  : ((channel + 0.055) / 1.055) ** 2.4;
+const luminance = (hex) => {
+  const channels = hex.slice(1).match(/.{2}/g).map((value) => parseInt(value, 16) / 255);
+  return 0.2126 * linearize(channels[0])
+    + 0.7152 * linearize(channels[1])
+    + 0.0722 * linearize(channels[2]);
+};
+const contrast = (foreground, background) => {
+  const values = [luminance(foreground), luminance(background)].sort((left, right) => right - left);
+  return (values[0] + 0.05) / (values[1] + 0.05);
+};
 const pngSize = (buffer) => {
   if (buffer.toString('ascii', 1, 4) !== 'PNG') throw new Error('invalid PNG signature');
   return { width: buffer.readUInt32BE(16), height: buffer.readUInt32BE(20) };
@@ -45,6 +66,14 @@ const assets = expected.map((relativePath) => {
     for (const label of ['设计参考，非当前 App / 模拟器 / 设备截图', '浅色', '深色', 'App 特大 1.24 × 系统标准', '390lp', '同一 Admin9 可见契约', '系统交互差异单独验收', ...requiredScenarioLabels[page]]) {
       if (!source.includes(label)) throw new Error(`${relativePath}: missing label ${label}`);
     }
+    if (page === 'feedback') {
+      if (source.includes('#0000001A')) {
+        throw new Error(`${relativePath}: pressed overlay uses unsupported 8-digit SVG fill`);
+      }
+      if (!source.includes('fill="#000000" fill-opacity="0.1"')) {
+        throw new Error(`${relativePath}: pressed overlay must use explicit 10% opacity`);
+      }
+    }
   }
   if (width !== 2400 || height !== 1200) {
     throw new Error(`${relativePath}: expected 2400x1200, got ${width}x${height}`);
@@ -63,6 +92,30 @@ for (const page of ['account', 'auth', 'settings', 'feedback']) {
   if (android !== ios) {
     throw new Error(`${page}: visible Android/iOS structure drifted outside allowed annotations`);
   }
+}
+
+const contrastRows = [];
+for (const theme of ['light', 'dark']) {
+  for (const pair of calibrationPairs) {
+    const ratio = contrast(
+      palettes[theme][pair.foreground],
+      palettes[theme][pair.background],
+    );
+    contrastRows.push(
+      `| ${theme} ${pair.label} | ${ratio.toFixed(2)}:1 | ${pair.target.toFixed(1)} | ${ratio >= pair.target ? 'Pass' : 'Fail'} |`,
+    );
+  }
+}
+const contrastTable = [
+  '<!-- BEGIN GENERATED CONTRAST TABLE -->',
+  '| Pair | Ratio | Target | Result |',
+  '| --- | --- | --- | --- |',
+  ...contrastRows,
+  '<!-- END GENERATED CONTRAST TABLE -->',
+].join('\n');
+const calibration = fs.readFileSync(calibrationPath, 'utf8');
+if (!calibration.includes(contrastTable)) {
+  throw new Error(`${calibrationPath}: contrast table is stale or does not match the generator palette`);
 }
 
 const manifest = {
