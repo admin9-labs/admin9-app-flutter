@@ -312,7 +312,13 @@ void main() {
           expect(feedbackNodes.evaluate(), hasLength(1));
           expect(focus.focusNode!.hasFocus, isTrue);
 
-          await tester.pump();
+          await pumpG2Candidate(
+            tester,
+            candidate: candidate,
+            scenario: G2CandidateScenario.feedback,
+            evidenceState: G2CandidateEvidenceState.alternate,
+            platform: TargetPlatform.android,
+          );
           expect(feedbackNodes.evaluate(), hasLength(1));
           expect(focus.focusNode!.hasFocus, isTrue);
         } finally {

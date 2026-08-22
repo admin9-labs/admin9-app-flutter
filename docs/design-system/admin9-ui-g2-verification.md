@@ -37,7 +37,7 @@ or production integration.
 
 | Evidence | Result | Meaning |
 | --- | --- | --- |
-| Widget contracts | 21 focused tests pass | Both platforms cover executable button/switch semantics, disabled actions, registration keyboard/autofill/focus/password behavior, navigation, empty/error/menu/dialog/progress states, 320x720 at 3x text, and appearing feedback |
+| Widget contracts | 21 focused tests pass | Both platforms cover executable button/switch semantics, disabled actions and the 320x720 at 3x matrix; the focused registration input test covers keyboard/autofill/focus/password metadata; navigation, empty/error/menu/dialog/progress and appearing feedback are also covered |
 | Announcement contract | Appearing error has one live-region node, survives rebuild without duplication, and retains the prior focus for first-party and Forui | Static `liveRegion` presence is not treated as sufficient evidence |
 | Golden contracts | 110 pass: 96 scenario matrix images, 6 pressed images and 8 first-party 320x720 dark/high-contrast/3x stress images | Matrix inputs are deterministic; Android/iOS images are not expected to be pixel-equal |
 | Golden matrix | Each renderer/platform/scenario has baseline light, baseline dark, baseline light at 1.24x and alternate light | Dark, scaled text and recovery content are no longer inferred from one light image |
