@@ -51,6 +51,28 @@ void main() {
     }, tags: 'golden');
   }
 
+  for (final row in const [
+    _GoldenRow('g3_android', TargetPlatform.android, Size(390, 844), 1, 1),
+    _GoldenRow('g3_ios', TargetPlatform.iOS, Size(390, 844), 1, 1),
+  ]) {
+    testWidgets('G3 paired component baseline ${row.name}', (tester) async {
+      final controller = TextEditingController(text: 'admin9@example.com');
+      final focusNode = FocusNode();
+      addTearDown(controller.dispose);
+      addTearDown(focusNode.dispose);
+      await _pumpComponentGolden(
+        tester,
+        row: row,
+        controller: controller,
+        focusNode: focusNode,
+      );
+      await expectLater(
+        find.byKey(const Key('component-golden-boundary')),
+        matchesGoldenFile('goldens/components_${row.name}.png'),
+      );
+    }, tags: 'golden');
+  }
+
   testWidgets(
     'Phase 5 Home page golden',
     (tester) async {

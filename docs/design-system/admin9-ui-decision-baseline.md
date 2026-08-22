@@ -120,10 +120,15 @@ G2 implemented Forui 0.25.0 as the primary package candidate and retained
 recommends the first-party unified route: it met the fixed POC contract without
 a named package-only capability gap, while Forui required substantial wrappers,
 bundled font/license handling, semantics and typography compatibility work,
-pressure-layout exceptions, and still lacked progress parity. The first review
-round returned Revise; its confirmed P1 findings are closed in the supervision
-revision and await a bounded closure review. This does not approve final visual
-tokens, Demo acceptance, or Starter migration.
+pressure-layout exceptions, and still lacked progress parity. Three bounded
+closure reviewers returned Go on G2 commit
+`06a398a747178e1aaed4933f96806ced3c498ad8`.
+
+G3 therefore selects the first-party route for this Demo. Forui, its transitive
+packages and the complete G2 POC are removed before production integration.
+This is an evidence-based component implementation decision, not a general ban
+on third-party packages, approval of final visual tokens, real-device Demo
+acceptance, or authorization for Starter migration.
 
 `App*` owns visible, business-neutral component presentation. It does not own
 permissions, sharing, system pickers, keyboard services, autofill, or other
@@ -179,14 +184,15 @@ every comparison object must rerun against the same new reference commit.
 ## Undecided
 
 - Final brand art direction and approver acceptance.
-- Final production implementation route; G2 recommends first-party pending the
-  bounded closure review and G3 production evidence.
 - Final font, type metrics, icon family, spacing, radii, and component geometry.
 - Design System release/version naming.
 - Starter migration scope and migration sequence.
 
 ## Change log
 
+- 2026-08-23: closed G2 Go at `06a398a`, selected the first-party route for the
+  Demo, and removed Forui from G3 production integration while retaining the
+  package-neutral `App*` boundary.
 - 2026-08-23: closed the G2 supervision P1 set with a fixed baseline/alternate
   scenario matrix, executable semantics, announcement timing/focus checks, 110
   Golden images, real pressed pixels, a regenerated CJK subset, pressure-layout

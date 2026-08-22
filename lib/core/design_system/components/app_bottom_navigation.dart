@@ -1,9 +1,7 @@
-import 'dart:math' as math;
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../foundation/app_contracts.dart';
+import '../foundation/app_design_tokens.dart';
 import 'app_icon.dart';
 
 class AppBottomNavigation extends StatelessWidget {
@@ -22,40 +20,71 @@ class AppBottomNavigation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final platform = Theme.of(context).platform;
-    if (platform == TargetPlatform.iOS) {
-      final scaler = MediaQuery.textScalerOf(context);
-      final contentHeight = scaler.scale(24) + scaler.scale(10) + 12;
-      return CupertinoTabBar(
-        height: math.max(50, contentHeight),
-        currentIndex: selectedIndex,
-        onTap: onDestinationSelected,
-        items: destinations
-            .map(
-              (destination) => BottomNavigationBarItem(
-                icon: Icon(resolveAppIcon(destination.icon, platform)),
-                activeIcon: Icon(
-                  resolveAppIcon(destination.selectedIcon, platform),
+    final tokens = AppDesignScope.of(context);
+    return Material(
+      color: tokens.surface,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          border: Border(top: BorderSide(color: tokens.outline)),
+        ),
+        child: SafeArea(
+          top: false,
+          child: Row(
+            children: [
+              for (final (index, destination) in destinations.indexed)
+                Expanded(
+                  child: Semantics(
+                    button: true,
+                    selected: selectedIndex == index,
+                    label: destination.label,
+                    onTap: () => onDestinationSelected(index),
+                    child: ExcludeSemantics(
+                      child: InkWell(
+                        onTap: () => onDestinationSelected(index),
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(minHeight: 56),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: tokens.space4,
+                              vertical: tokens.space8,
+                            ),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  resolveAppIcon(
+                                    selectedIndex == index
+                                        ? destination.selectedIcon
+                                        : destination.icon,
+                                    platform,
+                                  ),
+                                  color: selectedIndex == index
+                                      ? tokens.primary
+                                      : tokens.onSurfaceContainer,
+                                ),
+                                SizedBox(height: tokens.space4),
+                                Text(
+                                  destination.label,
+                                  textAlign: TextAlign.center,
+                                  style: tokens.captionTextStyle.copyWith(
+                                    color: selectedIndex == index
+                                        ? tokens.primary
+                                        : tokens.onSurfaceContainer,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
-                label: destination.label,
-              ),
-            )
-            .toList(growable: false),
-      );
-    }
-    return NavigationBar(
-      selectedIndex: selectedIndex,
-      onDestinationSelected: onDestinationSelected,
-      destinations: destinations
-          .map(
-            (destination) => NavigationDestination(
-              icon: Icon(resolveAppIcon(destination.icon, platform)),
-              selectedIcon: Icon(
-                resolveAppIcon(destination.selectedIcon, platform),
-              ),
-              label: destination.label,
-            ),
-          )
-          .toList(growable: false),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

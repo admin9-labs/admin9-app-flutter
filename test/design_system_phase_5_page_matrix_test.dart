@@ -159,7 +159,7 @@ Future<void> _verifySettingsStress(WidgetTester tester, _MatrixRow row) async {
         ),
         findsWidgets,
       );
-      await tester.pageBack();
+      await tester.binding.handlePopRoute();
       await tester.pumpAndSettle();
     case 'E':
     case 'F':

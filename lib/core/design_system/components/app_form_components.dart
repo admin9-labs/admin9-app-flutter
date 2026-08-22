@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../foundation/app_contracts.dart';
@@ -25,19 +24,19 @@ class AppButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final platform = Theme.of(context).platform;
     final tokens = AppDesignScope.of(context);
     final callback = enabled && !loading ? onPressed : null;
+    final foreground = switch (variant) {
+      AppButtonVariant.primary => tokens.onPrimary,
+      AppButtonVariant.destructive => tokens.onDanger,
+      _ => tokens.primary,
+    };
     final content = _ButtonContent(
       label: label,
       icon: icon,
       loading: loading,
-      platform: platform,
-      progressColor: tokens.onSurface,
+      progressColor: foreground,
     );
-    final button = platform == TargetPlatform.iOS
-        ? _cupertinoButton(tokens, callback, content)
-        : _materialButton(tokens, callback, content);
 
     return Semantics(
       button: true,
@@ -46,12 +45,15 @@ class AppButton extends StatelessWidget {
       value: loading ? '加载中' : null,
       liveRegion: loading,
       onTap: callback,
-      child: ExcludeSemantics(child: button),
+      child: ExcludeSemantics(
+        child: _button(tokens, foreground, callback, content),
+      ),
     );
   }
 
-  Widget _materialButton(
+  Widget _button(
     AppDesignTokens tokens,
+    Color foreground,
     VoidCallback? callback,
     Widget child,
   ) {
@@ -65,6 +67,10 @@ class AppButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(tokens.controlRadius),
         ),
       ),
+      overlayColor: WidgetStateProperty.resolveWith((states) {
+        if (!states.contains(WidgetState.pressed)) return null;
+        return foreground.withValues(alpha: 0.16);
+      }),
     );
     return switch (variant) {
       AppButtonVariant.primary => FilledButton(
@@ -100,58 +106,6 @@ class AppButton extends StatelessWidget {
       ),
     };
   }
-
-  Widget _cupertinoButton(
-    AppDesignTokens tokens,
-    VoidCallback? callback,
-    Widget child,
-  ) {
-    final common = (
-      minimumSize: const Size(44, 44),
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-      borderRadius: BorderRadius.circular(tokens.controlRadius),
-    );
-    return switch (variant) {
-      AppButtonVariant.primary => CupertinoButton.filled(
-        minimumSize: common.minimumSize,
-        padding: common.padding,
-        borderRadius: common.borderRadius,
-        color: tokens.primary,
-        disabledColor: tokens.disabledContainer,
-        foregroundColor: tokens.onPrimary,
-        onPressed: callback,
-        child: child,
-      ),
-      AppButtonVariant.secondary => CupertinoButton.tinted(
-        minimumSize: common.minimumSize,
-        padding: common.padding,
-        borderRadius: common.borderRadius,
-        color: tokens.primary,
-        disabledColor: tokens.disabledContainer,
-        foregroundColor: tokens.primary,
-        onPressed: callback,
-        child: child,
-      ),
-      AppButtonVariant.tertiary => CupertinoButton(
-        minimumSize: common.minimumSize,
-        padding: common.padding,
-        borderRadius: common.borderRadius,
-        foregroundColor: tokens.primary,
-        onPressed: callback,
-        child: child,
-      ),
-      AppButtonVariant.destructive => CupertinoButton(
-        minimumSize: common.minimumSize,
-        padding: common.padding,
-        borderRadius: common.borderRadius,
-        color: tokens.danger,
-        disabledColor: tokens.disabledContainer,
-        foregroundColor: tokens.onDanger,
-        onPressed: callback,
-        child: child,
-      ),
-    };
-  }
 }
 
 class _ButtonContent extends StatelessWidget {
@@ -159,14 +113,12 @@ class _ButtonContent extends StatelessWidget {
     required this.label,
     required this.icon,
     required this.loading,
-    required this.platform,
     required this.progressColor,
   });
 
   final String label;
   final AppIconRole? icon;
   final bool loading;
-  final TargetPlatform platform;
   final Color progressColor;
 
   @override
@@ -177,7 +129,7 @@ class _ButtonContent extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         if (icon != null) ...[
-          Icon(resolveAppIcon(icon!, platform), size: 20),
+          Icon(resolveAppIcon(icon!, Theme.of(context).platform), size: 20),
           const SizedBox(width: 8),
         ],
         Flexible(
@@ -204,9 +156,10 @@ class _ButtonContent extends StatelessWidget {
         Opacity(opacity: 0, child: labelContent),
         SizedBox.square(
           dimension: 20,
-          child: platform == TargetPlatform.iOS
-              ? CupertinoActivityIndicator(color: progressColor)
-              : CircularProgressIndicator(strokeWidth: 2, color: progressColor),
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            color: progressColor,
+          ),
         ),
       ],
     );
@@ -252,7 +205,7 @@ class AppTextField extends StatefulWidget {
 }
 
 class _AppTextFieldState extends State<AppTextField> {
-  final GlobalKey<FormFieldState<String>> _cupertinoFieldKey = GlobalKey();
+  final GlobalKey<FormFieldState<String>> _fieldKey = GlobalKey();
   late bool _obscured;
   late String _lastControllerText;
 
@@ -262,7 +215,6 @@ class _AppTextFieldState extends State<AppTextField> {
     _obscured = widget.obscureText;
     _lastControllerText = widget.controller.text;
     widget.controller.addListener(_handleControllerChanged);
-    widget.focusNode?.addListener(_handleFocusChanged);
   }
 
   @override
@@ -273,14 +225,8 @@ class _AppTextFieldState extends State<AppTextField> {
       _lastControllerText = widget.controller.text;
       widget.controller.addListener(_handleControllerChanged);
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          _cupertinoFieldKey.currentState?.didChange(widget.controller.text);
-        }
+        if (mounted) _fieldKey.currentState?.didChange(widget.controller.text);
       });
-    }
-    if (!identical(oldWidget.focusNode, widget.focusNode)) {
-      oldWidget.focusNode?.removeListener(_handleFocusChanged);
-      widget.focusNode?.addListener(_handleFocusChanged);
     }
     if (oldWidget.obscureText != widget.obscureText) {
       _obscured = widget.obscureText;
@@ -290,24 +236,19 @@ class _AppTextFieldState extends State<AppTextField> {
   @override
   void dispose() {
     widget.controller.removeListener(_handleControllerChanged);
-    widget.focusNode?.removeListener(_handleFocusChanged);
     super.dispose();
-  }
-
-  void _handleFocusChanged() {
-    if (mounted) setState(() {});
   }
 
   void _handleControllerChanged() {
     final value = widget.controller.text;
     if (_lastControllerText == value) return;
     _lastControllerText = value;
-    _cupertinoFieldKey.currentState?.didChange(value);
+    _fieldKey.currentState?.didChange(value);
   }
 
-  void _handleChanged(String value, FormFieldState<String>? field) {
+  void _handleChanged(String value, FormFieldState<String> field) {
     _lastControllerText = value;
-    if (field?.value != value) field?.didChange(value);
+    if (field.value != value) field.didChange(value);
     widget.onChanged?.call(value);
   }
 
@@ -315,87 +256,34 @@ class _AppTextFieldState extends State<AppTextField> {
 
   @override
   Widget build(BuildContext context) {
-    final platform = Theme.of(context).platform;
-    return platform == TargetPlatform.iOS
-        ? _buildCupertino(context)
-        : _buildMaterial(context);
-  }
-
-  Widget _buildMaterial(BuildContext context) {
-    return TextFormField(
-      controller: widget.controller,
-      focusNode: widget.focusNode,
-      validator: widget.validator,
-      forceErrorText: widget.forceErrorText,
-      keyboardType: widget.keyboardType,
-      textInputAction: widget.textInputAction,
-      autofillHints: widget.autofillHints,
-      obscureText: _obscured,
-      enabled: widget.enabled,
-      onChanged: (value) => _handleChanged(value, null),
-      onFieldSubmitted: widget.onFieldSubmitted,
-      decoration: InputDecoration(
-        labelText: widget.label,
-        floatingLabelBehavior: FloatingLabelBehavior.always,
-        errorMaxLines: 20,
-        prefixIcon: _prefix(context),
-        suffixIcon: _visibilityToggle(context, TargetPlatform.android),
-      ),
-    );
-  }
-
-  Widget _buildCupertino(BuildContext context) {
     final tokens = AppDesignScope.of(context);
     return FormField<String>(
-      key: _cupertinoFieldKey,
+      key: _fieldKey,
       initialValue: widget.controller.text,
       validator: widget.validator,
       forceErrorText: widget.forceErrorText,
       enabled: widget.enabled,
       builder: (field) {
         final errorText = field.errorText;
-        final borderColor = errorText == null ? tokens.outline : tokens.danger;
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Semantics(
-              container: true,
-              label: widget.label,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ExcludeSemantics(
-                    child: Text(widget.label, style: tokens.labelTextStyle),
-                  ),
-                  SizedBox(height: tokens.space8),
-                  ConstrainedBox(
-                    constraints: const BoxConstraints(minHeight: 44),
-                    child: CupertinoTextField(
-                      controller: widget.controller,
-                      focusNode: widget.focusNode,
-                      keyboardType: widget.keyboardType,
-                      textInputAction: widget.textInputAction,
-                      autofillHints: widget.autofillHints,
-                      obscureText: _obscured,
-                      enabled: widget.enabled,
-                      onChanged: (value) => _handleChanged(value, field),
-                      onSubmitted: widget.onFieldSubmitted,
-                      prefix: _prefix(context),
-                      suffix: _visibilityToggle(context, TargetPlatform.iOS),
-                      padding: EdgeInsets.symmetric(
-                        horizontal: tokens.space12,
-                        vertical: tokens.space12,
-                      ),
-                      decoration: BoxDecoration(
-                        color: widget.enabled
-                            ? tokens.surface
-                            : tokens.disabledContainer,
-                        border: Border.all(color: borderColor),
-                        borderRadius: BorderRadius.circular(tokens.fieldRadius),
-                      ),
-                    ),
-                  ),
-                ],
+            TextField(
+              controller: widget.controller,
+              focusNode: widget.focusNode,
+              keyboardType: widget.keyboardType,
+              textInputAction: widget.textInputAction,
+              autofillHints: widget.autofillHints,
+              obscureText: _obscured,
+              enabled: widget.enabled,
+              onChanged: (value) => _handleChanged(value, field),
+              onSubmitted: widget.onFieldSubmitted,
+              decoration: InputDecoration(
+                labelText: widget.label,
+                floatingLabelBehavior: FloatingLabelBehavior.always,
+                error: errorText == null ? null : const SizedBox.shrink(),
+                prefixIcon: _prefix(context),
+                suffixIcon: _visibilityToggle(context),
               ),
             ),
             if (errorText != null) ...[
@@ -432,30 +320,16 @@ class _AppTextFieldState extends State<AppTextField> {
     );
   }
 
-  Widget? _visibilityToggle(BuildContext context, TargetPlatform platform) {
+  Widget? _visibilityToggle(BuildContext context) {
     if (!widget.showObscureToggle) return null;
     final label = _obscured ? '显示密码' : '隐藏密码';
     final iconRole = _obscured
         ? AppIconRole.visibility
         : AppIconRole.visibilityOff;
-    final icon = Icon(resolveAppIcon(iconRole, platform), size: 20);
-    if (platform == TargetPlatform.iOS) {
-      return Semantics(
-        container: true,
-        button: true,
-        label: label,
-        enabled: widget.enabled,
-        onTap: widget.enabled ? _toggleObscured : null,
-        child: ExcludeSemantics(
-          child: CupertinoButton(
-            minimumSize: const Size(44, 44),
-            padding: EdgeInsets.zero,
-            onPressed: widget.enabled ? _toggleObscured : null,
-            child: icon,
-          ),
-        ),
-      );
-    }
+    final icon = Icon(
+      resolveAppIcon(iconRole, Theme.of(context).platform),
+      size: 20,
+    );
     return IconButton(
       tooltip: label,
       constraints: const BoxConstraints(minWidth: 48, minHeight: 48),

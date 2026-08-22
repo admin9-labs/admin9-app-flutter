@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../foundation/app_contracts.dart';
@@ -31,11 +30,7 @@ final class AppInteractionPresenterController
       body: Text(message),
       confirmLabel: '知道了',
     );
-    if (Theme.of(context).platform == TargetPlatform.iOS) {
-      await showCupertinoDialog<void>(context: context, builder: (_) => dialog);
-    } else {
-      await showDialog<void>(context: context, builder: (_) => dialog);
-    }
+    await showDialog<void>(context: context, builder: (_) => dialog);
     _restoreFocus(previousFocus);
   }
 
@@ -79,17 +74,11 @@ final class AppInteractionPresenterController
       cancelLabel: '取消',
       confirmLabel: confirmLabel,
     );
-    final result = Theme.of(context).platform == TargetPlatform.iOS
-        ? await showCupertinoDialog<bool>(
-            context: context,
-            barrierDismissible: barrierDismissible,
-            builder: (_) => dialog,
-          )
-        : await showDialog<bool>(
-            context: context,
-            barrierDismissible: barrierDismissible,
-            builder: (_) => dialog,
-          );
+    final result = await showDialog<bool>(
+      context: context,
+      barrierDismissible: barrierDismissible,
+      builder: (_) => dialog,
+    );
     _restoreFocus(previousFocus);
     return result ?? false;
   }
@@ -104,28 +93,17 @@ final class AppInteractionPresenterController
     assert(cancelLabel.isNotEmpty);
     final context = _context;
     final previousFocus = FocusManager.instance.primaryFocus;
-    final platform = Theme.of(context).platform;
-    final result = platform == TargetPlatform.iOS
-        ? await showCupertinoModalPopup<T>(
-            context: context,
-            builder: (_) => AppActionMenu<T>(
-              title: title,
-              items: items,
-              cancelLabel: cancelLabel,
-              onSelected: (value) => Navigator.of(context).pop(value),
-            ),
-          )
-        : await showModalBottomSheet<T>(
-            context: context,
-            useSafeArea: true,
-            showDragHandle: true,
-            builder: (_) => AppActionMenu<T>(
-              title: title,
-              items: items,
-              cancelLabel: cancelLabel,
-              onSelected: (value) => Navigator.of(context).pop(value),
-            ),
-          );
+    final result = await showModalBottomSheet<T>(
+      context: context,
+      useSafeArea: true,
+      showDragHandle: true,
+      builder: (_) => AppActionMenu<T>(
+        title: title,
+        items: items,
+        cancelLabel: cancelLabel,
+        onSelected: (value) => Navigator.of(context).pop(value),
+      ),
+    );
     _restoreFocus(previousFocus);
     return result;
   }
@@ -163,46 +141,30 @@ class AppDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (Theme.of(context).platform == TargetPlatform.iOS) {
-      return CupertinoAlertDialog(
-        title: Text(title),
-        content: body,
-        actions: _cupertinoActions(context),
-      );
-    }
     return AlertDialog(
       title: Text(title),
       content: body,
-      actions: _materialActions(context),
+      actions: _actions(context),
     );
   }
 
-  List<Widget> _materialActions(BuildContext context) => [
+  List<Widget> _actions(BuildContext context) => [
     if (cancelLabel != null)
-      TextButton(
+      OutlinedButton(
+        style: OutlinedButton.styleFrom(minimumSize: const Size(48, 48)),
         onPressed: () => Navigator.of(context).pop(false),
         child: Text(cancelLabel!),
       ),
-    TextButton(
-      onPressed: () => Navigator.of(context).pop(true),
-      style: variant == AppDialogVariant.destructive
-          ? TextButton.styleFrom(
-              foregroundColor: Theme.of(context).colorScheme.error,
-            )
-          : null,
-      child: Text(confirmLabel),
-    ),
-  ];
-
-  List<Widget> _cupertinoActions(BuildContext context) => [
-    if (cancelLabel != null)
-      CupertinoDialogAction(
-        onPressed: () => Navigator.of(context).pop(false),
-        child: Text(cancelLabel!),
+    FilledButton(
+      style: FilledButton.styleFrom(
+        minimumSize: const Size(48, 48),
+        backgroundColor: variant == AppDialogVariant.destructive
+            ? Theme.of(context).colorScheme.error
+            : null,
+        foregroundColor: variant == AppDialogVariant.destructive
+            ? Theme.of(context).colorScheme.onError
+            : null,
       ),
-    CupertinoDialogAction(
-      isDefaultAction: variant != AppDialogVariant.destructive,
-      isDestructiveAction: variant == AppDialogVariant.destructive,
       onPressed: () => Navigator.of(context).pop(true),
       child: Text(confirmLabel),
     ),
@@ -239,85 +201,42 @@ class _AppActionMenuState<T extends Object> extends State<AppActionMenu<T>> {
 
   @override
   Widget build(BuildContext context) {
-    return Theme.of(context).platform == TargetPlatform.iOS
-        ? CupertinoActionSheet(
-            title: widget.title == null ? null : Text(widget.title!),
-            actions: widget.items
-                .map<Widget>(
-                  (item) => Semantics(
-                    enabled: item.enabled,
-                    child: IgnorePointer(
-                      ignoring: !item.enabled,
-                      child: Opacity(
-                        opacity: item.enabled ? 1 : 0.45,
-                        child: CupertinoActionSheetAction(
-                          onPressed: item.enabled
-                              ? () => _select(item.value)
-                              : () {},
-                          isDestructiveAction: item.destructive,
-                          child: _itemContent(context, item),
-                        ),
-                      ),
-                    ),
-                  ),
-                )
-                .toList(growable: false),
-            cancelButton: CupertinoActionSheetAction(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(widget.cancelLabel),
+    return SafeArea(
+      top: false,
+      child: ListView(
+        shrinkWrap: true,
+        children: [
+          if (widget.title != null)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 8, 24, 12),
+              child: Text(
+                widget.title!,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
             ),
-          )
-        : SafeArea(
-            top: false,
-            child: ListView(
-              shrinkWrap: true,
-              children: [
-                if (widget.title != null)
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(24, 8, 24, 12),
-                    child: Text(
-                      widget.title!,
-                      style: Theme.of(context).textTheme.titleMedium,
+          for (final item in widget.items)
+            ListTile(
+              enabled: item.enabled,
+              leading: item.icon == null
+                  ? null
+                  : Icon(
+                      resolveAppIcon(item.icon!, Theme.of(context).platform),
                     ),
-                  ),
-                for (final item in widget.items)
-                  ListTile(
-                    enabled: item.enabled,
-                    leading: item.icon == null
-                        ? null
-                        : Icon(
-                            resolveAppIcon(
-                              item.icon!,
-                              Theme.of(context).platform,
-                            ),
-                          ),
-                    title: Text(item.label),
-                    textColor: item.destructive
-                        ? Theme.of(context).colorScheme.error
-                        : null,
-                    iconColor: item.destructive
-                        ? Theme.of(context).colorScheme.error
-                        : null,
-                    onTap: item.enabled ? () => _select(item.value) : null,
-                  ),
-                ListTile(
-                  title: Text(widget.cancelLabel),
-                  onTap: () => Navigator.of(context).pop(),
-                ),
-              ],
+              title: Text(item.label),
+              textColor: item.destructive
+                  ? Theme.of(context).colorScheme.error
+                  : null,
+              iconColor: item.destructive
+                  ? Theme.of(context).colorScheme.error
+                  : null,
+              onTap: item.enabled ? () => _select(item.value) : null,
             ),
-          );
+          ListTile(
+            title: Text(widget.cancelLabel),
+            onTap: () => Navigator.of(context).pop(),
+          ),
+        ],
+      ),
+    );
   }
-
-  Widget _itemContent(BuildContext context, AppActionMenuItem<T> item) => Row(
-    mainAxisAlignment: MainAxisAlignment.center,
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      if (item.icon != null) ...[
-        Icon(resolveAppIcon(item.icon!, TargetPlatform.iOS)),
-        const SizedBox(width: 8),
-      ],
-      Flexible(child: Text(item.label)),
-    ],
-  );
 }

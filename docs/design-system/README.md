@@ -137,3 +137,4 @@ v1 records:
 - [G1 verification](admin9-ui-g1-verification.md)
 - [G2 candidate screening](admin9-ui-g2-candidate-screening.md)
 - [G2 verification and recommendation](admin9-ui-g2-verification.md)
+- [G3 Demo verification and real-device handoff](admin9-ui-g3-verification.md)

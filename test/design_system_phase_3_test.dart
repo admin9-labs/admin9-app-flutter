@@ -21,7 +21,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('AppSwitch maps platforms and dispatches one controlled change', (
+  testWidgets('AppSwitch keeps one visible control and controlled change', (
     tester,
   ) async {
     for (final platform in [TargetPlatform.android, TargetPlatform.iOS]) {
@@ -39,21 +39,14 @@ void main() {
           },
         ),
       );
-      expect(
-        find.byType(platform == TargetPlatform.iOS ? CupertinoSwitch : Switch),
-        findsOneWidget,
-      );
+      expect(find.byType(Switch), findsOneWidget);
+      expect(find.byType(CupertinoSwitch), findsNothing);
       await tester.tap(find.text('高对比度'));
       await tester.pump();
       expect(calls, 1);
       expect(nextValue, isTrue);
-      final control = platform == TargetPlatform.iOS
-          ? find.byType(CupertinoListTile)
-          : find.byType(SwitchListTile);
-      expect(
-        tester.getSize(control).shortestSide,
-        greaterThanOrEqualTo(platform == TargetPlatform.iOS ? 44 : 48),
-      );
+      final control = find.byType(SwitchListTile);
+      expect(tester.getSize(control).shortestSide, greaterThanOrEqualTo(48));
     }
   });
 
@@ -128,7 +121,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('AppSection and choice list use unique platform mappings', (
+  testWidgets('AppSection and choice list use one branded mapping', (
     tester,
   ) async {
     final semantics = tester.ensureSemantics();
@@ -147,38 +140,16 @@ void main() {
           onChanged: (value) => selected = value,
         ),
       );
-      if (platform == TargetPlatform.iOS) {
-        expect(find.byType(CupertinoListSection), findsOneWidget);
-        expect(find.byIcon(CupertinoIcons.check_mark), findsOneWidget);
-      } else {
-        expect(find.byType(RadioGroup<AppThemePreference>), findsOneWidget);
-        expect(
-          find.byType(RadioListTile<AppThemePreference>),
-          findsNWidgets(2),
-        );
-      }
+      expect(find.byType(CupertinoListSection), findsNothing);
+      expect(find.byType(RadioGroup<AppThemePreference>), findsOneWidget);
+      expect(find.byType(RadioListTile<AppThemePreference>), findsNWidgets(2));
       final selectedSemantics = tester.getSemantics(
         find.bySemanticsLabel('跟随系统'),
       );
-      if (platform == TargetPlatform.iOS) {
-        expect(
-          selectedSemantics,
-          matchesSemantics(
-            label: '跟随系统',
-            isButton: true,
-            hasEnabledState: true,
-            isEnabled: true,
-            hasSelectedState: true,
-            isSelected: true,
-            hasTapAction: true,
-          ),
-        );
-      } else {
-        expect(
-          selectedSemantics.flagsCollection.isChecked,
-          ui.CheckedState.isTrue,
-        );
-      }
+      expect(
+        selectedSemantics.flagsCollection.isChecked,
+        ui.CheckedState.isTrue,
+      );
       await tester.tap(find.text('深色'));
       await tester.pump();
       expect(selected, AppThemePreference.dark);
@@ -458,7 +429,7 @@ void main() {
       expect(find.byType(AppSwitch), findsNWidgets(2));
       expect(find.byType(AppListTile), findsNWidgets(2));
       expect(tester.takeException(), isNull);
-      final minimum = row.platform == TargetPlatform.iOS ? 44.0 : 48.0;
+      const minimum = 48.0;
       for (final key in const [
         Key('matrix-list-tile'),
         Key('matrix-selected-tile'),
@@ -550,11 +521,7 @@ void main() {
       final choiceFlags = tester
           .getSemantics(find.bySemanticsLabel('始终使用深色外观并保持系统辅助设置优先'))
           .flagsCollection;
-      if (row.platform == TargetPlatform.iOS) {
-        expect(choiceFlags.isSelected, ui.Tristate.isTrue);
-      } else {
-        expect(choiceFlags.isChecked, ui.CheckedState.isTrue);
-      }
+      expect(choiceFlags.isChecked, ui.CheckedState.isTrue);
       expect(tester.takeException(), isNull);
     });
   }

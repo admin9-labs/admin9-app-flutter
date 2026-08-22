@@ -10,9 +10,7 @@
     "yaml",
     "yaml_edit"
   ],
-  "candidatePackages": [
-    "forui"
-  ],
+  "candidatePackages": [],
   "adapterRoots": [
     "lib/core/design_system/adapters/"
   ],

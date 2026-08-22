@@ -32,6 +32,7 @@ class AppNotice extends StatelessWidget {
     );
     return Semantics(
       container: true,
+      explicitChildNodes: true,
       liveRegion: tone == AppTone.error,
       label: [_toneLabel, ?title, message].join('，'),
       child: DecoratedBox(
@@ -57,15 +58,19 @@ class AppNotice extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     if (title != null) ...[
-                      Text(
-                        title!,
-                        style: tokens.sectionTitleTextStyle.copyWith(
-                          color: foreground,
+                      ExcludeSemantics(
+                        child: Text(
+                          title!,
+                          style: tokens.sectionTitleTextStyle.copyWith(
+                            color: foreground,
+                          ),
                         ),
                       ),
                       SizedBox(height: tokens.space4),
                     ],
-                    Text(message, style: TextStyle(color: foreground)),
+                    ExcludeSemantics(
+                      child: Text(message, style: TextStyle(color: foreground)),
+                    ),
                     if (actionLabel != null) ...[
                       SizedBox(height: tokens.space8),
                       AppButton(

@@ -3,9 +3,9 @@
 Date: 2026-08-23
 Baseline commit: `cf68a24844e45c16d983d29fb4878ad2f14bfd41`
 Candidate commit: `46d359f39197978b20271c1c1120f348887cc532`
-Supervision revision: this document's commit
+Supervision revision: `06a398a747178e1aaed4933f96806ced3c498ad8`
 Gate: bounded candidate POC and recommendation
-Status: supervision P1 closed; ready for bounded fixed-SHA closure review
+Status: closed Go; three bounded reviewers found no open P0/P1
 
 ## Scope
 
@@ -143,6 +143,11 @@ a separately removable package adapter.
 4. G3 fixes production notice semantics and verifies affected keyboard,
    autofill, focus, safe-area, back and representative Android/iOS runtime
    contracts.
+
+All three bounded product/brand, Flutter architecture and QA/accessibility
+reviewers returned Go on `06a398a747178e1aaed4933f96806ced3c498ad8` after the
+confirmed supervision P1 set was closed. G2 did not expand after that review;
+recorded P2 items carried forward to the named G3 or real-device evidence gate.
 
 ## Recorded P2
 

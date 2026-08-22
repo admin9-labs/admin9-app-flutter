@@ -14,7 +14,7 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('AppButton uses the frozen platform and variant mappings', (
+  testWidgets('AppButton uses one branded variant mapping on both platforms', (
     tester,
   ) async {
     for (final platform in [TargetPlatform.android, TargetPlatform.iOS]) {
@@ -31,27 +31,20 @@ void main() {
           ),
         );
 
-        if (platform == TargetPlatform.android) {
-          final expectedType = switch (variant) {
-            AppButtonVariant.primary ||
-            AppButtonVariant.destructive => FilledButton,
-            AppButtonVariant.secondary => OutlinedButton,
-            AppButtonVariant.tertiary => TextButton,
-          };
-          expect(find.byType(expectedType), findsOneWidget);
-        } else {
-          expect(find.byType(CupertinoButton), findsOneWidget);
-          final button = tester.widget<CupertinoButton>(
-            find.byType(CupertinoButton),
-          );
-          expect(button.minimumSize, const Size(44, 44));
-        }
+        final expectedType = switch (variant) {
+          AppButtonVariant.primary ||
+          AppButtonVariant.destructive => FilledButton,
+          AppButtonVariant.secondary => OutlinedButton,
+          AppButtonVariant.tertiary => TextButton,
+        };
+        expect(find.byType(expectedType), findsOneWidget);
+        expect(find.byType(CupertinoButton), findsNothing);
         final semantics = tester.getSemantics(find.bySemanticsLabel('继续'));
         expect(semantics.flagsCollection.isButton, isTrue);
         expect(semantics.flagsCollection.isEnabled, ui.Tristate.isTrue);
         expect(
           tester.getSize(find.bySemanticsLabel('继续')).height,
-          greaterThanOrEqualTo(platform == TargetPlatform.iOS ? 44 : 48),
+          greaterThanOrEqualTo(48),
         );
         await tester.tap(find.bySemanticsLabel('继续'));
         await tester.pump();
@@ -87,12 +80,8 @@ void main() {
         ),
       );
       expect(tester.getSize(find.byKey(const Key('button'))), enabledSize);
-      expect(
-        platform == TargetPlatform.iOS
-            ? find.byType(CupertinoActivityIndicator)
-            : find.byType(CircularProgressIndicator),
-        findsOneWidget,
-      );
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+      expect(find.byType(CupertinoActivityIndicator), findsNothing);
       final loadingSemantics = tester.getSemantics(
         find.bySemanticsLabel('提交注册信息'),
       );
@@ -156,21 +145,15 @@ void main() {
       expect(formKey.currentState!.validate(), isFalse);
       expect(validatorCalls, 0);
       expect(find.text('服务端返回的账号错误'), findsOneWidget);
-      expect(
-        platform == TargetPlatform.iOS
-            ? find.byType(CupertinoTextField)
-            : find.byType(TextFormField),
-        findsOneWidget,
-      );
+      expect(find.byType(TextField), findsOneWidget);
+      expect(find.byType(CupertinoTextField), findsNothing);
       final editable = tester.widget<EditableText>(find.byType(EditableText));
       expect(editable.focusNode, same(focusNode));
       expect(editable.keyboardType, TextInputType.emailAddress);
       expect(editable.textInputAction, TextInputAction.next);
-      final autofillHints = platform == TargetPlatform.iOS
-          ? tester
-                .widget<CupertinoTextField>(find.byType(CupertinoTextField))
-                .autofillHints
-          : tester.widget<TextField>(find.byType(TextField)).autofillHints;
+      final autofillHints = tester
+          .widget<TextField>(find.byType(TextField))
+          .autofillHints;
       expect(autofillHints, contains(AutofillHints.username));
       final fieldSemantics = tester.getSemantics(find.byType(EditableText));
       expect(fieldSemantics.flagsCollection.isTextField, isTrue);
@@ -208,19 +191,7 @@ void main() {
         ),
       );
 
-      if (platform == TargetPlatform.iOS) {
-        expect(
-          tester
-              .widget<CupertinoTextField>(find.byType(CupertinoTextField))
-              .enabled,
-          isFalse,
-        );
-      } else {
-        expect(
-          tester.widget<TextField>(find.byType(TextField)).enabled,
-          isFalse,
-        );
-      }
+      expect(tester.widget<TextField>(find.byType(TextField)).enabled, isFalse);
       final fieldSemantics = tester.getSemantics(find.byType(EditableText));
       expect(fieldSemantics.flagsCollection.isEnabled, ui.Tristate.isFalse);
       await tester.tap(find.byType(EditableText), warnIfMissed: false);
@@ -257,13 +228,8 @@ void main() {
         tester.widget<EditableText>(find.byType(EditableText)).obscureText,
         isTrue,
       );
-      final toggle = platform == TargetPlatform.iOS
-          ? find.byType(CupertinoButton)
-          : find.byTooltip('显示密码');
-      expect(
-        tester.getSize(toggle).shortestSide,
-        greaterThanOrEqualTo(platform == TargetPlatform.iOS ? 44 : 48),
-      );
+      final toggle = find.byTooltip('显示密码');
+      expect(tester.getSize(toggle).shortestSide, greaterThanOrEqualTo(48));
       await tester.tap(toggle);
       await tester.pump();
       expect(
@@ -272,12 +238,7 @@ void main() {
       );
       expect(controller.text, 'Admin9-secret');
       expect(focusNode.hasFocus, isTrue);
-      expect(
-        platform == TargetPlatform.iOS
-            ? find.bySemanticsLabel('隐藏密码')
-            : find.byTooltip('隐藏密码'),
-        findsOneWidget,
-      );
+      expect(find.byTooltip('隐藏密码'), findsOneWidget);
     }
   });
 
@@ -341,10 +302,8 @@ void main() {
         ),
       );
 
-      final minimum = row.platform == TargetPlatform.iOS ? 44.0 : 48.0;
-      final field = row.platform == TargetPlatform.iOS
-          ? find.byType(CupertinoTextField)
-          : find.byType(TextFormField);
+      const minimum = 48.0;
+      final field = find.byType(TextField);
       expect(tester.getSize(field).height, greaterThanOrEqualTo(minimum));
       expect(
         tester

@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../foundation/app_contracts.dart';
@@ -19,15 +18,10 @@ class AppProgressIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final platform = Theme.of(context).platform;
     final tokens = AppDesignScope.of(context);
     final semanticValue = value == null ? null : '${(value! * 100).round()}%';
-    final indicator = platform == TargetPlatform.iOS
-        ? _cupertinoIndicator(tokens)
-        : _materialIndicator();
-    final usesLinearLayout =
-        kind == AppProgressKind.linear ||
-        (platform == TargetPlatform.iOS && value != null);
+    final indicator = _indicator();
+    final usesLinearLayout = kind == AppProgressKind.linear;
     final content = !usesLinearLayout
         ? Row(
             mainAxisSize: MainAxisSize.min,
@@ -54,30 +48,7 @@ class AppProgressIndicator extends StatelessWidget {
     );
   }
 
-  Widget _materialIndicator() => kind == AppProgressKind.circular
+  Widget _indicator() => kind == AppProgressKind.circular
       ? CircularProgressIndicator(value: value)
       : LinearProgressIndicator(value: value);
-
-  Widget _cupertinoIndicator(AppDesignTokens tokens) {
-    if (value == null) {
-      return const CupertinoActivityIndicator();
-    }
-    return SizedBox(
-      height: 4,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(2),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            ColoredBox(color: tokens.disabledContainer),
-            FractionallySizedBox(
-              alignment: Alignment.centerLeft,
-              widthFactor: value,
-              child: ColoredBox(color: tokens.primary),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }

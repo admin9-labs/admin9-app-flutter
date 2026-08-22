@@ -1,6 +1,7 @@
 import 'package:admin9_app_flutter/app/admin9_app.dart';
 import 'package:admin9_app_flutter/app/admin9_shell.dart';
 import 'package:admin9_app_flutter/app/app_route_names.dart';
+import 'package:admin9_app_flutter/admin9_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -13,7 +14,9 @@ void main() {
   ) async {
     await _pumpAcceptedApp(tester);
 
-    final navigation = tester.widget<NavigationBar>(find.byType(NavigationBar));
+    final navigation = tester.widget<AppBottomNavigation>(
+      find.byType(AppBottomNavigation),
+    );
     expect(navigation.destinations, hasLength(2));
     expect(find.text('首页'), findsOneWidget);
     expect(find.text('我的'), findsOneWidget);

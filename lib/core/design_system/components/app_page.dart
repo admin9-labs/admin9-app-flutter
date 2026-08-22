@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../foundation/app_contracts.dart';
@@ -32,17 +31,21 @@ class AppPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final platform = Theme.of(context).platform;
-    return platform == TargetPlatform.iOS
-        ? _buildCupertino(context)
-        : _buildMaterial(context);
-  }
-
-  Widget _buildMaterial(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
-        automaticallyImplyLeading:
-            navigationMode == AppPageNavigationMode.child,
+        automaticallyImplyLeading: false,
+        leading: navigationMode == AppPageNavigationMode.child
+            ? IconButton(
+                tooltip: '返回$parentLabel',
+                constraints: const BoxConstraints.tightFor(
+                  width: 48,
+                  height: 48,
+                ),
+                onPressed: () => Navigator.of(context).maybePop(),
+                icon: Icon(resolveAppIcon(AppIconRole.back, platform)),
+              )
+            : null,
         title: Text(title),
         actions: actions
             .map(
@@ -54,51 +57,12 @@ class AppPage extends StatelessWidget {
                   height: 48,
                 ),
                 onPressed: action.enabled ? action.onPressed : null,
-                icon: Icon(resolveAppIcon(action.icon, TargetPlatform.android)),
+                icon: Icon(resolveAppIcon(action.icon, platform)),
               ),
             )
             .toList(growable: false),
       ),
       body: _body(context),
-    );
-  }
-
-  Widget _buildCupertino(BuildContext context) {
-    final trailing = actions.isEmpty
-        ? null
-        : Row(
-            mainAxisSize: MainAxisSize.min,
-            children: actions
-                .map(
-                  (action) => CupertinoButton(
-                    key: action.key,
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    minimumSize: const Size(44, 44),
-                    onPressed: action.enabled ? action.onPressed : null,
-                    child: Semantics(
-                      label: action.label,
-                      button: true,
-                      child: ExcludeSemantics(
-                        child: Icon(
-                          resolveAppIcon(action.icon, TargetPlatform.iOS),
-                        ),
-                      ),
-                    ),
-                  ),
-                )
-                .toList(growable: false),
-          );
-    return CupertinoPageScaffold(
-      resizeToAvoidBottomInset: true,
-      navigationBar: CupertinoNavigationBar(
-        automaticallyImplyLeading:
-            navigationMode == AppPageNavigationMode.child,
-        transitionBetweenRoutes: navigationMode == AppPageNavigationMode.child,
-        previousPageTitle: parentLabel,
-        middle: Text(title),
-        trailing: trailing,
-      ),
-      child: _body(context),
     );
   }
 

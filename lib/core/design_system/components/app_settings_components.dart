@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../foundation/app_contracts.dart';
@@ -24,89 +23,37 @@ class AppSingleChoiceList<T extends Object> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     assert(choices.length >= 2);
-    return Theme.of(context).platform == TargetPlatform.iOS
-        ? CupertinoPageScaffold(
-            navigationBar: CupertinoNavigationBar(
-              automaticallyImplyLeading: true,
-              previousPageTitle: '设置',
-              middle: Text(title),
-            ),
-            child: SafeArea(
-              child: ListView(
-                children: [
-                  CupertinoListSection.insetGrouped(
-                    children: choices
-                        .map((choice) {
-                          final pressured =
-                              MediaQuery.textScalerOf(context).scale(16) > 24 ||
-                              choice.label.runes.length > 12;
-                          final trailing = choice.value == value
-                              ? const Icon(CupertinoIcons.check_mark)
-                              : null;
-                          final tap = enabled
-                              ? () => onChanged(choice.value)
-                              : null;
-                          return Semantics(
-                            container: true,
-                            label: choice.label,
-                            button: true,
-                            selected: choice.value == value,
-                            enabled: enabled,
-                            onTap: tap,
-                            child: ExcludeSemantics(
-                              child: pressured
-                                  ? _CupertinoPressuredRow(
-                                      key: ValueKey<Object>(choice.value),
-                                      content: Text(choice.label),
-                                      trailing: trailing,
-                                      onPressed: tap,
-                                    )
-                                  : CupertinoListTile(
-                                      key: ValueKey<Object>(choice.value),
-                                      title: Text(choice.label),
-                                      trailing: trailing,
-                                      onTap: tap,
-                                    ),
-                            ),
-                          );
-                        })
-                        .toList(growable: false),
+    return Scaffold(
+      appBar: AppBar(title: Text(title)),
+      body: RadioGroup<T>(
+        groupValue: value,
+        onChanged: (next) {
+          if (enabled && next != null) onChanged(next);
+        },
+        child: ListView(
+          children: choices
+              .map(
+                (choice) => Semantics(
+                  container: true,
+                  label: choice.label,
+                  checked: choice.value == value,
+                  enabled: enabled,
+                  inMutuallyExclusiveGroup: true,
+                  onTap: enabled ? () => onChanged(choice.value) : null,
+                  child: ExcludeSemantics(
+                    child: RadioListTile<T>(
+                      key: ValueKey<Object>(choice.value),
+                      value: choice.value,
+                      title: Text(choice.label),
+                      enabled: enabled,
+                    ),
                   ),
-                ],
-              ),
-            ),
-          )
-        : Scaffold(
-            appBar: AppBar(title: Text(title)),
-            body: RadioGroup<T>(
-              groupValue: value,
-              onChanged: (next) {
-                if (enabled && next != null) onChanged(next);
-              },
-              child: ListView(
-                children: choices
-                    .map(
-                      (choice) => Semantics(
-                        container: true,
-                        label: choice.label,
-                        checked: choice.value == value,
-                        enabled: enabled,
-                        inMutuallyExclusiveGroup: true,
-                        onTap: enabled ? () => onChanged(choice.value) : null,
-                        child: ExcludeSemantics(
-                          child: RadioListTile<T>(
-                            key: ValueKey<Object>(choice.value),
-                            value: choice.value,
-                            title: Text(choice.label),
-                            enabled: enabled,
-                          ),
-                        ),
-                      ),
-                    )
-                    .toList(growable: false),
-              ),
-            ),
-          );
+                ),
+              )
+              .toList(growable: false),
+        ),
+      ),
+    );
   }
 }
 
@@ -130,35 +77,6 @@ class AppSwitch extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (Theme.of(context).platform == TargetPlatform.iOS) {
-      final pressured = _isPressured(context, primaryText: label);
-      return Semantics(
-        container: true,
-        label: label,
-        toggled: value,
-        enabled: enabled,
-        onTap: enabled ? _toggle : null,
-        child: ExcludeSemantics(
-          child: pressured
-              ? _CupertinoPressuredRow(
-                  onPressed: enabled ? _toggle : null,
-                  content: Text(label),
-                  trailing: CupertinoSwitch(
-                    value: value,
-                    onChanged: enabled ? onChanged : null,
-                  ),
-                )
-              : CupertinoListTile(
-                  title: Text(label),
-                  onTap: enabled ? _toggle : null,
-                  trailing: CupertinoSwitch(
-                    value: value,
-                    onChanged: enabled ? onChanged : null,
-                  ),
-                ),
-        ),
-      );
-    }
     return Semantics(
       container: true,
       label: label,
@@ -170,6 +88,7 @@ class AppSwitch extends StatelessWidget {
           title: Text(label),
           value: value,
           onChanged: enabled ? onChanged : null,
+          contentPadding: EdgeInsets.zero,
         ),
       ),
     );
@@ -212,47 +131,6 @@ class AppListTile extends StatelessWidget {
         : Icon(resolveAppIcon(leadingIcon!, platform));
     final trailing = _trailing(context, platform, pressured);
     final tap = enabled ? onTap : null;
-    if (platform == TargetPlatform.iOS) {
-      return Semantics(
-        selected: selected,
-        enabled: enabled,
-        child: pressured
-            ? _CupertinoPressuredRow(
-                onPressed: tap,
-                leading: leading,
-                content: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(title),
-                    if (subtitleLines.isNotEmpty) ...[
-                      const SizedBox(height: 4),
-                      Text(
-                        subtitleLines.join('\n'),
-                        style: TextStyle(
-                          color: CupertinoColors.secondaryLabel.resolveFrom(
-                            context,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-                trailing: trailing,
-              )
-            : CupertinoListTile(
-                title: Text(title),
-                subtitle: subtitleLines.isEmpty
-                    ? null
-                    : Text(subtitleLines.join('\n')),
-                leading: leading,
-                additionalInfo: currentValue == null
-                    ? null
-                    : Text(currentValue!),
-                trailing: trailing,
-                onTap: tap,
-              ),
-      );
-    }
     return ListTile(
       title: Text(title),
       subtitle: subtitleLines.isEmpty ? null : Text(subtitleLines.join('\n')),
@@ -271,7 +149,7 @@ class AppListTile extends StatelessWidget {
     bool pressured,
   ) {
     final children = <Widget>[
-      if (!pressured && currentValue != null && platform != TargetPlatform.iOS)
+      if (!pressured && currentValue != null)
         Flexible(child: Text(currentValue!, overflow: TextOverflow.ellipsis)),
       if (disclosure)
         Icon(resolveAppIcon(AppIconRole.chevronForward, platform)),
@@ -295,44 +173,6 @@ bool _isPressured(
       (secondaryText?.runes.length ?? 0) > 12;
 }
 
-class _CupertinoPressuredRow extends StatelessWidget {
-  const _CupertinoPressuredRow({
-    super.key,
-    required this.content,
-    required this.trailing,
-    this.leading,
-    this.onPressed,
-  });
-
-  final Widget content;
-  final Widget? trailing;
-  final Widget? leading;
-  final VoidCallback? onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return CupertinoButton(
-      minimumSize: const Size(44, 44),
-      padding: const EdgeInsetsDirectional.fromSTEB(16, 12, 12, 12),
-      onPressed: onPressed,
-      child: DefaultTextStyle(
-        style: CupertinoTheme.of(context).textTheme.textStyle,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            if (leading != null) ...[
-              SizedBox.square(dimension: 28, child: Center(child: leading)),
-              const SizedBox(width: 12),
-            ],
-            Expanded(child: content),
-            if (trailing != null) ...[const SizedBox(width: 12), trailing!],
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class AppSection extends StatelessWidget {
   const AppSection({
     super.key,
@@ -347,13 +187,6 @@ class AppSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (Theme.of(context).platform == TargetPlatform.iOS) {
-      return CupertinoListSection.insetGrouped(
-        header: title == null ? null : Text(title!),
-        footer: footer == null ? null : Text(footer!),
-        children: children,
-      );
-    }
     final tokens = AppDesignScope.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,

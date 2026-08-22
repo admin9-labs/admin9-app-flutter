@@ -15,12 +15,12 @@ areas, and accessibility keep their platform behavior.
 ## Current stage
 
 G1 is closed Go at `cf68a24844e45c16d983d29fb4878ad2f14bfd41` and must not
-be reopened or expanded. G2 candidate commit `46d359f` received three Revise
-decisions. All confirmed P1 findings are closed in one supervision revision:
-the fixed scenario/state matrix, executable semantics, announcement behavior,
-expanded Golden evidence, CJK fixture, visual pressure states and removal drill
-are now ready for the final bounded three-reviewer closure pass. The
-first-party unified route remains the G3 recommendation.
+be reopened or expanded. G2 is closed Go at
+`06a398a747178e1aaed4933f96806ced3c498ad8`. G3 implements the selected
+first-party route in the Demo: the Forui candidate and complete G2 POC are
+removed, while the existing `App*` API, one route tree, App host and
+system-owned behavior remain intact. Local verification is complete and the
+implementation is ready for one fixed-SHA, three-reviewer G3 supervision pass.
 
 ## Completed
 
@@ -69,6 +69,19 @@ first-party unified route remains the G3 recommendation.
   sources/tests and 110 candidate images were removed while analyze, 145
   original non-Golden tests and boundary gates passed with zero `lib/app`,
   `lib/ui` or root Theme differences.
+- Closed G2 after three independent bounded reviewers returned Go on
+  `06a398a747178e1aaed4933f96806ced3c498ad8`.
+- Removed Forui, its transitive packages, the G2 adapters/harness/tests and all
+  110 candidate-only Goldens from the production tree.
+- Reimplemented the visible `App*` families as one first-party Admin9 control
+  language for Android and iOS, including page/shell structure, navigation,
+  buttons, fields, settings rows, switches, dialogs, menus, feedback, notices,
+  progress and icon mapping.
+- Preserved the public `App*` contract, route tree, keyboard/autofill/focus,
+  safe-area, back dispatch, accessibility services and capability ownership.
+- Added paired Android/iOS production component Goldens and corrected the
+  production notice semantics so one shared tone/title/message node does not
+  consume the independent action.
 
 ## Verification evidence
 
@@ -108,9 +121,13 @@ first-party unified route remains the G3 recommendation.
   non-Golden tests, 129 tagged Goldens (110 G2 plus 19 existing), every CI
   Design System/documentation gate, Android Release APK 52.9 MB and iOS
   no-codesign Release app 19.7 MB.
-- Current visible branching is present in `AppButton`, `AppTextField`,
-  `AppPage`, `AppBottomNavigation`, `AppDialog`, `AppActionMenu`, `AppSwitch`,
-  `AppListTile`, feedback, progress, icon mapping, and shell scaffolds.
+- 2026-08-23: the G3 production tree passed `flutter analyze`, all 145 original
+  non-Golden regressions, 21 production Goldens in compare mode, all
+  configuration/import/candidate/Gallery/visual/documentation gates, Android
+  Release APK 51,005,113 bytes and iOS no-codesign Release app 17.1 MB.
+- 2026-08-23: final Android/iOS asset scans contain no Forui, Inter or Lucide
+  candidate artifacts. Manual review of all 21 production Goldens found no
+  incoherent overlap or cross-platform component-family drift.
 
 ## Provisional decisions
 
@@ -118,17 +135,16 @@ first-party unified route remains the G3 recommendation.
   replaceable working reference, not approved final brand art direction.
 - Brand-owned visible controls should converge before system-owned behavior is
   changed.
-- Existing self-built `App*` components are the comparison baseline. A third
-  party package is neither required nor excluded. The unchanged implementation
-  is the control, not a candidate winner.
+- G2 selected the first-party route for this Demo on evidence, not on a blanket
+  ban against third-party UI packages. Future package adoption still requires a
+  named capability or maintenance advantage and the same removable `App*`
+  boundary.
 - A mixed implementation is allowed only when evidence shows a single
   implementation route has a material gap.
 - One primary package and at most one evidence-triggered backup may enter POC;
   no candidate type or adapter may leak through the `App*` public surface.
-- G2 recommends the first-party unified route. Forui 0.25.0 was
-  the implemented package candidate and `shadcn_ui` 0.56.1 remained the
-  evidence-only backup; stage exit still requires all three bounded closure
-  reviewers to return Go on the supervision revision SHA.
+- Forui 0.25.0 was the implemented package candidate and `shadcn_ui` 0.56.1
+  remained the evidence-only backup. Neither is a G3 production dependency.
 
 ## Blocking decisions
 
@@ -141,11 +157,9 @@ POCs, or Demo implementation.
 
 ## Next
 
-1. Run the complete G2 revision verification suite and commit one new fixed
-   SHA without amending `46d359f`.
-2. Run exactly three bounded closure reviews covering only confirmed P1
-   closure and direct P0/P1 regressions; record P2 without expanding G2.
-3. Require all three reviewers to return Go, then close G2.
-4. In G3 remove Forui POC code/dependencies and implement the first-party route
-   behind existing `App*`; do not migrate Starter or release before real-device
-   acceptance.
+1. Commit one fixed G3 SHA with the implementation and local evidence.
+2. Run exactly three independent G3 reviews for product/brand, Flutter
+   architecture and QA/accessibility. Fix only direct P0/P1 regressions.
+3. After all three return Go, hand the Android/iOS builds and shared checklist
+   to the user for real-device acceptance.
+4. Stop before Starter migration, versioning, release, push or publication.

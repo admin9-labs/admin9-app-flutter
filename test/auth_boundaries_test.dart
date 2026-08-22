@@ -33,7 +33,7 @@ void main() {
       find.byKey(const Key('auth-account-field')),
       'user@example.com',
     );
-    await tester.enterText(find.byType(TextFormField).at(1), 'password123');
+    await tester.enterText(find.byType(TextField).at(1), 'password123');
     final textInputCalls = <MethodCall>[];
     tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
       SystemChannels.textInput,

@@ -8,7 +8,6 @@ import 'package:admin9_app_flutter/core/design_system/foundation/app_theme.dart'
 import 'package:admin9_app_flutter/ui/features/account/views/account_page.dart';
 import 'package:admin9_app_flutter/ui/features/account/view_models/session_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -49,20 +48,18 @@ void main() {
         return !focusIsInsideAccountField;
       });
       expect(focusIsInsideAccountField, isTrue);
-      if (Theme.of(accountElement).platform == TargetPlatform.iOS) {
-        final accountError = tester.getSemantics(
-          find.bySemanticsLabel('请输入手机号或邮箱'),
+      final accountError = tester.getSemantics(
+        find.bySemanticsLabel('请输入手机号或邮箱'),
+      );
+      expect(accountError.flagsCollection.isLiveRegion, isTrue);
+      for (final passwordError in find.bySemanticsLabel('请输入密码').evaluate()) {
+        expect(
+          tester
+              .getSemantics(find.byWidget(passwordError.widget))
+              .flagsCollection
+              .isLiveRegion,
+          isFalse,
         );
-        expect(accountError.flagsCollection.isLiveRegion, isTrue);
-        for (final passwordError in find.bySemanticsLabel('请输入密码').evaluate()) {
-          expect(
-            tester
-                .getSemantics(find.byWidget(passwordError.widget))
-                .flagsCollection
-                .isLiveRegion,
-            isFalse,
-          );
-        }
       }
 
       await tester.enterText(
@@ -208,7 +205,7 @@ void main() {
   }
 
   testWidgets(
-    'iOS child bars identify the actual route source',
+    'iOS child bars keep the actual route source in back semantics',
     (tester) async {
       final session = SessionController(
         initialStatus: SessionStatus.authenticated,
@@ -224,20 +221,12 @@ void main() {
 
       await tester.tap(find.text('账号安全'));
       await tester.pumpAndSettle();
-      expect(
-        tester
-            .widget<CupertinoNavigationBar>(find.byType(CupertinoNavigationBar))
-            .previousPageTitle,
-        '我的',
-      );
+      expect(find.widgetWithText(AppBar, '账号安全'), findsOneWidget);
+      expect(find.byTooltip('返回我的'), findsOneWidget);
       await tester.tap(find.text('修改密码'));
       await tester.pumpAndSettle();
-      expect(
-        tester
-            .widget<CupertinoNavigationBar>(find.byType(CupertinoNavigationBar))
-            .previousPageTitle,
-        '账号安全',
-      );
+      expect(find.widgetWithText(AppBar, '修改密码'), findsOneWidget);
+      expect(find.byTooltip('返回账号安全'), findsOneWidget);
 
       SharedPreferences.setMockInitialValues({});
       final preferences = await SharedPreferences.getInstance();
@@ -245,12 +234,8 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text('用户协议'));
       await tester.pumpAndSettle();
-      expect(
-        tester
-            .widget<CupertinoNavigationBar>(find.byType(CupertinoNavigationBar))
-            .previousPageTitle,
-        '隐私保护提示',
-      );
+      expect(find.widgetWithText(AppBar, '用户协议'), findsOneWidget);
+      expect(find.byTooltip('返回隐私保护提示'), findsOneWidget);
     },
     variant: TargetPlatformVariant.only(TargetPlatform.iOS),
   );

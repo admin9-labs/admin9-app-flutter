@@ -52,12 +52,10 @@ void main() {
           body: Text('正文'),
         ),
       );
-      final bar = tester.widget<CupertinoNavigationBar>(
-        find.byType(CupertinoNavigationBar),
-      );
-      expect(bar.previousPageTitle, '我的');
-      expect(bar.automaticallyImplyLeading, isTrue);
-      expect(bar.transitionBetweenRoutes, isTrue);
+      final bar = tester.widget<AppBar>(find.byType(AppBar));
+      expect(bar.automaticallyImplyLeading, isFalse);
+      expect(find.byTooltip('返回我的'), findsOneWidget);
+      expect(find.byType(CupertinoNavigationBar), findsNothing);
     },
   );
 
@@ -118,7 +116,7 @@ void main() {
     );
   });
 
-  testWidgets('AppBottomNavigation uses the unique platform controls', (
+  testWidgets('AppBottomNavigation uses one branded control structure', (
     tester,
   ) async {
     const destinations = [
@@ -145,7 +143,8 @@ void main() {
         ),
       ),
     );
-    expect(find.byType(NavigationBar), findsOneWidget);
+    expect(find.byType(AppBottomNavigation), findsOneWidget);
+    expect(find.byType(NavigationBar), findsNothing);
     expect(
       tester
           .getSemantics(find.bySemanticsLabel(RegExp('^\u9996页')))
@@ -173,7 +172,8 @@ void main() {
         ),
       ),
     );
-    expect(find.byType(CupertinoTabBar), findsOneWidget);
+    expect(find.byType(AppBottomNavigation), findsOneWidget);
+    expect(find.byType(CupertinoTabBar), findsNothing);
     expect(
       tester
           .getSemantics(find.bySemanticsLabel(RegExp('^\u9996页')))
@@ -208,7 +208,8 @@ void main() {
       platform: TargetPlatform.iOS,
       child: const AppProgressIndicator(label: '正在加载'),
     );
-    expect(find.byType(CupertinoActivityIndicator), findsOneWidget);
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    expect(find.byType(CupertinoActivityIndicator), findsNothing);
     expect(find.bySemanticsLabel('正在加载'), findsOneWidget);
   });
 
@@ -357,7 +358,7 @@ void main() {
     );
   });
 
-  testWidgets('iOS feedback is a top overlay with 44pt actions', (
+  testWidgets('iOS feedback uses the shared branded persistent surface', (
     tester,
   ) async {
     final controller = AppFeedbackPresenterController();
@@ -405,13 +406,16 @@ void main() {
     );
     expect(tester.getSemantics(action).sortKey, const OrdinalSortKey(2));
     expect(tester.getSemantics(close).sortKey, const OrdinalSortKey(3));
-    expect(find.byType(CupertinoButton), findsNWidgets(2));
-    for (final element in find.byType(CupertinoButton).evaluate()) {
-      final size = tester.getSize(find.byWidget(element.widget));
-      expect(size.width, greaterThanOrEqualTo(44));
-      expect(size.height, greaterThanOrEqualTo(44));
-    }
-    expect(tester.getTopLeft(find.text('操作结果')).dy, greaterThanOrEqualTo(64));
+    expect(find.byType(MaterialBanner), findsOneWidget);
+    expect(find.byType(CupertinoButton), findsNothing);
+    expect(
+      tester.getSize(find.widgetWithText(TextButton, '撤销')).height,
+      greaterThanOrEqualTo(48),
+    );
+    expect(
+      tester.getSize(find.byTooltip('关闭')).shortestSide,
+      greaterThanOrEqualTo(48),
+    );
     expect(
       find.ancestor(
         of: find.bySemanticsLabel('操作结果'),
@@ -520,7 +524,7 @@ void main() {
       expect(tester.takeException(), isNull);
       expect(find.textContaining('最长中文说明'), findsOneWidget);
       expect(find.text('当前状态可撤销'), findsOneWidget);
-      final minimum = row.platform == TargetPlatform.iOS ? 44.0 : 48.0;
+      const minimum = 48.0;
       final homeDestination = find.text('首页');
       final accountDestination = find.text('我的');
       expect(homeDestination, findsOneWidget);
@@ -534,30 +538,19 @@ void main() {
       );
       final feedbackAction = find.bySemanticsLabel('撤销');
       expect(feedbackAction, findsOneWidget);
-      final actionControl = row.platform == TargetPlatform.iOS
-          ? find.widgetWithText(CupertinoButton, '撤销')
-          : find.widgetWithText(TextButton, '撤销');
+      final actionControl = find.widgetWithText(TextButton, '撤销');
       expect(
         tester.getSize(actionControl).height,
         greaterThanOrEqualTo(minimum),
       );
       await tester.tap(accountDestination);
       await tester.pump();
-      if (row.platform == TargetPlatform.iOS) {
-        expect(
-          tester
-              .widget<CupertinoTabBar>(find.byType(CupertinoTabBar))
-              .currentIndex,
-          1,
-        );
-      } else {
-        expect(
-          tester
-              .widget<NavigationBar>(find.byType(NavigationBar))
-              .selectedIndex,
-          1,
-        );
-      }
+      expect(
+        tester
+            .widget<AppBottomNavigation>(find.byType(AppBottomNavigation))
+            .selectedIndex,
+        1,
+      );
       feedback.dismiss();
       await tester.pump();
       await tester.drag(
@@ -702,16 +695,6 @@ class _Phase2MatrixShellState extends State<_Phase2MatrixShell> {
         ],
       ),
     );
-    if (Theme.of(context).platform == TargetPlatform.iOS) {
-      return CupertinoPageScaffold(
-        child: Column(
-          children: [
-            Expanded(child: page),
-            navigation,
-          ],
-        ),
-      );
-    }
     return Scaffold(body: page, bottomNavigationBar: navigation);
   }
 }

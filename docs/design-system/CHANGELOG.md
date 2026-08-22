@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Selected the first-party G3 route after the fixed G2 comparison. Removed
+  Forui and the complete candidate POC, unified brand-owned visible `App*`
+  presentation across Android and iOS, retained system-owned interaction
+  behavior, added paired production Goldens, and recorded local release-build
+  and real-device handoff evidence.
 - Added a removable G2 comparison POC for the current control, a first-party
   unified candidate, and Forui 0.25.0; recorded package provenance, focused
   Widget/Golden/local performance evidence, candidate isolation and a passing

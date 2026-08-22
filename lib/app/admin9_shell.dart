@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../admin9_ui.dart';
@@ -48,17 +47,6 @@ class _Admin9ShellState extends State<Admin9Shell> {
       selectedIndex: _selectedIndex,
       onDestinationSelected: _selectDestination,
     );
-    if (Theme.of(context).platform == TargetPlatform.iOS) {
-      return CupertinoPageScaffold(
-        resizeToAvoidBottomInset: true,
-        child: Column(
-          children: [
-            Expanded(child: body),
-            navigation,
-          ],
-        ),
-      );
-    }
     return Scaffold(body: body, bottomNavigationBar: navigation);
   }
 }

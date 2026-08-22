@@ -95,7 +95,7 @@ void main() {
   });
 
   testWidgets(
-    'privacy decline uses global iOS feedback inside token scope',
+    'privacy decline uses shared feedback inside token scope on iOS',
     (tester) async {
       SharedPreferences.setMockInitialValues({});
       final preferences = await SharedPreferences.getInstance();
@@ -107,7 +107,7 @@ void main() {
 
       expect(tester.takeException(), isNull);
       expect(find.text('未同意前无法进入应用。'), findsOneWidget);
-      expect(find.bySemanticsLabel('关闭'), findsOneWidget);
+      expect(find.byType(SnackBar), findsOneWidget);
     },
     variant: TargetPlatformVariant.only(TargetPlatform.iOS),
   );

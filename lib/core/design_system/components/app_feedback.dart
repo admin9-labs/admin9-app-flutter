@@ -1,11 +1,9 @@
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 
 import '../foundation/app_contracts.dart';
-import '../foundation/app_design_tokens.dart';
 import 'app_icon.dart';
 
 final class AppFeedbackPresenterController implements AppFeedbackController {
@@ -75,7 +73,6 @@ class _AppFeedbackState extends State<AppFeedback> {
   Timer? _timer;
   bool _actionDispatched = false;
   bool? _accessibleNavigation;
-  OverlayEntry? _cupertinoEntry;
 
   AppFeedbackPresenterController? get _presenter =>
       widget.controller is AppFeedbackPresenterController
@@ -97,11 +94,6 @@ class _AppFeedbackState extends State<AppFeedback> {
       }
       _presenter?._attach(this);
     }
-    if (!identical(oldWidget.navigatorKey, widget.navigatorKey) &&
-        _cupertinoEntry != null) {
-      _removeCupertinoFeedback();
-      _showCupertinoFeedback();
-    }
   }
 
   @override
@@ -113,8 +105,7 @@ class _AppFeedbackState extends State<AppFeedback> {
     final request = _request;
     if (previous != null &&
         previous != _accessibleNavigation &&
-        request != null &&
-        Theme.of(context).platform != TargetPlatform.iOS) {
+        request != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted || !identical(_request, request)) return;
         _clearMaterialFeedback();
@@ -126,7 +117,6 @@ class _AppFeedbackState extends State<AppFeedback> {
   @override
   void dispose() {
     _timer?.cancel();
-    _removeCupertinoFeedback();
     _presenter?._detach(this);
     super.dispose();
   }
@@ -139,17 +129,12 @@ class _AppFeedbackState extends State<AppFeedback> {
       _actionDispatched = false;
     });
     _scheduleDismissal();
-    if (Theme.of(context).platform != TargetPlatform.iOS) {
-      _showMaterialFeedback(request, announce: true);
-    } else {
-      _showCupertinoFeedback();
-    }
+    _showMaterialFeedback(request, announce: true);
   }
 
   void dismiss() {
     _timer?.cancel();
     _clearMaterialFeedback();
-    _removeCupertinoFeedback();
     if (_request == null || !mounted) return;
     setState(() => _request = null);
   }
@@ -196,43 +181,6 @@ class _AppFeedbackState extends State<AppFeedback> {
     sortKey: sortKey,
     child: ExcludeSemantics(child: child),
   );
-
-  void _showCupertinoFeedback() {
-    final tokens = AppDesignScope.of(context);
-    final topInset = MediaQuery.paddingOf(context).top + 44;
-    void insert(OverlayState overlay) {
-      if (!mounted || _request == null || _cupertinoEntry != null) return;
-      final entry = OverlayEntry(
-        builder: (context) {
-          final request = _request;
-          if (request == null) return const SizedBox.shrink();
-          return Positioned(
-            left: 0,
-            top: topInset,
-            right: 0,
-            child: _cupertinoOverlay(context, request, tokens),
-          );
-        },
-      );
-      _cupertinoEntry = entry;
-      overlay.insert(entry);
-    }
-
-    final overlay = widget.navigatorKey.currentState?.overlay;
-    if (overlay != null) {
-      insert(overlay);
-      return;
-    }
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final deferredOverlay = widget.navigatorKey.currentState?.overlay;
-      if (deferredOverlay != null) insert(deferredOverlay);
-    });
-  }
-
-  void _removeCupertinoFeedback() {
-    _cupertinoEntry?.remove();
-    _cupertinoEntry = null;
-  }
 
   void _showMaterialFeedback(
     AppFeedbackRequest request, {
@@ -314,87 +262,10 @@ class _AppFeedbackState extends State<AppFeedback> {
     messenger?.hideCurrentMaterialBanner();
   }
 
-  Widget _cupertinoOverlay(
-    BuildContext context,
-    AppFeedbackRequest request,
-    AppDesignTokens tokens,
-  ) {
-    return SafeArea(
-      top: false,
-      bottom: false,
-      minimum: EdgeInsets.all(tokens.space8),
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: tokens.surfaceContainer,
-          border: Border.all(color: tokens.outline),
-          borderRadius: BorderRadius.circular(tokens.controlRadius),
-        ),
-        child: Padding(
-          padding: EdgeInsets.all(tokens.space12),
-          child: Row(
-            children: [
-              Icon(
-                resolveAppIcon(_toneIcon(request.tone), TargetPlatform.iOS),
-                color: _toneColor(tokens, request.tone),
-              ),
-              SizedBox(width: tokens.space8),
-              Expanded(
-                child: _liveRegion(
-                  request.message,
-                  Text(request.message),
-                  announce: true,
-                  sortKey: const OrdinalSortKey(1),
-                ),
-              ),
-              if (request.actionLabel != null)
-                Semantics(
-                  container: true,
-                  sortKey: const OrdinalSortKey(2),
-                  button: true,
-                  label: request.actionLabel,
-                  child: ExcludeSemantics(
-                    child: CupertinoButton(
-                      minimumSize: const Size(44, 44),
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      onPressed: _activateAction,
-                      child: Text(request.actionLabel!),
-                    ),
-                  ),
-                ),
-              Semantics(
-                container: true,
-                sortKey: const OrdinalSortKey(3),
-                label: '关闭',
-                button: true,
-                child: ExcludeSemantics(
-                  child: CupertinoButton(
-                    minimumSize: const Size(44, 44),
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    onPressed: dismiss,
-                    child: Icon(
-                      resolveAppIcon(AppIconRole.close, TargetPlatform.iOS),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   AppIconRole _toneIcon(AppTone tone) => switch (tone) {
     AppTone.info => AppIconRole.info,
     AppTone.success => AppIconRole.success,
     AppTone.warning => AppIconRole.warning,
     AppTone.error => AppIconRole.error,
-  };
-
-  Color _toneColor(AppDesignTokens tokens, AppTone tone) => switch (tone) {
-    AppTone.info => tokens.info,
-    AppTone.success => tokens.success,
-    AppTone.warning => tokens.warning,
-    AppTone.error => tokens.danger,
   };
 }

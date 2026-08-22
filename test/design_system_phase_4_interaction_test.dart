@@ -62,18 +62,11 @@ void main() {
         expect(noticeSemantics.label, contains(entry.$2));
         expect(noticeSemantics.label, contains('状态标题'));
         expect(noticeSemantics.label, contains('状态说明'));
-        expect(
-          platform == TargetPlatform.iOS
-              ? find.byType(CupertinoButton)
-              : find.byType(TextButton),
-          findsOneWidget,
-        );
+        expect(find.byType(TextButton), findsOneWidget);
+        expect(find.byType(CupertinoButton), findsNothing);
         final action = find.byType(AppButton);
         expect(tester.getSemantics(action).label, contains('重试'));
-        expect(
-          tester.getSize(action).shortestSide,
-          greaterThanOrEqualTo(platform == TargetPlatform.iOS ? 44 : 48),
-        );
+        expect(tester.getSize(action).shortestSide, greaterThanOrEqualTo(48));
         await tester.tap(action);
         expect(calls, 1);
       }
@@ -125,12 +118,8 @@ void main() {
         confirmLabel: '继续',
       );
       await tester.pumpAndSettle();
-      expect(
-        platform == TargetPlatform.iOS
-            ? find.byType(CupertinoAlertDialog)
-            : find.byType(AlertDialog),
-        findsOneWidget,
-      );
+      expect(find.byType(AlertDialog), findsOneWidget);
+      expect(find.byType(CupertinoAlertDialog), findsNothing);
       await tester.tap(find.text('取消'));
       expect(await confirmation, isFalse);
       await tester.pump();
@@ -186,12 +175,8 @@ void main() {
         ],
       );
       await tester.pumpAndSettle();
-      expect(
-        platform == TargetPlatform.iOS
-            ? find.byType(CupertinoActionSheet)
-            : find.byType(BottomSheet),
-        findsOneWidget,
-      );
+      expect(find.byType(BottomSheet), findsOneWidget);
+      expect(find.byType(CupertinoActionSheet), findsNothing);
       await tester.tap(find.text('不可用'), warnIfMissed: false);
       await tester.pump();
       expect(find.text('选择操作'), findsOneWidget);
@@ -212,10 +197,8 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(find.text('第六项'), findsOneWidget);
-      if (platform == TargetPlatform.android) {
-        await tester.drag(find.byType(ListView).last, const Offset(0, -300));
-        await tester.pumpAndSettle();
-      }
+      await tester.drag(find.byType(ListView).last, const Offset(0, -300));
+      await tester.pumpAndSettle();
       await tester.tap(find.text('取消'));
       expect(await dismissed, isNull);
 
@@ -279,10 +262,8 @@ void main() {
       );
       expect(find.text('取消'), findsOneWidget);
       expect(find.text('删除当前资料且无法撤销'), findsOneWidget);
-      final minimum = row.platform == TargetPlatform.iOS ? 44.0 : 48.0;
-      final cancelTarget = row.platform == TargetPlatform.iOS
-          ? find.widgetWithText(CupertinoActionSheetAction, '取消')
-          : find.widgetWithText(ListTile, '取消');
+      const minimum = 48.0;
+      final cancelTarget = find.widgetWithText(ListTile, '取消');
       expect(
         tester.getSize(cancelTarget).height,
         greaterThanOrEqualTo(minimum),
