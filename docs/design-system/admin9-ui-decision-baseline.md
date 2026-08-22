@@ -1,7 +1,7 @@
 # Admin9 Cross-platform UI Decision Baseline
 
 Status: working baseline for the Demo-first UI unification initiative
-Last updated: 2026-08-22
+Last updated: 2026-08-23
 
 When this document conflicts with the v1 Material/Cupertino visible-component
 mapping, this document controls the current initiative. Older phase documents
@@ -115,6 +115,15 @@ second package. A third-party Theme, Controller, Router, state model, enum,
 callback, style, or context extension must not cross `App*` into business code.
 Removal must leave business APIs and the route tree intact.
 
+G2 implemented Forui 0.25.0 as the primary package candidate and retained
+`shadcn_ui` 0.56.1 as an evidence-only backup. The same-scenario comparison
+provisionally recommends the first-party unified route: it met the POC contract
+without a named capability gap, while Forui required a larger adapter, bundled
+font/license handling, extra semantics and typography compatibility work, and
+still lacked progress parity. This is a provisional implementation decision
+until the three fixed-SHA G2 reviews return Go; it does not approve final visual
+tokens, Demo acceptance, or Starter migration.
+
 `App*` owns visible, business-neutral component presentation. It does not own
 permissions, sharing, system pickers, keyboard services, autofill, or other
 platform capabilities. Those remain in the existing capability/service or
@@ -169,14 +178,16 @@ every comparison object must rerun against the same new reference commit.
 ## Undecided
 
 - Final brand art direction and approver acceptance.
-- Self-built, third-party, or mixed implementation.
-- Third-party candidates and exact versions.
+- Final production implementation route; G2 currently recommends first-party
+  pending fixed-SHA supervision.
 - Final font, type metrics, icon family, spacing, radii, and component geometry.
 - Design System release/version naming.
 - Starter migration scope and migration sequence.
 
 ## Change log
 
+- 2026-08-23: recorded the G2 candidate identities and provisional first-party
+  recommendation without treating it as final visual or Starter approval.
 - 2026-08-23: closed the fixed-commit P1 review findings. Distinguished legal
   App-host/barrel encapsulation from root Theme leakage, added bidirectional
   dependency classification and explicit public-type gates, repaired pressed

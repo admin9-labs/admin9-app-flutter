@@ -128,3 +128,12 @@ unavailable-service behavior. Historical device evidence remains valid only for
 the exact source/artifact it names. Later unexecuted device or assistive-
 technology checks remain `Unknown`; no compatibility or accessibility
 certification is inferred from earlier evidence.
+
+Current Demo-first UI unification work is tracked separately from the released
+v1 records:
+
+- [decision baseline](admin9-ui-decision-baseline.md)
+- [stage gates](admin9-ui-stage-gates.md)
+- [G1 verification](admin9-ui-g1-verification.md)
+- [G2 candidate screening](admin9-ui-g2-candidate-screening.md)
+- [G2 verification and recommendation](admin9-ui-g2-verification.md)

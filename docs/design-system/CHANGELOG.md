@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Added a removable G2 comparison POC for the current control, a first-party
+  unified candidate, and Forui 0.25.0; recorded package provenance, focused
+  Widget/Golden/local performance evidence, candidate isolation and a passing
+  removal drill. The first-party route is recommended for G3 pending the fixed-
+  SHA independent review gate.
 - Repositioned the upstream project as Admin9 App Starter and unified the
   default Dart, Android, and iOS display identity.
 - Retired the downstream manifest, compatibility registry, exact-source tuple,

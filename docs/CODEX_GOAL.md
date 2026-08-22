@@ -14,9 +14,11 @@ areas, and accessibility keep their platform behavior.
 
 ## Current stage
 
-The three fixed-SHA supervision reports for `6c30ac4` returned Revise with no
-P0 or Block. Their five confirmed P1 findings are closed locally as one bounded
-change set and are ready for one final fixed-commit closure/regression review.
+G1 is closed Go at `cf68a24844e45c16d983d29fb4878ad2f14bfd41` and must not
+be reopened or expanded. G2 has completed bounded control/first-party/Forui
+same-scenario POCs, candidate isolation, local performance evidence and an
+actual removal drill. The first-party unified route is recommended for G3 and
+is ready for one fixed-SHA three-reviewer G2 decision.
 
 ## Completed
 
@@ -50,6 +52,17 @@ change set and are ready for one final fixed-commit closure/regression review.
   host/barrel encapsulation, bidirectional dependency classification, explicit
   adapter-dependent public types, compatible pressed-state SVG opacity, and
   generator-bound visual calibration.
+- Screened Forui 0.25.0 as the primary package and `shadcn_ui` 0.56.1 as an
+  evidence-only backup; recorded exact artifacts, licenses, activity,
+  advisories, dependency surfaces and exit risks before package code.
+- Built one shared four-scenario harness for the current control, a new
+  first-party unified candidate and an isolated Forui adapter without changing
+  business pages, routes, the App host, root Theme or public `App*`.
+- Passed 16 focused Widget tests, 24 G2 Golden tests, local bounded performance
+  sampling and the complete candidate/import boundary gates.
+- Completed an isolated removal drill: all three Forui packages and residual
+  references were removed while analyze, 157 non-Golden tests and boundary
+  gates passed with zero `lib/app`, `lib/ui`, route or root Theme differences.
 
 ## Verification evidence
 
@@ -75,6 +88,13 @@ change set and are ready for one final fixed-commit closure/regression review.
 - 2026-08-23: candidate fixtures passed one legal topology and 22 focused
   negative cases; repository dependency/boundary scanning and all 16 visual
   assets passed, and all eight 2400x1200 boards were visually rechecked.
+- 2026-08-23: the fixed G2 candidate tree passed `flutter analyze`, 164
+  non-Golden tests, 43 tagged Golden tests (24 G2 plus 19 existing), both
+  Design System probes, all configuration/import/candidate/Gallery gates, and
+  documentation verification across 65 Markdown files.
+- 2026-08-23: Android Release APK and iOS no-codesign Release app builds passed.
+  Both asset trees contained the three Forui font assets (2,627,296 bytes),
+  confirming the package footprint is present even though the POC is unrouted.
 - Current visible branching is present in `AppButton`, `AppTextField`,
   `AppPage`, `AppBottomNavigation`, `AppDialog`, `AppActionMenu`, `AppSwitch`,
   `AppListTile`, feedback, progress, icon mapping, and shell scaffolds.
@@ -92,6 +112,10 @@ change set and are ready for one final fixed-commit closure/regression review.
   implementation route has a material gap.
 - One primary package and at most one evidence-triggered backup may enter POC;
   no candidate type or adapter may leak through the `App*` public surface.
+- G2 provisionally recommends the first-party unified route. Forui 0.25.0 was
+  the implemented package candidate and `shadcn_ui` 0.56.1 remained the
+  evidence-only backup; the recommendation is not final until all three G2
+  fixed-SHA reviewers return Go.
 
 ## Blocking decisions
 
@@ -104,9 +128,12 @@ POCs, or Demo implementation.
 
 ## Next
 
-1. Commit the bounded P1 closure as a new SHA without amending `6c30ac4`.
-2. Run one final review limited to existing-P1 closure and direct P0/P1
-   regressions; record P2 without expanding G1.
-3. Enter G2 to screen one primary and at most one evidence-triggered backup,
-   then build removable, `App*`-contained comparison POCs against the same
-   reference SHA.
+1. Run the complete G2 verification suite and commit one fixed G2 SHA.
+2. Create exactly three independent read-only G2 reviews of that SHA, limited
+   to product/brand value, Flutter/Design System architecture, and
+   accessibility/delivery risk.
+3. Fix only confirmed G2 P0/P1, record P2, and require all three reviewers to
+   return Go before G3.
+4. In G3 remove Forui POC code/dependencies and implement the first-party route
+   behind existing `App*`; do not migrate Starter or release before real-device
+   acceptance.
