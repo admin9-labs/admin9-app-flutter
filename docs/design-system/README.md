@@ -97,6 +97,7 @@ local consistency checks, not compatibility approval or certification.
 | import boundaries | Core/App/Brand/Business dependency direction and public barrel |
 | UI candidate boundary | candidate package adapter isolation, public API leakage, and root Theme independence |
 | Gallery boundary | debug/profile reachability and release isolation |
+| paired visual references | generated asset dimensions, required state labels, hashes, and explicitly allowed platform differences |
 | App configuration | optional schema fixtures, default identity, native display names, and generated drift |
 | rule links | stable IDs, module anchors, and named quality gates |
 | upstream ownership | current upstream `OWNERS.md` and `CODEOWNERS` records |

@@ -11,36 +11,36 @@
       "path": "android/account.svg",
       "width": 2400,
       "height": 1200,
-      "bytes": 22571,
-      "sha256": "c7b1b2749a049e1207d59eac003837da60cc819b3201734d8a753e5da77ce316"
+      "bytes": 24966,
+      "sha256": "b404718f4bc8e7f435d4a7bea12df7f182c3eae338e4c0fd83746da6a5a51643"
     },
     {
       "path": "android/account.png",
       "width": 2400,
       "height": 1200,
-      "bytes": 243253,
-      "sha256": "5fb0ddd2fe5d5e4d8012f439b6b98680cef0edfe0a80a973714bcad9a508b4c5"
+      "bytes": 281695,
+      "sha256": "7df2bbfc9faa269a5c323b457911fdb647c0b3125f6e764f6c586e3e562ba0cc"
     },
     {
       "path": "android/auth.svg",
       "width": 2400,
       "height": 1200,
-      "bytes": 23405,
-      "sha256": "6839558605b624bb54eb3c7d0bbe173fca95d69aa4b4c6ec72e6280f1037091e"
+      "bytes": 23613,
+      "sha256": "66c38dfa1e07ac4377c5e7316ea631fa7032eb2d82b70e206c7461185832e130"
     },
     {
       "path": "android/auth.png",
       "width": 2400,
       "height": 1200,
-      "bytes": 301361,
-      "sha256": "dd80614217c32483b38ba8ac2d08a9f8b648ce7a9db300298778dc14761e5bd9"
+      "bytes": 300977,
+      "sha256": "70fadf7a0386fc34fc50ef488d67f3a6816bd18e2299184ece08a81f8da75147"
     },
     {
       "path": "android/settings.svg",
       "width": 2400,
       "height": 1200,
-      "bytes": 22136,
-      "sha256": "a1d61a9162649ea79f20ebf07bdc946f5cf6e209cbdc0bdf458018d59026bb2a"
+      "bytes": 22758,
+      "sha256": "87a64d35d4980b10ecef152fb8514cb498a7c79bd8796f2ef39a5f29742d61c5"
     },
     {
       "path": "android/settings.png",
@@ -53,8 +53,8 @@
       "path": "android/feedback.svg",
       "width": 2400,
       "height": 1200,
-      "bytes": 16037,
-      "sha256": "6ec1c92f21578195b2ead6ac2e3ef0ef7f0fd6c7dd9ebdd50f965b67834f8afc"
+      "bytes": 16413,
+      "sha256": "d1c571d9f7e089c297647abfb1be5a2ffe7169216808964f671b4e473e780d27"
     },
     {
       "path": "android/feedback.png",
@@ -67,36 +67,36 @@
       "path": "ios/account.svg",
       "width": 2400,
       "height": 1200,
-      "bytes": 22575,
-      "sha256": "5b65fcdc29275ab95fdcd64e3f4215d4b99dffb870c72e0c8205b8655ac3d786"
+      "bytes": 24970,
+      "sha256": "97587166788504373f263d451ad7eb3688af81d0f75a12536ed703cbea338251"
     },
     {
       "path": "ios/account.png",
       "width": 2400,
       "height": 1200,
-      "bytes": 242628,
-      "sha256": "ee7d4cac616ec71a7e739f79df0bd6456d606f7b0fdbaccfd346d30e966f9911"
+      "bytes": 281032,
+      "sha256": "eecf5c96a5ea68aa2e94de44f631cf34f37c43c0cfd3ccf462a28ad21f503333"
     },
     {
       "path": "ios/auth.svg",
       "width": 2400,
       "height": 1200,
-      "bytes": 23401,
-      "sha256": "1bf9554287df0a12d34de0265a525211079b4814b260c9101a93fd9f396d93ed"
+      "bytes": 23609,
+      "sha256": "96d4c7d38e499484da10b6ffc12e2cc4d418ff4da3641f9bf9e2492ee6db487d"
     },
     {
       "path": "ios/auth.png",
       "width": 2400,
       "height": 1200,
-      "bytes": 300710,
-      "sha256": "36348f14d1b562c8be0fd43166cc69889eb4663977f1d5801ba77994603baf17"
+      "bytes": 300316,
+      "sha256": "f0cdee89f680c305f826841a33b18f129edc9dfaa2ffb50d3858a30a56b025a4"
     },
     {
       "path": "ios/settings.svg",
       "width": 2400,
       "height": 1200,
-      "bytes": 22141,
-      "sha256": "499e4916867750ad2d7be05f475247bdb6733f3e213f3bc9fcccecccf7d22a44"
+      "bytes": 22763,
+      "sha256": "74dbbd142a42eaa1d425037b3722f3be550fe18ec9d0f48e3387831c2b15c77f"
     },
     {
       "path": "ios/settings.png",
@@ -109,8 +109,8 @@
       "path": "ios/feedback.svg",
       "width": 2400,
       "height": 1200,
-      "bytes": 16017,
-      "sha256": "8cf6486babf0454c48862660bce0d35242e5f20fc58cd600319143fa16cb72d9"
+      "bytes": 16393,
+      "sha256": "6f01b6608e3e5894566510621350c71545e23f61d6ba486db674da79857a5072"
     },
     {
       "path": "ios/feedback.png",

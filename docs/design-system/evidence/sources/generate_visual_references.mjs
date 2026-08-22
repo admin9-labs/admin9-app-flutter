@@ -13,6 +13,7 @@ const esc = (value) => String(value).replaceAll('&', '&amp;').replaceAll('<', '&
 const rect = (x, y, w, h, fill, stroke = 'none', r = 0, dash = '') => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${r}" fill="${fill}" stroke="${stroke}"${dash ? ` stroke-dasharray="${dash}"` : ''}/>`;
 const line = (x1, y1, x2, y2, color, width = 1) => `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="${width}"/>`;
 const text = (x, y, value, size, color, weight = 400, anchor = 'start') => `<text x="${x}" y="${y}" font-size="${size}" font-weight="${weight}" fill="${color}" text-anchor="${anchor}" font-family="-apple-system,BlinkMacSystemFont,'Noto Sans CJK SC','PingFang SC',Arial,sans-serif">${esc(value)}</text>`;
+const platformText = (key, ...args) => text(...args).replace('<text ', `<text data-platform-difference="${esc(key)}" `);
 const multilineText = (x, y, lines, size, color, weight = 400, lineHeight = 22, anchor = 'start') => lines.map((value, index) => text(x, y + index * lineHeight, value, size, color, weight, anchor)).join('');
 const typeSize = (base, extraLarge) => extraLarge ? Math.round(base * 1.24 * 100) / 100 : base;
 
@@ -23,7 +24,7 @@ function chrome(p, platform, title, large = false, parent = '') {
   s += text(195, 28, '9:41', 12, p.text, 600, 'middle');
   s += rect(0, 44, 390, 64, p.surface);
   if (parent) {
-    s += text(18, 84, platform === 'ios' ? `‹ ${parent}` : `← ${parent}`, typeSize(14, large), p.primary, 650);
+    s += platformText('back-control', 18, 84, platform === 'ios' ? `‹ ${parent}` : `← ${parent}`, typeSize(14, large), p.primary, 650);
   }
   s += text(parent ? 132 : 20, 85, title, titleSize, p.text, 700);
   s += line(0, 108, 390, 108, p.outline, 0.6);
@@ -32,6 +33,10 @@ function chrome(p, platform, title, large = false, parent = '') {
 
 function hit(x, y, w, h, p, label = '') {
   return rect(x, y, w, h, 'none', p.primary, 4, '5 4') + (label ? text(x + w, y - 4, label, 9, p.primary, 600, 'end') : '');
+}
+
+function platformHit(x, y, w, h, p, label, key) {
+  return rect(x, y, w, h, 'none', p.primary, 4, '5 4') + platformText(key, x + w, y - 4, label, 9, p.primary, 600, 'end');
 }
 
 function button(x, y, w, label, p, variant = 'primary', large = false, platform = 'android') {
@@ -81,7 +86,7 @@ function switchControl(x, y, p, on = true, platform = 'android') {
   const h = 28;
   let s = rect(x, y, w, h, on ? p.primary : p.outline, 'none', h / 2);
   s += `<circle cx="${on ? x + w - h / 2 : x + h / 2}" cy="${y + h / 2}" r="${h / 2 - 3}" fill="${p.surface}"/>`;
-  s += hit(x - 2, y - 9, Math.max(52, w + 4), 48, p, platform === 'ios' ? '44pt+' : '48dp');
+  s += platformHit(x - 2, y - 9, Math.max(52, w + 4), 48, p, platform === 'ios' ? '44pt+' : '48dp', 'switch-hit-minimum');
   return s;
 }
 
@@ -93,21 +98,37 @@ function bottomNavigation(platform, p, large = false) {
   s += text(98, y + 43, '首页', typeSize(11, large), p.muted, 500, 'middle');
   s += text(292, y + 24, '●', typeSize(17, large), p.primary, 600, 'middle');
   s += text(292, y + 43, '我的', typeSize(11, large), p.primary, 650, 'middle');
-  s += hit(50, y + 3, 96, 48, p, platform === 'ios' ? '44pt+' : '48dp');
-  s += hit(244, y + 3, 96, 48, p, platform === 'ios' ? '44pt+' : '48dp');
+  s += platformHit(50, y + 3, 96, 48, p, platform === 'ios' ? '44pt+' : '48dp', 'navigation-hit-minimum');
+  s += platformHit(244, y + 3, 96, 48, p, platform === 'ios' ? '44pt+' : '48dp', 'navigation-hit-minimum');
   return s;
 }
 
 function account(platform, theme, large, variant = 'guest') {
   const p = palettes[theme];
   let s = chrome(p, platform, '我的', large);
-  if (variant === 'empty' || variant === 'error') {
-    const error = variant === 'error';
+  if (variant === 'long') {
+    s += text(20, 140, '长中文重排', typeSize(13, large), p.muted, 650);
+    s += multilineText(20, 178, ['这是用于验证长中文重排的', '账号显示名称'], typeSize(20, large), p.text, 700, large ? 34 : 28);
+    s += text(20, large ? 252 : 230, 'sample.long.identity@example.com', typeSize(13, large), p.muted);
+    const groupY = large ? 282 : 260;
+    s += rect(20, groupY, 350, large ? 228 : 198, p.surface, 'none', 8);
+    s += multilineText(36, groupY + (large ? 42 : 36), ['这是用于验证长中文内容增长的', '账号资料设置名称'], typeSize(16, large), p.text, 500, large ? 30 : 24);
+    s += text(36, groupY + (large ? 114 : 96), '一个较长的当前值会换到下一行', typeSize(14, large), p.muted, 500);
+    s += line(36, groupY + (large ? 142 : 122), 370, groupY + (large ? 142 : 122), p.outline, 0.5);
+    s += text(36, groupY + (large ? 190 : 166), '账号安全', typeSize(16, large), p.text, 500);
+    s += text(350, groupY + (large ? 190 : 166), '›', typeSize(14, large), p.muted, 500, 'end');
+    s += bottomNavigation(platform, p, large);
+    return s;
+  }
+  if (variant === 'emptyError') {
     s += text(20, 144, '账号能力', typeSize(13, large), p.muted, 650);
-    s += rect(20, 162, 350, large ? 190 : 168, p.surface, error ? p.danger : p.outline, 8);
-    s += text(195, large ? 224 : 216, error ? '列表载入失败' : '暂无可用账号能力', typeSize(18, large), p.text, 700, 'middle');
-    s += multilineText(195, large ? 264 : 252, error ? ['请检查网络后重试，', '现有导航状态保持不变。'] : ['当前状态没有列表项，', '底部导航仍保持可用。'], typeSize(13, large), p.muted, 400, large ? 25 : 22, 'middle');
-    if (error) s += text(195, large ? 326 : 300, '重试', typeSize(14, large), p.primary, 650, 'middle');
+    s += rect(20, 162, 350, 148, p.surface, p.outline, 8);
+    s += text(195, 208, '暂无可用账号能力', typeSize(18, large), p.text, 700, 'middle');
+    s += multilineText(195, 244, ['当前状态没有列表项，', '底部导航仍保持可用。'], typeSize(13, large), p.muted, 400, 22, 'middle');
+    s += rect(20, 338, 350, 174, p.surface, p.danger, 8);
+    s += text(195, 386, '列表载入失败', typeSize(18, large), p.text, 700, 'middle');
+    s += multilineText(195, 422, ['请检查网络后重试，', '现有导航状态保持不变。'], typeSize(13, large), p.muted, 400, 22, 'middle');
+    s += text(195, 488, '重试', typeSize(14, large), p.primary, 650, 'middle');
     s += bottomNavigation(platform, p, large);
     return s;
   }
@@ -165,13 +186,13 @@ function auth(platform, theme, large, variant = 'register') {
     y += large ? (errorState ? 146 : 124) : (errorState ? 108 : 82);
   }
   s += button(20, y, 350, login ? '登录' : '注册', p, 'primary', large, platform);
-  y += large ? 74 : 64;
+  y += large ? 66 : 64;
   s += text(20, y + 12, login ? '注册账号' : '返回登录', typeSize(14, large), p.primary, 600);
   if (login) s += text(350, y + 12, '账号找回', typeSize(14, large), p.primary, 600, 'end');
   s += hit(16, y - 10, 120, 48, p);
   if (login) s += hit(254, y - 10, 120, 48, p);
-  y += 48;
-  const noticeH = large ? 78 : 62;
+  y += large ? 40 : 48;
+  const noticeH = large ? 70 : 62;
   s += rect(20, y, 350, noticeH, p.container, p.info, 6);
   s += text(36, y + (large ? 27 : 24), '信息：服务未接入', typeSize(14, large), p.info, 700);
   s += text(36, y + (large ? 55 : 45), '保留输入，不创建会话', typeSize(13, large), p.text);
@@ -274,7 +295,7 @@ function feedback(platform, theme, large, variant = 'dialog') {
     s += text(38, 472, '设置已更新', 14, p.text, 700);
     s += text(350, 497, '关闭', 13, p.primary, 650, 'end');
   }
-  s += text(195, 820, platform === 'ios' ? '保留 iOS 模态焦点、边缘返回与安全区' : '保留 Android 模态焦点、系统返回与安全区', typeSize(11, large), p.muted, 500, 'middle');
+  s += platformText('modal-behavior', 195, 820, platform === 'ios' ? '保留 iOS 模态焦点、边缘返回与安全区' : '保留 Android 模态焦点、系统返回与安全区', typeSize(11, large), p.muted, 500, 'middle');
   return s;
 }
 
@@ -282,13 +303,13 @@ function board(platform, page) {
   const title = { account: '主导航与列表', auth: '登录与注册', settings: '设置表单', feedback: '弹窗与反馈' }[page];
   const render = { account, auth, settings, feedback }[page];
   const variants = {
-    account: ['signed', 'signed', 'empty', 'error'],
+    account: ['signed', 'signed', 'long', 'emptyError'],
     auth: ['focused', 'register', 'error', 'login'],
     settings: ['main', 'main', 'error', 'selection'],
     feedback: ['menu', 'dialog', 'states', 'interaction'],
   }[page];
   const labels = {
-    account: ['已登录列表', '已登录列表', '空状态', '可恢复错误'],
+    account: ['已登录列表', '已登录列表', '长中文重排', '空状态与可恢复错误'],
     auth: ['键盘焦点', '注册基准态', '长中文错误', '登录替代态'],
     settings: ['设置基准态', '设置基准态', '持久化错误', '选择状态'],
     feedback: ['动作菜单', '确认弹窗', '错误·空态·确定进度', '按下·禁用·焦点·反馈'],
@@ -301,7 +322,7 @@ function board(platform, page) {
   ];
   let s = `<svg xmlns="http://www.w3.org/2000/svg" width="2400" height="1200" viewBox="0 0 2400 1200">`;
   s += rect(0, 0, 2400, 1200, '#E9EDF2');
-  s += text(70, 54, `Admin9 Design System · ${platform === 'android' ? 'Android' : 'iOS'} · ${title}`, 26, '#171A1F', 750);
+  s += platformText('board-platform-title', 70, 54, `Admin9 Design System · ${platform === 'android' ? 'Android' : 'iOS'} · ${title}`, 26, '#171A1F', 750);
   s += text(70, 84, '设计参考，非当前 App / 模拟器 / 设备截图', 15, '#4B5563', 500);
   s += text(2330, 84, '同一 Admin9 可见契约', 15, '#2457A7', 650, 'end');
   for (const state of states) {

@@ -1,6 +1,3 @@
-@Tags(['golden'])
-library;
-
 import 'dart:io';
 
 import 'package:admin9_app_flutter/admin9_ui.dart';
@@ -51,7 +48,7 @@ void main() {
         matchesGoldenFile('goldens/components_${row.name}.png'),
       );
       await pressedGesture?.up();
-    });
+    }, tags: 'golden');
   }
 
   testWidgets(
@@ -66,6 +63,7 @@ void main() {
         matchesGoldenFile('goldens/page_home_android.png'),
       );
     },
+    tags: 'golden',
     variant: TargetPlatformVariant.only(TargetPlatform.android),
   );
 
@@ -78,6 +76,7 @@ void main() {
         matchesGoldenFile('goldens/page_privacy_ios.png'),
       );
     },
+    tags: 'golden',
     variant: TargetPlatformVariant.only(TargetPlatform.iOS),
   );
 
@@ -97,6 +96,7 @@ void main() {
         matchesGoldenFile('goldens/page_settings_ios.png'),
       );
     },
+    tags: 'golden',
     variant: TargetPlatformVariant.only(TargetPlatform.iOS),
   );
 
@@ -118,6 +118,7 @@ void main() {
         matchesGoldenFile('goldens/page_registration_android.png'),
       );
     },
+    tags: 'golden',
     variant: TargetPlatformVariant.only(TargetPlatform.android),
   );
 
@@ -149,6 +150,7 @@ void main() {
         matchesGoldenFile('goldens/page_registration_E_android.png'),
       );
     },
+    tags: 'golden',
     variant: TargetPlatformVariant.only(TargetPlatform.android),
   );
 
@@ -179,6 +181,7 @@ void main() {
         matchesGoldenFile('goldens/page_settings_F_ios.png'),
       );
     },
+    tags: 'golden',
     variant: TargetPlatformVariant.only(TargetPlatform.iOS),
   );
 
@@ -199,7 +202,7 @@ void main() {
     expect(tester.getCenter(find.text('撤销')).dy, greaterThan(56));
     expect(tester.takeException(), isNull);
     await _expectSurfaceGolden(tester, 'goldens/gallery_feedback_android.png');
-  });
+  }, tags: 'golden');
 
   testWidgets('Phase 5 actual Gallery action menu golden', (tester) async {
     await _pumpGalleryGolden(tester, platform: TargetPlatform.android);
@@ -222,7 +225,7 @@ void main() {
       tester,
       'goldens/gallery_action_menu_android.png',
     );
-  });
+  }, tags: 'golden');
 
   testWidgets('Phase 5 actual Gallery iOS dialog golden', (tester) async {
     await _pumpGalleryGolden(tester, platform: TargetPlatform.iOS);
@@ -241,7 +244,7 @@ void main() {
     await tester.pump(const Duration(seconds: 1));
     await tester.pump();
     await _expectSurfaceGolden(tester, 'goldens/gallery_dialog_ios.png');
-  });
+  }, tags: 'golden');
 
   for (final row in _goldenRows) {
     testWidgets('Phase 5 actual Gallery matrix golden ${row.name}', (
@@ -275,7 +278,7 @@ void main() {
       }
       expect(tester.takeException(), isNull);
       await _expectSurfaceGolden(tester, 'goldens/gallery_${row.name}.png');
-    });
+    }, tags: 'golden');
   }
 
   testWidgets('Phase 5 actual Gallery A long value reflow stress', (
@@ -344,7 +347,7 @@ void main() {
     expect(find.text('AppPage 子页'), findsOneWidget);
     expect(tester.takeException(), isNull);
     await _expectSurfaceGolden(tester, 'goldens/gallery_app_page_android.png');
-  });
+  }, tags: 'golden');
 
   testWidgets('Phase 5 actual Gallery single choice golden', (tester) async {
     await _pumpGalleryGolden(tester, platform: TargetPlatform.iOS);
@@ -361,7 +364,7 @@ void main() {
     expect(find.text('跟随系统'), findsWidgets);
     expect(tester.takeException(), isNull);
     await _expectSurfaceGolden(tester, 'goldens/gallery_single_choice_ios.png');
-  });
+  }, tags: 'golden');
 }
 
 Finder get _galleryScrollable => find.descendant(

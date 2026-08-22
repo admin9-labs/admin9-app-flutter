@@ -37,21 +37,30 @@ Generated assets:
 | --- | --- | --- | --- | --- |
 | Light and dark | Yes | Yes | Yes | Yes |
 | Standard and large text | Yes | Yes | Yes | Yes |
-| Long Chinese/reflow | Two-line field errors and notice | Identity/list values and two-line recovery copy | Effective-state and persistence copy | Error and empty-state recovery copy |
+| Long Chinese/reflow | Two-line field errors and notice | Dedicated large-text panel with a two-line Chinese identity, two-line row label, and wrapped trailing value | Effective-state and persistence copy | Error and empty-state recovery copy |
 | Focus/pressed | Focused account field | Not represented on static board | Not represented on static board | Pressed button and keyboard-focus ring |
 | Disabled | Not represented on static board | Not represented on static board | Not represented on static board | Disabled menu command and button |
 | Loading | Not represented on static board | Not represented on static board | Not represented on static board | Determinate 45% and indeterminate loading |
-| Empty | Not applicable to form data | List empty state | Not applicable | Empty state shown |
-| Error | Two field errors and service boundary | Recoverable list error with retry | Persistence error with retry | Persistent recoverable error with retry |
+| Empty | Not applicable to form data | List empty state shown together with preserved navigation | Not applicable | Empty state shown |
+| Error | Two field errors and service boundary | Recoverable list error with retry shown beside the empty-state contract | Persistence error with retry | Persistent recoverable error with retry |
 
 Static boards mark the state rather than proving runtime focus, animation,
 reader output, or hit testing. Those move to Widget and device gates.
 
 The verifier requires the named state labels above, dimensions, hashes, and
-normalized Android/iOS structure. The SVG source, PNG rendering, and manifest
-belong to one reference round. If generator source or the manifest changes,
-control and every candidate must be rerun against the commit containing the new
-manifest; evidence from mixed reference commits is invalid.
+normalized Android/iOS structure. Only text nodes carrying an explicit
+`data-platform-difference` key are normalized; other platform words, glyphs,
+labels, and visible structure remain comparison evidence. The SVG source, PNG
+rendering, and manifest belong to one reference round. If generator source or
+the manifest changes, control and every candidate must be rerun against the
+commit containing the new manifest; evidence from mixed reference commits is
+invalid.
+
+All eight 2400x1200 PNG boards were visually checked after the current
+generation round. The inspection found no crop or overlap in the Auth
+large-text error state, Account long-Chinese reflow, combined empty/error
+state, Settings states, or Feedback states. This is static-reference evidence,
+not App, simulator, device, focus, gesture, animation, or reader evidence.
 
 ## Unity acceptance
 

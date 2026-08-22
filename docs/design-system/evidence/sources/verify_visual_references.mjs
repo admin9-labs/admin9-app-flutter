@@ -6,10 +6,10 @@ const root = process.argv[2] ?? 'docs/design-system/evidence/visual-references';
 const write = process.argv.includes('--write');
 const manifestPath = path.join(root, 'visual-assets.json');
 const requiredScenarioLabels = {
-  account: ['已登录列表', '暂无可用账号能力', '列表载入失败', '重试'],
-  auth: ['键盘焦点', '请输入手机号或邮箱', '内容不会被裁切', '登录替代态'],
-  settings: ['设置基准态', '设置暂未保存', '持久化错误', '重试'],
-  feedback: ['动作菜单', '删除账号', '确认弹窗', '已完成 45%', '按下状态', '禁用操作', '键盘焦点操作', '不确定进度'],
+  account: ['已登录列表', '长中文重排', '这是用于验证长中文内容增长的', '暂无可用账号能力', '列表载入失败', '重试'],
+  auth: ['键盘焦点', '注册基准态', '创建账号', '请输入手机号或邮箱', '两次密码不一致', '内容不会被裁切', '信息：服务未接入', '登录替代态'],
+  settings: ['设置基准态', '系统已开启高对比度', '设置暂未保存', '持久化错误', '重试', '选择状态', '选择主题', '跟随系统'],
+  feedback: ['动作菜单', '暂不可用', '删除账号', '取消', '确认弹窗', '确认提交', '操作失败', '暂无内容', '重试', '已完成 45%', '按下状态', '禁用操作', '键盘焦点操作', '不确定进度', '设置已更新', '关闭'],
 };
 const expected = [];
 const svgSources = new Map();
@@ -52,16 +52,10 @@ const assets = expected.map((relativePath) => {
   return { path: relativePath, width, height, bytes: buffer.length, sha256: sha256(buffer) };
 });
 
-const normalizeAllowedPlatformDifferences = (source) => source
-  .replaceAll('Android', 'Platform')
-  .replaceAll('iOS', 'Platform')
-  .replaceAll('48dp', 'platform-hit')
-  .replaceAll('44pt', 'platform-hit')
-  .replaceAll('platform-hit+', 'platform-hit')
-  .replaceAll('←', 'back-glyph')
-  .replaceAll('‹', 'back-glyph')
-  .replaceAll('系统返回', 'platform-back')
-  .replaceAll('边缘返回', 'platform-back');
+const normalizeAllowedPlatformDifferences = (source) => source.replace(
+  /(<text data-platform-difference="([^"]+)"[^>]*>)[^<]*(<\/text>)/g,
+  (_, open, key, close) => `${open}platform:${key}${close}`,
+);
 
 for (const page of ['account', 'auth', 'settings', 'feedback']) {
   const android = normalizeAllowedPlatformDifferences(svgSources.get(`android/${page}.svg`));

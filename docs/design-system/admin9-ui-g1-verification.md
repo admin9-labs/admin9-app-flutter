@@ -27,7 +27,7 @@ Result before independent re-review: Ready for fixed-commit review
 - Generated SVG source, PNG review assets, SHA-256 manifest, generator, and
   verifier.
 - Candidate boundary policy, repository validator, one positive fixture, and
-  nine exact negative fixtures.
+  18 exact negative fixtures.
 
 ## First-review revision closure
 
@@ -41,21 +41,34 @@ Result before independent re-review: Ready for fixed-commit review
 | Define staged POC/Demo/device gates | Stage-gate contract defines owners, P0/P1, resource limit, elimination, removal, entry, exit, and stop rules |
 | Unify accessible content/count/timing/focus | Decision baseline freezes one visible message, once after visibility, no rebuild repeat, and no focus movement; OS delivery remains adaptive |
 | Bind every candidate to one reference commit | Stage-gate and paired-reference protocols invalidate mixed-SHA evidence and require full-round reruns |
-| Scope old test evidence correctly | The Golden suite is file-tagged; this report separates 143 non-Golden old-contract tests from 21 existing v1 Golden tests, and neither proves a unified candidate |
+| Scope old test evidence correctly | Only tests that perform Golden comparisons carry the `golden` tag; this report separates 145 non-Golden old-contract tests from 19 existing v1 Golden tests, and neither proves a unified candidate |
+
+## Fixed-commit review at `37b0899` revision closure
+
+| Required correction | Closure evidence |
+| --- | --- |
+| Remove Auth large-text overlap | Regenerated Auth boards keep the long errors, action, secondary action, and unavailable-service notice visibly separated |
+| Prove Account long Chinese and list recovery states | The third Account panel now shows large-text Chinese reflow and a wrapped value; the fourth shows both empty and recoverable-error states |
+| Complete required-state labels and run the visual gate in CI | The verifier requires the full scenario label set; CI syntax-checks both scripts and validates all 16 committed assets |
+| Limit platform-difference normalization | Only `<text data-platform-difference>` nodes are normalized; arbitrary Android/iOS text, glyphs, and copy remain comparison evidence |
+| Follow the complete public export surface | The candidate gate traverses nested exports and associated parts from `lib/admin9_ui.dart` |
+| Follow every relevant dependency edge | Import, export, part, and conditional URI edges participate in adapter and root Theme/app-host reachability checks |
+| Cover public declaration shapes | Candidate signatures cover classes, enums, mixins, extension types, functions, extensions, typedefs, top-level variables, fields, methods, and constructors |
+| Correct Golden classification and CI selection | Nineteen comparison tests are individually tagged; two ordinary layout/semantics stress tests remain in the 145-test default suite |
 
 ## Checks
 
 | Check | Result | Meaning |
 | --- | --- | --- |
 | `flutter analyze` | Pass, no issues on Flutter 3.44.1 / Dart 3.12.1 | Existing source plus the new validator is statically clean; negative candidate fixtures are parsed only by their dedicated gate |
-| `flutter test --exclude-tags golden` | Pass, 143 tests | Existing non-Golden old-contract behavior is stable; does not prove visual unity |
-| `flutter test test/design_system_phase_5_golden_test.dart` | Pass, 21 tests | Existing v1 Flutter rendering remains stable; there is no G1 unified candidate rendering to prove |
+| `flutter test --exclude-tags golden` | Pass, 145 tests | Existing non-Golden old-contract behavior is stable; does not prove visual unity |
+| `flutter test --tags golden test/design_system_phase_5_golden_test.dart` | Pass, 19 tests | Existing v1 Flutter rendering remains stable; there is no G1 unified candidate rendering to prove |
 | Generator syntax | Pass | Reference generator and verifier parse on local Node.js |
 | Asset verification | Pass, 16 assets | SVG/PNG dimensions, required state labels, and recorded hashes match |
 | Normalized paired structure | Pass, four scenarios | After removing only approved platform annotations, Android/iOS SVG sources are identical |
-| 2400x1200 visual inspection | Pass, eight boards after one auth spacing correction | No observed crop, overlap, missing required state, or platform color swap |
+| 2400x1200 visual inspection | Pass, eight boards after auth spacing and Account reflow/state corrections | No observed crop, overlap, missing required state, or platform color swap |
 | Existing import/public API/Gallery gates | Pass | Existing architecture gates remain intact |
-| UI candidate boundary fixtures | Pass, one positive and nine negative | Direct and indirect candidate leakage paths fail before POC |
+| UI candidate boundary fixtures | Pass, one positive and 18 negative | Import/export/part, conditional URI, public declaration, adapter, and root-host leakage paths fail before POC |
 | UI candidate repository scan | Pass with no configured candidate package | G1 has no hidden candidate dependency; G2 must add exact package names before code |
 | Documentation verification | Pass, 63 Markdown files | Local links, anchors, tables, fences, and whitespace are valid |
 | Dart formatting and `git diff --check` | Pass | Source formatting and whitespace integrity |

@@ -46,6 +46,9 @@ dart run tool/design_system/verify_import_boundaries.dart --phase=final
 dart run tool/design_system/verify_ui_candidate_boundary.dart --fixtures
 dart run tool/design_system/verify_ui_candidate_boundary.dart
 dart run tool/design_system/verify_gallery_boundary.dart
+node --check docs/design-system/evidence/sources/generate_visual_references.mjs
+node --check docs/design-system/evidence/sources/verify_visual_references.mjs
+node docs/design-system/evidence/sources/verify_visual_references.mjs docs/design-system/evidence/visual-references
 dart run tool/design_system/verify_app_config.dart
 dart run tool/design_system/verify_app_config.dart --fixtures
 dart run tool/design_system/verify_rule_links.dart

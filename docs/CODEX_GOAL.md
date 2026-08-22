@@ -52,17 +52,21 @@ new fixed-commit review.
 
 - 2026-08-22: `flutter analyze` passed with no issues on Flutter 3.44.1 / Dart
   3.12.1.
-- 2026-08-22: `flutter test --exclude-tags golden` passed 143 tests. This is an
+- 2026-08-22: `flutter test --exclude-tags golden` passed 145 tests. This is an
   old-contract regression baseline, not proof of cross-platform brand unity.
-- 2026-08-22: the explicitly tagged existing Flutter Golden suite passed 21
+- 2026-08-22: the explicitly tagged existing Flutter Golden suite passed 19
   tests. It protects v1 rendering only; no unified candidate rendering exists
   in G1.
 - 2026-08-22: 16 generated SVG/PNG assets passed dimension, required-state,
-  hash, and normalized paired-structure checks; all eight boards were manually
-  checked after one long-error spacing correction.
+  hash, and explicitly marked platform-difference structure checks; all eight
+  boards were manually checked after auth spacing and Account reflow/state
+  corrections.
 - 2026-08-22: existing import/public API/Gallery gates passed. The new UI
-  candidate boundary passed one positive and nine exact negative fixtures plus
+  candidate boundary passed one positive and 18 exact negative fixtures plus
   the repository scan.
+- 2026-08-22: CI now excludes only tests tagged `golden`, keeps the two ordinary
+  layout/semantics stress tests in the default suite, and verifies the generated
+  paired-reference assets and manifest.
 - 2026-08-22: documentation links/structure, Dart formatting, and
   `git diff --check` passed.
 - Current visible branching is present in `AppButton`, `AppTextField`,

@@ -95,8 +95,10 @@ List<String> _validateTree(
   final files = _dartFiles(root);
   final errors = <String>[];
   final parsed = <String, _ParsedSource>{};
-  final adapterNames = <String>{};
-  final importGraph = <String, Set<String>>{};
+  final dependencyGraph = <String, Set<String>>{};
+  final exportGraph = <String, Set<String>>{};
+  final partGraph = <String, Set<String>>{};
+  final candidatePrefixesByPath = <String, Set<String>>{};
 
   for (final file in files) {
     final relative = _relativePath(root, file.path);
@@ -108,39 +110,44 @@ List<String> _validateTree(
       lineInfo: result.lineInfo,
     );
     parsed[relative] = parsedSource;
-    if (_isUnder(relative, policy.adapterRoots)) {
-      adapterNames.addAll(_publicAdapterNames(source));
-    }
   }
 
   for (final entry in parsed.entries) {
     final path = entry.key;
     final source = entry.value;
-    final inAdapter = _isUnder(path, policy.adapterRoots);
-    final candidatePrefixes = <String>{};
-    final localImports = importGraph.putIfAbsent(path, () => <String>{});
+    final inAdapterPath = _isUnder(path, policy.adapterRoots);
+    final candidatePrefixes = candidatePrefixesByPath.putIfAbsent(
+      path,
+      () => <String>{},
+    );
+    final localDependencies = dependencyGraph.putIfAbsent(
+      path,
+      () => <String>{},
+    );
 
     for (final directive
         in source.unit.directives.whereType<ImportDirective>()) {
-      final uri = directive.uri.stringValue;
-      if (uri == null) continue;
-      final package = _packageName(uri);
-      final target = _normalizeImport(path, uri);
       final location = _location(path, source, directive.offset);
-      if (target.startsWith('lib/')) localImports.add(target);
-
-      if (package != null && policy.candidatePackages.contains(package)) {
-        if (!inAdapter) {
-          errors.add(
-            '$location candidate package imports are allowed only under '
-            '${policy.adapterRoots.join(', ')}: $uri',
-          );
+      var importsCandidate = false;
+      for (final uri in _namespaceUris(directive)) {
+        final package = _packageName(uri);
+        final target = _normalizeImport(path, uri);
+        if (target.startsWith('lib/')) localDependencies.add(target);
+        if (package != null && policy.candidatePackages.contains(package)) {
+          importsCandidate = true;
+          if (!inAdapterPath) {
+            errors.add(
+              '$location candidate package imports are allowed only under '
+              '${policy.adapterRoots.join(', ')}: $uri',
+            );
+          }
         }
+      }
+      if (importsCandidate) {
         final prefix = directive.prefix?.name;
         if (prefix == null) {
           errors.add(
-            '$location candidate package imports require an explicit prefix: '
-            '$uri',
+            '$location candidate package imports require an explicit prefix',
           );
         } else {
           candidatePrefixes.add(prefix);
@@ -150,52 +157,82 @@ List<String> _validateTree(
 
     for (final directive
         in source.unit.directives.whereType<ExportDirective>()) {
-      final uri = directive.uri.stringValue;
-      if (uri == null) continue;
-      final package = _packageName(uri);
-      final target = _normalizeImport(path, uri);
       final location = _location(path, source, directive.offset);
-      if ((package != null && policy.candidatePackages.contains(package)) ||
-          _isUnder(target, policy.adapterRoots)) {
-        errors.add(
-          '$location candidate packages and adapters must not be exported: '
-          '$uri',
-        );
-      }
-    }
-
-    if (inAdapter) {
-      for (final declaration
-          in source.unit.declarations.whereType<ExtensionDeclaration>()) {
-        final name = declaration.name?.lexeme;
-        if (name == null || !_isPrivate(name)) {
+      for (final uri in _namespaceUris(directive)) {
+        final package = _packageName(uri);
+        final target = _normalizeImport(path, uri);
+        if (target.startsWith('lib/')) {
+          localDependencies.add(target);
+          exportGraph.putIfAbsent(path, () => <String>{}).add(target);
+        }
+        if ((package != null && policy.candidatePackages.contains(package)) ||
+            _isUnder(target, policy.adapterRoots)) {
           errors.add(
-            '${_location(path, source, declaration.offset)} candidate '
-            'adapters must not declare public context extensions',
+            '$location candidate packages and adapters must not be exported: '
+            '$uri',
           );
         }
       }
-      for (final signature in _publicSignatures(source)) {
-        for (final prefix in candidatePrefixes) {
-          if (RegExp(
-            '\\b${RegExp.escape(prefix)}\\.',
-          ).hasMatch(signature.text)) {
-            errors.add(
-              '${_location(path, source, signature.offset)} candidate types '
-              'must not appear in adapter public API',
-            );
-          }
+    }
+
+    for (final directive in source.unit.directives.whereType<PartDirective>()) {
+      final uri = directive.uri.stringValue;
+      if (uri == null) continue;
+      final target = _normalizeImport(path, uri);
+      if (target.startsWith('lib/')) {
+        localDependencies.add(target);
+        partGraph.putIfAbsent(path, () => <String>{}).add(target);
+      }
+    }
+  }
+
+  final adapterFiles = _adapterFiles(
+    parsed.keys,
+    partGraph,
+    policy.adapterRoots,
+  );
+  final adapterNames = <String>{};
+  for (final path in adapterFiles) {
+    final source = parsed[path];
+    if (source != null) adapterNames.addAll(_publicAdapterNames(source.source));
+  }
+  for (final entry in partGraph.entries) {
+    final libraryPrefixes = candidatePrefixesByPath[entry.key];
+    if (libraryPrefixes == null || libraryPrefixes.isEmpty) continue;
+    for (final part in entry.value) {
+      candidatePrefixesByPath
+          .putIfAbsent(part, () => <String>{})
+          .addAll(libraryPrefixes);
+    }
+  }
+
+  for (final path in adapterFiles) {
+    final source = parsed[path];
+    if (source == null) continue;
+    for (final declaration
+        in source.unit.declarations.whereType<ExtensionDeclaration>()) {
+      final name = declaration.name?.lexeme;
+      if (name == null || !_isPrivate(name)) {
+        errors.add(
+          '${_location(path, source, declaration.offset)} candidate adapters '
+          'must not declare public context extensions',
+        );
+      }
+    }
+    for (final signature in _publicSignatures(source)) {
+      for (final prefix in candidatePrefixesByPath[path] ?? const <String>{}) {
+        if (RegExp('\\b${RegExp.escape(prefix)}\\.').hasMatch(signature.text)) {
+          errors.add(
+            '${_location(path, source, signature.offset)} candidate types '
+            'must not appear in adapter public API',
+          );
         }
       }
     }
   }
 
   for (final rootThemeFile in policy.rootThemeFiles) {
-    final path = _pathToAdapter(
-      rootThemeFile,
-      importGraph,
-      policy.adapterRoots,
-    );
+    final path = _pathToAdapter(rootThemeFile, dependencyGraph, adapterFiles);
     if (path != null) {
       errors.add(
         '$rootThemeFile: root Theme and app host files must not depend on '
@@ -204,7 +241,12 @@ List<String> _validateTree(
     }
   }
 
-  final publicFiles = _publicApiFiles(parsed, policy.publicBarrel);
+  final publicFiles = _publicApiFiles(
+    parsed,
+    policy.publicBarrel,
+    exportGraph,
+    partGraph,
+  );
   for (final path in publicFiles) {
     final source = parsed[path];
     if (source == null) continue;
@@ -243,7 +285,7 @@ List<String> _validateTree(
 List<String>? _pathToAdapter(
   String start,
   Map<String, Set<String>> graph,
-  List<String> adapterRoots,
+  Set<String> adapterFiles,
 ) {
   final pending = <List<String>>[
     [start],
@@ -253,7 +295,7 @@ List<String>? _pathToAdapter(
     final path = pending.removeAt(0);
     final current = path.last;
     if (!visited.add(current)) continue;
-    if (current != start && _isUnder(current, adapterRoots)) return path;
+    if (current != start && adapterFiles.contains(current)) return path;
     for (final next in graph[current] ?? const <String>{}) {
       pending.add([...path, next]);
     }
@@ -264,15 +306,26 @@ List<String>? _pathToAdapter(
 Set<String> _publicApiFiles(
   Map<String, _ParsedSource> parsed,
   String barrelPath,
+  Map<String, Set<String>> exportGraph,
+  Map<String, Set<String>> partGraph,
 ) {
-  final barrel = parsed[barrelPath];
-  if (barrel == null) return const <String>{};
-  return barrel.unit.directives
-      .whereType<ExportDirective>()
-      .map((directive) => directive.uri.stringValue)
-      .whereType<String>()
-      .map((uri) => _normalizeImport(barrelPath, uri))
-      .toSet();
+  if (!parsed.containsKey(barrelPath)) return const <String>{};
+  final publicFiles = <String>{};
+  final pending = <String>[barrelPath];
+  final visited = <String>{};
+  while (pending.isNotEmpty) {
+    final current = pending.removeLast();
+    if (!visited.add(current)) continue;
+    for (final target in exportGraph[current] ?? const <String>{}) {
+      if (parsed.containsKey(target) && publicFiles.add(target)) {
+        pending.add(target);
+      }
+    }
+    for (final part in partGraph[current] ?? const <String>{}) {
+      if (parsed.containsKey(part)) publicFiles.add(part);
+    }
+  }
+  return publicFiles;
 }
 
 Set<String> _publicAdapterNames(String source) {
@@ -289,6 +342,33 @@ Set<String> _publicAdapterNames(String source) {
   return names;
 }
 
+Set<String> _adapterFiles(
+  Iterable<String> files,
+  Map<String, Set<String>> partGraph,
+  List<String> adapterRoots,
+) {
+  final result = files.where((path) => _isUnder(path, adapterRoots)).toSet();
+  var changed = true;
+  while (changed) {
+    changed = false;
+    for (final library in result.toList()) {
+      for (final part in partGraph[library] ?? const <String>{}) {
+        if (result.add(part)) changed = true;
+      }
+    }
+  }
+  return result;
+}
+
+Iterable<String> _namespaceUris(NamespaceDirective directive) sync* {
+  final primary = directive.uri.stringValue;
+  if (primary != null) yield primary;
+  for (final configuration in directive.configurations) {
+    final conditional = configuration.uri.stringValue;
+    if (conditional != null) yield conditional;
+  }
+}
+
 List<_Signature> _publicSignatures(_ParsedSource source) {
   final signatures = <_Signature>[];
   for (final declaration in source.unit.declarations) {
@@ -300,25 +380,31 @@ List<_Signature> _publicSignatures(_ParsedSource source) {
       );
       final body = declaration.body;
       if (body is BlockClassBody) {
-        for (final member in body.members) {
-          if (member is MethodDeclaration && !_isPrivate(member.name.lexeme)) {
-            signatures.add(
-              _slice(source.source, member.offset, member.body.offset),
-            );
-          } else if (member is ConstructorDeclaration) {
-            final name = member.name?.lexeme;
-            if (name == null || !_isPrivate(name)) {
-              signatures.add(
-                _slice(source.source, member.offset, member.body.offset),
-              );
-            }
-          } else if (member is FieldDeclaration &&
-              member.fields.variables.any(
-                (variable) => !_isPrivate(variable.name.lexeme),
-              )) {
-            signatures.add(_slice(source.source, member.offset, member.end));
-          }
-        }
+        _addPublicMemberSignatures(source, body.members, signatures);
+      }
+    } else if (declaration is EnumDeclaration) {
+      final name = _namedDeclarationName(declaration.toSource(), 'enum');
+      if (name == null || _isPrivate(name)) continue;
+      signatures.add(
+        _slice(source.source, declaration.offset, declaration.body.offset),
+      );
+      _addPublicMemberSignatures(source, declaration.body.members, signatures);
+    } else if (declaration is MixinDeclaration) {
+      final name = _namedDeclarationName(declaration.toSource(), 'mixin');
+      if (name == null || _isPrivate(name)) continue;
+      signatures.add(
+        _slice(source.source, declaration.offset, declaration.body.offset),
+      );
+      _addPublicMemberSignatures(source, declaration.body.members, signatures);
+    } else if (declaration is ExtensionTypeDeclaration) {
+      final name = _extensionTypeName(declaration.toSource());
+      if (name == null || _isPrivate(name)) continue;
+      signatures.add(
+        _slice(source.source, declaration.offset, declaration.body.offset),
+      );
+      final body = declaration.body;
+      if (body is BlockClassBody) {
+        _addPublicMemberSignatures(source, body.members, signatures);
       }
     } else if (declaration is FunctionDeclaration &&
         !_isPrivate(declaration.name.lexeme)) {
@@ -336,19 +422,58 @@ List<_Signature> _publicSignatures(_ParsedSource source) {
           _slice(source.source, declaration.offset, declaration.body.offset),
         );
       }
-    } else if (declaration.toSource().trimLeft().startsWith('typedef ')) {
-      final name = RegExp(
-        r'typedef\s+([A-Za-z]\w*)',
-      ).firstMatch(declaration.toSource())?.group(1);
+    } else if (declaration is TypeAlias) {
+      final name = _typedefName(declaration.toSource());
       if (name != null && !_isPrivate(name)) {
         signatures.add(
           _slice(source.source, declaration.offset, declaration.end),
         );
       }
+    } else if (declaration is TopLevelVariableDeclaration &&
+        declaration.variables.variables.any(
+          (variable) => !_isPrivate(variable.name.lexeme),
+        )) {
+      signatures.add(
+        _slice(source.source, declaration.offset, declaration.end),
+      );
     }
   }
   return signatures;
 }
+
+void _addPublicMemberSignatures(
+  _ParsedSource source,
+  Iterable<ClassMember> members,
+  List<_Signature> signatures,
+) {
+  for (final member in members) {
+    if (member is MethodDeclaration && !_isPrivate(member.name.lexeme)) {
+      signatures.add(_slice(source.source, member.offset, member.body.offset));
+    } else if (member is ConstructorDeclaration) {
+      final name = member.name?.lexeme;
+      if (name == null || !_isPrivate(name)) {
+        signatures.add(
+          _slice(source.source, member.offset, member.body.offset),
+        );
+      }
+    } else if (member is FieldDeclaration &&
+        member.fields.variables.any(
+          (variable) => !_isPrivate(variable.name.lexeme),
+        )) {
+      signatures.add(_slice(source.source, member.offset, member.end));
+    }
+  }
+}
+
+String? _namedDeclarationName(String source, String keyword) => RegExp(
+  '\\b${RegExp.escape(keyword)}\\s+([A-Za-z]\\w*)',
+).firstMatch(source)?.group(1);
+
+String? _extensionTypeName(String source) =>
+    RegExp(r'\bextension\s+type\s+([A-Za-z]\w*)').firstMatch(source)?.group(1);
+
+String? _typedefName(String source) =>
+    RegExp(r'\btypedef\s+([A-Za-z]\w*)').firstMatch(source)?.group(1);
 
 _Signature _slice(String source, int start, int end) =>
     _Signature(offset: start, text: source.substring(start, end));
