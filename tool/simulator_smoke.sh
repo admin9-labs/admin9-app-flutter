@@ -18,13 +18,8 @@ FLUTTER="$(command -v flutter 2>/dev/null || true)"
 FLUTTER_REAL="$(perl -MCwd=abs_path -e 'print abs_path(shift)' "$FLUTTER" 2>/dev/null || true)"
 FLUTTER_ROOT="$(cd "$(dirname "$FLUTTER_REAL")/.." 2>/dev/null && pwd -P || true)"
 SOURCE_SHA="$(git rev-parse HEAD)"
-RESULT_FILE="/dev/null"
-BLOCKS=0
-UNKNOWNS=0
-usage() {
-  printf '%s\n' 'tool/simulator_smoke.sh preflight' \
-    'tool/simulator_smoke.sh run [--rounds N] [--evidence-dir PATH]'
-}
+RESULT_FILE="/dev/null" BLOCKS=0 UNKNOWNS=0
+usage() { printf '%s\n' 'tool/simulator_smoke.sh preflight' 'tool/simulator_smoke.sh run [--rounds N] [--evidence-dir PATH]'; }
 cmdline() { printf '%q ' "$@"; }
 fail() {
   local category="$1" stage="$2" call="$3" log="$4" code=30
@@ -83,12 +78,13 @@ android_serial() {
 }
 preflight() {
   local output value ios_line runtime serial
-  BLOCKS=0
-  UNKNOWNS=0
+  BLOCKS=0 UNKNOWNS=0
   printf 'source_sha=%s\ntask_identity=uid:%s user:%s\n' \
     "$SOURCE_SHA" "$(id -u)" "$(id -un)"
   git diff --quiet && git diff --cached --quiet &&
     pass git_tracked_tree "clean" || unknown git_tracked_tree "changes are not represented by HEAD"
+  output="$(git ls-files --others --exclude-standard -- lib assets android ios pubspec.yaml pubspec.lock)"
+  [[ -z "$output" ]] && pass git_build_inputs "no untracked source" || unknown git_build_inputs "untracked: $(tr '\n' ' ' <<<"$output")"
   for feature in hw.optional.neon hw.optional.arm.FEAT_AES; do
     value="$(/usr/sbin/sysctl -n "$feature" 2>&1)"
     [[ "$?" -eq 0 && "$value" == 1 ]] && pass "$feature" "$value" ||
@@ -169,13 +165,12 @@ start_devices() {
   printf '%s\n' "$serial" >"$session_dir/android-serial.txt"
 }
 run_round() {
-  local round="$1" serial="$2" dir="$3" apk ios_app installed_app pid
-  apk="$ROOT/build/app/outputs/flutter-apk/app-release.apk"
-  ios_app="$ROOT/build/ios/iphonesimulator/Runner.app"
+  local round="$1" serial="$2" dir="$3" apk ios_app installed_app pid ios_pid
+  apk="$ROOT/build/app/outputs/flutter-apk/app-release.apk" ios_app="$ROOT/build/ios/iphonesimulator/Runner.app"
   mkdir -p "$dir"
   RESULT_FILE="$dir/result.txt"
-  [[ "$(git rev-parse HEAD)" == "$SOURCE_SHA" ]] && git diff --quiet && git diff --cached --quiet ||
-    fail Unknown source_provenance "git rev-parse HEAD; git diff --quiet" "$dir/result.txt"
+  [[ "$(git rev-parse HEAD)" == "$SOURCE_SHA" ]] && git diff --quiet && git diff --cached --quiet && [[ -z "$(git ls-files --others --exclude-standard -- lib assets android ios pubspec.yaml pubspec.lock)" ]] ||
+    fail Unknown source_provenance "git rev-parse HEAD; git diff --quiet; git ls-files --others --exclude-standard -- lib assets android ios pubspec.yaml pubspec.lock" "$dir/result.txt"
   step "Infrastructure Block" pub_get "$dir/pub-get.log" "$FLUTTER" pub get
   step "App Fail" android_build "$dir/android-build.log" "$FLUTTER" build apk --release
   step "App Fail" ios_build "$dir/ios-build.log" "$FLUTTER" build ios --simulator --debug
@@ -188,10 +183,10 @@ run_round() {
     am start -W -S -n "$BUNDLE_ID/.MainActivity"
   for _ in $(seq 1 90); do
     "$ADB" -s "$serial" logcat -b events -d -v brief >"$dir/android-launch-complete.log"
-    grep -Fq 'wm_activity_launch_time' "$dir/android-launch-complete.log" && grep -Fq "$BUNDLE_ID/.MainActivity" "$dir/android-launch-complete.log" && break
+    grep -Eq "wm_activity_launch_time.*$BUNDLE_ID/\\.MainActivity" "$dir/android-launch-complete.log" && break
     sleep 1
   done
-  grep -Fq 'wm_activity_launch_time' "$dir/android-launch-complete.log" && grep -Fq "$BUNDLE_ID/.MainActivity" "$dir/android-launch-complete.log" || fail "App Fail" android_cold_launch "adb logcat -b events; grep wm_activity_launch_time and $BUNDLE_ID/.MainActivity" "$dir/android-launch-complete.log"
+  grep -Eq "wm_activity_launch_time.*$BUNDLE_ID/\\.MainActivity" "$dir/android-launch-complete.log" || fail "App Fail" android_cold_launch "adb logcat -b events; grep one wm_activity_launch_time line containing $BUNDLE_ID/.MainActivity" "$dir/android-launch-complete.log"
   sleep 3
   pid="$($ADB -s "$serial" shell pidof "$BUNDLE_ID" 2>/dev/null | tr -d '\r')"
   [[ -n "$pid" ]] || fail "App Fail" android_process \
@@ -199,7 +194,14 @@ run_round() {
   xcrun simctl terminate "$IOS_UDID" "$BUNDLE_ID" >/dev/null 2>&1 || true
   step "App Fail" ios_cold_launch "$dir/ios-launch.log" xcrun simctl launch \
     --terminate-running-process "$IOS_UDID" "$BUNDLE_ID"
-  sleep 3
+  ios_pid="$(awk -F': ' 'END {print $2}' "$dir/ios-launch.log")"
+  [[ "$ios_pid" =~ ^[0-9]+$ ]] || fail "App Fail" ios_cold_launch "parse Runner PID from $dir/ios-launch.log" "$dir/ios-launch.log"
+  for _ in $(seq 1 30); do
+    xcrun simctl spawn "$IOS_UDID" log show --style compact --last 1m --predicate "processIdentifier == $ios_pid AND subsystem == \"com.apple.app_launch_measurement\"" >"$dir/ios-launch-complete.log" 2>&1
+    grep -Fq 'alm_release_pageins_recording_assertion' "$dir/ios-launch-complete.log" && break
+    sleep 1
+  done
+  grep -Fq 'alm_release_pageins_recording_assertion' "$dir/ios-launch-complete.log" || fail "App Fail" ios_cold_launch "xcrun simctl spawn $IOS_UDID log show for Runner PID $ios_pid; grep alm_release_pageins_recording_assertion" "$dir/ios-launch-complete.log"
   printf '$ %s\n' "$(cmdline "$ADB" -s "$serial" exec-out screencap -p)" >"$dir/android-screenshot.log"
   "$ADB" -s "$serial" exec-out screencap -p >"$dir/android-cold-launch.png" 2>>"$dir/android-screenshot.log" ||
     fail "Infrastructure Block" android_screenshot \
@@ -245,8 +247,7 @@ run_round() {
 }
 run_all() {
   local rounds="$1" evidence="$2" session lock status serial round
-  session="$evidence/$SOURCE_SHA"
-  lock="${TMPDIR:-/tmp}/admin9-simulator-smoke-$UID.lock"
+  session="$evidence/$SOURCE_SHA" lock="${TMPDIR:-/tmp}/admin9-simulator-smoke-$UID.lock"
   mkdir -p "$session"
   RESULT_FILE="$session/result.txt"
   mkdir "$lock" 2>/dev/null || fail "Infrastructure Block" lock "mkdir $lock" "$RESULT_FILE"
@@ -268,8 +269,7 @@ case "${1:-}" in
   preflight) preflight ;;
   run)
     shift
-    rounds=1
-    evidence="$ROOT/build/simulator-smoke"
+    rounds=1 evidence="$ROOT/build/simulator-smoke"
     while [[ $# -gt 0 ]]; do
       case "$1" in
         --rounds)
