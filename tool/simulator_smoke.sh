@@ -188,6 +188,8 @@ run_round() {
   step "Infrastructure Block" ios_install "$dir/ios-install.log" xcrun simctl install "$IOS_UDID" "$ios_app"
   step "App Fail" android_cold_launch "$dir/android-launch.log" "$ADB" -s "$serial" shell \
     am start -W -S -n "$BUNDLE_ID/.MainActivity"
+  grep -Fqx 'Status: ok' "$dir/android-launch.log" && grep -Fqx 'LaunchState: COLD' "$dir/android-launch.log" ||
+    fail "App Fail" android_cold_launch "grep Status:_ok and LaunchState:_COLD $dir/android-launch.log" "$dir/android-launch.log"
   sleep 3
   pid="$($ADB -s "$serial" shell pidof "$BUNDLE_ID" 2>/dev/null | tr -d '\r')"
   [[ -n "$pid" ]] || fail "App Fail" android_process \
@@ -256,6 +258,7 @@ run_all() {
   start_devices "$session"
   serial="$(cat "$session/android-serial.txt")"
   for round in $(seq 1 "$rounds"); do run_round "$round" "$serial" "$session/round-$round"; done
+  RESULT_FILE="$session/result.txt"
   printf 'RESULT=Pass\nsource_sha=%s\nrounds=%s\nevidence=%s\n' \
     "$SOURCE_SHA" "$rounds" "$session" | tee "$RESULT_FILE"
 }
