@@ -165,6 +165,9 @@ iPhone:
 Three independent reviewers returned Go on the implementation commit
 `d6adb41`, but that review did not contain interactive simulator evidence. The
 simulator delivery prerequisite is currently Blocked as recorded in the linked
-addendum. Do not create the three supplemental reviews, hand the builds to the
-user, migrate Starter, assign a Design System version, push, publish or release
-until the Android/iOS simulator gate is complete on one fixed SHA.
+addendum. The Block belongs to the current task's local-service permissions and
+does not require the user to launch Android Studio; Codex must retry the original
+AVD after those permissions are available. Do not create the three supplemental
+reviews, hand the builds to the user, migrate Starter, assign a Design System
+version, push, publish or release until the Android/iOS simulator gate is
+complete on one fixed SHA.

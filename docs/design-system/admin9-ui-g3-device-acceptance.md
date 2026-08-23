@@ -15,6 +15,10 @@ builds, simulators, Goldens and Flutter semantics tests remain supporting
 evidence. They do not establish real-device brand unity, native gesture
 quality, real keyboard behavior or TalkBack/VoiceOver delivery.
 
+The current simulator Block is not a request for the user to start an AVD.
+Codex must resume the original host-GPU AVD path when its task can access the
+normal host CPU query, ADB localhost socket and CoreSimulator services.
+
 Pass means both devices are immediately recognizable as the same Admin9 product,
 the same tasks retain the same information and recovery, and the operating
 system interactions still feel natural. Cross-platform pixel equality is not

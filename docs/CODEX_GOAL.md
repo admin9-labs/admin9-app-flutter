@@ -21,8 +21,10 @@ at `d6adb419dfa6935868b37621fc530e942fd13988` after the product/brand,
 Flutter architecture and QA/accessibility reviewers independently found no
 remaining direct P0/P1. The later delivery gate has been reopened because
 interactive Android/iOS simulator acceptance was not previously performed.
-The iOS run is a partial Pass, but Android Emulator boot is blocked by the
-current Codex process environment. Physical-device handoff is not open.
+The iOS run is a partial Pass, but the current task permission profile blocks
+both Android Emulator startup and exact-source iOS installation. This does not
+show that Codex generally cannot launch the existing AVDs: earlier Codex runs
+did so successfully. Physical-device handoff is not open.
 
 ## Completed
 
@@ -94,10 +96,14 @@ current Codex process environment. Physical-device handoff is not open.
   Simulator: login/registration, main navigation/account, settings, software
   keyboard/focus, unavailable feedback, edge-back, safe areas, dark/large text,
   contrast preferences and force-quit cold launch produced 13 labeled captures.
-- Attempted the Pixel 7 API 34 and API 36 arm64 AVDs through graphical,
-  headless, temporary-data and software-acceleration paths. QEMU consistently
-  failed before Android boot with a sandbox-coalition `SIGILL`; no Android
-  product result is claimed.
+- Recorded the earlier isolated/temporary Android attempts at `1cdb2c1`, then
+  rejected their `SIGILL` result as proof about the normal AVD path because the
+  last crash loaded a local shim.
+- Removed the temporary launcher, copied Emulator, shim and cloned AVD data,
+  then retried the original `Admin9_API_34` with the official Emulator,
+  original AVD, visible window, `-gpu host`, `-no-snapshot-load` and
+  `-no-boot-anim`; no wipe, shim, read-only mode, independent data directory or
+  headless mode was used.
 
 ## Verification evidence
 
@@ -154,10 +160,16 @@ current Codex process environment. Physical-device handoff is not open.
   installed App binary matches the existing workspace simulator artifact, but
   installing the separately rebuilt current-source Dart bundle was blocked;
   exact source-to-installed binding remains Unknown.
-- 2026-08-23: Android Emulator 36.6.11 failed before boot with
-  `EXC_BAD_INSTRUCTION` / `SIGILL` at `init_cache_info` inside the
-  `com.openai.codex` process coalition. This is a real environment Block and is
-  not converted into a product Fail or Pass.
+- 2026-08-23: the normal API 34 retry used the same official Emulator 36.6.11,
+  original Pixel 7 AVD and host-GPU arguments recorded by the earlier successful
+  launch. The current task profile denied `sysctl` and ADB's local port 5037;
+  the unmodified Qt runtime then aborted in `qDetectCpuFeatures` because NEON
+  could not be queried. The no-shim crash reports contain no temporary launcher,
+  shim or cloned-AVD image. This is a task-permission Block, not an App result
+  and not evidence that a normally privileged Codex run cannot start the AVD.
+- 2026-08-23: the same profile also rejected CoreSimulator XPC and log access,
+  so the exact current-source iOS rebuild still could not be installed even
+  though the already-running Simulator remained interactively visible.
 
 ## Provisional decisions
 
@@ -179,9 +191,11 @@ current Codex process environment. Physical-device handoff is not open.
 ## Blocking decisions
 
 - Final Admin9 brand direction and final approval still belong to the user.
-- Dual-simulator acceptance is blocked until an official Android Emulator can
-  run outside the current Codex process sandbox and the exact current-source
-  builds can be installed on both simulators.
+- Dual-simulator acceptance is blocked until a Codex task has the same local
+  process, socket and simulator-service permissions as the earlier successful
+  runs. Codex must then launch the original AVD itself and install exact
+  current-source builds on both simulators; user-operated Android Studio startup
+  is not a prerequisite.
 - Starter adoption is blocked until the user accepts the Demo on Android and
   iOS real devices.
 

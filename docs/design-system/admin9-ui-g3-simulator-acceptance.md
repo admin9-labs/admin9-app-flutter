@@ -6,13 +6,23 @@ Reviewed implementation commit: `d6adb419dfa6935868b37621fc530e942fd13988`
 Status: Blocked; iOS interactive evidence is partial Pass, Android Emulator did
 not reach boot
 
+Correction retry parent: `1cdb2c1cf3db804aba3cdc4a4adddcd70cb5855b`
+
 ## Gate decision
 
 The dual-simulator prerequisite is not Go. An iOS Simulator run exercised the
-normal Demo interactively, but the Android Emulator cannot start in the current
-Codex execution environment. Cross-platform same-product acceptance therefore
+normal Demo interactively, but Android did not boot and the current-source iOS
+rebuild was not installed. Cross-platform same-product acceptance therefore
 remains Unknown. Golden, Widget, build and former Phase 6 evidence are not used
-to replace the missing Android run.
+to replace either missing fixed-source result.
+
+The `1cdb2c1` conclusion was too broad: its isolated launcher, cloned AVD,
+temporary data and injected shim attempts do not prove that the original AVDs
+cannot run under Codex. Earlier Codex runs started both original AVDs, installed
+the App and exercised them. The correction retry below used the original API 34
+AVD and known host-GPU command; it was blocked by this task's restricted local
+service permissions. No user-operated Android Studio launch is required after
+those permissions are restored.
 
 The three final supplemental G3 reviews have not been opened. They are allowed
 only after one fixed source revision passes both simulator runs and any direct
@@ -91,31 +101,45 @@ device. Cursor highlights are automation evidence, not App rendering.
 
 ## Android blocker
 
-Both installed AVDs are Pixel 7 arm64 images and satisfy the requested API
-level. The API 34 AVD was the preferred target; API 36 was also attempted to
-exclude an image-specific failure. Graphical, headless, read-only, temporary
-data-directory and software-acceleration variants all failed before Android
-booted.
+Both original AVDs remain Pixel 7 arm64 images at 1080x2400 / 420 dpi. Their
+configuration and user-data timestamps predate this G3 retry. The saved launch
+parameters for both AVDs are the official Emulator plus `-avd <name>`,
+`-gpu host`, `-no-snapshot-load` and `-no-boot-anim`, matching the prior
+successful route.
 
-The macOS crash report for the last bounded attempt records:
+The correction retry used:
 
-- process `qemu-system-aarch64-headless`, parent and coalition `codex` /
-  `com.openai.codex`;
-- `EXC_BAD_INSTRUCTION`, signal `SIGILL`;
-- fault at `init_cache_info + 52` on raw ARM instruction `0xd53b0029`;
-- no Android system process, ADB device, installation or navigation mode was
-  reached.
+```text
+/Users/fengqiyue/Library/Android/sdk/emulator/emulator \
+  -avd Admin9_API_34 -no-snapshot-load -no-boot-anim -gpu host
+```
 
-The ordinary binary also reports that the sandboxed process lacks the NEON CPU
-feature expected by its Qt build. A narrow local `sysctlbyname` shim passed that
-front-door check, after which QEMU still failed on the privileged cache-info
-instruction above. This is an execution-environment limitation, not an App,
-AVD, API-level or rendering result.
+It used the original `Admin9_API_34`, an ordinary graphical window and no wipe.
+It did not use an injected library, copied Emulator, custom App wrapper, cloned
+AVD, read-only mode, independent data directory, headless mode or software GPU.
+The AVD did not reach a point where wiping data could affect the result, so its
+state was left intact.
+
+The current task process could not read `hw.optional.neon` or
+`hw.optional.arm.FEAT_AES` through `sysctl`, and ADB could not bind its normal
+localhost port 5037 (`Operation not permitted`). The official Emulator then
+aborted in Qt's `qDetectCpuFeatures` before Android boot. The new macOS reports
+record `EXC_CRASH` / `SIGABRT`, not the shim-path `SIGILL`, and their loaded
+images contain no shim or temporary experiment path.
+
+CoreSimulator CLI access failed independently because the same task profile
+could not connect to CoreSimulatorService or open its log. That prevents
+installing and hash-binding the current-source iOS rebuild in this retry. These
+are permission-profile observations, not App, AVD, rendering or host-capability
+results. They also do not support the former claim that all Codex-launched
+Emulators require an external user process.
 
 ## Resume conditions
 
-1. Run the official arm64 Emulator outside the Codex process sandbox, preferably
-   the Pixel 7 API 34 AVD, and record gesture or three-button navigation.
+1. Resume in a Codex task that can read the normal host CPU features, bind ADB's
+   localhost server and connect to CoreSimulatorService. Codex then launches the
+   original Pixel 7 API 34 AVD itself with the known host-GPU command and records
+   gesture or three-button navigation; no user manual startup is required.
 2. Build and install from the same fixed source SHA on both simulators. Replace
    the iOS installed-artifact Unknown with a hash-bound current-source install.
 3. Execute the same four scenarios and state inputs on Android and iOS,
