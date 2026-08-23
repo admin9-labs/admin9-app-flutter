@@ -271,7 +271,8 @@ run_round() {
     fail "Infrastructure Block" ios_install_identity \
       "$(command_string xcrun simctl get_app_container "$IOS_UDID" "$BUNDLE_ID" app)" "$round_dir/ios-install-identity.txt"
 
-  component="$($ADB -s "$serial" shell cmd package resolve-activity --brief "$BUNDLE_ID" 2>/dev/null | tr -d '\r')"
+  component="$($ADB -s "$serial" shell cmd package resolve-activity --brief "$BUNDLE_ID" 2>/dev/null |
+    tail -n 1 | tr -d '\r')"
   [[ -n "$component" && "$component" != No* ]] ||
     fail "App Fail" android_resolve_activity \
       "$(command_string "$ADB" -s "$serial" shell cmd package resolve-activity --brief "$BUNDLE_ID")" \
