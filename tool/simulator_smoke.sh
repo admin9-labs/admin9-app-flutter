@@ -152,16 +152,16 @@ start_devices() {
       boot=""
       [[ -n "$serial" ]] && boot="$($ADB -s "$serial" shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')"
       boot_animation="$($ADB -s "$serial" shell getprop init.svc.bootanim 2>/dev/null | tr -d '\r')"
-      package_ready="$($ADB -s "$serial" shell cmd package list packages android 2>/dev/null | tr -d '\r')"
-      [[ "$boot" == 1 && "$boot_animation" == stopped && "$package_ready" == package:android ]] && break
+      package_ready="$($ADB -s "$serial" shell pm path android 2>/dev/null | tr -d '\r')"
+      [[ "$boot" == 1 && "$boot_animation" == stopped && "$package_ready" == package:/system/framework/framework-res.apk ]] && break
       sleep 1
     done
     sleep 10
   fi
   boot="$($ADB -s "$serial" shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')"
   boot_animation="$($ADB -s "$serial" shell getprop init.svc.bootanim 2>/dev/null | tr -d '\r')"
-  package_ready="$($ADB -s "$serial" shell cmd package list packages android 2>/dev/null | tr -d '\r')"
-  [[ -n "$serial" && "$boot" == 1 && "$boot_animation" == stopped && "$package_ready" == package:android ]] || fail "Infrastructure Block" android_boot \
+  package_ready="$($ADB -s "$serial" shell pm path android 2>/dev/null | tr -d '\r')"
+  [[ -n "$serial" && "$boot" == 1 && "$boot_animation" == stopped && "$package_ready" == package:/system/framework/framework-res.apk ]] || fail "Infrastructure Block" android_boot \
     "$(cmdline "$EMULATOR" -avd "$ANDROID_AVD" -no-snapshot-load -no-boot-anim -gpu host)" \
     "$session_dir/android-emulator.log"
   if ! xcrun simctl list devices booted | grep -Fq "$IOS_UDID"; then
@@ -246,7 +246,7 @@ run_all() {
   mkdir -p "$session"
   RESULT_FILE="$session/result.txt"
   mkdir "$lock" 2>/dev/null || fail "Infrastructure Block" lock "mkdir $lock" "$RESULT_FILE"
-  trap "rmdir '$lock' 2>/dev/null || true" EXIT INT TERM
+  trap "rmdir '$lock' 2>/dev/null || true" EXIT
   preflight 2>&1 | tee "$session/preflight.log"
   status="${PIPESTATUS[0]}"
   [[ "$status" -eq 0 ]] || {
