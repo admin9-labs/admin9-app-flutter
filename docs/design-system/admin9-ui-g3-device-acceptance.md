@@ -3,21 +3,17 @@
 Date prepared: 2026-08-23
 Reviewed implementation commit: `d6adb419dfa6935868b37621fc530e942fd13988`
 Implementation tree: `7ad5e22ad62d29fd1c4eda2b520b156f54acff47`
-Status: physical handoff paused; dual-simulator prerequisite is Blocked
+Status: physical handoff paused; repeatable dual-simulator smoke is Pass
 
 ## Acceptance authority
 
-Only the user/product approver can close this gate after using both builds, but
-the packages must not be handed off yet. First close the blocked
-[dual-simulator acceptance record](admin9-ui-g3-simulator-acceptance.md) on one
-fixed source SHA and receive exactly three supplemental G3 Go decisions. Local
+Only the user/product approver can close this gate after using both builds. The
+repeatable [dual-simulator smoke record](admin9-ui-g3-simulator-acceptance.md)
+passed on fixed source commit `72d6e60`, but this infrastructure task did not
+perform the supplemental G3 reviews or authorize physical handoff. Local
 builds, simulators, Goldens and Flutter semantics tests remain supporting
 evidence. They do not establish real-device brand unity, native gesture
 quality, real keyboard behavior or TalkBack/VoiceOver delivery.
-
-The current simulator Block is not a request for the user to start an AVD.
-Codex must resume the original host-GPU AVD path when its task can access the
-normal host CPU query, ADB localhost socket and CoreSimulator services.
 
 Pass means both devices are immediately recognizable as the same Admin9 product,
 the same tasks retain the same information and recovery, and the operating

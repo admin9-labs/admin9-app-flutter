@@ -1,0 +1,34 @@
+--------- beginning of main
+08-23 21:17:48.498  4889  4889 I .app.foundation: Using CollectorTypeCC GC.
+08-23 21:17:49.238  4889  4889 E .app.foundation: Not starting debugger since process cannot load the jdwp agent.
+08-23 21:17:51.919  4889  4889 D CompatibilityChangeReporter: Compat change id reported: 171979766; UID 10192; state: ENABLED
+08-23 21:17:51.919  4889  4889 D CompatibilityChangeReporter: Compat change id reported: 242716250; UID 10192; state: ENABLED
+08-23 21:17:52.130  4889  4889 D ApplicationLoaders: Returning zygote-cached class loader: /system_ext/framework/androidx.window.extensions.jar
+08-23 21:17:52.131  4889  4889 D ApplicationLoaders: Returning zygote-cached class loader: /system_ext/framework/androidx.window.sidecar.jar
+08-23 21:17:52.204  4889  4889 I .app.foundation: Failed to add image file: Failed to find OatDexFile for DexFile /data/app/~~rO4DMeVWL6G2hYCGZ_ZmUA==/com.admin9.app.foundation-2vubFdlp7moNGUfPPrmjdA==/base.apk (canonical path /data/app/~~rO4DMeVWL6G2hYCGZ_ZmUA==/com.admin9.app.foundation-2vubFdlp7moNGUfPPrmjdA==/base.apk) in OatFile /data/app/~~j4ErDO56oAqjOCKHhY0f1w==/com.admin9.app.foundation-3kOGqoQLw2UTgMjnm9RskA==/oat/arm64/base.odex
+08-23 21:17:52.256  4889  4889 D nativeloader: Configuring clns-6 for other apk /data/app/~~j4ErDO56oAqjOCKHhY0f1w==/com.admin9.app.foundation-3kOGqoQLw2UTgMjnm9RskA==/base.apk. target_sdk_version=36, uses_libraries=, library_path=/data/app/~~j4ErDO56oAqjOCKHhY0f1w==/com.admin9.app.foundation-3kOGqoQLw2UTgMjnm9RskA==/lib/arm64:/data/app/~~j4ErDO56oAqjOCKHhY0f1w==/com.admin9.app.foundation-3kOGqoQLw2UTgMjnm9RskA==/base.apk!/lib/arm64-v8a, permitted_path=/data:/mnt/expand:/data/user/0/com.admin9.app.foundation
+08-23 21:17:54.063  4889  4889 V GraphicsEnvironment: Currently set values for:
+08-23 21:17:54.063  4889  4889 V GraphicsEnvironment:   angle_gl_driver_selection_pkgs=[]
+08-23 21:17:54.063  4889  4889 V GraphicsEnvironment:   angle_gl_driver_selection_values=[]
+08-23 21:17:54.108  4889  4889 V GraphicsEnvironment: ANGLE GameManagerService for com.admin9.app.foundation: false
+08-23 21:17:54.109  4889  4889 V GraphicsEnvironment: com.admin9.app.foundation is not listed in per-application setting
+08-23 21:17:54.109  4889  4889 V GraphicsEnvironment: Neither updatable production driver nor prerelease driver is supported.
+08-23 21:17:56.041  4889  4920 D libEGL  : loaded /vendor/lib64/egl/libEGL_emulation.so
+08-23 21:17:56.056  4889  4920 D libEGL  : loaded /vendor/lib64/egl/libGLESv1_CM_emulation.so
+08-23 21:17:56.184  4889  4920 D libEGL  : loaded /vendor/lib64/egl/libGLESv2_emulation.so
+08-23 21:17:57.297  4889  4925 D skia    : [SkFontMgr Android Parser] '/product/etc/fonts_customization.xml' could not be opened
+08-23 21:17:58.416  4889  4889 W .app.foundation: type=1400 audit(0.0:23): avc:  denied  { read } for  name="max_map_count" dev="proc" ino=53408 scontext=u:r:untrusted_app:s0:c192,c256,c512,c768 tcontext=u:object_r:proc_max_map_count:s0 tclass=file permissive=0 app=com.admin9.app.foundation
+08-23 21:18:00.552  4889  4927 I flutter : [IMPORTANT:flutter/shell/platform/android/android_context_gl_impeller.cc(104)] Using the Impeller rendering backend (OpenGLES).
+08-23 21:18:02.340  4889  4889 D CompatibilityChangeReporter: Compat change id reported: 237531167; UID 10192; state: DISABLED
+08-23 21:18:02.390  4889  4889 W OpenGLRenderer: Unknown dataspace 0
+08-23 21:18:03.864  4889  4889 I Choreographer: Skipped 555 frames!  The application may be doing too much work on its main thread.
+08-23 21:18:06.011  4889  4918 W OpenGLRenderer: Failed to choose config with EGL_SWAP_BEHAVIOR_PRESERVED, retrying without...
+08-23 21:18:06.022  4889  4918 W OpenGLRenderer: Failed to initialize 101010-2 format, error = EGL_SUCCESS
+08-23 21:18:07.844  4889  4927 I Gralloc4: mapper 4.x is not supported
+08-23 21:18:09.518  4889  4918 E OpenGLRenderer: Unable to match the desired swap behavior.
+08-23 21:18:18.762  4889  4897 I .app.foundation: Background concurrent copying GC freed 34123(1452KB) AllocSpace objects, 0(0B) LOS objects, 49% free, 2306KB/4612KB, paused 38us,10us total 1.302s
+08-23 21:19:39.971  4889  4889 I Choreographer: Skipped 5719 frames!  The application may be doing too much work on its main thread.
+08-23 21:19:40.558  4889  5131 D ProfileInstaller: Installing profile for com.admin9.app.foundation
+08-23 21:19:40.707  4889  4889 I Choreographer: Skipped 41 frames!  The application may be doing too much work on its main thread.
+08-23 21:19:43.297  4889  4889 I Choreographer: Skipped 49 frames!  The application may be doing too much work on its main thread.
+08-23 21:19:43.556  4889  4903 I OpenGLRenderer: Davey! duration=1147ms; Flags=1, FrameTimelineVsyncId=100565, IntendedVsync=711733038018, Vsync=711949704663, InputEventId=0, HandleInputStart=711963563756, AnimationStart=711963564547, PerformTraversalsStart=711963564797, DrawStart=712054192172, FrameDeadline=711749704684, FrameInterval=711963401464, FrameStartTime=16666665, SyncQueued=712055201297, SyncStart=712081119881, IssueDrawCommandsStart=712097363922, SwapBuffers=712799942589, FrameCompleted=712906249589, DequeueBufferDuration=8528000, QueueBufferDuration=1234750, GpuCompleted=712906249589, SwapBuffersCompleted=712855765506, DisplayPresentTime=0, CommandSubmissionCompleted=712799942589,

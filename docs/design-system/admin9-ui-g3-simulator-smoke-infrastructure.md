@@ -45,8 +45,14 @@ The run holds a per-user lock, starts only the fixed targets when needed, builds
 the current clean tracked Git SHA, installs the normal App, force-stops and cold
 launches it, captures native screenshots and App logs, then runs the same small
 navigation/state integration smoke on both devices. It records the source SHA
-and tree, artifact hashes, installed identities, device/API details, Android
+artifact hashes, installed identities, device/API details, Android
 navigation mode, iOS viewport/safe-area metrics, commands and result per round.
+
+Android's `am start -W` can return `Status: timeout` before a slow Flutter first
+frame while still exiting zero. The entry clears the Android events buffer
+before each launch and requires a new `wm_activity_launch_time` for the fixed
+package/activity before it captures evidence. Absence of that event after 90
+polls is `App Fail`; raw `am start` output remains archived.
 
 ## Result contract
 
@@ -62,3 +68,10 @@ script does not guess that a tool failure is a product regression, and it does
 not turn a simulator result into physical-device acceptance. Real autofill,
 TalkBack, VoiceOver and user brand acceptance remain `Unknown` until separately
 delivered on the required hardware.
+
+## Verified baseline
+
+Commit `72d6e60f925ea676dc9b0670c9a8ad7bb89bd73f` completed two consecutive
+rounds on 2026-08-23. Both Android API 34 and iOS 26.5 smoke runs passed in each
+round. The reviewable logs, screenshots, device identities and hashes are under
+[`evidence/admin9-ui-g3-simulator-smoke/`](evidence/admin9-ui-g3-simulator-smoke/).

@@ -1,0 +1,4 @@
+RESULT=Pass
+source_sha=72d6e60f925ea676dc9b0670c9a8ad7bb89bd73f
+rounds=2
+evidence=/Users/fengqiyue/.codex/worktrees/5fed/admin9-app-flutter/docs/design-system/evidence/admin9-ui-g3-simulator-smoke/72d6e60f925ea676dc9b0670c9a8ad7bb89bd73f

@@ -4,18 +4,17 @@ Date: 2026-08-23
 G2 gate commit: `06a398a747178e1aaed4933f96806ced3c498ad8`
 Initial implementation commit: `3b9ea41540440f8b518546110fdbd3e7fc2def7d`
 Supervision revision: `d6adb419dfa6935868b37621fc530e942fd13988`
-Gate: Demo implementation Go; simulator delivery prerequisite reopened
-Status: Blocked before Android Emulator boot; not ready for physical handoff
+Gate: Demo implementation Go; repeatable dual-simulator smoke Pass
+Status: simulator infrastructure closed; not ready for physical handoff
 
 ## Result
 
 G3 implements the first-party route selected by G2 for the Demo. Android and
 iOS now use one Admin9-owned visible component language behind the unchanged
 `App*` API. Three independent reviewers accepted the implementation revision.
-The later delivery gate is nevertheless blocked because interactive Android
-and iOS simulator acceptance was not part of that review and the current
-Android Emulator cannot boot in the Codex execution environment. This local
-result is not simulator-pair acceptance, real-device acceptance, Starter
+Later fixed-source infrastructure at `72d6e60` completed two consecutive
+Android/iOS build, install, cold-launch and minimal shared-smoke rounds. This
+does not replace full interactive G3 review, real-device acceptance, Starter
 migration, a release, or final brand-art approval.
 
 Forui 0.25.0, `forui_assets`, `sugar`, the candidate adapter, the two POC
@@ -52,6 +51,7 @@ remain platform-owned.
 | iOS compile build | Release no-codesign `Runner.app` builds, 17.1 MB | G3 compilation evidence only; later replaced by the signed handoff build |
 | iOS handoff export | Development-signed arm64 IPA builds, 7,211,488 bytes; strict code-sign and archive integrity pass | Provisioned local-device package, not App Store/Ad Hoc distribution or installation evidence |
 | Package exit | Source, package configuration and both release asset trees contain no Forui, Inter or Lucide candidate artifact | Confirms the G2 package footprint is removed |
+| Repeatable simulator smoke | Two Android API 34 and two iOS 26.5 runs pass on source `72d6e60`; build/install identities, cold-launch events, screenshots and metrics are archived | Bounded simulator evidence; not physical-device or real assistive-technology proof |
 
 Local handoff artifacts for this revision:
 
@@ -121,9 +121,9 @@ the reviewed implementation SHA is unchanged.
 
 ## Real-device handoff checklist
 
-Physical-device handoff is paused. First close the simulator addendum in
-[the simulator acceptance record](admin9-ui-g3-simulator-acceptance.md), commit
-one fixed SHA and obtain exactly three supplemental G3 Go decisions.
+Physical-device handoff is paused. The repeatable smoke prerequisite is closed
+in [the simulator acceptance record](admin9-ui-g3-simulator-acceptance.md).
+Supplemental G3 review and explicit handoff authorization remain separate.
 
 Use the fillable, artifact-bound
 [physical-device acceptance record](admin9-ui-g3-device-acceptance.md). Run the
@@ -162,12 +162,9 @@ iPhone:
 
 ## Stop condition
 
-Three independent reviewers returned Go on the implementation commit
-`d6adb41`, but that review did not contain interactive simulator evidence. The
-simulator delivery prerequisite is currently Blocked as recorded in the linked
-addendum. The Block belongs to the current task's local-service permissions and
-does not require the user to launch Android Studio; Codex must retry the original
-AVD after those permissions are available. Do not create the three supplemental
-reviews, hand the builds to the user, migrate Starter, assign a Design System
-version, push, publish or release until the Android/iOS simulator gate is
-complete on one fixed SHA.
+Three independent reviewers returned Go on implementation commit `d6adb41`,
+and fixed source `72d6e60` later passed the repeatable dual-simulator smoke.
+This infrastructure task did not create the supplemental reviews or perform
+physical-device acceptance. Do not hand the builds to the user, migrate Starter,
+assign a Design System version, push, publish or release until those separate
+gates are explicitly completed.

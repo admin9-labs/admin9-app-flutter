@@ -19,12 +19,10 @@ be reopened or expanded. G2 is closed Go at
 `06a398a747178e1aaed4933f96806ced3c498ad8`. The G3 implementation is closed Go
 at `d6adb419dfa6935868b37621fc530e942fd13988` after the product/brand,
 Flutter architecture and QA/accessibility reviewers independently found no
-remaining direct P0/P1. The later delivery gate has been reopened because
-interactive Android/iOS simulator acceptance was not previously performed.
-The iOS run is a partial Pass, but the current task permission profile blocks
-both Android Emulator startup and exact-source iOS installation. This does not
-show that Codex generally cannot launch the existing AVDs: earlier Codex runs
-did so successfully. Physical-device handoff is not open.
+remaining direct P0/P1. The later repeatable simulator infrastructure gate
+passed on fixed source `72d6e60f925ea676dc9b0670c9a8ad7bb89bd73f` with two
+consecutive Android/iOS build, install, cold-launch and minimal shared-smoke
+rounds. Full interactive G3 review and physical-device handoff are not open.
 
 ## Completed
 
@@ -104,6 +102,10 @@ did so successfully. Physical-device handoff is not open.
   original AVD, visible window, `-gpu host`, `-no-snapshot-load` and
   `-no-boot-anim`; no wipe, shim, read-only mode, independent data directory or
   headless mode was used.
+- Added a 300-line simulator entry and 55-line shared smoke, then passed two
+  consecutive fixed-SHA rounds on original `Admin9_API_34` and the fixed iPhone
+  17e / iOS 26.5 Simulator. Both rounds archive current-source hashes, install
+  identities, cold-launch completion, screenshots, logs and metrics.
 
 ## Verification evidence
 
@@ -155,21 +157,19 @@ did so successfully. Physical-device handoff is not open.
   `com.admin9.app.foundation`, contains the connected iPhone UDID in its
   provisioning profile and expires on 2027-06-05. This proves packaging and
   signing only, not installation or real-device acceptance.
-- 2026-08-23: iOS Simulator interaction passed the normal Demo scenarios listed
-  in `docs/design-system/admin9-ui-g3-simulator-acceptance.md`. The tested
-  installed App binary matches the existing workspace simulator artifact, but
-  installing the separately rebuilt current-source Dart bundle was blocked;
-  exact source-to-installed binding remains Unknown.
-- 2026-08-23: the normal API 34 retry used the same official Emulator 36.6.11,
-  original Pixel 7 AVD and host-GPU arguments recorded by the earlier successful
-  launch. The current task profile denied `sysctl` and ADB's local port 5037;
-  the unmodified Qt runtime then aborted in `qDetectCpuFeatures` because NEON
-  could not be queried. The no-shim crash reports contain no temporary launcher,
-  shim or cloned-AVD image. This is a task-permission Block, not an App result
-  and not evidence that a normally privileged Codex run cannot start the AVD.
-- 2026-08-23: the same profile also rejected CoreSimulator XPC and log access,
-  so the exact current-source iOS rebuild still could not be installed even
-  though the already-running Simulator remained interactively visible.
+- 2026-08-23: the simulator preflight passed `hw.optional.neon`, AES, ADB 5037,
+  original AVD and Emulator discovery, CoreSimulator/simctl, the fixed iOS
+  runtime and all required Flutter/Xcode cache write probes.
+- 2026-08-23: source `72d6e60` completed two consecutive current-source builds,
+  installs, process cold launches and minimal shared smokes on Android API 34
+  and iOS 26.5. The Android APK and iOS Dart App hashes were stable across both
+  rounds, installed iOS binaries matched each round, all four screenshots show
+  the App after launch, and all four smoke logs passed.
+- 2026-08-23: Android's short `am start -W` window expired before the Flutter
+  first frame, but cleared-buffer `wm_activity_launch_time` events confirmed the
+  two cold launches at 121,033 ms and 50,255 ms before screenshot capture. No
+  crash, ANR or failed assertion was found; physical-device performance remains
+  Unknown.
 
 ## Provisional decisions
 
@@ -191,11 +191,8 @@ did so successfully. Physical-device handoff is not open.
 ## Blocking decisions
 
 - Final Admin9 brand direction and final approval still belong to the user.
-- Dual-simulator acceptance is blocked until a Codex task has the same local
-  process, socket and simulator-service permissions as the earlier successful
-  runs. Codex must then launch the original AVD itself and install exact
-  current-source builds on both simulators; user-operated Android Studio startup
-  is not a prerequisite.
+- Repeatable dual-simulator infrastructure is closed at `72d6e60`; full
+  interactive supplemental G3 review remains a separate pending gate.
 - Starter adoption is blocked until the user accepts the Demo on Android and
   iOS real devices.
 
@@ -204,13 +201,11 @@ POCs, or Demo implementation.
 
 ## Next
 
-1. Resume from the Block conditions in
-   `docs/design-system/admin9-ui-g3-simulator-acceptance.md` and complete one
-   fixed-SHA Android/iOS simulator comparison.
-2. After any direct P0/P1 loop, run exactly three bounded supplemental G3
-   reviews on the fixed simulator evidence and direct regressions.
-3. Only after all three reviewers return Go, install the exact APK and
+1. Run exactly three bounded supplemental G3 reviews on the fixed simulator
+   evidence and direct regressions; no product P0/P1 was found in the bounded
+   repeatable smoke.
+2. Only after all three reviewers return Go, install the exact APK and
    development-signed IPA for user-operated physical-device acceptance.
-4. Continue only after the user explicitly accepts or rejects the Admin9 brand
+3. Continue only after the user explicitly accepts or rejects the Admin9 brand
    direction and both real-device experiences. Do not migrate Starter, assign
    a Design System version, push, publish or release before that acceptance.

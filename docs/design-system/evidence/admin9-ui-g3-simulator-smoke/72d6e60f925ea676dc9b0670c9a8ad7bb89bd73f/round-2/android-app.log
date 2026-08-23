@@ -1,0 +1,33 @@
+--------- beginning of main
+08-23 21:22:46.606  5518  5518 I .app.foundation: Using CollectorTypeCC GC.
+08-23 21:22:46.655  5518  5518 E .app.foundation: Not starting debugger since process cannot load the jdwp agent.
+08-23 21:22:47.005  5518  5518 D CompatibilityChangeReporter: Compat change id reported: 171979766; UID 10193; state: ENABLED
+08-23 21:22:47.006  5518  5518 D CompatibilityChangeReporter: Compat change id reported: 242716250; UID 10193; state: ENABLED
+08-23 21:22:47.079  5518  5518 D ApplicationLoaders: Returning zygote-cached class loader: /system_ext/framework/androidx.window.extensions.jar
+08-23 21:22:47.080  5518  5518 D ApplicationLoaders: Returning zygote-cached class loader: /system_ext/framework/androidx.window.sidecar.jar
+08-23 21:22:47.110  5518  5518 D nativeloader: Configuring clns-6 for other apk /data/app/~~6Xd34idR2QPPfBqKcaYDkA==/com.admin9.app.foundation-4B5zw2mypbc0Dv9UwmnTmg==/base.apk. target_sdk_version=36, uses_libraries=, library_path=/data/app/~~6Xd34idR2QPPfBqKcaYDkA==/com.admin9.app.foundation-4B5zw2mypbc0Dv9UwmnTmg==/lib/arm64:/data/app/~~6Xd34idR2QPPfBqKcaYDkA==/com.admin9.app.foundation-4B5zw2mypbc0Dv9UwmnTmg==/base.apk!/lib/arm64-v8a, permitted_path=/data:/mnt/expand:/data/user/0/com.admin9.app.foundation
+08-23 21:22:47.551  5518  5518 V GraphicsEnvironment: Currently set values for:
+08-23 21:22:47.557  5518  5518 V GraphicsEnvironment:   angle_gl_driver_selection_pkgs=[]
+08-23 21:22:47.558  5518  5518 V GraphicsEnvironment:   angle_gl_driver_selection_values=[]
+08-23 21:22:47.558  5518  5518 V GraphicsEnvironment: ANGLE GameManagerService for com.admin9.app.foundation: false
+08-23 21:22:47.558  5518  5518 V GraphicsEnvironment: com.admin9.app.foundation is not listed in per-application setting
+08-23 21:22:47.558  5518  5518 V GraphicsEnvironment: Neither updatable production driver nor prerelease driver is supported.
+08-23 21:22:48.055  5518  5553 D libEGL  : loaded /vendor/lib64/egl/libEGL_emulation.so
+08-23 21:22:48.072  5518  5553 D libEGL  : loaded /vendor/lib64/egl/libGLESv1_CM_emulation.so
+08-23 21:22:48.094  5518  5553 D libEGL  : loaded /vendor/lib64/egl/libGLESv2_emulation.so
+08-23 21:22:48.798  5518  5556 D skia    : [SkFontMgr Android Parser] '/product/etc/fonts_customization.xml' could not be opened
+08-23 21:22:49.216  5518  5518 W .app.foundation: type=1400 audit(0.0:39): avc:  denied  { read } for  name="max_map_count" dev="proc" ino=53408 scontext=u:r:untrusted_app:s0:c193,c256,c512,c768 tcontext=u:object_r:proc_max_map_count:s0 tclass=file permissive=0 app=com.admin9.app.foundation
+08-23 21:22:50.146  5518  5557 I flutter : [IMPORTANT:flutter/shell/platform/android/android_context_gl_impeller.cc(104)] Using the Impeller rendering backend (OpenGLES).
+08-23 21:22:50.761  5518  5518 D CompatibilityChangeReporter: Compat change id reported: 237531167; UID 10193; state: DISABLED
+08-23 21:22:50.779  5518  5518 W OpenGLRenderer: Unknown dataspace 0
+08-23 21:22:52.501  5518  5518 I Choreographer: Skipped 291 frames!  The application may be doing too much work on its main thread.
+08-23 21:22:53.857  5518  5551 W OpenGLRenderer: Failed to choose config with EGL_SWAP_BEHAVIOR_PRESERVED, retrying without...
+08-23 21:22:53.869  5518  5551 W OpenGLRenderer: Failed to initialize 101010-2 format, error = EGL_SUCCESS
+08-23 21:22:54.058  5518  5557 I Gralloc4: mapper 4.x is not supported
+08-23 21:22:54.345  5518  5551 E OpenGLRenderer: Unable to match the desired swap behavior.
+08-23 21:23:19.541  5518  5531 I .app.foundation: Background concurrent copying GC freed 34248(1465KB) AllocSpace objects, 0(0B) LOS objects, 49% free, 2309KB/4619KB, paused 67us,10us total 140.435ms
+08-23 21:23:26.335  5518  5518 I Choreographer: Skipped 2016 frames!  The application may be doing too much work on its main thread.
+08-23 21:23:26.457  5518  5636 D ProfileInstaller: Installing profile for com.admin9.app.foundation
+08-23 21:23:28.434  5518  5518 I Choreographer: Skipped 40 frames!  The application may be doing too much work on its main thread.
+08-23 21:23:28.632  5518  5543 I OpenGLRenderer: Davey! duration=906ms; Flags=1, FrameTimelineVsyncId=139968, IntendedVsync=937083028917, Vsync=937116362247, InputEventId=0, HandleInputStart=937119265530, AnimationStart=937119266405, PerformTraversalsStart=937119266655, DrawStart=937308685071, FrameDeadline=937099695583, FrameInterval=937119247613, FrameStartTime=16666665, SyncQueued=937310685780, SyncStart=937327563280, IssueDrawCommandsStart=937513031447, SwapBuffers=937886674072, FrameCompleted=938006905530, DequeueBufferDuration=7726667, QueueBufferDuration=533416, GpuCompleted=938006905530, SwapBuffersCompleted=937961956072, DisplayPresentTime=0, CommandSubmissionCompleted=937886674072,
+08-23 21:23:30.061  5518  5557 D EGL_emulation: app_time_stats: avg=1242.97ms min=123.87ms max=2362.07ms count=2
