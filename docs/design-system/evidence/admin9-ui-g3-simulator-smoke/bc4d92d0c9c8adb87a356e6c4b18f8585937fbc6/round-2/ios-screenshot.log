@@ -1,0 +1,4 @@
+$ xcrun simctl io C10E0968-4695-4C02-BC55-8C322531239A screenshot /Users/fengqiyue/.codex/worktrees/5fed/admin9-app-flutter/docs/design-system/evidence/admin9-ui-g3-simulator-smoke/bc4d92d0c9c8adb87a356e6c4b18f8585937fbc6/round-2/ios-cold-launch.png
+Detected file type from extension: PNG
+Note: No display specified. Defaulting to display: 2B12822C-9531-4003-B551-5B0EB4B7D931 (screenID: 1, name: LCD)
+Wrote screenshot to: /Users/fengqiyue/.codex/worktrees/5fed/admin9-app-flutter/docs/design-system/evidence/admin9-ui-g3-simulator-smoke/bc4d92d0c9c8adb87a356e6c4b18f8585937fbc6/round-2/ios-cold-launch.png

@@ -1,0 +1,109 @@
+$ /Users/fengqiyue/Library/Android/sdk/emulator/emulator -avd Admin9_API_34 -no-snapshot-load -no-boot-anim -gpu host
+INFO         | Android emulator version 36.6.11.0 (build_id 15507667) (CL:N/A)
+INFO         | Graphics backend: gfxstream
+INFO         | Found systemPath /Users/fengqiyue/Library/Android/sdk/system-images/android-34/google_apis/arm64-v8a/
+INFO         | Increasing RAM size to 2560MB
+INFO         | Guest GLES Driver: Auto (ext controls)
+INFO         | emuglConfig_init: vulkan_mode_selected:host gles_mode_selected:host
+INFO         | Checking system compatibility:
+INFO         |   Checking: hasSufficientDiskSpace
+INFO         |      Ok: Disk space requirements to run avd: `Admin9_API_34` are met
+INFO         |   Checking: hasSufficientHwGpu
+INFO         |      Ok: Hardware GPU requirements to run avd: `Admin9_API_34` are passed
+INFO         |   Checking: hasSufficientSystem
+INFO         |      Ok: System requirements to run avd: `Admin9_API_34` are met
+INFO         | Warning: QMetaObject::connectSlotsByName: No matching signal for on_default_environment_selected() (:0, )
+INFO         | Warning: QMetaObject::connectSlotsByName: No matching signal for on_none_selected() (:0, )
+INFO         | Warning: QMetaObject::connectSlotsByName: No matching signal for on_custom_image_selected() (:0, )
+INFO         | Warning: QMetaObject::connectSlotsByName: No matching signal for on_custom_video_selected() (:0, )
+INFO         | Warning: QMetaObject::connectSlotsByName: No matching signal for on_custom_360_image_selected() (:0, )
+INFO         | Storing crashdata in: /tmp/android-fengqiyue/emu-crash-36.6.11.db, detection is enabled for process: 56178
+INFO         | Initializing gfxstream backend
+INFO         | startOpenglesRendererImpl: gpu info
+INFO         |
+INFO         | Setting ICD filenames for the loader = /Users/fengqiyue/Library/Android/sdk/emulator/lib64/vulkan/MoltenVK_icd.json
+INFO         | SharedLibrary::open for [/Users/fengqiyue/Library/Android/sdk/emulator/qemu/darwin-aarch64/lib64/vulkan/libvulkan.dylib]
+INFO         | Added library: /Users/fengqiyue/Library/Android/sdk/emulator/qemu/darwin-aarch64/lib64/vulkan/libvulkan.dylib
+INFO         | Enabling Vulkan portability.
+INFO         | Selecting Vulkan device: Apple M1 Pro, Version: 1.1.323
+INFO         | Using Vulkan externalMemoryMode: Metal for VkEmulation
+INFO         | Initializing VkEmulation features:
+INFO         |     glInteropSupported: false
+INFO         |     useDeferredCommands: true
+INFO         |     createResourceWithRequirements: true
+INFO         |     useVulkanComposition: false
+INFO         |     useVulkanNativeSwapchain: false
+INFO         |     enable guestRenderDoc: false
+INFO         |     ASTC LDR emulation mode: Gpu
+INFO         |     enable ETC2 emulation: true
+INFO         |     enable Ycbcr emulation: false
+INFO         |     guestVulkanOnly: false
+INFO         |     useDedicatedAllocations: false
+INFO         |     guestVulkanMaxApiVersion: 1.3.0
+INFO         |     enableProtectedMemoryEmulation: false
+INFO         | Graphics Adapter Vendor Google (Apple)
+INFO         | Graphics Adapter Android Emulator OpenGL ES Translator (Apple M1 Pro)
+INFO         | Graphics API Version OpenGL ES 3.0 (4.1 Metal - 90.5)
+INFO         | Graphics API Extensions GL_OES_EGL_sync GL_OES_EGL_image GL_OES_EGL_image_external GL_OES_depth24 GL_OES_depth32 GL_OES_element_index_uint GL_OES_texture_float GL_OES_texture_float_linear GL_OES_compressed_paletted_texture GL_OES_compressed_ETC1_RGB8_texture GL_OES_depth_texture GL_OES_texture_npot GL_OES_rgb8_rgba8 GL_EXT_color_buffer_float GL_EXT_color_buffer_half_float GL_EXT_texture_format_BGRA8888 GL_APPLE_texture_format_BGRA8888
+INFO         | Graphics Device Extensions N/A
+INFO         | Disabling sparse binding feature support
+INFO         | Sending adb public key [QAAAABP2xJzlu7BN48R4p3Ke2Kzu3OlJcPTsCYBBMlSy/Wrvcl8ZNOFtnaOhRMW0JeKbQOdMFTMjzdi8VTGot/8fwm+fG48SVc8Eee0I5Clx7TihPgUjPkhjnBbWtsSFLDcRg3Mopr670usTGWT1o1cO1s/IxVujmQjumvGPh/nUOT+tKWe4b3jOMFtfRhIJFg2bFHxyCxikuIjGHnyAXDglW1mDktXL4cLSJpPEHDBwuNg3FIDa0d5aMJ6NlmJUlsxyIHFrNK8W9ty6P0qTZ7tnYqfOoHSr+w/ivnc7vScy8UsT+iosplmmaS3DV0Rym3+yB2h8zelEW+THS4AEkVo4H4NXkf+xVSooF1Onm2Ir4LDckVzzLBy7+YJAo9T/TKk35jn9Fmt4TpnXnfHw+8EubBwiwowojXmSqJKgNsiawyUaRx+iu54TOhrgKL3PxJlpLBxheMSK4QCE1GZVcwt4JBtfi2BDGY0L7WxcbF+7kvstCDE2RYdPkTCsYaeAWwiAA6E2/up1plt0nVdyHNDtpXbswZSkmqMvLlcPwpU4RJXs9LDjHWNCnElO9B5uQVBMitoXogG/ccLd1rhchUKeMJzxBSluQlf0bKYAq4iYRKc/fBEHfoc+KzN9wJ6t4og05ksfVkdkPHGOvQRGs5gJZgg/UkHsbRrfL4VhQHbyXdBAU5ZyEQEAAQA= fengqiyue@unknown]
+INFO         | Userspace boot properties:
+INFO         |   androidboot.boot_devices=a003600.virtio_mmio
+INFO         |   androidboot.dalvik.vm.heapsize=576m
+INFO         |   androidboot.debug.hwui.renderer=skiagl
+INFO         |   androidboot.debug.sf.nobootanimation=1
+INFO         |   androidboot.hardware=ranchu
+INFO         |   androidboot.hardware.gltransport=pipe
+INFO         |   androidboot.hardware.vulkan=ranchu
+INFO         |   androidboot.logcat=*:V
+INFO         |   androidboot.opengles.version=196608
+INFO         |   androidboot.qemu=1
+INFO         |   androidboot.qemu.adb.pubkey=QAAAABP2xJzlu7BN48R4p3Ke2Kzu3OlJcPTsCYBBMlSy/Wrvcl8ZNOFtnaOhRMW0JeKbQOdMFTMjzdi8VTGot/8fwm+fG48SVc8Eee0I5Clx7TihPgUjPkhjnBbWtsSFLDcRg3Mopr670usTGWT1o1cO1s/IxVujmQjumvGPh/nUOT+tKWe4b3jOMFtfRhIJFg2bFHxyCxikuIjGHnyAXDglW1mDktXL4cLSJpPEHDBwuNg3FIDa0d5aMJ6NlmJUlsxyIHFrNK8W9ty6P0qTZ7tnYqfOoHSr+w/ivnc7vScy8UsT+iosplmmaS3DV0Rym3+yB2h8zelEW+THS4AEkVo4H4NXkf+xVSooF1Onm2Ir4LDckVzzLBy7+YJAo9T/TKk35jn9Fmt4TpnXnfHw+8EubBwiwowojXmSqJKgNsiawyUaRx+iu54TOhrgKL3PxJlpLBxheMSK4QCE1GZVcwt4JBtfi2BDGY0L7WxcbF+7kvstCDE2RYdPkTCsYaeAWwiAA6E2/up1plt0nVdyHNDtpXbswZSkmqMvLlcPwpU4RJXs9LDjHWNCnElO9B5uQVBMitoXogG/ccLd1rhchUKeMJzxBSluQlf0bKYAq4iYRKc/fBEHfoc+KzN9wJ6t4og05ksfVkdkPHGOvQRGs5gJZgg/UkHsbRrfL4VhQHbyXdBAU5ZyEQEAAQA= fengqiyue@unknown
+INFO         |   androidboot.qemu.avd_name=Admin9_API_34
+INFO         |   androidboot.qemu.camera_hq_edge_processing=0
+INFO         |   androidboot.qemu.camera_protocol_ver=1
+INFO         |   androidboot.qemu.cpuvulkan.version=4206592
+INFO         |   androidboot.qemu.gltransport.drawFlushInterval=800
+INFO         |   androidboot.qemu.gltransport.name=pipe
+INFO         |   androidboot.qemu.hwcodec.avcdec=2
+INFO         |   androidboot.qemu.hwcodec.hevcdec=2
+INFO         |   androidboot.qemu.hwcodec.vpxdec=2
+INFO         |   androidboot.qemu.settings.system.screen_off_timeout=2147483647
+INFO         |   androidboot.qemu.skin=1080x2400
+INFO         |   androidboot.qemu.virtiowifi=1
+INFO         |   androidboot.qemu.vsync=60
+INFO         |   androidboot.serialno=EMULATOR36X6X11X0
+INFO         |   androidboot.vbmeta.digest=7d083757a5e20cd0c568182e509f6d02da844505ce73ef80b2f1ada3f02ae18c
+INFO         |   androidboot.vbmeta.hash_alg=sha256
+INFO         |   androidboot.vbmeta.size=6656
+INFO         |   androidboot.veritymode=enforcing
+INFO         | Monitoring duration of emulator setup.
+WARNING      | The emulator now requires a signed jwt token for gRPC access! Use the -grpc flag if you really want an open unprotected grpc port
+INFO         | Using security allow list from: /Users/fengqiyue/Library/Android/sdk/emulator/lib/emulator_access.json
+INFO         | The active JSON Web Key Sets can be found here: /Users/fengqiyue/Library/Caches/TemporaryItems/avd/running/56178/jwks/cbf1fea3-4af5-4ce4-92dd-9f840e4da545/active.jwk
+INFO         | Scanning /Users/fengqiyue/Library/Caches/TemporaryItems/avd/running/56178/jwks/cbf1fea3-4af5-4ce4-92dd-9f840e4da545 for jwk keys.
+INFO         | Started GRPC server at 127.0.0.1:8554, security: Local, auth: +token
+INFO         | Advertising in: /Users/fengqiyue/Library/Caches/TemporaryItems/avd/running/pid_56178.ini
+INFO         | Successfully initialized netsim WiFi
+INFO         | Activated packet streamer for bluetooth emulation
+INFO         | Setting display: 0 configuration to: 1080x2400, dpi: 420x420
+INFO         | setDisplayActiveConfig: id:0, 1080x2400
+INFO         | emulatorSetupEnvironment: Environment scene is not required
+INFO         | Checking system compatibility:
+INFO         |   Checking: hasSufficientDiskSpace
+INFO         |      Ok: Disk space requirements to run avd: `Admin9_API_34` are met
+INFO         |   Checking: hasSufficientHwGpu
+INFO         |      Ok: Hardware GPU requirements to run avd: `Admin9_API_34` are passed
+INFO         |   Checking: hasSufficientSystem
+INFO         |      Ok: System requirements to run avd: `Admin9_API_34` are met
+INFO         | Warning: QMetaObject::connectSlotsByName: No matching signal for on_rgbcSensorValueWidget_valueChanged() (:0, )
+INFO         | Warning: QMetaObject::connectSlotsByName: No matching signal for on_posture_valueChanged(int) (:0, )
+INFO         | Warning: QObject::connect: Cannot queue arguments of type 'std::vector<android::emulation::control::SnapshotInfo>'
+(Make sure 'std::vector<android::emulation::control::SnapshotInfo>' is registered using qRegisterMetaType().) (:0, )
+INFO         | AVD supportsNativeGLES=1, supportsGuestAngle=0
+INFO         | Platform does not support Guest Angle
+USER_INFO    | Emulator is performing a full startup. This may take upto two minutes, or more.
+INFO         | Created extended window in 102.447ms
+INFO         | Boot completed in 17700 ms
+INFO         | Increasing screen off timeout, logcat buffer size to 2M.

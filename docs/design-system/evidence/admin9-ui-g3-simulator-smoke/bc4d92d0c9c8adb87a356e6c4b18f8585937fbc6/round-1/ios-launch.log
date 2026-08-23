@@ -1,0 +1,2 @@
+$ xcrun simctl launch --terminate-running-process C10E0968-4695-4C02-BC55-8C322531239A com.admin9.app.foundation
+com.admin9.app.foundation: 69012

@@ -50,3 +50,19 @@ launch splash.
 This evidence proves repeatable build/install/cold-launch and the bounded shared
 navigation smoke on the fixed simulators. Real autofill, TalkBack, VoiceOver,
 physical-device behavior and final brand approval remain `Unknown`.
+
+## Hardened revalidation
+
+Source `bc4d92d0c9c8adb87a356e6c4b18f8585937fbc6` completed another two-round
+Pass at 14:31:46 and 14:36:03 UTC. The new archive is in the matching SHA-named
+directory; the original `72d6e60` archive above is unchanged.
+
+The revalidation additionally proves that each Android completion is one
+`wm_activity_launch_time` line containing the exact Activity, and that each iOS
+normal launch reached the launch-measurement completion marker for its current
+Runner PID before screenshot capture. The Android display times were 217,698 ms
+and 61,847 ms. Normal iOS PIDs were 69012 and 73630. Both rounds retained the
+same APK and Dart App hashes recorded above; each generated and installed iOS
+host binary also matched within its round. All four new screenshot/smoke
+checksums pass, and visual review confirms the App privacy screen rather than a
+launch splash.

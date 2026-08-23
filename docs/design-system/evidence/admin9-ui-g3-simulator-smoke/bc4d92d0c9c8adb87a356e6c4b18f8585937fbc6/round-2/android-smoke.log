@@ -1,0 +1,30 @@
+$ /opt/homebrew/bin/flutter test integration_test/simulator_smoke_test.dart -d emulator-5554 -r expanded --timeout 5m
+Resolving dependencies...
+Downloading packages...
+  _fe_analyzer_shared 95.0.0 (105.0.0 available)
+  analyzer 10.1.0 (14.1.0 available)
+  archive 4.0.9 (4.2.0 available)
+  image 4.9.1 (4.9.2 available)
+  intl 0.20.2 (0.20.3 available)
+  matcher 0.12.19 (0.12.20 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  meta 1.18.0 (1.19.0 available)
+  package_config 2.2.0 (3.0.0 available)
+  path_provider_linux 2.2.1 (2.2.2 available)
+  path_provider_platform_interface 2.1.2 (2.1.3 available)
+  shared_preferences_android 2.4.25 (2.4.27 available)
+  test_api 0.7.11 (0.7.13 available)
+  vector_math 2.2.0 (2.4.2 available)
+  vm_service 15.2.0 (15.3.0 available)
+Got dependencies!
+15 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+00:00 +0: loading /Users/fengqiyue/.codex/worktrees/5fed/admin9-app-flutter/integration_test/simulator_smoke_test.dart
+Running Gradle task 'assembleDebug'...                             10.6s
+✓ Built build/app/outputs/flutter-apk/app-debug.apk
+Installing build/app/outputs/flutter-apk/app-debug.apk...          11.4s
+00:00 +0: fixed simulator smoke
+ADMIN9_SMOKE_METRICS platform=android size=411.42857142857144x890.2857142857143 dpr=2.625 padding=EdgeInsets(0.0, 51.8, 0.0, 0.0) viewPadding=EdgeInsets(0.0, 51.8, 0.0, 0.0) viewInsets=EdgeInsets.zero navigation=app-bottom-navigation
+ADMIN9_SMOKE_RESULT platform=android Pass
+00:20 +1: (tearDownAll)
+00:21 +1: All tests passed!

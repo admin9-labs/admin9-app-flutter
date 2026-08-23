@@ -12,7 +12,7 @@ Status: simulator infrastructure closed; not ready for physical handoff
 G3 implements the first-party route selected by G2 for the Demo. Android and
 iOS now use one Admin9-owned visible component language behind the unchanged
 `App*` API. Three independent reviewers accepted the implementation revision.
-Later fixed-source infrastructure at `72d6e60` completed two consecutive
+Later hardened fixed-source infrastructure at `bc4d92d` completed two consecutive
 Android/iOS build, install, cold-launch and minimal shared-smoke rounds. This
 does not replace full interactive G3 review, real-device acceptance, Starter
 migration, a release, or final brand-art approval.
@@ -51,7 +51,7 @@ remain platform-owned.
 | iOS compile build | Release no-codesign `Runner.app` builds, 17.1 MB | G3 compilation evidence only; later replaced by the signed handoff build |
 | iOS handoff export | Development-signed arm64 IPA builds, 7,211,488 bytes; strict code-sign and archive integrity pass | Provisioned local-device package, not App Store/Ad Hoc distribution or installation evidence |
 | Package exit | Source, package configuration and both release asset trees contain no Forui, Inter or Lucide candidate artifact | Confirms the G2 package footprint is removed |
-| Repeatable simulator smoke | Two Android API 34 and two iOS 26.5 runs pass on source `72d6e60`; build/install identities, cold-launch events, screenshots and metrics are archived | Bounded simulator evidence; not physical-device or real assistive-technology proof |
+| Repeatable simulator smoke | Two Android API 34 and two iOS 26.5 runs pass on source `bc4d92d`; build/install identities, hardened cold-launch events, screenshots and metrics are archived | Bounded simulator evidence; not physical-device or real assistive-technology proof |
 
 Local handoff artifacts for this revision:
 
@@ -163,7 +163,7 @@ iPhone:
 ## Stop condition
 
 Three independent reviewers returned Go on implementation commit `d6adb41`,
-and fixed source `72d6e60` later passed the repeatable dual-simulator smoke.
+and hardened fixed source `bc4d92d` later passed the repeatable dual-simulator smoke.
 This infrastructure task did not create the supplemental reviews or perform
 physical-device acceptance. Do not hand the builds to the user, migrate Starter,
 assign a Design System version, push, publish or release until those separate

@@ -1,7 +1,7 @@
 # Admin9 UI G3 Simulator Acceptance
 
 Date: 2026-08-23
-Smoke source commit: `72d6e60f925ea676dc9b0670c9a8ad7bb89bd73f`
+Smoke source commit: `bc4d92d0c9c8adb87a356e6c4b18f8585937fbc6`
 Status: Pass for repeatable dual-simulator cold launch and minimal shared smoke
 
 ## Gate decision
@@ -42,7 +42,7 @@ Both platforms installed bundle/package `com.admin9.app.foundation`, version
 | --- | --- | --- | --- |
 | Android release APK | `f4da9119b1eb379d28b75f56e5594e2a86d75acc01fba91e56b9ecb6b82e360f` | Same | Pass |
 | iOS `App.framework/App` | `fb9f97f3b7aab44f0af7e05f0b5ddbfe8a28102f0bb36bd6827b461407efe44e` | Same | Pass |
-| iOS `Runner` | `cb8f4985b90854bb19c3ec06e614aa26961833b932a06a4cf1ccfe4a62a8e891` | `4569b32000a983639f52b8a6f07c1f52fac5722aa2380b9bdc54c3f275f5846c` | Built and installed copies match within each round |
+| iOS `Runner` | `0e8e65c2b05e92d2a8937bcee3a19069b9cdfc06f695b3ce53986d6e26c413ab` | `e2e8f2909d56e9cea1394dc8876c0db5735fe3944c4664078d350bb116ae1507` | Built and installed copies match within each round |
 
 The generated iOS host executable is not byte-reproducible across separate
 Xcode builds. The Dart App binary is stable, and each installed host/App pair
@@ -53,15 +53,18 @@ matches the bundle produced in its own round.
 Android was force-stopped with `am start -W -S`. On this AVD, Android's short
 `am start -W` window returned `Status: timeout` before Flutter drew its first
 frame. The entry therefore clears the events buffer before launch and requires
-a new `wm_activity_launch_time` for the exact package/activity before capture.
-The two system-reported display times were 121,033 ms and 50,255 ms. Both
-post-display screenshots show the privacy screen, not the launch splash.
+a new `wm_activity_launch_time` line containing the exact package/activity
+before capture. The two system-reported display times were 217,698 ms and
+61,847 ms. Both post-display screenshots show the privacy screen, not the
+launch splash.
 
 iOS used `simctl launch --terminate-running-process` after installing the
-current round's `Runner.app`. Both screenshots show the same privacy screen.
-No crash, ANR, uncaught exception or failed assertion was found in the archived
-App logs. The long Android simulator display time is recorded as environment
-performance evidence; this task does not claim it represents a physical device.
+current round's `Runner.app`. Before capture, each normal launch required the
+launch-completion marker for its returned Runner PID (`69012`, then `73630`)
+within 30 seconds. Both screenshots show the same privacy screen. No crash,
+ANR, uncaught exception or failed assertion was found in the archived App logs.
+The long Android simulator display time is environment performance evidence;
+this task does not claim it represents a physical device.
 
 ## Minimal shared smoke
 

@@ -20,7 +20,7 @@ be reopened or expanded. G2 is closed Go at
 at `d6adb419dfa6935868b37621fc530e942fd13988` after the product/brand,
 Flutter architecture and QA/accessibility reviewers independently found no
 remaining direct P0/P1. The later repeatable simulator infrastructure gate
-passed on fixed source `72d6e60f925ea676dc9b0670c9a8ad7bb89bd73f` with two
+passed on hardened fixed source `bc4d92d0c9c8adb87a356e6c4b18f8585937fbc6` with two
 consecutive Android/iOS build, install, cold-launch and minimal shared-smoke
 rounds. Full interactive G3 review and physical-device handoff are not open.
 
@@ -170,6 +170,11 @@ rounds. Full interactive G3 review and physical-device handoff are not open.
   two cold launches at 121,033 ms and 50,255 ms before screenshot capture. No
   crash, ANR or failed assertion was found; physical-device performance remains
   Unknown.
+- 2026-08-23: hardened source `bc4d92d` rejected untracked build inputs,
+  required each Android launch event and exact Activity on one line, and bound
+  iOS readiness to the current normal Runner PID. Two new fixed-source rounds
+  passed at Android display times 217,698 ms and 61,847 ms; all four normal-App
+  screenshots, smoke logs and checksums passed.
 
 ## Provisional decisions
 
@@ -191,7 +196,7 @@ rounds. Full interactive G3 review and physical-device handoff are not open.
 ## Blocking decisions
 
 - Final Admin9 brand direction and final approval still belong to the user.
-- Repeatable dual-simulator infrastructure is closed at `72d6e60`; full
+- Repeatable dual-simulator infrastructure is closed at `bc4d92d`; full
   interactive supplemental G3 review remains a separate pending gate.
 - Starter adoption is blocked until the user accepts the Demo on Android and
   iOS real devices.

@@ -28,6 +28,11 @@ reads the fixed device state and uses short host-cache write probes that are
 removed immediately. Those probes are necessary because filesystem mode bits
 alone did not detect the earlier Codex sandbox denial.
 
+Source provenance requires a clean tracked and staged tree and no untracked
+build input under `lib/`, `assets/`, `android/`, `ios/`, `pubspec.yaml` or
+`pubspec.lock`. An exact untracked path returns `Unknown`; task-local `.codex/`
+state is outside those build inputs and remains allowed.
+
 Run the complete path once, writing generated evidence under ignored `build/`:
 
 ```bash
@@ -51,8 +56,14 @@ navigation mode, iOS viewport/safe-area metrics, commands and result per round.
 Android's `am start -W` can return `Status: timeout` before a slow Flutter first
 frame while still exiting zero. The entry clears the Android events buffer
 before each launch and requires a new `wm_activity_launch_time` for the fixed
-package/activity before it captures evidence. Absence of that event after 90
-polls is `App Fail`; raw `am start` output remains archived.
+package/activity on the same event line before it captures evidence. Absence of
+that event after 90 polls is `App Fail`; raw `am start` output remains archived.
+
+iOS readiness is bound to the PID returned by the current normal
+`simctl launch`. Before screenshot capture, a 30-second poll must find that PID's
+`com.apple.app_launch_measurement` page-in recording release marker. Timeout is
+`App Fail` with the exact log query and archived output. The later integration
+smoke reinstall cannot satisfy this normal-App cold-launch gate.
 
 ## Result contract
 
@@ -71,7 +82,9 @@ delivered on the required hardware.
 
 ## Verified baseline
 
-Commit `72d6e60f925ea676dc9b0670c9a8ad7bb89bd73f` completed two consecutive
-rounds on 2026-08-23. Both Android API 34 and iOS 26.5 smoke runs passed in each
-round. The reviewable logs, screenshots, device identities and hashes are under
+Commit `72d6e60f925ea676dc9b0670c9a8ad7bb89bd73f` retains the original two-round
+baseline. Hardened commit `bc4d92d0c9c8adb87a356e6c4b18f8585937fbc6`
+completed another two consecutive rounds on 2026-08-23 with the three stricter
+gates above. Both Android API 34 and iOS 26.5 passed in each round. Reviewable
+logs, screenshots, device identities and hashes for both baselines are under
 [`evidence/admin9-ui-g3-simulator-smoke/`](evidence/admin9-ui-g3-simulator-smoke/).

@@ -1,0 +1,35 @@
+--------- beginning of main
+08-23 22:27:08.929  4625  4625 I .app.foundation: Using CollectorTypeCC GC.
+08-23 22:27:09.167  4625  4625 E .app.foundation: Not starting debugger since process cannot load the jdwp agent.
+08-23 22:27:17.437  4625  4625 D CompatibilityChangeReporter: Compat change id reported: 171979766; UID 10192; state: ENABLED
+08-23 22:27:17.437  4625  4625 D CompatibilityChangeReporter: Compat change id reported: 242716250; UID 10192; state: ENABLED
+08-23 22:27:18.089  4625  4625 D ApplicationLoaders: Returning zygote-cached class loader: /system_ext/framework/androidx.window.extensions.jar
+08-23 22:27:18.089  4625  4625 D ApplicationLoaders: Returning zygote-cached class loader: /system_ext/framework/androidx.window.sidecar.jar
+08-23 22:27:18.107  4625  4625 D nativeloader: Configuring clns-6 for other apk /data/app/~~5ZcBXtajEjL32njazawx2A==/com.admin9.app.foundation-d-plkXhI1lvUraRLQEzoPw==/base.apk. target_sdk_version=36, uses_libraries=, library_path=/data/app/~~5ZcBXtajEjL32njazawx2A==/com.admin9.app.foundation-d-plkXhI1lvUraRLQEzoPw==/lib/arm64:/data/app/~~5ZcBXtajEjL32njazawx2A==/com.admin9.app.foundation-d-plkXhI1lvUraRLQEzoPw==/base.apk!/lib/arm64-v8a, permitted_path=/data:/mnt/expand:/data/user/0/com.admin9.app.foundation
+08-23 22:27:20.442  4625  4625 V GraphicsEnvironment: Currently set values for:
+08-23 22:27:20.495  4625  4625 V GraphicsEnvironment:   angle_gl_driver_selection_pkgs=[]
+08-23 22:27:20.495  4625  4625 V GraphicsEnvironment:   angle_gl_driver_selection_values=[]
+08-23 22:27:20.535  4625  4625 V GraphicsEnvironment: ANGLE GameManagerService for com.admin9.app.foundation: false
+08-23 22:27:20.581  4625  4625 V GraphicsEnvironment: com.admin9.app.foundation is not listed in per-application setting
+08-23 22:27:20.624  4625  4625 V GraphicsEnvironment: Neither updatable production driver nor prerelease driver is supported.
+08-23 22:27:27.098  4625  4662 D libEGL  : loaded /vendor/lib64/egl/libEGL_emulation.so
+08-23 22:27:27.257  4625  4662 D libEGL  : loaded /vendor/lib64/egl/libGLESv1_CM_emulation.so
+08-23 22:27:27.588  4625  4662 D libEGL  : loaded /vendor/lib64/egl/libGLESv2_emulation.so
+08-23 22:27:32.433  4625  4675 D skia    : [SkFontMgr Android Parser] '/product/etc/fonts_customization.xml' could not be opened
+08-23 22:27:33.376  4625  4625 W .app.foundation: type=1400 audit(0.0:19): avc:  denied  { read } for  name="max_map_count" dev="proc" ino=64214 scontext=u:r:untrusted_app:s0:c192,c256,c512,c768 tcontext=u:object_r:proc_max_map_count:s0 tclass=file permissive=0 app=com.admin9.app.foundation
+08-23 22:27:37.616  4625  4682 I flutter : [IMPORTANT:flutter/shell/platform/android/android_context_gl_impeller.cc(104)] Using the Impeller rendering backend (OpenGLES).
+08-23 22:27:38.432  4625  4635 I .app.foundation: Background concurrent copying GC freed 23670(1012KB) AllocSpace objects, 0(0B) LOS objects, 49% free, 2110KB/4221KB, paused 41us,22us total 562.948ms
+08-23 22:28:06.211  4625  4625 D CompatibilityChangeReporter: Compat change id reported: 237531167; UID 10192; state: DISABLED
+08-23 22:28:06.440  4625  4625 W OpenGLRenderer: Unknown dataspace 0
+08-23 22:28:14.722  4625  4625 I Choreographer: Skipped 3116 frames!  The application may be doing too much work on its main thread.
+08-23 22:28:16.764  4625  4660 W OpenGLRenderer: Failed to choose config with EGL_SWAP_BEHAVIOR_PRESERVED, retrying without...
+08-23 22:28:16.805  4625  4660 W OpenGLRenderer: Failed to initialize 101010-2 format, error = EGL_SUCCESS
+08-23 22:28:17.136  4625  4682 I Gralloc4: mapper 4.x is not supported
+08-23 22:28:18.540  4625  4660 E OpenGLRenderer: Unable to match the desired swap behavior.
+08-23 22:30:07.914  4625  4625 I Choreographer: Skipped 6767 frames!  The application may be doing too much work on its main thread.
+08-23 22:30:08.448  4625  5288 D ProfileInstaller: Installing profile for com.admin9.app.foundation
+08-23 22:30:09.718  4625  4625 I Choreographer: Skipped 83 frames!  The application may be doing too much work on its main thread.
+08-23 22:30:13.310  4625  5313 E SurfaceSyncGroup: Failed to receive transaction ready in 1000ms. Marking SurfaceSyncGroup(wmsSync-VRI[MainActivity]#1) as ready
+08-23 22:30:13.639  4625  5313 E SurfaceSyncGroup: Failed to receive transaction ready in 1000ms. Marking SurfaceSyncGroup(VRI[MainActivity]#2) as ready
+08-23 22:30:14.291  4625  4625 I Choreographer: Skipped 104 frames!  The application may be doing too much work on its main thread.
+08-23 22:30:14.352  4625  4639 I OpenGLRenderer: Davey! duration=1700ms; Flags=1, FrameTimelineVsyncId=18046, IntendedVsync=691537152560, Vsync=691687152554, InputEventId=0, HandleInputStart=691710668912, AnimationStart=691710669870, PerformTraversalsStart=691710670120, DrawStart=691845600079, FrameDeadline=691553819226, FrameInterval=691691459204, FrameStartTime=16666666, SyncQueued=691847248745, SyncStart=691850545079, IssueDrawCommandsStart=692023922454, SwapBuffers=692979373996, FrameCompleted=693241060038, DequeueBufferDuration=22430041, QueueBufferDuration=113761917, GpuCompleted=693218534704, SwapBuffersCompleted=693241060038, DisplayPresentTime=0, CommandSubmissionCompleted=692979373996,

@@ -1,0 +1,22 @@
+source_sha=bc4d92d0c9c8adb87a356e6c4b18f8585937fbc6
+task_identity=uid:501 user:fengqiyue
+PASS git_tracked_tree             clean
+PASS git_build_inputs             no untracked source
+PASS hw.optional.neon             1
+PASS hw.optional.arm.FEAT_AES     1
+PASS adb_5037                     /Users/fengqiyue/Library/Android/sdk/platform-tools/adb; devices query and listener passed
+PASS android_avd                  Admin9_API_34; Android emulator version 36.6.11.0 (build_id 15507667) (CL:N/A)
+PASS android_image                Google APIs arm64 API 34
+PASS core_simulator                   iPhone 17e (C10E0968-4695-4C02-BC55-8C322531239A) (Shutdown)
+PASS ios_runtime                  com.apple.CoreSimulator.SimRuntime.iOS-26-5
+PASS flutter                      /opt/homebrew/bin/flutter
+PASS xcode                        Xcode 26.6 Build version 17F113
+PASS cache_write                  /opt/homebrew/share/flutter/bin/cache
+PASS cache_write                  /Users/fengqiyue/.pub-cache
+PASS cache_write                  /Users/fengqiyue/.gradle
+PASS cache_write                  /Users/fengqiyue/Library/Developer/Xcode/DerivedData
+PASS cache_write                  /Users/fengqiyue/Library/Developer/CoreSimulator
+PASS cache_write                  /Users/fengqiyue/.codex/worktrees/5fed/admin9-app-flutter/build
+PASS android_target               Admin9_API_34 shutdown
+PASS ios_target                       iPhone 17e (C10E0968-4695-4C02-BC55-8C322531239A) (Shutdown)
+RESULT=Pass

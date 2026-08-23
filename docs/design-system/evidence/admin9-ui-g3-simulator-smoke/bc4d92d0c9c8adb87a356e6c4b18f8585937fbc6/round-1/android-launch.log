@@ -1,0 +1,8 @@
+$ /Users/fengqiyue/Library/Android/sdk/platform-tools/adb -s emulator-5554 shell am start -W -S -n com.admin9.app.foundation/.MainActivity
+Stopping: com.admin9.app.foundation
+Starting: Intent { cmp=com.admin9.app.foundation/.MainActivity }
+Status: timeout
+LaunchState: UNKNOWN (-1)
+Activity: com.admin9.app.foundation/.MainActivity
+WaitTime: 51491
+Complete

@@ -1,0 +1,22 @@
+round=2
+source_sha=bc4d92d0c9c8adb87a356e6c4b18f8585937fbc6
+Admin9_API_34
+34
+2
+Physical size: 1080x2400
+android_package=package:/data/app/~~RCMs4LZPglJd09a3yyx5mw==/com.admin9.app.foundation-UIH7Livk1JgOf_H9OZfVnA==/base.apk
+    versionCode=1 minSdk=24 targetSdk=36
+    versionName=1.0.0
+SIMULATOR_DEVICE_NAME=iPhone 17e
+SIMULATOR_RUNTIME_VERSION=26.5
+SIMULATOR_MODEL_IDENTIFIER=iPhone18,5
+SIMULATOR_MAINSCREEN_SCALE=3.000000
+SIMULATOR_MAINSCREEN_WIDTH=1170
+SIMULATOR_MAINSCREEN_HEIGHT=2532
+ios_installed_app=/Users/fengqiyue/Library/Developer/CoreSimulator/Devices/C10E0968-4695-4C02-BC55-8C322531239A/data/Containers/Bundle/Application/497ED265-7105-482F-923F-A9993136295B/Runner.app
+ios_bundle=com.admin9.app.foundation
+f4da9119b1eb379d28b75f56e5594e2a86d75acc01fba91e56b9ecb6b82e360f  /Users/fengqiyue/.codex/worktrees/5fed/admin9-app-flutter/build/app/outputs/flutter-apk/app-release.apk
+e2e8f2909d56e9cea1394dc8876c0db5735fe3944c4664078d350bb116ae1507  /Users/fengqiyue/.codex/worktrees/5fed/admin9-app-flutter/build/ios/iphonesimulator/Runner.app/Runner
+fb9f97f3b7aab44f0af7e05f0b5ddbfe8a28102f0bb36bd6827b461407efe44e  /Users/fengqiyue/.codex/worktrees/5fed/admin9-app-flutter/build/ios/iphonesimulator/Runner.app/Frameworks/App.framework/App
+e2e8f2909d56e9cea1394dc8876c0db5735fe3944c4664078d350bb116ae1507  /Users/fengqiyue/Library/Developer/CoreSimulator/Devices/C10E0968-4695-4C02-BC55-8C322531239A/data/Containers/Bundle/Application/497ED265-7105-482F-923F-A9993136295B/Runner.app/Runner
+fb9f97f3b7aab44f0af7e05f0b5ddbfe8a28102f0bb36bd6827b461407efe44e  /Users/fengqiyue/Library/Developer/CoreSimulator/Devices/C10E0968-4695-4C02-BC55-8C322531239A/data/Containers/Bundle/Application/497ED265-7105-482F-923F-A9993136295B/Runner.app/Frameworks/App.framework/App
