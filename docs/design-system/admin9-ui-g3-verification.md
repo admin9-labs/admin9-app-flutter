@@ -4,16 +4,19 @@ Date: 2026-08-23
 G2 gate commit: `06a398a747178e1aaed4933f96806ced3c498ad8`
 Initial implementation commit: `3b9ea41540440f8b518546110fdbd3e7fc2def7d`
 Supervision revision: `d6adb419dfa6935868b37621fc530e942fd13988`
-Gate: Demo implementation and local delivery evidence
-Status: G3 Go; three final closure reviewers found no direct P0/P1
+Gate: Demo implementation Go; simulator delivery prerequisite reopened
+Status: Blocked before Android Emulator boot; not ready for physical handoff
 
 ## Result
 
 G3 implements the first-party route selected by G2 for the Demo. Android and
 iOS now use one Admin9-owned visible component language behind the unchanged
-`App*` API. Three independent reviewers accepted the fixed revision. This local
-result is not real-device acceptance, Starter migration, a release, or final
-brand-art approval.
+`App*` API. Three independent reviewers accepted the implementation revision.
+The later delivery gate is nevertheless blocked because interactive Android
+and iOS simulator acceptance was not part of that review and the current
+Android Emulator cannot boot in the Codex execution environment. This local
+result is not simulator-pair acceptance, real-device acceptance, Starter
+migration, a release, or final brand-art approval.
 
 Forui 0.25.0, `forui_assets`, `sugar`, the candidate adapter, the two POC
 renderers, their harness/tests and all 110 candidate-only Goldens are removed.
@@ -118,6 +121,10 @@ the reviewed implementation SHA is unchanged.
 
 ## Real-device handoff checklist
 
+Physical-device handoff is paused. First close the simulator addendum in
+[the simulator acceptance record](admin9-ui-g3-simulator-acceptance.md), commit
+one fixed SHA and obtain exactly three supplemental G3 Go decisions.
+
 Use the fillable, artifact-bound
 [physical-device acceptance record](admin9-ui-g3-device-acceptance.md). Run the
 same representative flow on one supported Android device and one supported
@@ -155,8 +162,9 @@ iPhone:
 
 ## Stop condition
 
-Three independent reviewers have returned Go on fixed G3 commit `d6adb41`; the
-exact Android/iOS packages and shared checklist are prepared. Unattended work
-stops here. Do not migrate Starter, assign a Design System version, push,
-publish or release until the user explicitly accepts both real-device
-experiences.
+Three independent reviewers returned Go on the implementation commit
+`d6adb41`, but that review did not contain interactive simulator evidence. The
+simulator delivery prerequisite is currently Blocked as recorded in the linked
+addendum. Do not create the three supplemental reviews, hand the builds to the
+user, migrate Starter, assign a Design System version, push, publish or release
+until the Android/iOS simulator gate is complete on one fixed SHA.

@@ -3,14 +3,17 @@
 Date prepared: 2026-08-23
 Reviewed implementation commit: `d6adb419dfa6935868b37621fc530e942fd13988`
 Implementation tree: `7ad5e22ad62d29fd1c4eda2b520b156f54acff47`
-Status: packages and checklist ready; Android/iOS physical-device result Unknown
+Status: physical handoff paused; dual-simulator prerequisite is Blocked
 
 ## Acceptance authority
 
-Only the user/product approver can close this gate after using both builds.
-Local builds, simulators, Goldens and Flutter semantics tests remain supporting
-evidence. They do not establish real-device brand unity, native gesture quality,
-real keyboard behavior or TalkBack/VoiceOver delivery.
+Only the user/product approver can close this gate after using both builds, but
+the packages must not be handed off yet. First close the blocked
+[dual-simulator acceptance record](admin9-ui-g3-simulator-acceptance.md) on one
+fixed source SHA and receive exactly three supplemental G3 Go decisions. Local
+builds, simulators, Goldens and Flutter semantics tests remain supporting
+evidence. They do not establish real-device brand unity, native gesture
+quality, real keyboard behavior or TalkBack/VoiceOver delivery.
 
 Pass means both devices are immediately recognizable as the same Admin9 product,
 the same tasks retain the same information and recovery, and the operating

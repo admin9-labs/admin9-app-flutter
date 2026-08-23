@@ -16,13 +16,13 @@ areas, and accessibility keep their platform behavior.
 
 G1 is closed Go at `cf68a24844e45c16d983d29fb4878ad2f14bfd41` and must not
 be reopened or expanded. G2 is closed Go at
-`06a398a747178e1aaed4933f96806ced3c498ad8`. G3 is closed Go at
-`d6adb419dfa6935868b37621fc530e942fd13988` after the product/brand,
+`06a398a747178e1aaed4933f96806ced3c498ad8`. The G3 implementation is closed Go
+at `d6adb419dfa6935868b37621fc530e942fd13988` after the product/brand,
 Flutter architecture and QA/accessibility reviewers independently found no
-remaining direct P0/P1. The Demo now uses the selected first-party route while
-retaining the existing `App*` API, one route tree, App host and system-owned
-behavior. The current stage is Android/iOS real-device acceptance; implementation
-and unattended work stop before Starter migration.
+remaining direct P0/P1. The later delivery gate has been reopened because
+interactive Android/iOS simulator acceptance was not previously performed.
+The iOS run is a partial Pass, but Android Emulator boot is blocked by the
+current Codex process environment. Physical-device handoff is not open.
 
 ## Completed
 
@@ -90,6 +90,14 @@ and unattended work stop before Starter migration.
   QA/accessibility reviewers on the same G3 revision.
 - Prepared the exact Android Release APK and a development-signed iOS IPA for
   physical-device acceptance, together with one shared, fillable checklist.
+- Interactively exercised the installed normal Demo on iPhone 17e / iOS 26.5
+  Simulator: login/registration, main navigation/account, settings, software
+  keyboard/focus, unavailable feedback, edge-back, safe areas, dark/large text,
+  contrast preferences and force-quit cold launch produced 13 labeled captures.
+- Attempted the Pixel 7 API 34 and API 36 arm64 AVDs through graphical,
+  headless, temporary-data and software-acceleration paths. QEMU consistently
+  failed before Android boot with a sandbox-coalition `SIGILL`; no Android
+  product result is claimed.
 
 ## Verification evidence
 
@@ -141,6 +149,15 @@ and unattended work stop before Starter migration.
   `com.admin9.app.foundation`, contains the connected iPhone UDID in its
   provisioning profile and expires on 2027-06-05. This proves packaging and
   signing only, not installation or real-device acceptance.
+- 2026-08-23: iOS Simulator interaction passed the normal Demo scenarios listed
+  in `docs/design-system/admin9-ui-g3-simulator-acceptance.md`. The tested
+  installed App binary matches the existing workspace simulator artifact, but
+  installing the separately rebuilt current-source Dart bundle was blocked;
+  exact source-to-installed binding remains Unknown.
+- 2026-08-23: Android Emulator 36.6.11 failed before boot with
+  `EXC_BAD_INSTRUCTION` / `SIGILL` at `init_cache_info` inside the
+  `com.openai.codex` process coalition. This is a real environment Block and is
+  not converted into a product Fail or Pass.
 
 ## Provisional decisions
 
@@ -162,6 +179,9 @@ and unattended work stop before Starter migration.
 ## Blocking decisions
 
 - Final Admin9 brand direction and final approval still belong to the user.
+- Dual-simulator acceptance is blocked until an official Android Emulator can
+  run outside the current Codex process sandbox and the exact current-source
+  builds can be installed on both simulators.
 - Starter adoption is blocked until the user accepts the Demo on Android and
   iOS real devices.
 
@@ -170,11 +190,13 @@ POCs, or Demo implementation.
 
 ## Next
 
-1. Install the exact APK and development-signed IPA identified in
-   `docs/design-system/admin9-ui-g3-device-acceptance.md`.
-2. The user runs the shared checklist on one supported Android device and one
-   supported iPhone and records Pass/Fail plus device facts.
-3. Continue only after the user explicitly accepts or rejects the Admin9 brand
-   direction and both real-device experiences.
-4. Do not migrate Starter, assign a Design System version, push, publish or
-   release before that explicit acceptance.
+1. Resume from the Block conditions in
+   `docs/design-system/admin9-ui-g3-simulator-acceptance.md` and complete one
+   fixed-SHA Android/iOS simulator comparison.
+2. After any direct P0/P1 loop, run exactly three bounded supplemental G3
+   reviews on the fixed simulator evidence and direct regressions.
+3. Only after all three reviewers return Go, install the exact APK and
+   development-signed IPA for user-operated physical-device acceptance.
+4. Continue only after the user explicitly accepts or rejects the Admin9 brand
+   direction and both real-device experiences. Do not migrate Starter, assign
+   a Design System version, push, publish or release before that acceptance.
