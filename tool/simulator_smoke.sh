@@ -140,7 +140,7 @@ preflight() {
   printf 'RESULT=Pass\n'
 }
 start_devices() {
-  local session_dir="$1" serial boot
+  local session_dir="$1" serial boot boot_animation package_ready
   serial="$(android_serial || true)"
   if [[ -z "$serial" ]]; then
     printf '$ %s\n' "$(cmdline "$EMULATOR" -avd "$ANDROID_AVD" -no-snapshot-load -no-boot-anim -gpu host)" \
@@ -151,11 +151,17 @@ start_devices() {
       serial="$(android_serial || true)"
       boot=""
       [[ -n "$serial" ]] && boot="$($ADB -s "$serial" shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')"
-      [[ "$boot" == 1 ]] && break
+      boot_animation="$($ADB -s "$serial" shell getprop init.svc.bootanim 2>/dev/null | tr -d '\r')"
+      package_ready="$($ADB -s "$serial" shell cmd package list packages android 2>/dev/null | tr -d '\r')"
+      [[ "$boot" == 1 && "$boot_animation" == stopped && "$package_ready" == package:android ]] && break
       sleep 1
     done
+    sleep 10
   fi
-  [[ -n "$serial" && "${boot:-1}" == 1 ]] || fail "Infrastructure Block" android_boot \
+  boot="$($ADB -s "$serial" shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')"
+  boot_animation="$($ADB -s "$serial" shell getprop init.svc.bootanim 2>/dev/null | tr -d '\r')"
+  package_ready="$($ADB -s "$serial" shell cmd package list packages android 2>/dev/null | tr -d '\r')"
+  [[ -n "$serial" && "$boot" == 1 && "$boot_animation" == stopped && "$package_ready" == package:android ]] || fail "Infrastructure Block" android_boot \
     "$(cmdline "$EMULATOR" -avd "$ANDROID_AVD" -no-snapshot-load -no-boot-anim -gpu host)" \
     "$session_dir/android-emulator.log"
   if ! xcrun simctl list devices booted | grep -Fq "$IOS_UDID"; then
@@ -226,9 +232,9 @@ run_round() {
     grep -Fqx "ios_bundle=$BUNDLE_ID" "$dir/device-and-build.txt" || fail "Infrastructure Block" install_identity \
     "pm path; simctl get_app_container" "$dir/device-and-build.txt"
   step "App Fail" android_smoke "$dir/android-smoke.log" "$FLUTTER" test \
-    integration_test/simulator_smoke_test.dart -d "$serial" -r expanded
+    integration_test/simulator_smoke_test.dart -d "$serial" -r expanded --timeout 5m
   step "App Fail" ios_smoke "$dir/ios-smoke.log" "$FLUTTER" test \
-    integration_test/simulator_smoke_test.dart -d "$IOS_UDID" -r expanded
+    integration_test/simulator_smoke_test.dart -d "$IOS_UDID" -r expanded --timeout 5m
   shasum -a 256 "$dir"/*.png "$dir"/*-smoke.log >"$dir/evidence-sha256.txt"
   printf 'RESULT=Pass\nround=%s\nsource_sha=%s\ncompleted_at=%s\n' \
     "$round" "$SOURCE_SHA" "$(date -u '+%Y-%m-%dT%H:%M:%SZ')" | tee "$RESULT_FILE"
