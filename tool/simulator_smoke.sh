@@ -25,9 +25,7 @@ usage() {
   printf '%s\n' 'tool/simulator_smoke.sh preflight' \
     'tool/simulator_smoke.sh run [--rounds N] [--evidence-dir PATH]'
 }
-cmdline() {
-  printf '%q ' "$@"
-}
+cmdline() { printf '%q ' "$@"; }
 fail() {
   local category="$1" stage="$2" call="$3" log="$4" code=30
   [[ "$category" == "App Fail" ]] && code=10
@@ -124,7 +122,6 @@ preflight() {
     "$HOME/Library/Developer/Xcode/DerivedData" "$HOME/Library/Developer/CoreSimulator" "$ROOT/build"; do
     probe_write "$cache"
   done
-
   serial="$(android_serial || true)"
   [[ -n "$serial" ]] && pass android_target "$ANDROID_AVD booted as $serial" ||
     pass android_target "$ANDROID_AVD shutdown"
@@ -186,10 +183,15 @@ run_round() {
     "test -f $apk; test -d $ios_app" "$dir/build-sha256.txt"
   step "Infrastructure Block" android_install "$dir/android-install.log" "$ADB" -s "$serial" install -r "$apk"
   step "Infrastructure Block" ios_install "$dir/ios-install.log" xcrun simctl install "$IOS_UDID" "$ios_app"
+  step "Infrastructure Block" android_event_reset "$dir/android-event-reset.log" "$ADB" -s "$serial" logcat -b events -c
   step "App Fail" android_cold_launch "$dir/android-launch.log" "$ADB" -s "$serial" shell \
     am start -W -S -n "$BUNDLE_ID/.MainActivity"
-  grep -Fqx 'Status: ok' "$dir/android-launch.log" && grep -Fqx 'LaunchState: COLD' "$dir/android-launch.log" ||
-    fail "App Fail" android_cold_launch "grep Status:_ok and LaunchState:_COLD $dir/android-launch.log" "$dir/android-launch.log"
+  for _ in $(seq 1 90); do
+    "$ADB" -s "$serial" logcat -b events -d -v brief >"$dir/android-launch-complete.log"
+    grep -Fq 'wm_activity_launch_time' "$dir/android-launch-complete.log" && grep -Fq "$BUNDLE_ID/.MainActivity" "$dir/android-launch-complete.log" && break
+    sleep 1
+  done
+  grep -Fq 'wm_activity_launch_time' "$dir/android-launch-complete.log" && grep -Fq "$BUNDLE_ID/.MainActivity" "$dir/android-launch-complete.log" || fail "App Fail" android_cold_launch "adb logcat -b events; grep wm_activity_launch_time and $BUNDLE_ID/.MainActivity" "$dir/android-launch-complete.log"
   sleep 3
   pid="$($ADB -s "$serial" shell pidof "$BUNDLE_ID" 2>/dev/null | tr -d '\r')"
   [[ -n "$pid" ]] || fail "App Fail" android_process \
@@ -262,7 +264,6 @@ run_all() {
   printf 'RESULT=Pass\nsource_sha=%s\nrounds=%s\nevidence=%s\n' \
     "$SOURCE_SHA" "$rounds" "$session" | tee "$RESULT_FILE"
 }
-
 case "${1:-}" in
   preflight) preflight ;;
   run)
