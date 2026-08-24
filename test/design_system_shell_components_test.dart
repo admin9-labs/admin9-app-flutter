@@ -550,7 +550,7 @@ void main() {
   );
 
   for (final row in _matrix) {
-    testWidgets('Phase 2 A-L layout row ${row.name}', (tester) async {
+    testWidgets('shell components responsive row ${row.name}', (tester) async {
       tester.view.devicePixelRatio = 1;
       tester.view.physicalSize = row.size;
       addTearDown(() {
@@ -569,7 +569,7 @@ void main() {
         child: AppFeedback(
           controller: feedback,
           navigatorKey: navigatorKey,
-          child: const _Phase2MatrixShell(),
+          child: const _ResponsiveMatrixShell(),
         ),
       );
       feedback.show(
@@ -711,14 +711,14 @@ Future<void> _pumpFeedback(
   await tester.pump();
 }
 
-class _Phase2MatrixShell extends StatefulWidget {
-  const _Phase2MatrixShell();
+class _ResponsiveMatrixShell extends StatefulWidget {
+  const _ResponsiveMatrixShell();
 
   @override
-  State<_Phase2MatrixShell> createState() => _Phase2MatrixShellState();
+  State<_ResponsiveMatrixShell> createState() => _ResponsiveMatrixShellState();
 }
 
-class _Phase2MatrixShellState extends State<_Phase2MatrixShell> {
+class _ResponsiveMatrixShellState extends State<_ResponsiveMatrixShell> {
   int _selectedIndex = 0;
 
   @override

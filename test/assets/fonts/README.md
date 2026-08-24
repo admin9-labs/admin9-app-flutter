@@ -13,7 +13,7 @@ the runtime typography system.
 - Subset SHA-256:
   `6c6f8964c79de069e6dadd48f5c0016ffaa83b713ef2b03c0ad9076815aa3769`
 - Subset coverage: ASCII, common CJK punctuation, and Han glyphs present in
-  `lib/` and `test/` when the G2 supervision fixture was generated.
+  `lib/` and `test/` when the deterministic CJK fixture was generated.
 - Subset tool: FontTools `4.59.1`.
 - License: SIL Open Font License 1.1, in `OFL.txt`.
 

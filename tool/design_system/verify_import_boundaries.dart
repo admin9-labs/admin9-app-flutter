@@ -1,13 +1,9 @@
 import 'dart:io';
-import 'dart:convert';
 
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 
-enum _PolicyPhase { phase0d, finalPhase }
-
 const _fixtureRoot = 'tool/design_system/fixtures/import_boundaries';
-const _baselinePath = 'tool/design_system/import_boundary_baseline.json';
 const _allowedFeatureWidgetDeclarations = <String>{
   'Align',
   'AutofillGroup',
@@ -131,23 +127,19 @@ void main(List<String> arguments) {
     return;
   }
 
-  final phase = switch (arguments.single) {
-    '--phase=0d' => _PolicyPhase.phase0d,
-    '--phase=final' => _PolicyPhase.finalPhase,
-    _ => _usage(),
-  };
-  final errors = _validateRepository(phase);
+  if (arguments.single != '--mode=clean') _usage();
+  final errors = _validateRepository();
   if (errors.isNotEmpty) {
     errors.forEach(stderr.writeln);
     exit(1);
   }
-  stdout.writeln('import boundaries: PASS (${phase.name})');
+  stdout.writeln('import boundaries: PASS (clean)');
 }
 
 Never _usage() {
   stderr.writeln(
     'usage: dart run tool/design_system/verify_import_boundaries.dart '
-    '--fixtures|--phase=0d|--phase=final',
+    '--fixtures|--mode=clean',
   );
   exit(64);
 }
@@ -157,7 +149,7 @@ void _verifyFixtures() {
   final failFiles = _dartFiles('$_fixtureRoot/fail');
   final errors = <String>[];
   for (final file in passFiles) {
-    final violations = _validateFile(file, _PolicyPhase.finalPhase);
+    final violations = _validateFile(file);
     if (violations.isNotEmpty) {
       errors.add('${file.path}: expected pass, got ${violations.join('; ')}');
     }
@@ -166,7 +158,7 @@ void _verifyFixtures() {
     final name = file.uri.pathSegments.last;
     final violations = name.startsWith('barrel_')
         ? verifyPublicBarrel(file)
-        : _validateFile(file, _PolicyPhase.finalPhase);
+        : _validateFile(file);
     final expected = _fixtureExpectedViolation[name];
     if (expected == null) {
       errors.add('${file.path}: missing expected-violation contract');
@@ -197,35 +189,12 @@ void _verifyFixtures() {
   );
 }
 
-List<String> _validateRepository(_PolicyPhase phase) {
-  final baseline = _readBaseline();
+List<String> _validateRepository() {
   final errors = <String>[];
-  final observed = <String>{};
   for (final file in _dartFiles('lib')) {
-    errors.addAll(_validateFile(file, phase, baseline: baseline));
-    final path = file.path.replaceAll('\\', '/');
-    final unit = parseString(content: file.readAsStringSync(), path: path).unit;
-    for (final directive in unit.directives.whereType<ImportDirective>()) {
-      final uri = directive.uri.stringValue;
-      if (uri != null) observed.add('$path|${_normalizeImport(path, uri)}');
-    }
+    errors.addAll(_validateFile(file));
   }
   errors.addAll(verifyPublicBarrel(File('lib/admin9_ui.dart')));
-  if (phase == _PolicyPhase.finalPhase &&
-      (baseline.legacyFeaturePlatformImports.isNotEmpty ||
-          baseline.legacyFeatureCoreImports.isNotEmpty)) {
-    errors.add('final import boundary requires an empty legacy debt baseline');
-  } else if (phase == _PolicyPhase.phase0d) {
-    final stale = <String>{
-      ...baseline.legacyFeaturePlatformImports,
-      ...baseline.legacyFeatureCoreImports,
-    }.difference(observed);
-    if (stale.isNotEmpty) {
-      errors.add(
-        'import boundary baseline contains removed debt: ${stale.join(', ')}',
-      );
-    }
-  }
   return errors;
 }
 
@@ -237,11 +206,7 @@ List<File> _dartFiles(String root) =>
         .toList()
       ..sort((a, b) => a.path.compareTo(b.path)));
 
-List<String> _validateFile(
-  File file,
-  _PolicyPhase phase, {
-  _BoundaryBaseline baseline = const _BoundaryBaseline.empty(),
-}) {
+List<String> _validateFile(File file) {
   final normalizedPath = file.path.replaceAll('\\', '/');
   final policyPath = _fixturePolicyPath(normalizedPath) ?? normalizedPath;
   final source = file.readAsStringSync();
@@ -284,11 +249,7 @@ List<String> _validateFile(
     }
 
     if (isBusiness && target.startsWith('lib/core/')) {
-      if (phase == _PolicyPhase.finalPhase) {
-        errors.add('$location feature imports Core internals: $uri');
-      } else if (!baseline.legacyFeatureCoreImports.contains(pair)) {
-        errors.add('$location new feature Core-internal import: $uri');
-      }
+      errors.add('$location feature imports Core internals: $uri');
     }
 
     final importedFeature = _featureName(target);
@@ -311,19 +272,11 @@ List<String> _validateFile(
         shown.length == 1 &&
         shown.contains('SelectableText');
 
-    if (phase == _PolicyPhase.finalPhase &&
-        isBusiness &&
+    if (isBusiness &&
         (uri == 'package:flutter/material.dart' ||
             uri == 'package:flutter/cupertino.dart') &&
         !selectableTextPrimitive) {
       errors.add('$location Business imports an interactive platform library');
-    } else if (phase == _PolicyPhase.phase0d &&
-        isBusiness &&
-        (uri == 'package:flutter/material.dart' ||
-            uri == 'package:flutter/cupertino.dart') &&
-        !selectableTextPrimitive &&
-        !baseline.legacyFeaturePlatformImports.contains('$policyPath|$uri')) {
-      errors.add('$location new interactive platform import: $uri');
     }
 
     if (isBusiness && uri == 'package:flutter/widgets.dart') {
@@ -354,36 +307,6 @@ List<String> _validateFile(
     }
   }
   return errors;
-}
-
-_BoundaryBaseline _readBaseline() {
-  final value = jsonDecode(File(_baselinePath).readAsStringSync());
-  if (value is! Map<String, Object?> || value['schemaVersion'] != '1.0.0') {
-    stderr.writeln('$_baselinePath: invalid baseline schema');
-    exit(2);
-  }
-  Set<String> readSet(String key) =>
-      (value[key] as List<Object?>? ?? const <Object?>[])
-          .whereType<String>()
-          .toSet();
-  return _BoundaryBaseline(
-    legacyFeaturePlatformImports: readSet('legacyFeaturePlatformImports'),
-    legacyFeatureCoreImports: readSet('legacyFeatureCoreImports'),
-  );
-}
-
-final class _BoundaryBaseline {
-  const _BoundaryBaseline({
-    required this.legacyFeaturePlatformImports,
-    required this.legacyFeatureCoreImports,
-  });
-
-  const _BoundaryBaseline.empty()
-    : legacyFeaturePlatformImports = const <String>{},
-      legacyFeatureCoreImports = const <String>{};
-
-  final Set<String> legacyFeaturePlatformImports;
-  final Set<String> legacyFeatureCoreImports;
 }
 
 String? _fixturePolicyPath(String path) {

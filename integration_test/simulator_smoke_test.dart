@@ -11,7 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('fixed simulator smoke', (tester) async {
+  testWidgets('simulator smoke', (tester) async {
     final preferences = await SharedPreferences.getInstance();
     await preferences.clear();
     await preferences.setBool('admin9.privacy.accepted', true);

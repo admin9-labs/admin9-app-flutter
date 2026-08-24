@@ -22,17 +22,17 @@ RESULT_FILE="/dev/null" BLOCKS=0 UNKNOWNS=0
 usage() { printf '%s\n' 'tool/simulator_smoke.sh preflight' 'tool/simulator_smoke.sh run [--rounds N] [--evidence-dir PATH]'; }
 cmdline() { printf '%q ' "$@"; }
 fail() {
-  local category="$1" stage="$2" call="$3" log="$4" code=30
+  local category="$1" failed_step="$2" call="$3" log="$4" code=30
   [[ "$category" == "App Fail" ]] && code=10
   [[ "$category" == "Infrastructure Block" ]] && code=20
   {
-    printf 'RESULT=%s\nstage=%s\nsource_sha=%s\n' "$category" "$stage" "$SOURCE_SHA"
+    printf 'RESULT=%s\nfailed_step=%s\nsource_sha=%s\n' "$category" "$failed_step" "$SOURCE_SHA"
     printf 'failure_call=%s\nfailure_log=%s\n' "$call" "$log"
   } | tee "$RESULT_FILE"
   exit "$code"
 }
 step() {
-  local category="$1" stage="$2" log="$3" status call
+  local category="$1" step_name="$2" log="$3" status call
   shift 3
   call="$(cmdline "$@")"
   {
@@ -40,7 +40,7 @@ step() {
     "$@"
   } 2>&1 | tee "$log"
   status="${PIPESTATUS[0]}"
-  [[ "$status" -eq 0 ]] || fail "$category" "$stage" "$call" "$log"
+  [[ "$status" -eq 0 ]] || fail "$category" "$step_name" "$call" "$log"
 }
 pass() { printf 'PASS %-28s %s\n' "$1" "$2"; }
 block() {

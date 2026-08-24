@@ -217,7 +217,7 @@ void main() {
   }
 
   for (final row in _interactionMatrix) {
-    testWidgets('Phase 4 interaction components A-L row ${row.name}', (
+    testWidgets('interaction components responsive row ${row.name}', (
       tester,
     ) async {
       tester.view.devicePixelRatio = 1;

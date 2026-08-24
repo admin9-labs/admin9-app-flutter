@@ -368,7 +368,9 @@ void main() {
   });
 
   for (final row in _matrix) {
-    testWidgets('Phase 3 A-L settings row ${row.name}', (tester) async {
+    testWidgets('settings components responsive row ${row.name}', (
+      tester,
+    ) async {
       tester.view.devicePixelRatio = 1;
       tester.view.physicalSize = row.size;
       addTearDown(() {
@@ -386,7 +388,7 @@ void main() {
         textScaler: TextScaler.linear(row.systemScale * row.appScale),
         child: Scaffold(
           body: ListView(
-            key: const Key('phase3-matrix-list'),
+            key: const Key('settings-matrix-list'),
             children: [
               AppSection(
                 title: '用于验证分组标题在最长中文内容下仍然完整可达',
@@ -421,7 +423,7 @@ void main() {
                   ),
                 ],
               ),
-              const SizedBox(key: Key('phase3-matrix-end'), height: 24),
+              const SizedBox(key: Key('settings-matrix-end'), height: 24),
             ],
           ),
         ),
@@ -476,16 +478,16 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.tab);
       expect(FocusManager.instance.primaryFocus, isNotNull);
       await tester.scrollUntilVisible(
-        find.byKey(const Key('phase3-matrix-end')),
+        find.byKey(const Key('settings-matrix-end')),
         300,
         scrollable: find.descendant(
-          of: find.byKey(const Key('phase3-matrix-list')),
+          of: find.byKey(const Key('settings-matrix-list')),
           matching: find.byType(Scrollable),
         ),
       );
       final viewportBottom = tester.getBottomRight(find.byType(Scaffold)).dy;
       expect(
-        tester.getBottomRight(find.byKey(const Key('phase3-matrix-end'))).dy,
+        tester.getBottomRight(find.byKey(const Key('settings-matrix-end'))).dy,
         lessThanOrEqualTo(viewportBottom),
       );
       expect(tester.takeException(), isNull);

@@ -20,7 +20,7 @@ void main() {
   setUpAll(_loadGoldenCjkFont);
 
   for (final row in _goldenRows) {
-    testWidgets('Phase 5 component Gallery golden ${row.name}', (tester) async {
+    testWidgets('component gallery golden ${row.name}', (tester) async {
       final controller = TextEditingController(text: 'admin9@example.com');
       final focusNode = FocusNode();
       addTearDown(controller.dispose);
@@ -33,13 +33,13 @@ void main() {
       );
 
       TestGesture? pressedGesture;
-      if (row.name == 'A') {
+      if (row.name == 'compact_android') {
         pressedGesture = await tester.startGesture(
           tester.getCenter(find.byKey(const Key('golden-primary-button'))),
         );
         await tester.pump();
       }
-      if (row.name == 'F') {
+      if (row.name == 'dark_large_ios') {
         focusNode.requestFocus();
         await tester.pump();
       }
@@ -52,10 +52,10 @@ void main() {
   }
 
   for (final row in const [
-    _GoldenRow('g3_android', TargetPlatform.android, Size(390, 844), 1, 1),
-    _GoldenRow('g3_ios', TargetPlatform.iOS, Size(390, 844), 1, 1),
+    _GoldenRow('android', TargetPlatform.android, Size(390, 844), 1, 1),
+    _GoldenRow('ios', TargetPlatform.iOS, Size(390, 844), 1, 1),
   ]) {
-    testWidgets('G3 paired component baseline ${row.name}', (tester) async {
+    testWidgets('paired component baseline ${row.name}', (tester) async {
       final controller = TextEditingController(text: 'admin9@example.com');
       final focusNode = FocusNode();
       addTearDown(controller.dispose);
@@ -74,10 +74,16 @@ void main() {
   }
 
   for (final row in const [
-    _GoldenRow('g3_page_android', TargetPlatform.android, Size(390, 844), 1, 1),
-    _GoldenRow('g3_page_ios', TargetPlatform.iOS, Size(390, 844), 1, 1),
+    _GoldenRow(
+      'page_shell_android',
+      TargetPlatform.android,
+      Size(390, 844),
+      1,
+      1,
+    ),
+    _GoldenRow('page_shell_ios', TargetPlatform.iOS, Size(390, 844), 1, 1),
   ]) {
-    testWidgets('G3 paired AppPage baseline ${row.name}', (tester) async {
+    testWidgets('paired AppPage baseline ${row.name}', (tester) async {
       await _pumpPageGolden(tester, row: row);
       await expectLater(
         find.byKey(const Key('page-pair-golden-boundary')),
@@ -87,7 +93,7 @@ void main() {
   }
 
   testWidgets(
-    'Phase 5 Home page golden',
+    'Home page golden',
     (tester) async {
       await _pumpAppGolden(
         tester,
@@ -103,7 +109,7 @@ void main() {
   );
 
   testWidgets(
-    'Phase 5 Privacy page golden',
+    'Privacy page golden',
     (tester) async {
       await _pumpAppGolden(tester, preferences: const {});
       await expectLater(
@@ -116,7 +122,7 @@ void main() {
   );
 
   testWidgets(
-    'Phase 5 Settings page golden',
+    'Settings page golden',
     (tester) async {
       await _pumpAppGolden(
         tester,
@@ -136,7 +142,7 @@ void main() {
   );
 
   testWidgets(
-    'Phase 5 Registration page golden',
+    'Registration page golden',
     (tester) async {
       await _pumpAppGolden(
         tester,
@@ -158,10 +164,10 @@ void main() {
   );
 
   testWidgets(
-    'Phase 5 exact E registration calibration golden',
+    'large registration calibration golden',
     (tester) async {
       const row = _GoldenRow(
-        'E',
+        'large_android',
         TargetPlatform.android,
         Size(390, 844),
         1,
@@ -182,7 +188,7 @@ void main() {
       expect(tester.takeException(), isNull);
       await expectLater(
         find.byKey(const Key('page-golden-boundary')),
-        matchesGoldenFile('goldens/page_registration_E_android.png'),
+        matchesGoldenFile('goldens/page_registration_large_android.png'),
       );
     },
     tags: 'golden',
@@ -190,10 +196,10 @@ void main() {
   );
 
   testWidgets(
-    'Phase 5 dark Extra Large F settings golden',
+    'dark Extra Large settings golden',
     (tester) async {
       const row = _GoldenRow(
-        'F',
+        'dark_large_ios',
         TargetPlatform.iOS,
         Size(390, 844),
         1,
@@ -213,14 +219,14 @@ void main() {
       expect(tester.takeException(), isNull);
       await expectLater(
         find.byKey(const Key('page-golden-boundary')),
-        matchesGoldenFile('goldens/page_settings_F_ios.png'),
+        matchesGoldenFile('goldens/page_settings_dark_large_ios.png'),
       );
     },
     tags: 'golden',
     variant: TargetPlatformVariant.only(TargetPlatform.iOS),
   );
 
-  testWidgets('Phase 5 actual Gallery feedback golden', (tester) async {
+  testWidgets('Gallery feedback golden', (tester) async {
     await _pumpGalleryGolden(tester, platform: TargetPlatform.android);
     await tester.scrollUntilVisible(
       find.text('警告与撤销'),
@@ -239,7 +245,7 @@ void main() {
     await _expectSurfaceGolden(tester, 'goldens/gallery_feedback_android.png');
   }, tags: 'golden');
 
-  testWidgets('Phase 5 actual Gallery action menu golden', (tester) async {
+  testWidgets('Gallery action menu golden', (tester) async {
     await _pumpGalleryGolden(tester, platform: TargetPlatform.android);
     await tester.scrollUntilVisible(
       find.text('打开六项动作菜单'),
@@ -262,7 +268,7 @@ void main() {
     );
   }, tags: 'golden');
 
-  testWidgets('Phase 5 actual Gallery iOS dialog golden', (tester) async {
+  testWidgets('Gallery iOS dialog golden', (tester) async {
     await _pumpGalleryGolden(tester, platform: TargetPlatform.iOS);
     await tester.scrollUntilVisible(
       find.text('打开确认对话框'),
@@ -282,14 +288,12 @@ void main() {
   }, tags: 'golden');
 
   for (final row in _goldenRows) {
-    testWidgets('Phase 5 actual Gallery matrix golden ${row.name}', (
-      tester,
-    ) async {
+    testWidgets('Gallery responsive golden ${row.name}', (tester) async {
       await _pumpGalleryGolden(tester, row: row);
       final section = switch (row.name) {
-        'A' => '平台骨架',
-        'F' => '设置与列表',
-        'G' || 'L' => '表单与动作',
+        'compact_android' => '平台骨架',
+        'dark_large_ios' => '设置与列表',
+        'wide_high_contrast_android' || 'extreme_text_ios' => '表单与动作',
         _ => throw StateError('Unmapped Gallery golden row ${row.name}'),
       };
       await tester.scrollUntilVisible(
@@ -300,7 +304,7 @@ void main() {
       await tester.ensureVisible(find.text(section));
       await tester.pump();
       expect(find.text(section).hitTestable(), findsOneWidget);
-      if (row.name == 'G') {
+      if (row.name == 'wide_high_contrast_android') {
         expect(find.text('账号格式不正确，错误出现后内容区域按需增长。'), findsOneWidget);
         expect(
           find.byWidgetPredicate(
@@ -316,9 +320,7 @@ void main() {
     }, tags: 'golden');
   }
 
-  testWidgets('Phase 5 actual Gallery A long value reflow stress', (
-    tester,
-  ) async {
+  testWidgets('Gallery compact long-value reflow stress', (tester) async {
     await _pumpGalleryGolden(tester, row: _goldenRows.first);
     const longLabel = '这是用于验证长中文内容增长的设置名称';
     const trailingValue = '一个较长的当前值';
@@ -336,11 +338,9 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('Phase 5 actual Gallery C error and disabled stress', (
-    tester,
-  ) async {
+  testWidgets('Gallery dark error and disabled stress', (tester) async {
     const row = _GoldenRow(
-      'C',
+      'dark_compact_android',
       TargetPlatform.android,
       Size(360, 800),
       1,
@@ -368,7 +368,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('Phase 5 actual Gallery AppPage golden', (tester) async {
+  testWidgets('Gallery AppPage golden', (tester) async {
     await _pumpGalleryGolden(tester, platform: TargetPlatform.android);
     await tester.scrollUntilVisible(
       find.text('打开 AppPage 样例'),
@@ -384,7 +384,7 @@ void main() {
     await _expectSurfaceGolden(tester, 'goldens/gallery_app_page_android.png');
   }, tags: 'golden');
 
-  testWidgets('Phase 5 actual Gallery single choice golden', (tester) async {
+  testWidgets('Gallery single choice golden', (tester) async {
     await _pumpGalleryGolden(tester, platform: TargetPlatform.iOS);
     await tester.scrollUntilVisible(
       find.text('打开单选列表样例'),
@@ -769,9 +769,9 @@ AppFontScale _fontScaleFor(double factor) => switch (factor) {
 };
 
 const _goldenRows = <_GoldenRow>[
-  _GoldenRow('A', TargetPlatform.android, Size(320, 720), 1, 1),
+  _GoldenRow('compact_android', TargetPlatform.android, Size(320, 720), 1, 1),
   _GoldenRow(
-    'F',
+    'dark_large_ios',
     TargetPlatform.iOS,
     Size(390, 844),
     1,
@@ -779,7 +779,7 @@ const _goldenRows = <_GoldenRow>[
     brightness: Brightness.dark,
   ),
   _GoldenRow(
-    'G',
+    'wide_high_contrast_android',
     TargetPlatform.android,
     Size(600, 960),
     1,
@@ -788,7 +788,7 @@ const _goldenRows = <_GoldenRow>[
     highContrast: true,
   ),
   _GoldenRow(
-    'L',
+    'extreme_text_ios',
     TargetPlatform.iOS,
     Size(390, 844),
     3,

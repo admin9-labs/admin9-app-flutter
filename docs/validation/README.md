@@ -15,7 +15,7 @@ flutter analyze tool/design_system/design_system_contract_probe.dart
 flutter analyze tool/design_system/design_system_implementation_probe.dart
 dart run tool/design_system/verify_public_api_parity.dart --self-test
 dart run tool/design_system/verify_import_boundaries.dart --fixtures
-dart run tool/design_system/verify_import_boundaries.dart --phase=final
+dart run tool/design_system/verify_import_boundaries.dart --mode=clean
 dart run tool/design_system/verify_ui_candidate_boundary.dart --fixtures
 dart run tool/design_system/verify_ui_candidate_boundary.dart
 dart run tool/design_system/verify_gallery_boundary.dart

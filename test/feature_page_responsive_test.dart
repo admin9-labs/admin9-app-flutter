@@ -11,7 +11,7 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   for (final row in _matrix) {
-    testWidgets('Phase 5 reference pages satisfy matrix ${row.name}', (
+    testWidgets('feature pages satisfy responsive row ${row.name}', (
       tester,
     ) async {
       debugDefaultTargetPlatformOverride = row.platform;

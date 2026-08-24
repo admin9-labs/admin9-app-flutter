@@ -243,7 +243,7 @@ void main() {
   });
 
   for (final row in _matrix) {
-    testWidgets('Phase 4 form components A-L row ${row.name}', (tester) async {
+    testWidgets('form components responsive row ${row.name}', (tester) async {
       tester.view.devicePixelRatio = 1;
       tester.view.physicalSize = row.size;
       addTearDown(() {
@@ -263,7 +263,7 @@ void main() {
         textScaler: TextScaler.linear(row.systemScale * row.appScale),
         child: Scaffold(
           body: ListView(
-            key: const Key('phase4-form-matrix-list'),
+            key: const Key('form-matrix-list'),
             padding: const EdgeInsets.all(16),
             children: [
               AppTextField(
@@ -296,7 +296,7 @@ void main() {
                   onPressed: _noop,
                 ),
               ),
-              const SizedBox(key: Key('phase4-form-matrix-end'), height: 24),
+              const SizedBox(key: Key('form-matrix-end'), height: 24),
             ],
           ),
         ),
@@ -324,7 +324,7 @@ void main() {
       expect(focusNode.hasFocus, isTrue);
       final scrollable = find
           .descendant(
-            of: find.byKey(const Key('phase4-form-matrix-list')),
+            of: find.byKey(const Key('form-matrix-list')),
             matching: find.byType(Scrollable),
           )
           .first;
@@ -352,7 +352,7 @@ void main() {
         isFalse,
       );
       await tester.scrollUntilVisible(
-        find.byKey(const Key('phase4-form-matrix-end')),
+        find.byKey(const Key('form-matrix-end')),
         300,
         scrollable: scrollable,
       );
