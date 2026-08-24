@@ -17,7 +17,8 @@ an admin console, or a compatibility program for other projects.
   Contact pages.
 - Honest guest and unavailable-service states. The Starter does not fabricate
   users, sessions, tokens, messages, or successful backend operations.
-- Material 3 and Cupertino mapping through public `App*` components.
+- One first-party Admin9 visible component language through public `App*`
+  components, with platform-owned system behavior retained.
 - Appearance and accessibility settings, responsive matrices, semantics,
   contrast, hit-target, Gallery, Golden, and platform checks.
 - An optional App configuration tool for synchronizing identity, colors, app
@@ -36,8 +37,9 @@ flowchart TB
     H --> C["Design System Core"]
     H --> F["Feature-first business code"]
     F -->|"public UI through lib/admin9_ui.dart"| C
-    C --> A["Android / Material 3"]
-    C --> P["iOS / Cupertino"]
+    C --> U["Unified Admin9 visible UI"]
+    U --> A["Android system behavior"]
+    U --> P["iOS system behavior"]
 ```
 
 Core, Brand, Business, and App Host are repository ownership and dependency
@@ -56,7 +58,7 @@ lib/
     └── shared/               # UI shared by features in this repository
 ```
 
-See the [current architecture](docs/architecture/admin9-app-starter.md) and
+See the [current architecture](docs/architecture/README.md) and
 [Design System](docs/design-system/README.md) for the upstream implementation
 rules.
 
@@ -110,40 +112,20 @@ a convenience, not proof of compatibility or approval.
 
 ## Upstream Verification
 
-Run from the repository root with Flutter 3.44.1 and Dart 3.12.1:
+The canonical command list, required toolchain, and evidence boundaries are in
+[Validation](docs/validation/README.md). A normal local development loop starts
+with:
 
 ```bash
 flutter pub get
 dart format --output=none --set-exit-if-changed lib test integration_test tool
 flutter analyze
 flutter test
-dart run tool/design_system/validate_app_config.dart --fixtures
-flutter analyze tool/design_system/design_system_contract_probe.dart
-flutter analyze tool/design_system/design_system_implementation_probe.dart
-dart run tool/design_system/verify_public_api_parity.dart --self-test
-dart run tool/design_system/verify_import_boundaries.dart --fixtures
-dart run tool/design_system/verify_import_boundaries.dart --phase=final
-dart run tool/design_system/verify_ui_candidate_boundary.dart --fixtures
-dart run tool/design_system/verify_ui_candidate_boundary.dart
-dart run tool/design_system/verify_gallery_boundary.dart
-node --check docs/design-system/evidence/sources/generate_visual_references.mjs
-node --check docs/design-system/evidence/sources/verify_visual_references.mjs
-node docs/design-system/evidence/sources/verify_visual_references.mjs docs/design-system/evidence/visual-references
-dart run tool/design_system/verify_app_config.dart
-dart run tool/design_system/verify_app_config.dart --fixtures
-dart run tool/design_system/verify_rule_links.dart
-dart run tool/design_system/verify_upstream_ownership.dart
-dart run tool/design_system/verify_android_release_plugins.dart --self-test
-dart run tool/design_system/verify_android_release_plugins.dart
-node tool/design_system/verify_documentation.mjs
-flutter build apk --release
-flutter build ios --release --no-codesign
-git diff --check
 ```
 
 An unsigned iOS build does not prove signing, installation, cold launch, or
-device behavior. Device and assistive-technology claims require evidence tied
-to the tested source and artifact.
+device behavior. Artifact and device limits are recorded in
+[Delivery](docs/delivery/README.md).
 
 ## Versions And History
 
@@ -160,10 +142,11 @@ to the tested source and artifact.
 
 - [Design System](docs/design-system/README.md)
 - [Accessibility and Quality](docs/design-system/06-accessibility-quality.md)
-- [Current architecture](docs/architecture/admin9-app-starter.md)
+- [Current architecture](docs/architecture/README.md)
 - [Optional customization quickstart](docs/customization/quickstart.md)
 - [Upstream contribution boundaries](docs/design-system/05-upstream-contribution-boundaries.md)
-- [Validation](docs/audit/VALIDATION.md)
+- [Validation](docs/validation/README.md)
+- [Delivery](docs/delivery/README.md)
 - [Historical records](docs/HISTORY.md)
 - [Changelog](docs/design-system/CHANGELOG.md)
 - [Contributing](CONTRIBUTING.md)

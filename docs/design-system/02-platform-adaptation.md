@@ -4,98 +4,117 @@
 > contributions proposed for inclusion in the upstream Admin9 App Starter
 > repository. They do not govern independent forks.
 
-## 1. Ownership and host
+## 1. Ownership And Host
 
 <a id="ds-plt-001"></a>
 
-Core owns every visible interactive platform choice. Feature code MUST NOT call `Platform.isIOS`, select Material/Cupertino controls, change route builders, or import platform implementation files. Business pages MAY use non-interactive Flutter layout and content primitives: `Widget`, `Text`, `Image`, `Row`, `Column`, `Stack`, `Wrap`, `Flex`, `Expanded`, `Flexible`, `Padding`, `Align`, `Center`, `SizedBox`, `ColoredBox`, `ClipOval`, `ConstrainedBox`, `LayoutBuilder`, `MediaQuery`, `SafeArea`, `SingleChildScrollView`, `ListView`, `CustomScrollView`, `Sliver*`, `Form`, `FocusTraversalGroup`, and `Semantics`. The single read-only content exception is `package:flutter/material.dart show SelectableText`, used only to preserve native text selection for long legal/reference copy; it is not an action, field, picker, or styling escape. Interactive commands, fields, selections, feedback, dialogs, sheets, lists, page bars, and navigation go through `App*` APIs.
+Core owns every visible interactive platform choice. Feature code MUST NOT call
+`Platform.isIOS`, select Material/Cupertino controls, change route builders, or
+import platform implementation files. Business pages MAY use the non-
+interactive Flutter declarations allowed by the import-boundary gate. Commands,
+fields, selections, feedback, dialogs, sheets, lists, page bars, and navigation
+go through `App*` APIs.
 
-The root remains one `MaterialApp` for Navigator, localization, and theme infrastructure. This host choice does not authorize Material visual controls on iOS. The same semantic tokens derive `ThemeData` and `CupertinoThemeData`.
+The root remains one `MaterialApp` for Navigator, localization, theming, and
+system integration. This is infrastructure, not permission for Feature code to
+select a visual component family.
 
-## 2. Unique mapping
+## 2. Visible Unity And System Differences
 
-| Semantic role | Android implementation | iOS implementation | Fixed behavior |
-| --- | --- | --- | --- |
-| app root | `MaterialApp`, Material 3 | shared `MaterialApp` host + Cupertino theme bridge | one route tree and localization source |
-| route | `MaterialPageRoute`, default Android builder | `MaterialPageRoute`, default Cupertino builder | no custom no-transition builder |
-| shell | `Scaffold + IndexedStack + NavigationBar` | `CupertinoPageScaffold + IndexedStack + CupertinoTabBar` | Shell owns index and page instances; a real resource owner observes lifecycle when required |
-| page/bar | `Scaffold + AppBar` | `CupertinoPageScaffold + CupertinoNavigationBar` | root no back; child back names parent |
-| primary button | `FilledButton` | `CupertinoButton.filled` | one primary action region |
-| secondary button | `OutlinedButton` | `CupertinoButton.tinted` | no elevation |
-| tertiary button | `TextButton` | `CupertinoButton` | low-priority command |
-| destructive button | error-role `FilledButton` | destructive `CupertinoButton` | irreversible action requires confirmation |
-| text/password field | `TextFormField` | external label/error + `FormField<String>` bridging `CupertinoTextField` | persistent label, adjacent error, controlled focus |
-| compact field select | `DropdownMenuFormField<T>` | modal `CupertinoPicker` with Cancel/Done | 2-20 non-search choices; not settings |
-| peer-mode segment | `SegmentedButton<T>` | `CupertinoSlidingSegmentedControl<T>` | 2-5 short, equal modes; not theme/font |
-| settings single choice | `RadioGroup<T> + RadioListTile<T>` | pushed checkmark list with selected trait | immediate selection, user returns manually |
-| boolean | `Switch` | `CupertinoSwitch` | controlled App preference; system/effective status separate |
-| list row | `ListTile` | `CupertinoListTile` | Core owns disclosure and pressed feedback |
-| section | unframed column, header/footer, row dividers | `CupertinoListSection.insetGrouped` | no decorative or nested cards |
-| dialog | `AlertDialog` | `CupertinoAlertDialog` | information 1 action; confirm 2 actions |
-| action menu | `showModalBottomSheet<T>` | `showCupertinoModalPopup<T>` containing `CupertinoActionSheet` | 2-6 commands; Cancel/dismiss returns null; never a field picker |
-| inline notice | semantic inline container | semantic inline container | icon + tone label + message + optional action |
-| feedback | transient `SnackBar`; persistent `MaterialBanner` | top status `OverlayEntry` | one app-global owner; not a toast |
-| loading | `AppProgressKind.circular` -> `CircularProgressIndicator`; `.linear` -> `LinearProgressIndicator` | indeterminate -> `CupertinoActivityIndicator`; determinate -> Core semantic linear bar | readable label; determinate value 0...1 |
-| page action icon | Material icon mapped from `AppIconRole` | Cupertino icon mapped from `AppIconRole` | tooltip/name and platform hit minimum |
+Brand-owned controls use one first-party Admin9 structure on both platforms.
+Platform differences are allowed only where the operating system owns the
+interaction:
 
-`AppSelect` and `AppSegmentedControl` have frozen v1 contracts but no approved current consumer. Settings MUST use `AppSingleChoiceList<T>`. `AppActionMenu` is the only 2-6 command sheet; it MUST NOT select field or settings values. `AppProgressIndicator` uses Material circular/linear indicators on Android; iOS uses `CupertinoActivityIndicator` for indeterminate work and a Core semantic determinate bar for known progress.
-
-### 2.1 Authoritative icon mapping
-
-| `AppIconRole` | Android | iOS |
+| Responsibility | Shared Admin9 contract | Platform-owned behavior retained |
 | --- | --- | --- |
-| `back` | `Icons.arrow_back` | `CupertinoIcons.back` |
-| `close` | `Icons.close` | `CupertinoIcons.clear` |
-| `chevronForward` | `Icons.chevron_right` | `CupertinoIcons.chevron_forward` |
-| `home` | `Icons.home_outlined` | `CupertinoIcons.house` |
-| `homeSelected` | `Icons.home` | `CupertinoIcons.house_fill` |
-| `account` | `Icons.person_outline` | `CupertinoIcons.person` |
-| `accountSelected` | `Icons.person` | `CupertinoIcons.person_fill` |
-| `settings` | `Icons.settings_outlined` | `CupertinoIcons.gear` |
-| `search` | `Icons.search` | `CupertinoIcons.search` |
-| `info` | `Icons.info_outline` | `CupertinoIcons.info` |
-| `warning` | `Icons.warning_amber_outlined` | `CupertinoIcons.exclamationmark_triangle` |
-| `success` | `Icons.check_circle_outline` | `CupertinoIcons.check_mark_circled` |
-| `error` | `Icons.error_outline` | `CupertinoIcons.exclamationmark_circle` |
-| `visibility` | `Icons.visibility` | `CupertinoIcons.eye` |
-| `visibilityOff` | `Icons.visibility_off` | `CupertinoIcons.eye_slash` |
-| `more` | `Icons.more_horiz` | `CupertinoIcons.ellipsis` |
+| App host and routes | one host, route tree, route names, destinations, and results | default Android/iOS transition and back dispatch |
+| page and shell | one title hierarchy, surface language, action order, and bottom navigation | status/navigation/home-indicator safe areas and system bars |
+| buttons and fields | one variant, label, validation, state, loading, and recovery language | keyboard layout, IME actions, autofill/password-manager UI |
+| settings and lists | one row, section, value, selected, switch, and disclosure language | operating-system accessibility focus and input mechanics |
+| dialogs, menus, notices, and feedback | one action order, destructive meaning, state message, and recovery | system dismissal/back delivery and accessibility scheduling |
+| progress and icons | one semantic role and branded glyph family | necessary system busy behavior and rasterization differences |
 
-`AppNavigationDestination` receives distinct normal and selected roles. Core resolves the complete table; Business never receives `IconData` and cannot substitute platform glyphs.
+The current production component code uses the shared first-party mapping.
+Material/Cupertino types may remain inside Core for host, theme, route, or future
+system-owned behavior, but their types, themes, controllers, resources, and
+callbacks MUST NOT leak through `lib/admin9_ui.dart` or into Feature code.
 
-## 3. Navigation and back
+### 2.1 Authoritative Icon Mapping
+
+`AppIconRole` maps to one current branded glyph family on Android and iOS:
+
+| `AppIconRole` | Glyph |
+| --- | --- |
+| `back` | `Icons.arrow_back` |
+| `close` | `Icons.close` |
+| `chevronForward` | `Icons.chevron_right` |
+| `home` / `homeSelected` | `Icons.home_outlined` / `Icons.home` |
+| `account` / `accountSelected` | `Icons.person_outline` / `Icons.person` |
+| `settings` | `Icons.settings_outlined` |
+| `search` | `Icons.search` |
+| `info` | `Icons.info_outline` |
+| `warning` | `Icons.warning_amber_outlined` |
+| `success` | `Icons.check_circle_outline` |
+| `error` | `Icons.error_outline` |
+| `visibility` / `visibilityOff` | `Icons.visibility` / `Icons.visibility_off` |
+| `more` | `Icons.more_horiz` |
+
+Business never receives raw `IconData` and cannot substitute a platform glyph.
+
+## 3. Navigation And Back
 
 <a id="ds-nav-001"></a>
 
-Root tabs never show back. Child pages preserve the platform default page-transition builder. Android uses synchronous `PopScope` state compatible with predictive back; iOS preserves the left-edge gesture. A cancelled gesture keeps route-local form and scroll state; a completed gesture pops once. Dialog, sheet, and picker consume back/dismissal before the page. Reduced motion never replaces these builders.
+Root tabs never show back. Child pages preserve the platform default page-
+transition builder. Android remains compatible with predictive back; iOS
+preserves the left-edge gesture. A cancelled gesture keeps route-local form and
+scroll state; a completed gesture pops once. Dialog, sheet, and picker dismissal
+resolves before a page pop. Reduced motion does not replace system navigation.
 
-Automation can verify application state before/after pop. It cannot prove Android predictive-back start/progress/cancel/complete or iOS interactive edge-back. Android API 34+ (with API 36 regression) and current iOS simulator/device manual recordings are hard gates after implementation.
+Automation verifies application state before and after pop. It cannot prove
+gesture start, progress, cancellation, or completion on the operating system.
+Those results require contemporaneous device evidence.
 
-## 4. Edge-to-edge and safe areas
+## 4. Edge-To-Edge And Safe Areas
 
-Android target SDK 36 edge-to-edge is a system constraint, not a product option. Background may extend behind system bars; interactive content is protected by page bars, navigation, `SafeArea`, and `MediaQuery.viewPadding`. System-bar foreground brightness follows the real backing surface. Test gesture navigation, three-button navigation, display cutout, light/dark/high contrast, bottom navigation, and the scroll endpoint.
+Android target SDK edge-to-edge is a system constraint, not a product option.
+Background may extend behind system bars; interactive content is protected by
+page bars, navigation, `SafeArea`, and `MediaQuery.viewPadding`. System-bar
+foreground brightness follows the backing surface.
 
-Top bars own the top safe area. Child bodies use bottom protection; Shell tabs rely on the platform bottom bar and do not add duplicate bottom padding. Sheets and pickers own their bottom safe area. iOS content respects the home indicator and does not double-inset `CupertinoTabBar`.
+Top bars own the top safe area. Child bodies own bottom protection; Shell tabs
+rely on their bottom navigation and do not add duplicate padding. Sheets and
+pickers own their bottom safe area. iOS content respects the home indicator.
 
-## 5. Keyboard, IME, and autofill
+## 5. Keyboard, IME, And Autofill
 
-Android keeps manifest `adjustResize`; both page scaffolds resize for the keyboard. Task forms are scrollable. `viewInsets.bottom` represents IME occlusion; `viewPadding` represents persistent system regions and they are not interchangeable.
+Android keeps manifest `adjustResize`; page scaffolds resize for the keyboard.
+Task forms remain scrollable. `viewInsets.bottom` is IME occlusion and
+`viewPadding` is a persistent system region; they are not interchangeable.
 
-Focus, visual, and semantics order match. `next` advances to the next field; `done` validates/submits. The first error receives focus and one announcement. Password visibility is a separately named toggle with 48dp/44pt hit bounds. Autofill groups and hints are supplied by Business according to the flow (`username`, `password`, `newPassword`), while Core preserves them. Submitting locks duplicate activation but does not invent network loading.
+Focus, visual, and semantics order match. `next` advances; `done` validates or
+submits. The first error receives focus and one announcement. Password
+visibility is a separately named control. Business supplies input type, action,
+and autofill hints; Core preserves them without inventing a network result.
 
-## 6. Feedback lifecycle
+## 6. Feedback Lifecycle
 
 `persistent = action exists OR MediaQuery.accessibleNavigationOf(context)`.
 
-- Non-persistent info/success closes after 3 seconds; warning/error after 5 seconds.
-- Persistent feedback never auto-closes. It exposes a visible close control and, when applicable, one action.
-- Action activation is locked to once, invokes the callback once, then closes.
-- A new message replaces the current message in the app-global scope.
-- Every new message is announced once through a live region without stealing focus; replacement does not announce the old message again.
-- Close and action satisfy platform hit targets and have distinct names.
+- Non-persistent info/success closes after 3 seconds; warning/error after 5.
+- Persistent feedback exposes Close and, when applicable, one action.
+- Action dispatches once, then closes; a new message replaces the old message.
+- A new message is announced once without stealing focus.
+- Close and action have distinct names and at least 48 logical-pixel bounds.
 
-The iOS overlay is anchored inside the current Navigator content below the status and navigation bars. It never covers back/title, grows for long text, preserves existing focus, and exposes reader order `message -> action -> close`; action and close hit bounds are at least 44x44pt. Widget tests verify geometry/order and device VoiceOver verifies that the platform accessibility state drives `accessibleNavigation`; until device evidence exists, that signal remains Unknown rather than being inferred from `semanticsEnabled`.
+Widget tests verify lifecycle, semantics, focus, and geometry. They do not prove
+TalkBack or VoiceOver delivery.
 
-## 7. Verification status
+## 7. Evidence Boundary
 
-Static visual assets verify intended structural difference only. Android/iOS device visuals, IME, autofill/password manager, TalkBack/VoiceOver/Switch Access/Control, predictive back, edge back, system-bar contrast, and runtime bounds remain Unknown until the Flutter implementation and device gates exist.
+Current automated coverage protects visible structure, route/application state,
+keyboard metadata, semantics, responsive layout, and safe-area ownership. The
+fixed-source repeated simulator smoke is historical bounded `Pass` evidence.
+Current physical-device, real IME/password-manager, TalkBack/VoiceOver,
+predictive/edge-back gesture, and final brand results remain exactly as recorded
+in [Delivery](../delivery/README.md).

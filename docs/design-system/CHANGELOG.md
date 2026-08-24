@@ -2,19 +2,13 @@
 
 ## Unreleased
 
-- Selected the first-party G3 route after the fixed G2 comparison. Removed
-  Forui and the complete candidate POC, unified brand-owned visible `App*`
-  presentation across Android and iOS, retained system-owned interaction
-  behavior, added paired production Goldens, and recorded local release-build
-  and real-device handoff evidence.
-- Added a removable G2 comparison POC for the current control, a first-party
-  unified candidate, and Forui 0.25.0; recorded package provenance, focused
-  Widget/Golden/local performance evidence, candidate isolation and a passing
-  removal drill. Supervision expanded the fixed business/state matrix, made
-  semantics actions executable, verified appearing feedback/focus behavior,
-  regenerated the CJK fixture, and replaced 24 shallow images with 110
-  light/dark/scaled/stress/pressed Goldens. The first-party route is recommended
-  for G3 pending the bounded fixed-SHA closure gate.
+- Unified brand-owned visible `App*` presentation across Android and iOS with
+  the selected first-party implementation while retaining system-owned
+  interaction behavior. Removed Forui and the complete comparison POC after a
+  passing removal drill; no candidate package remains in production.
+- Added paired production Goldens, executable semantics actions, feedback and
+  focus coverage, pressure-layout checks, the regenerated CJK fixture, and
+  bounded local release-build and simulator evidence.
 - Repositioned the upstream project as Admin9 App Starter and unified the
   default Dart, Android, and iOS display identity.
 - Retired the downstream manifest, compatibility registry, exact-source tuple,

@@ -9,7 +9,7 @@ developer_instructions = """
 
 ## 开始工作
 
-- 先读取所有适用的 `AGENTS.md`、`docs/CODEX_GOAL.md`、任务涉及的真实源码和测试，不以历史描述替代当前证据。
+- 先读取所有适用的 `AGENTS.md`、`docs/architecture/README.md`、`docs/design-system/README.md`、任务涉及的真实源码和测试，不以历史描述替代当前证据。
 - 检查 Git 状态，保留并绕开无关工作区改动；不得回退、覆盖或顺手整理他人的修改。
 - 在实施前明确任务假设、边界和可验证的成功标准；存在会实质改变结果的歧义时，先向主 Agent 说明。
 - 只做与任务直接相关的最小修改，遵循仓库既有结构、命名和实现风格。

@@ -1,4 +1,4 @@
-# Admin9 App Starter 当前架构
+# Admin9 App Starter 架构
 
 ## 1. 定位与范围
 
@@ -52,9 +52,10 @@ App 默认且真实地处于游客状态。`SessionController` 只表达游客/�
 
 ## 5. 平台与 Design System
 
-公共 `App*` 组件在 Core 内选择 Material 3 或 Cupertino 实现，Feature 不直接选择
-平台交互控件。系统字号、Bold Text、高对比度、减少动态、灰度、命中区、Semantics、
-焦点、键盘、安全区与返回手势由 [Design System](../design-system/README.md) 定义。
+公共 `App*` 组件在 Core 内提供统一的第一方 Admin9 可见组件语言，Feature 不直接
+选择平台交互控件。系统字号、Bold Text、高对比度、减少动态、灰度、命中区、
+Semantics、焦点、键盘、安全区与返回手势由
+[Design System](../design-system/README.md) 定义并保留平台职责。
 
 Design System 中的规范词只约束准备合入本上游仓库的实现和贡献，不约束独立 fork。
 自动化证明确定性行为；真机、读屏、系统手势、真实 IME、签名安装与冷启动必须绑定
@@ -89,9 +90,9 @@ deviation、expiry 或 provenance。校验通过只证明配置数据满足本�
 Gallery release exclusion、响应式/Golden/无障碍检查、文档链接校验、SemVer 和 Changelog。
 `CODEOWNERS` 与 `OWNERS.md` 只描述本上游仓库的评审责任。
 
-既有 Git Tag、Phase 报告和设备证据不修改、不重打；它们记录当时的 Foundation 实现和
-事实，不再是当前 Starter 的下游合同。当前变更先进入 Changelog 的 `Unreleased`，
-正式发布仍需独立的版本与 Tag 决策。
+既有 Git Tag 和历史验收记录不修改、不重打；它们记录当时的 Foundation 实现和事实，
+不再是当前 Starter 的下游合同。历史入口见[历史记录](../HISTORY.md)。当前变更先进入
+Changelog 的 `Unreleased`，正式发布仍需独立的版本与 Tag 决策。
 
 ## 8. 当前明确未提供
 

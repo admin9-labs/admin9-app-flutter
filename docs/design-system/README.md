@@ -31,6 +31,9 @@ stable rule IDs to current modules and automated evidence. Prior acceptance
 reports and device artifacts are historical records; see
 [Historical Records](../HISTORY.md).
 
+Generated [visual references](visual-references.md) support paired design
+review but do not override source, tests, Goldens, or device evidence.
+
 ## 2. Three-Layer Model
 
 | Layer | Upstream responsibility | Allowed change in upstream | Not accepted into upstream Core |
@@ -42,16 +45,20 @@ reports and device artifacts are historical records; see
 The App Host composes these layers. They are repository dependency boundaries,
 not a mandatory runtime architecture for forks.
 
-## 3. Platform Principle
+## 3. Product And Platform Principle
 
-The Design System uses one semantic API with platform-native behavior:
+The Design System follows one rule: one Admin9 brand appearance and business
+experience, with operating-system interaction differences retained.
 
-- Android maps to Material 3 behavior and system conventions.
-- iOS maps to Cupertino behavior and system conventions.
-- Feature code uses the public `App*` API instead of choosing interactive
-  Material/Cupertino controls or branching on the platform.
-- Visual brand meaning remains coherent while navigation, feedback, selection,
-  gestures, hit targets, keyboard behavior, and system settings remain native.
+- Brand-owned visible controls use one first-party Admin9 language on Android
+  and iOS behind the public `App*` API.
+- Feature code does not choose interactive Material/Cupertino controls or
+  branch on the target platform.
+- Routes, back gestures and transitions, keyboards, autofill/password managers,
+  permissions, sharing, system pickers, safe areas, system bars, and operating-
+  system accessibility behavior remain platform-owned.
+- Business information, action order, copy, state, feedback meaning, and
+  recovery remain identical across platforms.
 
 Static references prove design intent only. Widget tests prove deterministic
 state and layout. Installed builds and device observations are required for
@@ -105,7 +112,7 @@ local consistency checks, not compatibility approval or certification.
 | platform builds | Android release and unsigned iOS release compilation |
 
 The canonical command list is maintained in
-[VALIDATION.md](../audit/VALIDATION.md) and CI. These gates apply to upstream
+[Validation](../validation/README.md) and CI. These gates apply to upstream
 changes only.
 
 ## 7. Versioning And Change Control
@@ -114,11 +121,10 @@ Design System changes follow SemVer and are recorded in [CHANGELOG.md](CHANGELOG
 Public API removals require an appropriate version change and migration note.
 Existing tags are immutable and are never moved or recreated.
 
-The `design-system-v1.0.0` through `design-system-v1.0.3` tags, Phase reports,
-and historical device evidence preserve their original Foundation-era facts.
-They do not establish a current downstream compatibility matrix. Current
-working-tree changes remain `Unreleased` until a separate release decision is
-made.
+The `design-system-v1.0.0` through `design-system-v1.0.3` tags and historical
+device evidence preserve their original Foundation-era facts. They do not
+establish a current downstream compatibility matrix. Current working-tree
+changes remain `Unreleased` until a separate release decision is made.
 
 ## 8. Current Evidence Boundary
 
@@ -129,13 +135,8 @@ the exact source/artifact it names. Later unexecuted device or assistive-
 technology checks remain `Unknown`; no compatibility or accessibility
 certification is inferred from earlier evidence.
 
-Current Demo-first UI unification work is tracked separately from the released
-v1 records:
-
-- [decision baseline](admin9-ui-decision-baseline.md)
-- [stage gates](admin9-ui-stage-gates.md)
-- [G1 verification](admin9-ui-g1-verification.md)
-- [G2 candidate screening](admin9-ui-g2-candidate-screening.md)
-- [G2 verification and recommendation](admin9-ui-g2-verification.md)
-- [G3 Demo verification and real-device handoff](admin9-ui-g3-verification.md)
-- [G3 physical-device acceptance record](admin9-ui-g3-device-acceptance.md)
+The first-party visible component route is the current implementation. Its
+former comparison POC and temporary gate documents are historical; no candidate
+package remains in production. Current build and device limits are maintained
+only in [Delivery](../delivery/README.md), and superseded decisions are indexed
+in [History](../HISTORY.md).

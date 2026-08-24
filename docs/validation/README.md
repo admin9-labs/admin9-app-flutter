@@ -40,3 +40,5 @@ git diff --check
 自动化和无签名构建不证明签名、安装、冷启动、TalkBack/VoiceOver、系统手势、真实
 IME、安全区、正式法务内容或后端接入。只有绑定精确源码与产物的当代执行才能记为
 `Pass`；未执行时记录 `Unknown`。
+
+历史设备结论及当前交付边界见[交付入口](../delivery/README.md)。

@@ -32,33 +32,7 @@ Use Flutter 3.44.1 and Dart 3.12.1. Keep changes scoped, add focused tests for
 behavior changes, and use a Conventional Commit subject when a commit is
 requested.
 
-Run from the repository root:
-
-```bash
-flutter pub get
-dart format --output=none --set-exit-if-changed lib test integration_test tool
-flutter analyze
-flutter test
-dart run tool/design_system/validate_app_config.dart --fixtures
-dart run tool/design_system/verify_public_api_parity.dart --self-test
-dart run tool/design_system/verify_import_boundaries.dart --fixtures
-dart run tool/design_system/verify_import_boundaries.dart --phase=final
-dart run tool/design_system/verify_ui_candidate_boundary.dart --fixtures
-dart run tool/design_system/verify_ui_candidate_boundary.dart
-dart run tool/design_system/verify_gallery_boundary.dart
-node --check docs/design-system/evidence/sources/generate_visual_references.mjs
-node --check docs/design-system/evidence/sources/verify_visual_references.mjs
-node docs/design-system/evidence/sources/verify_visual_references.mjs docs/design-system/evidence/visual-references
-dart run tool/design_system/verify_app_config.dart
-dart run tool/design_system/verify_app_config.dart --fixtures
-dart run tool/design_system/verify_rule_links.dart
-dart run tool/design_system/verify_upstream_ownership.dart
-node tool/design_system/verify_documentation.mjs
-git diff --check
-```
-
-Run `flutter build apk --release` and
-`flutter build ios --release --no-codesign` when changing platform files,
-dependencies, generation, Core behavior, or release configuration. An unsigned
-iOS build does not prove signing, installation, cold launch, or device behavior.
-Record unexecuted device and assistive-technology checks as `Unknown`.
+Run the checks in the canonical [validation guide](docs/validation/README.md).
+Its build and evidence rules are part of upstream review. An unsigned iOS build
+does not prove signing, installation, cold launch, or device behavior. Record
+unexecuted device and assistive-technology checks as `Unknown`.

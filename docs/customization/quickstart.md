@@ -91,6 +91,6 @@ import 'package:admin9_app_flutter/admin9_ui.dart';
 ## 6. 建议验证
 
 fork 可自行调整门禁；本上游仓库的完整验证入口是
-[VALIDATION.md](../audit/VALIDATION.md)。至少应运行与修改范围相关的 format、analyze、
+[验证入口](../validation/README.md)。至少应运行与修改范围相关的 format、analyze、
 Widget 测试和 Android/iOS 构建，并在正式交付前完成真实签名、安装、冷启动、无障碍、
 系统手势、键盘、安全区和法务内容验收。

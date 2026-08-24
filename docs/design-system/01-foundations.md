@@ -29,7 +29,7 @@ Feature code MUST consume semantic roles, never raw colors. Brand Theme MAY repl
 | disabled text | `#606872` on `#EEF1F4` | n/a | `#A1AAB4` on `#242A31` | n/a | prohibited |
 | focus | `#2457A7` | shape + 2px ring | `#AFC6FF` | shape + 2px ring | follows primary pair |
 
-`state layer` uses the current semantic foreground at 8% hover, 10% focus, and 10% pressed opacity. Selected state uses the platform component's indicator/marker plus label and semantics; no universal selected-opacity token overrides Material or Cupertino selection treatment. Disabled, selected, error, warning, success, grayscale, and high contrast MUST NOT rely on color alone. Brand primary replacement MUST recalculate the 2px focus ring against background, surface, and surfaceContainer in both themes, as well as primary/onPrimary.
+`state layer` uses the current semantic foreground at 8% hover, 10% focus, and 10% pressed opacity. Selected state uses the branded control's indicator plus label and semantics; no universal selected-opacity token overrides its component contract. Disabled, selected, error, warning, success, grayscale, and high contrast MUST NOT rely on color alone. Brand primary replacement MUST recalculate the 2px focus ring against background, surface, and surfaceContainer in both themes, as well as primary/onPrimary.
 
 The former `ColorScheme.fromSeed(#263238)` is **adjusted**: generated Material roles remain an implementation aid, but `#263238` is retired as a fixed Admin9 brand color. The former fixed warning/info pairs are **replaced** by the table above after contrast calculation. Current red/teal source accents are **not** Core tokens; Brand may adopt a verified accent pair.
 
@@ -63,7 +63,7 @@ The theme bridge freezes the following standard-mode base geometry. The line val
 | label | `14 / 20 / semibold` | `17 / 22 / semibold` |
 | caption | `12 / 16 / regular` | `12 / 16 / regular` |
 
-Pages MUST use semantic roles, not platform point sizes. The system nonlinear `TextScaler` is the base. App modes are frozen as Standard `1.00`, Large `1.12`, and Extra Large `1.24`. For semantic base size `s`, the resolved size is `systemTextScaler.scale(s) * appFactor`. The factor is always at least `1.00`, preserves monotonic system scaling, and has no total upper cap. Phase 1 removed the former runtime `2.0` clamp; automated stress cases prove `2.0 x 1.24 = 2.48` and `3.0 x 1.24 = 3.72`.
+Pages MUST use semantic roles, not platform point sizes. The system nonlinear `TextScaler` is the base. App modes are frozen as Standard `1.00`, Large `1.12`, and Extra Large `1.24`. For semantic base size `s`, the resolved size is `systemTextScaler.scale(s) * appFactor`. The factor is always at least `1.00`, preserves monotonic system scaling, and has no total upper cap. Automated stress cases prove `2.0 x 1.24 = 2.48` and `3.0 x 1.24 = 3.72`.
 
 The six visual boards use an exact `1.24` multiplier on every displayed semantic font size in the third fixture. Container height is independently content-driven: field 62lp versus 54lp, button 56lp versus 48lp, and row 72/78lp versus 52/56lp are calibration measurements, not fixed component heights. Automated rows `E`, `F`, `J`, `K`, and `L` in [the canonical matrix](06-accessibility-quality.md#ds-rsp-001) verify Extra Large, including synthetic system stress scalers. Android 200% and iOS maximum Dynamic Type remain device gates and are never inferred from the static boards.
 
@@ -96,9 +96,9 @@ Responsive rules:
 
 ## 4. Shape and elevation
 
-The default character is restrained and work-focused. Field and inline-notice visual radius is `6`; button, dialog, sheet, and grouped Android surface radius is `8`; iOS native grouped lists retain the platform-provided shape. Brand MAY adjust the `6/8` visual character by at most 2 logical pixels through the single Brand entry after contrast and clipping review. Platform-native controls and hit regions are unaffected. The generator, visual boards, token text, and later implementation MUST use these same values.
+The default character is restrained and work-focused. Field and inline-notice visual radius is `6`; button, dialog, sheet, and grouped surface radius is `8`. Brand MAY adjust the `6/8` visual character by at most 2 logical pixels through the single Brand entry after contrast and clipping review. Platform-owned system controls and hit regions are unaffected. The generator, visual boards, token text, and implementation MUST use these same values.
 
-Elevation is zero for ordinary page sections, lists, fields, and buttons. Android dialogs/sheets/navigation use Material defaults; iOS overlays use Cupertino defaults. No gradients, glassmorphism, decorative cards, nested cards, marketing-scale titles, or elevation without interaction/occlusion meaning.
+Elevation is zero for ordinary page sections, lists, fields, and buttons. Branded dialogs, sheets, and navigation use the current host defaults consistently on both platforms. No gradients, glassmorphism, decorative cards, nested cards, marketing-scale titles, or elevation without interaction/occlusion meaning.
 
 ## 5. Motion
 

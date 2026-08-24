@@ -13,7 +13,8 @@ feature-first 应用宿主、平台适配、无障碍行为、公共 Design Syst
 - 首次启动时 fail-closed 且可持久化的隐私同意门禁；
 - 首页、个人中心、设置、法务内容宿主、关于和联系方式页面；
 - 真实的游客态与“服务尚未接入”状态，不伪造用户、会话、Token、消息或后端成功；
-- 通过公共 `App*` 组件完成 Material 3 与 Cupertino 映射；
+- 通过公共 `App*` 组件提供统一的第一方 Admin9 可见组件语言，并保留平台负责的
+  系统行为；
 - 外观与无障碍设置、响应式矩阵、Semantics、对比度、命中区、Gallery、Golden
   和平台质量检查；
 - 用于同步身份、颜色、App 图标、启动图及 Android/iOS 原生显示信息的可选工具。
@@ -31,8 +32,9 @@ flowchart TB
     H --> C["Design System Core"]
     H --> F["Feature-first 业务代码"]
     F -->|"公共 UI 仅经 lib/admin9_ui.dart"| C
-    C --> A["Android / Material 3"]
-    C --> P["iOS / Cupertino"]
+    C --> U["统一 Admin9 可见 UI"]
+    U --> A["Android 系统行为"]
+    U --> P["iOS 系统行为"]
 ```
 
 Core、Brand、Business 与 App Host 是本上游仓库的所有权和依赖边界，不是强制的
@@ -50,7 +52,7 @@ lib/
     └── shared/               # 本仓库内跨 feature 共享的 UI
 ```
 
-当前上游实现规则见[架构说明](../architecture/admin9-app-starter.md)和
+当前上游实现规则见[架构说明](../architecture/README.md)和
 [Design System](../design-system/README.md)。
 
 ## Fork 与独立使用
@@ -95,34 +97,18 @@ namespace/application ID/显示名/Kotlin package/图标/启动图，以及 iOS 
 
 ## 上游验证
 
-使用 Flutter 3.44.1 与 Dart 3.12.1，在仓库根执行：
+完整命令、工具链和证据边界以[验证入口](../validation/README.md)为准。日常本地循环从
+以下命令开始：
 
 ```bash
 flutter pub get
 dart format --output=none --set-exit-if-changed lib test integration_test tool
 flutter analyze
 flutter test
-dart run tool/design_system/validate_app_config.dart --fixtures
-flutter analyze tool/design_system/design_system_contract_probe.dart
-flutter analyze tool/design_system/design_system_implementation_probe.dart
-dart run tool/design_system/verify_public_api_parity.dart --self-test
-dart run tool/design_system/verify_import_boundaries.dart --fixtures
-dart run tool/design_system/verify_import_boundaries.dart --phase=final
-dart run tool/design_system/verify_gallery_boundary.dart
-dart run tool/design_system/verify_app_config.dart
-dart run tool/design_system/verify_app_config.dart --fixtures
-dart run tool/design_system/verify_rule_links.dart
-dart run tool/design_system/verify_upstream_ownership.dart
-dart run tool/design_system/verify_android_release_plugins.dart --self-test
-dart run tool/design_system/verify_android_release_plugins.dart
-node tool/design_system/verify_documentation.mjs
-flutter build apk --release
-flutter build ios --release --no-codesign
-git diff --check
 ```
 
 iOS 无签名构建不证明签名、安装、冷启动或设备行为。真机与辅助技术结论必须绑定
-实际测试的源码和产物。
+实际测试的源码和产物；当前边界见[交付入口](../delivery/README.md)。
 
 ## 版本与历史
 
@@ -137,10 +123,11 @@ iOS 无签名构建不证明签名、安装、冷启动或设备行为。真机�
 
 - [Design System](../design-system/README.md)
 - [无障碍与质量](../design-system/06-accessibility-quality.md)
-- [当前架构](../architecture/admin9-app-starter.md)
+- [当前架构](../architecture/README.md)
 - [可选定制 Quickstart](../customization/quickstart.md)
 - [上游贡献边界](../design-system/05-upstream-contribution-boundaries.md)
-- [验证](../audit/VALIDATION.md)
+- [验证](../validation/README.md)
+- [交付](../delivery/README.md)
 - [历史记录](../HISTORY.md)
 - [Changelog](../design-system/CHANGELOG.md)
 - [贡献指南](../../CONTRIBUTING.md)
