@@ -1,7 +1,0 @@
-2026-07-30T13:41:00+0800
-system_font_scale=
-1.0
-stay_on_while_plugged_in=
-0
-app_theme_semantics=
-theme: Follow system

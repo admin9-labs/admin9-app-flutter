@@ -1,8 +1,8 @@
 # Admin9 UI Unification Visual Calibration
 
-> **Working G1 evidence:** These generated boards are a reversible visual
-> comparison fixture for the Demo-first UI unification initiative. They are not
-> current App, simulator, or device screenshots and do not freeze final Tokens.
+> **Generated visual evidence:** These boards are reproducible design-review
+> inputs. They are not App, simulator, device, or Golden screenshots and do not
+> freeze final Tokens.
 
 ## 1. Asset entry
 
@@ -75,11 +75,12 @@ generator palette.
 | dark primary/surfaceContainer | 8.51:1 | 4.5 | Pass |
 <!-- END GENERATED CONTRAST TABLE -->
 
-Pressed/focus state-layer composites require post-composite calculation in
-implementation and remain Unknown. The primary pairs above also cover the
-solid 2px focus ring where it is rendered, and use the stricter ordinary-text
-target because the same pairs render links and actions. High-contrast resolved
-colors, grayscale rendering, and device antialiasing remain Unknown.
+Pressed/focus state-layer composites require post-composite implementation
+checks and are not proven by this static calibration. The primary pairs above
+also cover the solid 2px focus ring where it is rendered, and use the stricter
+ordinary-text target because the same pairs render links and actions. High-
+contrast resolution, grayscale output, and device antialiasing require their
+separate test or device evidence.
 
 ## 4. Bounds and responsive calibration
 
@@ -92,7 +93,7 @@ annotations are evidence chrome, not App semantic roles. Dashed overlays sample
 primary, secondary, password-toggle, switch, modal action, and bottom-navigation
 hit bounds. Static coordinates are not runtime evidence.
 
-320/360 move trailing values below labels before truncation; 390 uses the reference fixture; 600 centers page content within 640 and forms within 480; phone landscape remains a scrollable single task. Full extra-width and landscape high-fidelity permutations are intentionally not produced. Widget canvases and devices later prove actual layout.
+320/360 move trailing values below labels before truncation; 390 uses the reference fixture; 600 centers page content within 640 and forms within 480; phone landscape remains a scrollable single task. Full extra-width and landscape high-fidelity permutations are intentionally not produced. Widget canvases and device records prove actual layout separately.
 
 Focus and expected reading order follow visible order: back, title, page
 content, primary action, secondary actions, notices, then later sections.

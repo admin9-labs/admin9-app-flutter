@@ -1,8 +1,0 @@
-Starting: Intent { cmp=com.admin9.app.foundation/.MainActivity }
-Status: ok
-LaunchState: COLD
-Activity: com.admin9.app.foundation/.MainActivity
-TotalTime: 454
-WaitTime: 456
-Complete
-pid=1761

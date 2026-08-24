@@ -1,3 +1,0 @@
-$ xcrun simctl bootstatus C10E0968-4695-4C02-BC55-8C322531239A -b
-Monitoring boot status for iPhone 17e (C10E0968-4695-4C02-BC55-8C322531239A).
-Device already booted, nothing to do.

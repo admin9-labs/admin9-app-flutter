@@ -38,6 +38,9 @@ is needed. The `1.0.0` through `1.0.3` sections of
 [the Design System changelog](design-system/CHANGELOG.md) remain the release
 summary.
 
+The deliberately retained raw subset and its complete integrity manifest are
+indexed under [Historical Device Evidence](history/device-evidence/README.md).
+
 ## Failure facts retained
 
 - The initial contract draft could not honestly express the required static

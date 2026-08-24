@@ -54,6 +54,9 @@ codesign --verify --deep --strict --verbose=2 \
 不重跑真机；后续任何与路由、系统交互、可见 UI、平台工程或依赖相关的变更，都必须在
 新源码和新产物上重新选择受影响设备门禁。
 
+当前树保留的最小历史原始证据及其完整性清单见
+[历史设备证据](../history/device-evidence/README.md)。
+
 ## 交付检查
 
 1. 从 clean 工作树执行[完整验证](../validation/README.md)。

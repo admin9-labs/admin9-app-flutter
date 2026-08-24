@@ -1,1 +1,0 @@
-$ /Users/fengqiyue/Library/Android/sdk/platform-tools/adb -s emulator-5554 logcat -b events -c
