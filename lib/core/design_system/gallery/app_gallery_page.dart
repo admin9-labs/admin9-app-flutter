@@ -152,11 +152,11 @@ class _AppGalleryPageState extends State<AppGalleryPage> {
                   const SizedBox(height: 24),
                   const _TokenSample(),
                   const SizedBox(height: 24),
-                  const _Phase2Sample(),
+                  const _ShellAndFeedbackSample(),
                   const SizedBox(height: 24),
-                  const _Phase3Sample(),
+                  const _SettingsAndListSample(),
                   const SizedBox(height: 24),
-                  const _Phase4Sample(),
+                  const _FormAndActionSample(),
                 ],
               ),
             ),
@@ -167,14 +167,14 @@ class _AppGalleryPageState extends State<AppGalleryPage> {
   }
 }
 
-class _Phase4Sample extends StatefulWidget {
-  const _Phase4Sample();
+class _FormAndActionSample extends StatefulWidget {
+  const _FormAndActionSample();
 
   @override
-  State<_Phase4Sample> createState() => _Phase4SampleState();
+  State<_FormAndActionSample> createState() => _FormAndActionSampleState();
 }
 
-class _Phase4SampleState extends State<_Phase4Sample> {
+class _FormAndActionSampleState extends State<_FormAndActionSample> {
   final TextEditingController _account = TextEditingController();
   final TextEditingController _password = TextEditingController();
 
@@ -278,14 +278,15 @@ class _Phase4SampleState extends State<_Phase4Sample> {
   }
 }
 
-class _Phase2Sample extends StatefulWidget {
-  const _Phase2Sample();
+class _ShellAndFeedbackSample extends StatefulWidget {
+  const _ShellAndFeedbackSample();
 
   @override
-  State<_Phase2Sample> createState() => _Phase2SampleState();
+  State<_ShellAndFeedbackSample> createState() =>
+      _ShellAndFeedbackSampleState();
 }
 
-class _Phase2SampleState extends State<_Phase2Sample> {
+class _ShellAndFeedbackSampleState extends State<_ShellAndFeedbackSample> {
   int _selectedIndex = 0;
 
   @override
@@ -421,14 +422,14 @@ class _Phase2SampleState extends State<_Phase2Sample> {
   }
 }
 
-class _Phase3Sample extends StatefulWidget {
-  const _Phase3Sample();
+class _SettingsAndListSample extends StatefulWidget {
+  const _SettingsAndListSample();
 
   @override
-  State<_Phase3Sample> createState() => _Phase3SampleState();
+  State<_SettingsAndListSample> createState() => _SettingsAndListSampleState();
 }
 
-class _Phase3SampleState extends State<_Phase3Sample> {
+class _SettingsAndListSampleState extends State<_SettingsAndListSample> {
   bool _enabledSwitch = true;
   String _choice = 'system';
 
@@ -445,7 +446,7 @@ class _Phase3SampleState extends State<_Phase3Sample> {
           footer: '当前值在内容压力下重排；启用项可按住查看按压态，并可通过键盘 Tab 获得焦点态。',
           children: [
             AppListTile(
-              key: const Key('gallery-phase3-interactive-tile'),
+              key: const Key('gallery-settings-interactive-tile'),
               title: '主题',
               currentValue: '跟随系统',
               disclosure: true,
@@ -471,7 +472,7 @@ class _Phase3SampleState extends State<_Phase3Sample> {
           footer: '启用开关提供平台原生按压态与键盘焦点态。',
           children: [
             AppSwitch(
-              key: const Key('gallery-phase3-interactive-switch'),
+              key: const Key('gallery-settings-interactive-switch'),
               label: '高对比度',
               value: _enabledSwitch,
               onChanged: (value) => setState(() => _enabledSwitch = value),
