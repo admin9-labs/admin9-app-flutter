@@ -130,11 +130,12 @@ device behavior. Artifact and device limits are recorded in
 ## Versions And History
 
 - App version: `1.0.0+1`.
-- Current recorded Design System release: `1.0.3`.
+- Current recorded Design System release: `2.0.0`.
 - Toolchain: Flutter `3.44.1` / Dart `3.12.1`.
 - Existing `design-system-v1.0.0` through `design-system-v1.0.3` tags and prior
   reports are immutable historical records. Their former Foundation and
   downstream-governance wording does not define the current Starter project.
+- `design-system-v2.0.0` is the current Starter Design System baseline.
 - New changes follow SemVer and are recorded under `Unreleased` before a
   release. Existing tags are never moved or recreated.
 

@@ -91,8 +91,9 @@ Gallery release exclusion、响应式/Golden/无障碍检查、文档链接校�
 `CODEOWNERS` 与 `OWNERS.md` 只描述本上游仓库的评审责任。
 
 既有 Git Tag 和历史验收记录不修改、不重打；它们记录当时的 Foundation 实现和事实，
-不再是当前 Starter 的下游合同。历史入口见[历史记录](../HISTORY.md)。当前变更先进入
-Changelog 的 `Unreleased`，正式发布仍需独立的版本与 Tag 决策。
+不再是当前 Starter 的下游合同。历史入口见[历史记录](../HISTORY.md)。当前发布基线为
+`design-system-v2.0.0`；后续变更先进入 Changelog 的 `Unreleased`，并通过独立的版本与
+Tag 决策发布。
 
 ## 8. 当前明确未提供
 

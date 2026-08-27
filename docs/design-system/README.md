@@ -1,6 +1,6 @@
 # Admin9 Design System
 
-Current recorded release: `1.0.3`
+Current recorded release: `2.0.0`
 
 Admin9 Design System defines the public UI, platform adaptation,
 accessibility, responsive behavior, and quality gates maintained in the
@@ -123,8 +123,9 @@ Existing tags are immutable and are never moved or recreated.
 
 The `design-system-v1.0.0` through `design-system-v1.0.3` tags and historical
 device evidence preserve their original Foundation-era facts. They do not
-establish a current downstream compatibility matrix. Current working-tree
-changes remain `Unreleased` until a separate release decision is made.
+establish a current downstream compatibility matrix. `design-system-v2.0.0`
+is the current Starter baseline. Later changes remain `Unreleased` until a
+separate release decision is made.
 
 ## 8. Current Evidence Boundary
 

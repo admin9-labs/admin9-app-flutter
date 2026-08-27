@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+No unreleased changes.
+
+## 2.0.0 - 2026-08-28
+
 - Unified brand-owned visible `App*` presentation across Android and iOS with
   the selected first-party implementation while retaining system-owned
   interaction behavior. Removed Forui and the complete comparison POC after a
@@ -18,6 +22,18 @@
   configuration convenience that has no certification or compatibility role.
 - Limited normative Design System language to implementations and
   contributions proposed for inclusion in this upstream repository.
+
+### Migration
+
+- The former Foundation manifest, compatibility registry, derived-project
+  certification contract, and their validation commands have been removed.
+  Independent forks now own their governance and compatibility process.
+- `validate_app_config.dart`, `apply_app_config.dart`, and
+  `verify_app_config.dart` provide optional identity and Brand synchronization;
+  they do not replace the removed compatibility or certification mechanisms.
+- The public `lib/admin9_ui.dart` export set and declaration contract remain
+  unchanged from `1.0.3`. Tooling and governance interfaces are not backward
+  compatible, which is why this release advances the major version.
 
 The entries below are immutable historical release records. Their original
 Foundation-era terminology describes those releases; it does not govern current

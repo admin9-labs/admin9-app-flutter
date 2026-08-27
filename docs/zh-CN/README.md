@@ -113,10 +113,11 @@ iOS 无签名构建不证明签名、安装、冷启动或设备行为。真机�
 ## 版本与历史
 
 - App 版本：`1.0.0+1`；
-- 当前已记录的 Design System 发布版本：`1.0.3`；
+- 当前已记录的 Design System 发布版本：`2.0.0`；
 - 工具链：Flutter `3.44.1` / Dart `3.12.1`；
 - 既有 `design-system-v1.0.0` 至 `design-system-v1.0.3` Tag 及此前报告是不可变的
   历史记录，其中旧 Foundation 名称和下游治理措辞不再定义当前 Starter 项目；
+- `design-system-v2.0.0` 是当前 Starter Design System 基线；
 - 新变更按 SemVer 管理，并先记录在 `Unreleased`；既有 Tag 不移动、不重打。
 
 ## 文档

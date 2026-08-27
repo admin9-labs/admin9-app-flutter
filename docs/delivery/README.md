@@ -12,6 +12,10 @@ Tag、push 或发布。构建命令见[验证入口](../validation/README.md)，
 - 未在精确源码和产物上执行的设备项目保持 `Unknown`；不得由旧记录升级。
 - 最终品牌方向、双端真机体验、签名发布和商店交付均未获授权。
 
+`design-system-v2.0.0` 是源码正式版，只提供 GitHub 自动生成的源码归档，不附带 APK、
+IPA 或 unsigned iOS App。当前源码的 Android release 和 iOS no-codesign 编译只作为构建
+证据，不升级签名、安装、真机或商店交付结论。
+
 ## 已保护交接制品
 
 清理开始前，以下两个忽略目录中的制品与既有交接记录精确匹配，已复制到仓库外保存，
