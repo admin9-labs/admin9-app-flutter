@@ -1,9 +1,9 @@
 import 'package:admin9_app_flutter/app/admin9_app.dart';
-import 'package:admin9_app_flutter/features/forms/presentation/pages/forms_page.dart';
-import 'package:admin9_app_flutter/features/forms/presentation/pages/text_input_page.dart';
-import 'package:admin9_app_flutter/features/settings/data/repositories/theme_preference_repository.dart';
-import 'package:admin9_app_flutter/features/settings/data/services/theme_preference_service.dart';
-import 'package:admin9_app_flutter/features/settings/presentation/providers/theme_preference_provider.dart';
+import 'package:admin9_app_flutter/app/appearance/app_appearance_provider.dart';
+import 'package:admin9_app_flutter/app/appearance/app_appearance_repository.dart';
+import 'package:admin9_app_flutter/app/appearance/app_appearance_service.dart';
+import 'package:admin9_app_flutter/features/examples/presentation/pages/catalog/forms_page.dart';
+import 'package:admin9_app_flutter/features/examples/presentation/pages/form/text_input/text_input_playground_page.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -27,8 +27,8 @@ void main() {
     addTearDown(() {
       SharedPreferencesAsyncPlatform.instance = previousPlatform;
     });
-    final repository = SharedPreferencesThemePreferenceRepository(
-      ThemePreferenceService(SharedPreferencesAsync()),
+    final repository = SharedPreferencesAppAppearanceRepository(
+      AppAppearanceService(SharedPreferencesAsync()),
     );
 
     await tester.pumpWidget(
@@ -40,7 +40,7 @@ void main() {
         saveLocale: false,
         child: ProviderScope(
           overrides: [
-            themePreferenceRepositoryProvider.overrideWithValue(repository),
+            appAppearanceRepositoryProvider.overrideWithValue(repository),
           ],
           child: const Admin9App(),
         ),
@@ -52,9 +52,11 @@ void main() {
 
     await _selectDestination(tester, '表单');
     expect(find.byType(FormsPage), findsOneWidget);
-    await tester.tap(find.text('文本输入'));
+    final textFieldEntry = find.text('资料表单实验台');
+    await tester.ensureVisible(textFieldEntry);
+    await tester.tap(textFieldEntry);
     await tester.pumpAndSettle();
-    expect(find.byType(TextInputPage), findsOneWidget);
+    expect(find.byType(TextInputPlaygroundPage), findsOneWidget);
     expect(await tester.binding.handlePopRoute(), isTrue);
     await tester.pumpAndSettle();
     expect(find.byType(FormsPage), findsOneWidget);
@@ -65,10 +67,10 @@ void main() {
 
     expect(
       await preferences.getString(
-        ThemePreferenceService.key,
+        AppAppearanceService.key,
         const SharedPreferencesOptions(),
       ),
-      'dark',
+      contains('"brightness":"dark"'),
     );
   });
 }

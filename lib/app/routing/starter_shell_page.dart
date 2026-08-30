@@ -20,19 +20,19 @@ class StarterShellPage extends StatelessWidget {
           children: [
             FBottomNavigationBarItem(
               icon: const Icon(FLucideIcons.blocks),
-              label: Text(context.tr('navigation.foundation')),
+              label: Text(context.tr('examples.navigation.foundation')),
             ),
             FBottomNavigationBarItem(
               icon: const Icon(FLucideIcons.listChecks),
-              label: Text(context.tr('navigation.forms')),
+              label: Text(context.tr('examples.navigation.forms')),
             ),
             FBottomNavigationBarItem(
               icon: const Icon(FLucideIcons.layoutList),
-              label: Text(context.tr('navigation.content')),
+              label: Text(context.tr('examples.navigation.content')),
             ),
             FBottomNavigationBarItem(
               icon: const Icon(FLucideIcons.messageCircle),
-              label: Text(context.tr('navigation.feedback')),
+              label: Text(context.tr('examples.navigation.feedback')),
             ),
             FBottomNavigationBarItem(
               icon: const Icon(FLucideIcons.settings),

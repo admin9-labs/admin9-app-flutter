@@ -1,5 +1,4 @@
 import 'package:admin9_app_flutter/shared/ui/component_example_section.dart';
-import 'package:admin9_app_flutter/shared/ui/empty_state_view.dart';
 import 'package:admin9_app_flutter/shared/ui/error_state_view.dart';
 import 'package:admin9_app_flutter/shared/ui/loading_state_view.dart';
 import 'package:admin9_app_flutter/shared/ui/responsive_page_body.dart';
@@ -36,28 +35,6 @@ void main() {
 
     expect(tester.getSize(find.byKey(contentKey)).width, 288);
     expect(tester.takeException(), isNull);
-  });
-
-  testWidgets('empty state renders its action and invokes it', (tester) async {
-    var actionCalls = 0;
-    await tester.pumpWidget(
-      _Harness(
-        child: EmptyStateView(
-          title: '暂无内容',
-          message: '完成创建后，内容会显示在这里。',
-          actionLabel: '创建',
-          onAction: () => actionCalls++,
-        ),
-      ),
-    );
-
-    expect(find.text('暂无内容'), findsOneWidget);
-    expect(find.text('完成创建后，内容会显示在这里。'), findsOneWidget);
-
-    await tester.tap(find.text('创建'));
-    await tester.pump(const Duration(milliseconds: 200));
-
-    expect(actionCalls, 1);
   });
 
   testWidgets('error state renders and invokes retry', (tester) async {

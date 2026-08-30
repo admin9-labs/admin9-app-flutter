@@ -5,108 +5,68 @@ description: Use when initializing, implementing, reviewing, or extending this r
 
 # Admin9 Flutter App
 
-Use this Skill as the execution guide for this repository and projects derived
-from it. It does not replace repository authority or expand user authorization.
+Use this Skill as an execution guide. It does not replace repository authority
+or expand user authorization.
 
-## Read Repository Authority First
+## Read Authority First
 
-Resolve the active Git root and read its local authorities before changing code:
+Resolve the active Git root and read its current local authority before acting:
 
 - [Repository Working Agreements](../../../AGENTS.md)
 - [Application Architecture](../../../docs/architecture.md)
 - [UI System](../../../docs/ui.md)
+- [Upstream Starter](../../../docs/starter.md) for bundled Showroom work
 
-The active repository documents override this Skill. A derived project may have
-changed product scope, dependencies, identities, or validation rules; never
-assume the upstream Starter remains current there.
+A derived project may replace upstream scope, identities, routes, or evidence;
+its repository-local documents take precedence.
 
-## Route The Task
+## Execution Decision Tree
 
-- **Forui UI, theme, component, style, snippet, or CLI work:** read the relevant
-  UI rules, then use the version-matched Forui lookup below.
-- **Feature, Riverpod, Repository, Service, Model, Domain, or shared code:** read
-  the corresponding architecture sections and create only responsibilities with
-  an approved consumer.
-- **Page, AutoRoute, Guard, nested Tab Router, or deep-link work:** follow the
-  routing architecture, require an approved consumer or Starter example for each
-  optional routing capability, and keep navigation out of Riverpod Notifiers and
-  data or Domain code.
-- **New dependency or generator:** check whether it is a frozen baseline or a
-  candidate. A candidate entry is advice, not implementation authority; require
-  its trigger, an approved Feature, and fresh compatibility, maintenance,
-  licensing, and platform review.
-- **Validation, build, simulator, signing, installation, or device work:** follow
-  the repository authorization boundary. Builds and device actions are not
-  implied by ordinary source implementation.
+1. Read `pubspec.yaml` and `pubspec.lock`. Match Forui work to the resolved
+   version; the current checked-in snapshot is `references/0.26.0/`.
+2. Inventory the real consumer and public API axes before choosing a layer,
+   dependency, generator, route, or component. Do not infer generic size,
+   color, state, or variant controls that the API does not provide.
+3. For UI ownership, follow [UI Ownership](../../../docs/ui.md#ui-ownership-model):
+   use `F*` directly when it satisfies the requirement, create an `A*` API only
+   for a stable observable Admin9 difference, and keep Feature-only UI with its
+   Feature.
+4. For Examples work, follow the
+   [Showroom contract](../../../docs/ui.md#showroom-playground-contract) and the
+   [Starter registry](../../../docs/starter.md#current-playground-registry).
+   Group related official capabilities into a coherent Playground; do not create
+   one shallow route per capability or count an `F*` type occurrence as coverage.
+5. Keep Playground preview, configuration, synchronized usage, copy feedback,
+   and reset widgets inside Examples. Do not promote them to `shared/ui/` or
+   build a generic dynamic component renderer.
+6. For AGrid or another approved Admin9 API, verify a real consumer, documented
+   difference, Forui Theme/style integration, accessibility and directionality,
+   tests, and the dependency boundary. The current scope uses official `FTabs`
+   and does not create `ATabs` or a tabs experiment.
+7. For routing, state, persistence, localization, dependencies, generators, and
+   native work, use the boundaries in [Architecture](../../../docs/architecture.md)
+   rather than duplicating them here. Never hand-edit generated router source.
+8. Check authorization separately for builds, simulators, signing,
+   installation, and physical devices. Source implementation does not authorize
+   those actions.
 
-Keep edits scoped to the request. Do not create empty layers, placeholder APIs,
-parallel Forui primitives, speculative Features, or compatibility code for
-superseded implementations.
+Do not create empty layers, placeholder APIs, mechanically renamed Forui
+primitives, compatibility code for superseded implementations, or speculative
+Features and dependencies.
 
-When a task affects the upstream repository's bundled example, also read
-[Upstream Starter](../../../docs/starter.md). Do not project that example's
-Features, routes, platform scope, or acceptance matrix onto a derived project.
-For a derived project, its repository-local authority and Starter reference
-document take precedence.
+## Version-Matched Forui Lookup
 
-## Use The Selected Stack At Its Boundary
-
-- Forui owns visible product UI, theme, and base components. Compose `F*`
-  widgets directly; add App-owned UI only for a stable pattern, business meaning,
-  or confirmed Forui gap.
-- Riverpod owns presentation state and dependency wiring. Keep feature providers
-  with their Feature; keep Widget-local input, focus, scrolling, and animation
-  state in the Widget.
-- AutoRoute owns typed routes, nested navigation, Guards, and deep-link route
-  construction. Use generated Route objects and never hand-edit generated router
-  files. Typed route generation is baseline; nested Tab Routers, Guards,
-  Observers, and deep links still require a consumer.
-- EasyLocalization owns App copy. Add Flutter 3.47 external
-  `material_ui`/`cupertino_ui` delegates for the App host, then append exactly
-  one `FLocalizations.delegate` for Forui component copy.
-- Services and Repositories own external and persistence boundaries. Models,
-  Preferences, Services, Repositories, and Domain code remain independent of UI,
-  Riverpod, AutoRoute, and `BuildContext`.
-
-These bullets orient work; the repository documents contain the complete and
-current rules.
-
-For AutoRoute work, use `auto_route: ^11.1.0`,
-`auto_route_generator: ^10.6.0`, and `build_runner: ^2.16.0`. Follow the
-repository's adaptive RouteType, import boundary, navigation-state terminology,
-and generation-drift gate; do not carry forward the old direct
-`analyzer: 10.1.0` constraint.
-
-## Match The Version First
-
-1. Read `pubspec.yaml` and `pubspec.lock` before relying on a snapshot.
-2. If Forui is not resolved yet, use the target baseline in `AGENTS.md` only as
-   initialization intent and verify it after dependency resolution.
-3. Use the reference directory matching the resolved Forui version. The current
-   snapshot is `references/0.26.0/`.
+1. Read the compact index first: `references/0.26.0/llms.txt`.
+2. Prefer the matching official single-page documentation when live access and
+   version context are available.
+3. For offline or cross-page questions, search narrow terms in
+   `references/0.26.0/llms-full.txt`; do not load the full file by default.
 4. Read [snapshot metadata](references/0.26.0/source.json) when provenance,
-   freshness, Flutter/Dart constraints, or exact hashes matter.
-5. If the resolved version differs, use official version-matched sources or add
-   a new snapshot only with user authorization. Never overwrite an older
-   versioned snapshot.
+   capture time, constraints, or hashes matter.
+5. If documentation and resolved package source disagree, inspect the package
+   source and report the mismatch instead of guessing.
 
-The Forui website is live and unversioned. This snapshot records the site while
-0.26.0 was the current pub.dev release; its hashes bind the captured content,
-not future website state.
-
-## Look Up Documentation Progressively
-
-1. Read [the compact index](references/0.26.0/llms.txt) to discover relevant
-   page titles, terms, and official single-page URLs.
-2. Prefer the relevant official single page for routine work when live access is
-   available and its package version context still matches the project.
-3. For offline work, cross-page questions, or suspected omissions, search
-   `references/0.26.0/llms-full.txt` with `rg` and read only narrow ranges around
-   matches.
-4. Never load or print the entire `llms-full.txt` by default. Broaden the search
-   only when narrower terms fail.
-
-Useful lookup shapes:
+Useful commands:
 
 ```shell
 rg -n -i "button|FButton" .agents/skills/admin9-flutter-app/references/0.26.0/llms.txt
@@ -114,25 +74,27 @@ rg -n -i "FButton|button style|button variant" .agents/skills/admin9-flutter-app
 sed -n '<start>,<end>p' .agents/skills/admin9-flutter-app/references/0.26.0/llms-full.txt
 ```
 
-Use exact widget, class, CLI command, or concept names where possible. When
-documentation and package source disagree, inspect the resolved package source
-and report the mismatch instead of guessing.
+## Verification Checklist
 
-For implementation or review, cite the relevant official page or narrow snapshot
-section for non-obvious Forui claims. When documentation and resolved package
-source disagree, inspect the source and report the mismatch instead of guessing.
+- Confirm the resolved Forui version and version-bound snapshot.
+- For Showroom work, verify all 72 official capability IDs once, the many-to-one
+  Playground registry, required axes, coverage modes, and focused evidence.
+- For every `direct` claim, verify a realistic scenario, configuration-driven
+  preview, observable interaction feedback, synchronized usage summary, copy,
+  reset, Chinese copy, responsive layout, accessibility, and focused tests.
+- Verify every registered Playground Page, typed route, translation namespace,
+  and test; reject orphan routes, old generated routes, and untracked pages.
+- Verify `shared/ui/` does not depend on Examples, AutoRoute, App routing, or a
+  business Feature, and that Playground-only UI remains Examples-owned.
+- Run focused tests and the repository source gates, Markdown local-link check,
+  and `git diff --check`.
+- On a clean checkout, run `dart run build_runner build`, then require
+  `git diff --exit-code` and an empty
+  `git status --porcelain --untracked-files=all` result.
+- Treat Android/iOS builds, platform delivery, simulator behavior, signing,
+  installation, and physical-device acceptance as `Unknown` unless that exact
+  scope was authorized and executed against the current source.
 
-## Verify The Result
-
-Run focused tests for changed behavior plus the applicable repository source
-gates. Check generated output, local links, naming, dependency direction, and
-`git diff --check`. UI acceptance uses only evidence from the new source.
-
-On a clean CI checkout, regenerate AutoRoute output with
-`dart run build_runner build`, then require both `git diff --exit-code` and an
-empty status with
-`test -z "$(git status --porcelain --untracked-files=all)"`.
-
-Do not claim Android/iOS builds, deep-link delivery, simulator behavior,
-signing, installation, or physical-device acceptance unless that exact scope was
-authorized and executed.
+When removing Examples in a derived project, follow the
+[removal contract](../../../docs/starter.md#examples-removal-contract) without
+deleting independent Admin9 UI such as AGrid or the Settings Feature.

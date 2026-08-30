@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:admin9_app_flutter/app/routing/app_router.dart';
 import 'package:admin9_app_flutter/app/routing/app_router.gr.dart';
+import 'package:admin9_app_flutter/app/routing/examples_routes.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -11,6 +12,8 @@ void main() {
 
     expect(router.defaultRouteType, const RouteType.adaptive());
     expect(router.guards, isEmpty);
+    expect(router.matcher.match('/'), isNotNull);
+    expect(router.matcher.match('/foundation'), isNotNull);
 
     final shell = router.routes.singleWhere(
       (route) => route.name == StarterShellRoute.name,
@@ -31,6 +34,30 @@ void main() {
       feedbackTab.name,
       settingsTab.name,
     ]);
+    expect(examplesTabRoutes, hasLength(4));
+    expect(examplesTabRoutes.map((route) => route.children!.length), [
+      6,
+      7,
+      4,
+      4,
+    ]);
+    expect(
+      _flatten(examplesTabRoutes).map((route) => route.path),
+      containsAll([
+        'playground/app-shell',
+        'playground/text-input',
+        'playground/overview',
+        'playground/status',
+      ]),
+    );
+    expect(
+      File('lib/app/routing/app_router.dart')
+          .readAsStringSync()
+          .split('...examplesTabRoutes')
+          .length,
+      2,
+      reason: 'Examples must have exactly one AppRouter mount point.',
+    );
   });
 
   test('route table has no guards or speculative media paths', () {

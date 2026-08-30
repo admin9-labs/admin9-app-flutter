@@ -9,29 +9,38 @@ FStyle _style({
   required FColors colors,
   required FTypography typography,
   required bool touch,
+  required FBorderRadius borderRadius,
 }) {
-  const borderRadius = FBorderRadius();
+  final focusedOutlineStyle = FFocusedOutlineStyle(
+    color: colors.primary,
+    borderRadius: borderRadius.md,
+  );
   return FStyle(
     formFieldStyle: .inherit(
       colors: colors,
       typography: typography,
       touch: touch,
     ),
-    focusedOutlineStyle: FFocusedOutlineStyle(
-      color: colors.primary,
-      borderRadius: borderRadius.md,
-    ),
+    focusedOutlineStyle: focusedOutlineStyle,
     sizes: FSizes.inherit(touch: touch),
     iconStyle: IconThemeData(
       color: colors.foreground,
       size: typography.body.lg.fontSize,
     ),
     tappableStyle: FTappableStyle(),
-    borderRadius: const FBorderRadius(),
+    borderRadius: borderRadius,
     borderWidth: 1,
     pagePadding: const .symmetric(vertical: 8, horizontal: 12),
     shadow: const [
       BoxShadow(color: Color(0x0d000000), offset: Offset(0, 1), blurRadius: 2),
+    ],
+    extensions: [
+      AGridStyle.inherit(
+        colors: colors,
+        typography: typography,
+        borderRadius: borderRadius,
+        focusedOutlineStyle: focusedOutlineStyle,
+      ),
     ],
   );
 }

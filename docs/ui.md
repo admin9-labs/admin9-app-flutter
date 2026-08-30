@@ -7,17 +7,47 @@ It is not a candidate under evaluation. Project verification confirms that the
 application integrates Forui correctly; it does not compare Forui with a custom
 design language or reopen the selection decision.
 
-Feature presentation uses Forui `F*` widgets directly. Do not create an `App*`
-equivalent for each Forui primitive. Add a project-owned Widget only when there
-is demonstrated repetition, stable business meaning, a confirmed Forui
-capability gap, or a stable Starter-level App pattern backed by a current,
-runnable example and tests. Ordinary business UI stays with its first Feature
-until a second Feature needs the same responsibility.
+Forui remains the visual and semantic foundation even when the Starter exposes
+an Admin9-owned brand API. Admin9 UI must not create a parallel Theme, token,
+typography, icon, interaction, focus, or accessibility system.
 
 See [Application Architecture](architecture.md) for ownership, dependency, and
-navigation rules. The upstream component catalog and example Feature are
+navigation rules. The upstream Admin9 UI Showroom and Examples Feature are
 described separately in [Upstream Starter](starter.md); derived projects may
 replace that example without redefining Forui's role.
+
+## UI Ownership Model
+
+Choose the narrowest owner that expresses an observable requirement:
+
+1. Use a Forui `F*` widget directly when its visual, interaction, behavior, and
+   public API already satisfy the requirement.
+2. Create an Admin9 `A*` API only for a stable brand visual, interaction,
+   behavior, or public API difference. It may wrap or extend an `F*` widget, or
+   independently implement a confirmed Forui capability gap. Its public API
+   must not reveal which internal strategy it uses.
+3. Keep a Widget inside its Feature when the responsibility is specific to that
+   Feature. Ordinary business UI usually stays with its first Feature until a
+   second real Feature needs the same responsibility.
+
+Mechanical `F*` renaming is prohibited: an `A*` API needs a documented,
+testable difference, not merely a new class name. Every `A*` implementation must
+continue to use the active Forui Theme, typography, icons, variants, tappable and
+focused-outline behavior, accessibility semantics, directionality, and
+light/dark states. Flutter layout and platform primitives remain available where
+Forui does not own the capability.
+
+Reusable `A*` APIs live in a responsibility-specific `shared/ui/<category>/`
+location, have a real consumer, documentation, and tests, and receive semantic
+callbacks rather than importing AutoRoute. A Theme-backed default is a typed
+extension of the existing Forui Theme or widget-style contract, not an `ATheme`
+or parallel token source. Do not create an empty style extension before a real
+Theme contract exists.
+
+The current Examples Showroom demonstrates the official `FTabs` directly. This
+scope does not create `ATabs`, a tabs feasibility experiment, or a shared tabs
+directory. The approved Admin9 brand component in this iteration is AGrid; its
+current implementation and coverage belong in [Upstream Starter](starter.md).
 
 ## Theme And CLI Ownership
 
@@ -66,18 +96,67 @@ Generated snippets are ordinary project source. Do not keep a permanent generic
 when it implements an approved Starter pattern with real use, a runnable example,
 documentation, and tests. Give every generated source file a specific name.
 
-## Shared UI Patterns
+### Theme Workbench
 
-The Starter may provide `shared/ui/` before a second Feature exists so adopters
-can see the recommended extension path immediately. It is reserved for stable
-App-wide page patterns such as a specifically named empty state, error state,
-loading state, or responsive page body. Each early pattern must be used by a
-current runnable example and covered by tests and documentation.
+The Showroom Theme Playground is the control surface for the App's global Theme,
+not a swatch gallery. It provides at least three visually distinct,
+contrast-checked presets, each with complete light and dark Forui themes, plus
+system/light/dark mode selection. Any radius, control-scale, or other global
+option must be supported coherently by the real Forui Theme/style contract; do
+not expose a partial setting or arbitrary color picker.
 
-`shared/ui/` composes Forui; it does not replace it. Continue using `FButton`,
-`FTextField`, `FDialog`, and other Forui primitives directly. Renamed primitive
-wrappers, empty architecture, placeholder interfaces, `common_card.dart`, and
-generic utility collections are prohibited.
+Changes apply immediately across the App through one state source and persist
+through the Settings persistence boundary. The Playground previews buttons,
+input, card, tile, status color, dialog, and AGrid together, provides a default
+reset, and shows read or write failures visibly. It does not create `ATheme` or a
+second token system.
+
+## Shared UI APIs And Patterns
+
+The Starter may provide `shared/ui/<category>/` before a second Feature exists
+so adopters can see the recommended extension path immediately. It may contain
+a stable Admin9 brand UI API or App-wide pattern such as a branded layout,
+specifically named empty state, error state, loading state, or responsive page
+body. Each early API or pattern must have a current runnable consumer and tests
+and documentation.
+
+Shared UI follows the ownership model above; it does not replace Forui as the UI
+foundation. Mechanical primitive wrappers, empty architecture, placeholder
+interfaces, `common_card.dart`, and generic utility collections are prohibited.
+Existing root-level shared UI files are not moved merely to normalize the tree;
+new code uses a clear category and responsibility.
+
+## Showroom Playground Contract
+
+Examples is an Admin9 UI Showroom, not a static component gallery or a test
+fixture rendered as an App. Each direct Playground provides one coherent mobile
+scenario with all of the following:
+
+- a configuration area whose controls correspond to real Forui or approved
+  Admin9 API parameters;
+- a live preview that changes from those controls and exposes applicable
+  enabled, selected, loading, error, confirmation, and content states;
+- executable interaction with visible, accessible feedback;
+- a minimal Dart usage or parameter summary synchronized with the current
+  configuration, plus copy feedback and a reset command; and
+- Chinese long-copy, narrow-screen, large-text, light/dark, directionality,
+  focus, semantics, and no-overflow evidence appropriate to that capability.
+
+Do not invent a universal `size`, color, variant, or state option when the
+component API does not provide it. Theme, Delta, Controller, composition, and
+Admin9 API behavior are configured only through their real public contracts;
+private Forui APIs and a generic dynamic component renderer are prohibited.
+
+Several official capabilities may share one Playground when they form a
+complete scenario. Coverage is retained by recording each capability's axes and
+focused evidence in the version-bound ledger, not by creating a page for every
+type. Merely rendering an `F*` widget is not direct coverage.
+
+Preview frames, configuration sections, synchronized usage summaries, copy
+feedback, and reset controls are Examples-owned UI under
+`features/examples/presentation/widgets/`. They do not enter `shared/ui/` unless
+they independently become a stable App-wide or Admin9 brand responsibility with
+a non-Showroom consumer.
 
 ## Presentation State
 
@@ -113,9 +192,11 @@ AutoRoute stack.
 ## Brand And Platform Boundaries
 
 Use Forui's existing design language, Theme, components, and interaction states.
-Do not invent a parallel token or component system. Brand changes belong in the
-Forui Theme and require confirmed product inputs; a lack of design input is not
-permission to create a new visual language.
+An Admin9 `A*` API expresses a specific brand difference within that foundation;
+it is not permission to build a second base component or token system. Brand
+changes belong in the Forui Theme or a typed Forui Theme/widget-style extension
+and require confirmed inputs. A lack of design input is not permission to create
+a new visual language.
 
 Forui owns visible product UI. Flutter and Android/iOS own platform behavior and
 native capabilities. Use system keyboards, permissions, sharing, text selection,
@@ -171,6 +252,7 @@ requirement.
 | Area | Required coverage |
 | --- | --- |
 | Theme and language | Chinese App translations, Forui component translations, missing-key behavior, font fallback, light and dark themes, readable contrast, and states |
+| Showroom closure | configuration changes the preview, interactions produce visible feedback, usage/parameter summaries remain synchronized, copy reports success or failure, and reset restores documented defaults |
 | Responsive layout | narrow supported screens, large system text, long Chinese labels, safe content growth, and no overflow |
 | Navigation | typed AutoRoute generation, adaptive Route behavior, basic stack/back behavior, Forui navigation controls, and each actually implemented Tab stack, Guard, Observer, or deep-link reconstruction path |
 | Forms | labels, validation, focus order, disabled/loading/error states, password/input behavior, and system keyboard interaction |
@@ -183,6 +265,12 @@ device checks prove only the exact source, build, platform, and interaction that
 were actually exercised. Any unexecuted platform, gesture, keyboard, signing,
 installation, or device item remains `Unknown` until explicitly authorized and
 performed on the new implementation.
+
+Automated geometry and behavior do not prove visual quality. Save current-source
+screenshots for the Theme and AGrid Playgrounds at representative light/dark and
+narrow-screen states, bind them to the tested source, and leave visual hierarchy,
+spacing, balance, and comfort for explicit human review. Superseded screenshots
+never satisfy this review.
 
 Cold-start deep-link reconstruction and in-process Tab stack retention do not
 prove process state restoration. Process restoration enters this matrix only

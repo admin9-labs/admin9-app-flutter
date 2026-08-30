@@ -1,65 +1,148 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
 
-import 'package:admin9_app_flutter/features/foundation/presentation/pages/foundation_page.dart';
-import 'package:admin9_app_flutter/features/settings/data/models/theme_preference.dart';
-import 'package:admin9_app_flutter/features/settings/presentation/providers/theme_preference_provider.dart';
-import 'package:admin9_app_flutter/theme/theme.dart';
+import 'package:admin9_app_flutter/app/admin9_app.dart';
+import 'package:admin9_app_flutter/app/appearance/app_appearance_preference.dart';
+import 'package:admin9_app_flutter/app/appearance/app_appearance_provider.dart';
+import 'package:admin9_app_flutter/app/appearance/app_appearance_repository.dart';
+import 'package:admin9_app_flutter/app/appearance/app_theme_catalog.dart';
+import 'package:admin9_app_flutter/features/examples/presentation/pages/catalog/foundation_page.dart';
+import 'package:admin9_app_flutter/shared/ui/layout/grid/a_grid_style.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:forui/forui.dart';
 import 'package:material_ui/material_ui.dart' as material;
-
-import 'support/test_admin9_app.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
-  test('generated themes contain no placeholder extensions', () {
-    final extensionArgument = RegExp(r'\bextensions\s*:');
-    for (final path in ['lib/theme/colors.dart', 'lib/theme/style.dart']) {
-      expect(
-        File(path).readAsStringSync(),
-        isNot(contains(extensionArgument)),
-        reason: '$path must omit extension arguments until one has a consumer',
-      );
-    }
+  setUpAll(() async {
+    SharedPreferences.setMockInitialValues({});
+    await EasyLocalization.ensureInitialized();
+  });
 
-    for (final theme in [lightTheme, darkTheme]) {
-      expect(theme.colors.extensions, isEmpty);
-      expect(theme.style.extensions, isEmpty);
+  test('G01 registers only the consumed AGrid Theme extension', () {
+    expect(
+      File('lib/theme/colors.dart').readAsStringSync(),
+      isNot(contains(RegExp(r'\bextensions\s*:'))),
+    );
+    for (final preset in AppThemePreset.values) {
+      for (final radius in AppRadiusPreference.values) {
+        final pair = AppThemeCatalog.resolve(preset: preset, radius: radius);
+        for (final theme in [pair.light, pair.dark]) {
+          expect(theme.colors.extensions, isEmpty);
+          expect(theme.style.extensions, hasLength(1));
+          expect(theme.style.extensions.single, isA<AGridStyle>());
+          expect(theme.style.aGrid.minimumTouchSize, greaterThanOrEqualTo(44));
+        }
+      }
     }
   });
 
-  testWidgets('resolves explicit and system brightness for both theme layers', (
+  testWidgets('resolves brightness, preset, and radius for both theme layers', (
     tester,
   ) async {
     tester.platformDispatcher.platformBrightnessTestValue = Brightness.light;
     addTearDown(tester.platformDispatcher.clearPlatformBrightnessTestValue);
-    final repository = FakeThemePreferenceRepository(
-      preference: ThemePreference.light,
+    final repository = _FakeRepository(
+      AppAppearancePreference.defaults.copyWith(
+        brightness: AppBrightnessPreference.light,
+      ),
     );
-    await pumpTestAdmin9App(tester, repository: repository);
+    await _pumpApp(tester, repository);
 
     _expectBrightness(tester, Brightness.light);
     final context = tester.element(find.byType(FoundationPage));
     final container = ProviderScope.containerOf(context);
+    final next = const AppAppearancePreference(
+      brightness: AppBrightnessPreference.dark,
+      preset: AppThemePreset.forest,
+      radius: AppRadiusPreference.large,
+    );
 
-    await container
-        .read(themePreferenceProvider.notifier)
-        .setPreference(ThemePreference.dark);
+    await container.read(appAppearanceProvider.notifier).savePreference(next);
+    expect(container.read(appAppearanceProvider).requireValue.preference, next);
     await tester.pumpAndSettle();
+
     _expectBrightness(tester, Brightness.dark);
+    final expected = AppThemeCatalog.resolve(
+      preset: next.preset,
+      radius: next.radius,
+    ).dark;
+    expect(FTheme.of(context).colors.primary, expected.colors.primary);
+    expect(
+      FTheme.of(context).style.borderRadius.md,
+      expected.style.borderRadius.md,
+    );
 
     tester.platformDispatcher.platformBrightnessTestValue = Brightness.dark;
     await container
-        .read(themePreferenceProvider.notifier)
-        .setPreference(ThemePreference.system);
+        .read(appAppearanceProvider.notifier)
+        .savePreference(
+          next.copyWith(brightness: AppBrightnessPreference.system),
+        );
     await tester.pumpAndSettle();
     _expectBrightness(tester, Brightness.dark);
   });
+}
+
+Future<void> _pumpApp(
+  WidgetTester tester,
+  AppAppearanceRepository repository,
+) async {
+  final translations = jsonDecode(
+    File('assets/translations/zh-CN.json').readAsStringSync(),
+  ) as Map<String, dynamic>;
+  tester.view
+    ..physicalSize = const Size(390, 844)
+    ..devicePixelRatio = 1;
+  addTearDown(tester.view.reset);
+  await tester.pumpWidget(
+    EasyLocalization(
+      supportedLocales: const [Locale('zh', 'CN')],
+      fallbackLocale: const Locale('zh', 'CN'),
+      startLocale: const Locale('zh', 'CN'),
+      path: 'assets/translations',
+      assetLoader: _InMemoryAssetLoader(translations),
+      saveLocale: false,
+      child: ProviderScope(
+        overrides: [
+          appAppearanceRepositoryProvider.overrideWithValue(repository),
+        ],
+        child: const Admin9App(),
+      ),
+    ),
+  );
+  await tester.pumpAndSettle();
+}
+
+final class _InMemoryAssetLoader extends AssetLoader {
+  const _InMemoryAssetLoader(this.translations);
+
+  final Map<String, dynamic> translations;
+
+  @override
+  Future<Map<String, dynamic>?> load(String path, Locale locale) async =>
+      Map.of(translations);
 }
 
 void _expectBrightness(WidgetTester tester, Brightness expected) {
   final context = tester.element(find.byType(FoundationPage));
   expect(material.Theme.of(context).brightness, expected);
   expect(FTheme.of(context).colors.brightness, expected);
+}
+
+final class _FakeRepository implements AppAppearanceRepository {
+  _FakeRepository(this.value);
+
+  AppAppearancePreference value;
+
+  @override
+  Future<AppAppearancePreference> load() async => value;
+
+  @override
+  Future<void> save(AppAppearancePreference preference) async {
+    value = preference;
+  }
 }

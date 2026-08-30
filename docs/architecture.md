@@ -38,7 +38,8 @@ lib/
 |   |-- style.dart
 |   |-- icons.dart
 |   `-- styles/                       # only generated styles in current use
-|-- shared/ui/                        # stable App-wide page patterns
+|-- shared/ui/                        # stable categorized Admin9 UI APIs/patterns
+|   `-- <category>/                   # e.g. layout/grid, not a generic bucket
 `-- features/<feature>/               # confirmed product or example Features
     |-- presentation/
     |   |-- pages/                    # complete route pages
@@ -52,17 +53,19 @@ lib/
 ```
 
 The tree describes recommended ownership, not a requirement to create every
-directory. Create a Preferences implementation only for real persistence. Create
-privacy code only for an explicit product or compliance requirement.
+directory. Do not add top-level `lib/examples/` or `lib/widgets/`. Create a
+Preferences implementation only for real persistence. Create privacy code only
+for an explicit product or compliance requirement.
 
 ## Starter Channels And On-Demand Layers
 
-The Starter may establish `shared/ui/` from the first day when it contains a
-stable App-wide page pattern with a clear name, real use, a runnable example,
-documentation, and tests. Appropriate responsibilities include empty, error, and
-loading states or a responsive page body. `shared/ui/` is not a place to rename
-`FButton`, `FTextField`, or other Forui primitives, and it must not contain vague
-files such as `common_card.dart` or `utils.dart`.
+The Starter may establish a specifically named `shared/ui/<category>/` channel
+from the first day when it contains a stable Admin9 UI API or App-wide page
+pattern with a clear name, real use, a runnable example, documentation, and
+tests. Appropriate responsibilities include branded layout components, empty,
+error, and loading states, or a responsive page body. `shared/ui/` is not a
+generic Widget bucket and must not contain mechanically renamed Forui
+primitives or vague files such as `common_card.dart` or `utils.dart`.
 
 Shared ownership follows two rules:
 
@@ -71,10 +74,56 @@ Shared ownership follows two rules:
 - the Starter may provide one canonical pattern earlier when a current example
   consumes it and its behavior is runnable, tested, and documented.
 
-The Starter may include an approved example Feature that demonstrates the
-recommended layers through a real local, external, or platform-backed workflow.
-Its concrete behavior belongs in the repository-local Starter reference document and
-does not imply a downstream product requirement.
+The Starter has one approved runnable Admin9 UI Showroom Feature at
+`lib/features/examples/`. It owns the Foundation, Forms, Content, and Feedback
+groups and their Playgrounds, translations, tests, and routes. Settings remains
+an independent real Feature. The Showroom lets adopters browse a capability,
+configure a realistic scenario, interact with its states, inspect and copy the
+matching usage, and reset the scenario. It does not turn its scenarios into
+downstream product requirements.
+
+Official capability ownership and route ownership are deliberately different.
+Several related Forui capabilities may map to one complete Playground when they
+form one coherent scenario. Do not create a shallow route merely to preserve a
+one-capability/one-page ratio. The version-bound capability ledger and the
+Playground registry in [Upstream Starter](starter.md) retain the many-to-one
+mapping and its focused evidence.
+
+Reusable structure that exists only to compose a Playground belongs under
+`lib/features/examples/presentation/widgets/`. This includes preview frames,
+configuration sections, synchronized usage summaries, copy feedback, and reset
+controls. It does not move to `shared/ui/` merely because several Showroom pages
+use it; `shared/ui/` remains reserved for stable App-wide or Admin9 brand APIs.
+
+Examples may depend on `shared/ui/`; `shared/ui/` must not import Examples,
+AutoRoute, App routing, or a business Feature. Existing root-level shared UI
+files are not moved merely to make the category tree look complete. New shared
+UI uses a responsibility-specific category such as `layout/grid/`.
+
+The App router consumes Examples through one route-group integration point. The
+current five destinations remain Foundation, Forms, Content, Feedback, and
+Settings. The four visible Showroom destinations may retain separate nested
+stacks, but their
+route declarations remain owned by the Examples group rather than four separate
+Features. Removing the bundled Examples Feature requires removing that one
+mount, regenerating AutoRoute output, and deleting its routes, tests,
+`examples.*` translations, and Starter coverage claims. The removal must not
+delete independent shared UI APIs or the Settings Feature.
+
+The approved reusable Admin9 brand component for this iteration is owned at:
+
+```text
+lib/shared/ui/layout/grid/
+|-- a_grid.dart
+|-- a_grid_item.dart
+`-- a_grid_style.dart
+```
+
+AGrid remains independent of Examples so a derived project can remove the
+Showroom without removing the brand API. Its style extends the existing Forui
+Theme contract; it does not introduce a parallel App Theme. Other category
+directories and APIs are created only after their own responsibility and
+consumer are approved.
 
 Data, Domain, Repository, Service, Use Case, and shared layers require a real
 consumer and a specific responsibility. Do not create empty layers or placeholder
@@ -106,14 +155,18 @@ that forwards a single call. Do not create a generic `core/ui`, `patterns`,
 - Feature Models, Preferences, Services, Repositories, Domain code, and Use Cases
   do not depend on Flutter presentation, Forui, AutoRoute, `BuildContext`, or
   Riverpod.
-- Shared presentation code, including a documented Starter pattern, remains
-  presentation code. It must not acquire business decisions merely because one
-  or more Features render it.
+- Shared presentation code, including an Admin9 brand UI API or documented
+  Starter pattern, remains presentation code. It must not acquire business
+  decisions merely because one or more Features render it, and it does not
+  depend on AutoRoute.
 
-Feature presentation uses Forui widgets directly. A project Widget is justified
-by real repetition, a stable business meaning, a confirmed Forui capability gap,
-or a documented and tested Starter-level App pattern with a current example.
-Do not wrap each Forui primitive behind a parallel API.
+Feature presentation uses a Forui `F*` widget directly when it already satisfies
+the requirement. An Admin9 `A*` API is justified only by a stable, observable
+brand visual, interaction, behavior, or API difference. It may wrap or extend an
+`F*` implementation, or independently implement a confirmed Forui capability
+gap, without exposing that internal choice through its public API. A Widget used
+only by one Feature remains Feature-owned. See [UI](ui.md#ui-ownership-model)
+for the decision rules.
 
 ## Riverpod State And Dependency Scope
 

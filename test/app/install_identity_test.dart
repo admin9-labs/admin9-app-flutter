@@ -9,6 +9,8 @@ final _legacyIdentity = ['com', 'admin9', 'app', 'foundation'].join('.');
 void main() {
   test('Android uses the Starter installation identity and Kotlin package', () {
     final gradle = File('android/app/build.gradle.kts').readAsStringSync();
+    final manifest = File('android/app/src/main/AndroidManifest.xml')
+        .readAsStringSync();
     final activity = File(
       'android/app/src/main/kotlin/dev/admin9/starter/MainActivity.kt',
     );
@@ -20,6 +22,7 @@ void main() {
     expect(gradle, contains('namespace = "$_identity"'));
     expect(gradle, contains('applicationId = "$_identity"'));
     expect(gradle, isNot(contains(_legacyIdentity)));
+    expect(manifest, contains('android:enableOnBackInvokedCallback="true"'));
     expect(activity.existsSync(), isTrue);
     expect(activity.readAsStringSync(), contains('package $_identity'));
     expect(legacyActivity.existsSync(), isFalse);

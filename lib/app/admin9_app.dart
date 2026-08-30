@@ -3,9 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:material_ui/material_ui.dart';
 
-import '../features/settings/data/models/theme_preference.dart';
-import '../features/settings/presentation/providers/theme_preference_provider.dart';
-import '../theme/theme.dart';
+import 'appearance/app_appearance_preference.dart';
+import 'appearance/app_appearance_provider.dart';
+import 'appearance/app_theme_catalog.dart';
 import 'routing/app_router.dart';
 
 class Admin9App extends ConsumerStatefulWidget {
@@ -20,13 +20,13 @@ class _Admin9AppState extends ConsumerState<Admin9App> {
 
   @override
   Widget build(BuildContext context) {
-    final preference = ref
-        .watch(themePreferenceProvider)
-        .when(
-          data: (value) => value,
-          error: (error, stackTrace) => ThemePreference.system,
-          loading: () => ThemePreference.system,
-        );
+    final preference =
+        ref.watch(appAppearanceProvider).value?.preference ??
+        AppAppearancePreference.defaults;
+    final themes = AppThemeCatalog.resolve(
+      preset: preference.preset,
+      radius: preference.radius,
+    );
 
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
@@ -39,17 +39,17 @@ class _Admin9AppState extends ConsumerState<Admin9App> {
         FLocalizations.delegate,
       ],
       routerConfig: _router.config(),
-      theme: lightTheme.toApproximateMaterialTheme(),
-      darkTheme: darkTheme.toApproximateMaterialTheme(),
-      themeMode: switch (preference) {
-        ThemePreference.system => ThemeMode.system,
-        ThemePreference.light => ThemeMode.light,
-        ThemePreference.dark => ThemeMode.dark,
+      theme: themes.lightMaterial,
+      darkTheme: themes.darkMaterial,
+      themeMode: switch (preference.brightness) {
+        AppBrightnessPreference.system => ThemeMode.system,
+        AppBrightnessPreference.light => ThemeMode.light,
+        AppBrightnessPreference.dark => ThemeMode.dark,
       },
       builder: (context, child) {
         final theme = Theme.brightnessOf(context) == Brightness.light
-            ? lightTheme
-            : darkTheme;
+            ? themes.light
+            : themes.dark;
         final toasterBottomOffset =
             (96 - MediaQuery.viewPaddingOf(context).bottom)
                 .clamp(48, 96)

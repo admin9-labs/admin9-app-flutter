@@ -2,20 +2,19 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:admin9_app_flutter/app/admin9_app.dart';
+import 'package:admin9_app_flutter/app/appearance/app_appearance_preference.dart';
+import 'package:admin9_app_flutter/app/appearance/app_appearance_provider.dart';
+import 'package:admin9_app_flutter/app/appearance/app_appearance_repository.dart';
+import 'package:admin9_app_flutter/app/appearance/app_theme_catalog.dart';
 import 'package:admin9_app_flutter/app/routing/starter_shell_page.dart';
-import 'package:admin9_app_flutter/features/content/presentation/pages/content_page.dart';
-import 'package:admin9_app_flutter/features/feedback/presentation/pages/dialogs_page.dart';
-import 'package:admin9_app_flutter/features/feedback/presentation/pages/feedback_page.dart';
-import 'package:admin9_app_flutter/features/feedback/presentation/pages/sheets_page.dart';
-import 'package:admin9_app_flutter/features/feedback/presentation/pages/toasts_tooltips_page.dart';
-import 'package:admin9_app_flutter/features/forms/presentation/pages/forms_page.dart';
-import 'package:admin9_app_flutter/features/foundation/presentation/pages/foundation_page.dart';
-import 'package:admin9_app_flutter/features/settings/data/models/theme_preference.dart';
-import 'package:admin9_app_flutter/features/settings/data/repositories/theme_preference_repository.dart';
+import 'package:admin9_app_flutter/features/examples/presentation/pages/catalog/content_page.dart';
+import 'package:admin9_app_flutter/features/examples/presentation/pages/catalog/feedback_page.dart';
+import 'package:admin9_app_flutter/features/examples/presentation/pages/catalog/forms_page.dart';
+import 'package:admin9_app_flutter/features/examples/presentation/pages/catalog/foundation_page.dart';
+import 'package:admin9_app_flutter/features/examples/presentation/pages/feedback/playgrounds/async_status_playground_page.dart';
+import 'package:admin9_app_flutter/features/examples/presentation/pages/feedback/playgrounds/confirmation_playground_page.dart';
 import 'package:admin9_app_flutter/features/settings/presentation/pages/settings_page.dart';
-import 'package:admin9_app_flutter/features/settings/presentation/providers/theme_preference_provider.dart';
 import 'package:admin9_app_flutter/shared/ui/responsive_page_body.dart';
-import 'package:admin9_app_flutter/theme/theme.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -39,25 +38,25 @@ void main() {
   for (final scenario in [
     const _ThemeScenario(
       name: 'explicit light ignores a dark platform',
-      preference: ThemePreference.light,
+      preference: AppBrightnessPreference.light,
       platformBrightness: Brightness.dark,
       expectedBrightness: Brightness.light,
     ),
     const _ThemeScenario(
       name: 'explicit dark ignores a light platform',
-      preference: ThemePreference.dark,
+      preference: AppBrightnessPreference.dark,
       platformBrightness: Brightness.light,
       expectedBrightness: Brightness.dark,
     ),
     const _ThemeScenario(
       name: 'system follows a light platform',
-      preference: ThemePreference.system,
+      preference: AppBrightnessPreference.system,
       platformBrightness: Brightness.light,
       expectedBrightness: Brightness.light,
     ),
     const _ThemeScenario(
       name: 'system follows a dark platform',
-      preference: ThemePreference.system,
+      preference: AppBrightnessPreference.system,
       platformBrightness: Brightness.dark,
       expectedBrightness: Brightness.dark,
     ),
@@ -74,9 +73,13 @@ void main() {
       final foruiTheme = tester.widget<FTheme>(
         find.ancestor(of: shell, matching: find.byType(FTheme)),
       );
+      final pair = AppThemeCatalog.resolve(
+        preset: AppThemePreset.neutral,
+        radius: AppRadiusPreference.medium,
+      );
       final expectedTheme = scenario.expectedBrightness == Brightness.light
-          ? lightTheme
-          : darkTheme;
+          ? pair.light
+          : pair.dark;
 
       expect(
         material_ui.Theme.of(context).brightness,
@@ -97,19 +100,19 @@ void main() {
   for (final scenario in [
     const (
       size: Size(320, 844),
-      preference: ThemePreference.light,
+      preference: AppBrightnessPreference.light,
       platformBrightness: Brightness.dark,
       bottomInset: 24.0,
     ),
     const (
       size: Size(390, 844),
-      preference: ThemePreference.dark,
+      preference: AppBrightnessPreference.dark,
       platformBrightness: Brightness.light,
       bottomInset: 34.0,
     ),
   ]) {
     testWidgets(
-      'bottom navigation geometry at ${scenario.size.width.toInt()}px',
+      'WN01 bottom navigation geometry at ${scenario.size.width.toInt()}px',
       (tester) async {
         await _pumpStarter(
           tester,
@@ -215,20 +218,20 @@ void main() {
       );
 
       expect(find.byType(FoundationPage), findsOneWidget);
-      expect(find.text('能力目录的移动端交互示例。'), findsOneWidget);
+      expect(find.text('选择完整实验台，调整参数并观察真实移动页面中的结果。'), findsOneWidget);
       _expectInsets(tester, find.byType(FoundationPage), scenario);
       _expectResponsiveSafeArea(tester);
       expect(tester.takeException(), isNull);
 
       await _selectDestination(tester, '表单');
       expect(find.byType(FormsPage), findsOneWidget);
-      expect(find.text('能力目录的移动端交互示例。'), findsOneWidget);
+      expect(find.text('在完整表单流程中配置、输入、校验、反馈并复制用法。'), findsOneWidget);
       _expectInsets(tester, find.byType(FormsPage), scenario);
       expect(tester.takeException(), isNull);
 
       await _selectDestination(tester, '内容');
       expect(find.byType(ContentPage), findsOneWidget);
-      expect(find.text('能力目录的移动端交互示例。'), findsOneWidget);
+      expect(find.text('在真实项目、排期和设置列表中观察内容组件组合。'), findsOneWidget);
       _expectInsets(tester, find.byType(ContentPage), scenario);
       expect(tester.takeException(), isNull);
 
@@ -245,45 +248,48 @@ void main() {
     });
   }
 
-  testWidgets('dialog and sheet restore focus to their trigger', (
+  testWidgets('confirmation dialog and sheet restore focus to their trigger', (
     tester,
   ) async {
     await _pumpStarter(tester);
     await _selectDestination(tester, '反馈');
 
-    await _openFeedbackDetail(tester, '打开对话框', DialogsPage);
-    final dialogTrigger = find.text('打开对话框');
-    final dialogFocus = Focus.of(tester.element(dialogTrigger));
+    await _openFeedbackDetail(tester, '确认与编辑流程实验台', ConfirmationPlaygroundPage);
+    final dialogTrigger = find.byKey(const ValueKey('confirmation-open'));
+    final dialogFocus = tester.widget<FButton>(dialogTrigger).focusNode!;
     dialogFocus.requestFocus();
     await tester.pump();
     expect(dialogFocus.hasFocus, isTrue);
 
     await tester.tap(dialogTrigger);
     await tester.pump(const Duration(milliseconds: 300));
-    expect(find.text('确认操作需要确认。'), findsOneWidget);
-    await tester.tap(find.text('取消'));
+    expect(find.byKey(const ValueKey('confirmation-dialog')), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('confirmation-cancel')));
     await tester.pump(const Duration(milliseconds: 300));
 
-    expect(find.text('确认操作需要确认。'), findsNothing);
+    expect(find.byKey(const ValueKey('confirmation-dialog')), findsNothing);
     expect(dialogFocus.hasFocus, isTrue);
     expect(tester.takeException(), isNull);
 
-    expect(await tester.binding.handlePopRoute(), isTrue);
-    await tester.pumpAndSettle();
-    await _openFeedbackDetail(tester, '打开面板', SheetsPage);
-    final sheetTrigger = find.text('打开模态面板');
-    final sheetFocus = Focus.of(tester.element(sheetTrigger));
+    await tester.ensureVisible(find.text('编辑底部面板'));
+    await tester.tap(find.text('编辑底部面板'));
+    await tester.pump(const Duration(milliseconds: 300));
+    final sheetTrigger = find.byKey(const ValueKey('confirmation-open'));
+    await tester.ensureVisible(sheetTrigger);
+    final sheetFocus = tester.widget<FButton>(sheetTrigger).focusNode!;
     sheetFocus.requestFocus();
     await tester.pump();
     expect(sheetFocus.hasFocus, isTrue);
 
     await tester.tap(sheetTrigger);
     await tester.pumpAndSettle();
-    expect(find.text('模态面板操作需要确认。'), findsOneWidget);
-    await tester.tap(find.text('确认'));
+    expect(find.byKey(const ValueKey('confirmation-draft')), findsOneWidget);
+    final save = find.byKey(const ValueKey('confirmation-save'));
+    await tester.ensureVisible(save);
+    await tester.tap(save);
     await tester.pumpAndSettle();
 
-    expect(find.text('模态面板操作需要确认。'), findsNothing);
+    expect(find.byKey(const ValueKey('confirmation-draft')), findsNothing);
     expect(sheetFocus.hasFocus, isTrue);
     expect(tester.takeException(), isNull);
   });
@@ -291,33 +297,33 @@ void main() {
   testWidgets('a toast does not steal focus from its trigger', (tester) async {
     await _pumpStarter(tester);
     await _selectDestination(tester, '反馈');
-    await _openFeedbackDetail(tester, '打开提示条与工具提示', ToastsTooltipsPage);
+    await _openFeedbackDetail(tester, '上传与同步状态实验台', AsyncStatusPlaygroundPage);
 
-    final trigger = find.text('显示');
-    final focus = Focus.of(tester.element(trigger));
+    final trigger = find.byKey(const ValueKey('async-run'));
+    await tester.ensureVisible(trigger);
+    final focus = tester.widget<FButton>(trigger).focusNode!;
     focus.requestFocus();
     await tester.pump();
     expect(focus.hasFocus, isTrue);
 
     await tester.tap(trigger);
+    await tester.pump(const Duration(milliseconds: 50));
+    focus.requestFocus();
     await tester.pump();
-    await tester.pump(const Duration(milliseconds: 600));
-
-    expect(find.text('操作成功'), findsOneWidget);
     expect(focus.hasFocus, isTrue);
-    _expectToastAboveNavigation(tester, find.text('操作成功'));
-    expect(tester.takeException(), isNull);
-
-    await tester.tap(find.text('关闭'));
-    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 250));
     await tester.pump(const Duration(milliseconds: 600));
-    expect(find.text('操作成功'), findsNothing);
+
+    expect(find.text('同步成功'), findsOneWidget);
+    expect(focus.hasFocus, isTrue);
+    _expectToastAboveNavigation(tester, find.text('同步成功'));
+    expect(tester.takeException(), isNull);
   });
 }
 
 Future<void> _pumpStarter(
   WidgetTester tester, {
-  ThemePreference preference = ThemePreference.system,
+  AppBrightnessPreference preference = AppBrightnessPreference.system,
   Brightness platformBrightness = Brightness.light,
   Size size = const Size(390, 844),
   double textScale = 1,
@@ -346,8 +352,10 @@ Future<void> _pumpStarter(
       saveLocale: false,
       child: ProviderScope(
         overrides: [
-          themePreferenceRepositoryProvider.overrideWithValue(
-            _FakeThemePreferenceRepository(preference),
+          appAppearanceRepositoryProvider.overrideWithValue(
+            _FakeAppAppearanceRepository(
+              AppAppearancePreference.defaults.copyWith(brightness: preference),
+            ),
           ),
         ],
         child: const Admin9App(),
@@ -371,7 +379,7 @@ Future<void> _openFeedbackDetail(
   final entry = find.text(catalogLabel);
   await tester.ensureVisible(entry);
   await tester.tap(entry);
-  await tester.pumpAndSettle();
+  await tester.pump(const Duration(milliseconds: 500));
   expect(find.byType(pageType), findsOneWidget);
 }
 
@@ -402,17 +410,16 @@ void _expectToastAboveNavigation(WidgetTester tester, Finder content) {
   );
 }
 
-final class _FakeThemePreferenceRepository
-    implements ThemePreferenceRepository {
-  _FakeThemePreferenceRepository(this.preference);
+final class _FakeAppAppearanceRepository implements AppAppearanceRepository {
+  _FakeAppAppearanceRepository(this.preference);
 
-  ThemePreference preference;
-
-  @override
-  Future<ThemePreference> load() async => preference;
+  AppAppearancePreference preference;
 
   @override
-  Future<void> save(ThemePreference value) async {
+  Future<AppAppearancePreference> load() async => preference;
+
+  @override
+  Future<void> save(AppAppearancePreference value) async {
     preference = value;
   }
 }
@@ -436,7 +443,7 @@ final class _ThemeScenario {
   });
 
   final String name;
-  final ThemePreference preference;
+  final AppBrightnessPreference preference;
   final Brightness platformBrightness;
   final Brightness expectedBrightness;
 }
