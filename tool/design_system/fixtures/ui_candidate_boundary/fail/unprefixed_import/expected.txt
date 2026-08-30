@@ -1,1 +1,0 @@
-candidate package imports require an explicit prefix

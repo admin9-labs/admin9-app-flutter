@@ -1,1 +1,0 @@
-candidate types must not appear in adapter public API

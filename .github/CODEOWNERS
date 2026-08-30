@@ -1,7 +1,12 @@
 * @qiyue2015
 
-/lib/core/design_system/ @qiyue2015
-/tool/design_system/ @qiyue2015
-/docs/design-system/ @qiyue2015
+/AGENTS.md @qiyue2015
+/docs/architecture.md @qiyue2015
+/docs/ui.md @qiyue2015
+/.agents/skills/admin9-flutter-app/ @qiyue2015
+/.github/workflows/ @qiyue2015
+/lib/app/ @qiyue2015
+/lib/theme/ @qiyue2015
+/lib/shared/ui/ @qiyue2015
 /android/ @qiyue2015
 /ios/ @qiyue2015

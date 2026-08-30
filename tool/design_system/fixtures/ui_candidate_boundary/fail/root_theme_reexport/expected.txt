@@ -1,1 +1,0 @@
-root Theme files must not depend on candidate adapters

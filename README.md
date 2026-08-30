@@ -1,155 +1,104 @@
 # Admin9 App Starter
 
-English | [简体中文](docs/zh-CN/README.md)
+Admin9 App Starter is an Android/iOS Flutter skeleton built on Forui. It is a
+runnable reference for application structure, mobile UI capabilities, typed
+routing, localized copy, and a small persisted-settings feature. It is not a
+finished product, backend, or compatibility layer for superseded APIs.
 
-Admin9 App Starter is an open-source Flutter starting point for Android and
-iOS applications. It provides a feature-first app host, platform adaptation,
-accessibility behavior, a reusable Design System, quality gates, and optional
-identity and brand tooling. It is not a finished business product, a backend,
-an admin console, or a compatibility program for other projects.
+## Included
 
-## What Is Included
+- Flutter 3.47.2 and Dart 3.13.2.
+- Forui 0.26.0 as the visible UI design system and base component source.
+- Five persistent capability destinations: Foundation, Forms, Content,
+  Feedback, and Settings.
+- AutoRoute typed routes with independent nested Tab stacks.
+- Riverpod presentation state and dependency wiring.
+- Simplified Chinese App copy through EasyLocalization, plus Forui's own
+  localization delegate.
+- A Settings example that persists the system/light/dark theme preference
+  through a Repository and SharedPreferences Service.
+- Reusable App-level page patterns under `lib/shared/ui/`, each backed by real
+  consumers and tests.
+- `dev.admin9.starter` as the Android application ID/namespace and iOS Runner
+  bundle identifier.
 
-- Flutter startup, global error handling, Provider composition, and explicit
-  routes.
-- A fail-closed, persisted privacy-consent gate.
-- Home and Account navigation, settings, legal-document hosts, About, and
-  Contact pages.
-- Honest guest and unavailable-service states. The Starter does not fabricate
-  users, sessions, tokens, messages, or successful backend operations.
-- One first-party Admin9 visible component language through public `App*`
-  components, with platform-owned system behavior retained.
-- Appearance and accessibility settings, responsive matrices, semantics,
-  contrast, hit-target, Gallery, Golden, and platform checks.
-- An optional App configuration tool for synchronizing identity, colors, app
-  icons, launch images, Android display data, and iOS display data.
+The catalog covers Forui 0.26.0 capabilities relevant to Android and iOS. It
+does not claim desktop or complete package coverage. Pointer-first or
+desktop-oriented examples such as Sidebar, Breadcrumb, Pagination, Resizable,
+and Context Menu are intentionally excluded.
 
-The repository currently has no real backend or authentication-success path.
-Repository, Service, or Domain layers should be added inside a feature only
-when a real data source or reusable domain rule gives them a concrete job.
-
-## Architecture
-
-```mermaid
-flowchart TB
-    I["App identity and optional brand configuration"] --> H["App Host"]
-    B["Brand Theme"] --> H
-    H --> C["Design System Core"]
-    H --> F["Feature-first business code"]
-    F -->|"public UI through lib/admin9_ui.dart"| C
-    C --> U["Unified Admin9 visible UI"]
-    U --> A["Android system behavior"]
-    U --> P["iOS system behavior"]
-```
-
-Core, Brand, Business, and App Host are repository ownership and dependency
-boundaries. They are not mandatory UI/Data/Domain runtime layers. Current
-upstream contributions follow these boundaries so the shared code remains
-testable; forks may change their own architecture independently.
+## Structure
 
 ```text
 lib/
-├── main.dart                 # Flutter initialization and error capture
-├── admin9_ui.dart            # Design System public barrel
-├── app/                      # App Host, routes, privacy gate, identity, Brand
-├── core/                     # Design System, errors, and local preferences
-└── ui/
-    ├── features/             # feature-first pages, state, and local models
-    └── shared/               # UI shared by features in this repository
+|-- main.dart                  # starts the application
+|-- app/                       # bootstrap, App host, and typed routing
+|-- theme/                     # Forui CLI theme output
+|-- shared/ui/                 # tested App-wide page patterns
+`-- features/                  # capability catalogs and Settings example
 ```
 
-See the [current architecture](docs/architecture/README.md) and
-[Design System](docs/design-system/README.md) for the upstream implementation
-rules.
+Feature Pages use Forui `F*` widgets directly. The Starter does not rename
+Forui primitives behind parallel `App*` wrappers. Services, Repositories,
+preferences, and models stay independent of Forui, AutoRoute, Riverpod, and
+`BuildContext`; feature-owned providers connect those layers to presentation.
 
-## Forks And Independent Use
+See [Application Architecture](docs/architecture.md) and
+[UI System](docs/ui.md) for the authoritative ownership, routing, generation,
+and generic UI rules. See [Upstream Starter](docs/starter.md) for this
+repository's five catalog destinations, exclusions, and acceptance matrix.
 
-You may copy, modify, use commercially, and redistribute the code under the
-[Apache License 2.0](LICENSE). A fork is fully independent:
+## Getting Started
 
-- this project does not certify, approve, register, track, or audit forks;
-- there is no required manifest, compatibility registry, source commit tuple,
-  remote name, push restriction, ownership record, deviation record, expiry,
-  provenance record, or clone-acceptance process;
-- this project does not promise compatibility, support, migrations, security
-  maintenance, compliance review, delivery, or release assistance for forks;
-- fork maintainers are responsible for their own maintenance, security,
-  privacy, legal compliance, dependency review, testing, signing, delivery,
-  and user support; and
-- fixes do not have to be contributed back upstream. Contributions are welcome
-  only when their authors choose to propose them.
-
-The Apache License applies to the software copyright and patent grants. It does
-not grant a right to present a product as endorsed, certified, or officially
-compatible by Admin9, nor a general right to use the Admin9 name or Logo as a
-fork's product identity. See [Trademark Notice](TRADEMARKS.md). Dependencies,
-fonts, images, and other third-party materials remain subject to their own
-licenses and notices. For example, the test font license is preserved at
-`test/assets/fonts/OFL.txt`.
-
-## Optional App And Brand Configuration
-
-No configuration file is required to use or fork this repository. The optional
-JSON-compatible YAML schema and example can reduce repetitive identity work:
+Install Flutter 3.47.2, then resolve the committed dependency graph and run the
+application:
 
 ```bash
-dart run tool/design_system/validate_app_config.dart --fixtures
-dart run tool/design_system/validate_app_config.dart path/to/app-config.yaml
-dart run tool/design_system/apply_app_config.dart path/to/app-config.yaml .
-dart run tool/design_system/verify_app_config.dart path/to/app-config.yaml .
+flutter pub get --enforce-lockfile
+flutter run
 ```
 
-The tool synchronizes the configured app name and version, Dart identity,
-`pubspec.yaml` description and assets, Android namespace/application ID/display
-name/Kotlin package/icons/launch image, and iOS bundle/display names/icons/launch
-images. Changing application or bundle identifiers affects installation,
-signing, and upgrades; it is opt-in and is not part of this repository's
-Foundation-to-Starter rename. The default identifiers remain
-`com.admin9.app.foundation` for continuity.
-
-See the [customization quickstart](docs/customization/quickstart.md). The tool is
-a convenience, not proof of compatibility or approval.
-
-## Upstream Verification
-
-The canonical command list, required toolchain, and evidence boundaries are in
-[Validation](docs/validation/README.md). A normal local development loop starts
-with:
+The source checks used by CI are:
 
 ```bash
-flutter pub get
-dart format --output=none --set-exit-if-changed lib test integration_test tool
+dart run build_runner build
+git diff --exit-code
+test -z "$(git status --porcelain --untracked-files=all)"
+dart format --output=none --set-exit-if-changed lib test integration_test
 flutter analyze
 flutter test
+flutter build apk --debug
+flutter build apk --release
 ```
 
-An unsigned iOS build does not prove signing, installation, cold launch, or
-device behavior. Artifact and device limits are recorded in
-[Delivery](docs/delivery/README.md).
+The generation checks must run from a clean checkout. Generated AutoRoute
+source is committed and must not be edited by hand.
 
-## Versions And History
+## Using The Starter
 
-- App version: `1.0.0+1`.
-- Current recorded Design System release: `2.0.0`.
-- Toolchain: Flutter `3.44.1` / Dart `3.12.1`.
-- Existing `design-system-v1.0.0` through `design-system-v1.0.3` tags and prior
-  reports are immutable historical records. Their former Foundation and
-  downstream-governance wording does not define the current Starter project.
-- `design-system-v2.0.0` is the current Starter Design System baseline.
-- New changes follow SemVer and are recorded under `Unreleased` before a
-  release. Existing tags are never moved or recreated.
+Add Features only when they have an approved consumer. A Feature may add its
+own presentation, data, or domain paths when each layer has a concrete
+responsibility and tests; do not create empty architecture for symmetry.
 
-## Documentation
+Forui themes remain under `lib/theme/`. Generate snippets with an explicit
+output path into the owning Feature or a justified shared pattern. Do not keep
+a generic snippets directory, run `style create --all` without a demonstrated
+need, or use `--force` to overwrite hand-edited files.
 
-- [Design System](docs/design-system/README.md)
-- [Accessibility and Quality](docs/design-system/06-accessibility-quality.md)
-- [Current architecture](docs/architecture/README.md)
-- [Optional customization quickstart](docs/customization/quickstart.md)
-- [Upstream contribution boundaries](docs/design-system/05-upstream-contribution-boundaries.md)
-- [Validation](docs/validation/README.md)
-- [Delivery](docs/delivery/README.md)
-- [Historical records](docs/HISTORY.md)
-- [Changelog](docs/design-system/CHANGELOG.md)
-- [Contributing](CONTRIBUTING.md)
-- [Trademark Notice](TRADEMARKS.md)
-- [License](LICENSE)
+Android application IDs, iOS bundle IDs, signing configuration, and native
+capabilities are installation identity, not casual customization points. Change
+them only as an explicitly reviewed task. The bundled Starter uses
+`dev.admin9.starter`; replacing an older identifier installs a separate App and
+does not overwrite or migrate that App's data.
+
+## Contributing And License
+
+Read [Repository Working Agreements](AGENTS.md),
+[Contributing](CONTRIBUTING.md), and the
+[Admin9 Flutter App Skill](.agents/skills/admin9-flutter-app/SKILL.md) before
+changing the Starter.
+
+The project is licensed under the [Apache License 2.0](LICENSE). The license
+does not grant permission to imply Admin9 endorsement or unrestricted use of
+Admin9 trademarks; see [Trademark Notice](TRADEMARKS.md). Dependencies, fonts,
+images, and other third-party materials remain subject to their own notices.

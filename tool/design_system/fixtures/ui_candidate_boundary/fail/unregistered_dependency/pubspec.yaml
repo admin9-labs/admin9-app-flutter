@@ -1,6 +1,0 @@
-name: boundary_fixture
-
-dependencies:
-  candidate_ui: 1.0.0
-  existing_ui: 1.0.0
-  surprise_ui: 1.0.0

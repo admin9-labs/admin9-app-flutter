@@ -318,11 +318,15 @@ With only one supported locale, set `saveLocale: false`; there is no user locale
 choice to persist. Enable locale persistence only when approved locale switching
 exists and its storage behavior is tested.
 
-Forui component labels and messages remain owned by `FLocalizations`. The root
-App combines the EasyLocalization delegates with `FLocalizations.delegate`
-exactly once and uses the App's supported locale list rather than advertising
-all locales that Forui can technically render. EasyLocalization does not replace
-Forui localization, and Forui localization does not translate App-owned copy.
+Forui component labels and messages remain owned by `FLocalizations`. Flutter
+3.47's `material_ui.MaterialApp` also requires the external
+`material_ui`/`cupertino_ui` delegates, which EasyLocalization 3.0.8 does not
+replace. The root App combines the EasyLocalization delegates,
+`GlobalMaterialLocalizations.delegates`, and exactly one
+`FLocalizations.delegate`, in that order. Use the App's supported locale list
+rather than advertising every locale Forui can technically render.
+EasyLocalization does not replace Forui localization, and Forui localization
+does not translate App-owned copy.
 
 Start with translation assets and runtime key lookup. EasyLocalization key/code
 generation is optional and requires a demonstrated maintenance benefit before
@@ -374,3 +378,10 @@ real capability or behavior difference that Flutter cannot represent uniformly.
 Legal policies, required third-party notices, Android application IDs, iOS
 bundle IDs, signing configuration, and still-used native capabilities are
 protected boundaries. Their age is not a deletion criterion.
+
+The upstream runnable Starter uses `dev.admin9.starter` for its Android
+namespace/application ID and iOS Runner bundle ID; its test bundle uses
+`dev.admin9.starter.RunnerTests`. This identity belongs to the upstream example
+described in [Upstream Starter](starter.md), not to every derived product.
+Changing an installation identity creates a separately installed App and needs
+an explicit data, signing, delivery, and upgrade review.

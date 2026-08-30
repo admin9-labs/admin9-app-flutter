@@ -16,46 +16,84 @@ concurrency:
 
 jobs:
   quality:
-    name: Quality
+    name: Quality and Android builds
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: 3.44.1
+          flutter-version: 3.47.2
           channel: stable
           cache: true
 
-      - name: Resolve dependencies
-        run: flutter pub get
+      - name: Resolve locked dependencies
+        run: flutter pub get --enforce-lockfile
+
+      - name: Check committed patch whitespace
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          BEFORE_SHA: ${{ github.event.before }}
+          CURRENT_SHA: ${{ github.sha }}
+        run: |
+          case "$EVENT_NAME" in
+            pull_request)
+              git diff --check "$BASE_SHA...$PR_HEAD_SHA"
+              ;;
+            push)
+              if [[ "$BEFORE_SHA" =~ ^0+$ ]] ||
+                ! git cat-file -e "$BEFORE_SHA^{commit}" 2>/dev/null; then
+                empty_tree="$(git hash-object -t tree /dev/null)"
+                git diff --check "$empty_tree" "$CURRENT_SHA"
+              else
+                git diff --check "$BEFORE_SHA" "$CURRENT_SHA"
+              fi
+              ;;
+            workflow_dispatch)
+              if ! git rev-parse --verify "origin/main^{commit}" >/dev/null ||
+                ! git rev-parse --verify "$CURRENT_SHA^{commit}" >/dev/null; then
+                echo "Could not resolve origin/main or $CURRENT_SHA" >&2
+                exit 1
+              fi
+              if ! base_sha="$(git merge-base origin/main "$CURRENT_SHA")"; then
+                echo "Could not find a merge base for origin/main and $CURRENT_SHA" >&2
+                exit 1
+              fi
+              git diff --check "$base_sha...$CURRENT_SHA"
+              ;;
+            *)
+              echo "Unsupported event: $EVENT_NAME" >&2
+              exit 1
+              ;;
+          esac
+
+      - name: Verify generated routes are current
+        run: |
+          dart run build_runner build
+          git diff --exit-code
+          test -z "$(git status --porcelain --untracked-files=all)"
 
       - name: Check formatting
         run: dart format --output=none --set-exit-if-changed lib test integration_test tool
+
+      - name: Check Markdown links
+        run: dart run tool/check_markdown_links.dart
 
       - name: Analyze
         run: flutter analyze
 
       - name: Test
-        run: flutter test --exclude-tags golden
+        run: flutter test
 
-      - name: Verify Design System contracts
-        run: |
-          dart run tool/design_system/validate_app_config.dart --fixtures
-          dart run tool/design_system/verify_upstream_ownership.dart
-          dart run tool/design_system/verify_public_api_parity.dart --self-test
-          dart run tool/design_system/verify_import_boundaries.dart --fixtures
-          dart run tool/design_system/verify_import_boundaries.dart --mode=clean
-          dart run tool/design_system/verify_ui_candidate_boundary.dart --fixtures
-          dart run tool/design_system/verify_ui_candidate_boundary.dart
-          dart run tool/design_system/verify_gallery_boundary.dart
-          node --check docs/design-system/evidence/sources/generate_visual_references.mjs
-          node --check docs/design-system/evidence/sources/verify_visual_references.mjs
-          node docs/design-system/evidence/sources/verify_visual_references.mjs docs/design-system/evidence/visual-references
-          dart run tool/design_system/verify_app_config.dart
-          dart run tool/design_system/verify_app_config.dart --fixtures
-          dart run tool/design_system/verify_rule_links.dart
-          node tool/design_system/verify_documentation.mjs
+      - name: Build Android debug APK
+        run: flutter build apk --debug
+
+      - name: Build Android release APK
+        run: flutter build apk --release

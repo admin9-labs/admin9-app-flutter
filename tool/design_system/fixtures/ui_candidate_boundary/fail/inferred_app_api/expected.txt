@@ -1,1 +1,0 @@
-adapter-dependent App* public APIs must declare explicit types

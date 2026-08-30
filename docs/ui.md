@@ -130,6 +130,11 @@ native capability, follow the Pigeon boundary in
 generates the typed bridge but does not implement the native behavior or visible
 Forui UI.
 
+Installation identity is not a visual-theme concern. The upstream Android/iOS
+identifier and its new-App installation behavior are defined in
+[Upstream Starter](starter.md#installation-identity); UI or brand customization
+must not silently change that identity or signing configuration.
+
 ## Language And Localization
 
 Use `easy_localization: ^3.0.8` for App-owned product copy. Chinese is the initial
@@ -139,13 +144,15 @@ from the root `EasyLocalization` scope. Configure `saveLocale: false` while
 Chinese is the only supported locale; persist locale selection only after a real
 language switcher is approved.
 
-Forui separately owns localization for its component labels and messages. Add
-exactly one `FLocalizations.delegate` after `context.localizationDelegates` in
-the root App. Do not also merge `FLocalizations.localizationsDelegates`, because
-that complete list includes Flutter delegates already supplied through
-EasyLocalization. Use the App's approved supported-locale list rather than
-`FLocalizations.supportedLocales`, which represents every locale Forui can
-technically render.
+Forui separately owns localization for its component labels and messages.
+Flutter 3.47's `material_ui.MaterialApp` also requires the external
+`material_ui`/`cupertino_ui` delegates, which EasyLocalization 3.0.8 does not
+replace. The root App therefore combines `context.localizationDelegates`,
+`GlobalMaterialLocalizations.delegates`, and exactly one
+`FLocalizations.delegate`, in that order. Do not also merge
+`FLocalizations.localizationsDelegates`. Use the App's approved supported-locale
+list rather than `FLocalizations.supportedLocales`, which represents every
+locale Forui can technically render.
 
 EasyLocalization does not translate Forui internals, and `FLocalizations` does
 not translate App copy. Do not create duplicate keys for Forui-owned messages.

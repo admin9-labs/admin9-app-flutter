@@ -1,38 +1,57 @@
 # Contributing to Admin9 App Starter
 
-This guide applies only to changes proposed for inclusion in the upstream
-Admin9 App Starter repository. It does not govern independent forks.
+This guide applies to changes proposed for the upstream Android/iOS Starter. By
+submitting a contribution, you agree that it is licensed under the
+[Apache License 2.0](LICENSE), as described in Section 5 of that license.
 
-By submitting a contribution for inclusion, you agree that it is licensed
-under the [Apache License 2.0](LICENSE), as described in Section 5 of that
-license.
+Read [Repository Working Agreements](AGENTS.md),
+[Application Architecture](docs/architecture.md), [UI System](docs/ui.md), and
+the [Admin9 Flutter App Skill](.agents/skills/admin9-flutter-app/SKILL.md) before
+starting. Those sources define the current implementation; superseded APIs,
+tests, and tools do not.
 
-## Boundaries
+## Contribution Boundaries
 
-- Core owns tokens, public `App*` components, platform mapping, accessibility,
-  and quality behavior. Core changes require focused tests and maintainer
-  review.
-- Default identity and Brand changes may use the optional App configuration
-  tool. Do not change package/application/bundle identifiers incidentally.
-- Business code stays in its feature or `lib/ui/shared/` and consumes public
-  Core UI through `lib/admin9_ui.dart`.
-- Do not add Repository, Service, Domain, or generic Core abstractions without
-  a real data source or demonstrated reusable responsibility.
-- Do not include customer data, credentials, production logs, proprietary
-  assets, or unverifiable backend, user, session, success, or device claims.
-
-Normative words in the [Design System](docs/design-system/README.md) and
-[upstream contribution boundaries](docs/design-system/05-upstream-contribution-boundaries.md)
-apply only to upstream implementations and contributions. There is no required
-contribution flow for forks.
+- Keep changes scoped to a real Starter or approved Feature responsibility. Do
+  not add empty layers, placeholder interfaces, speculative product behavior,
+  or pass-through Use Cases.
+- Use Forui widgets directly in presentation. Do not build renamed wrappers or
+  a parallel base component library.
+- Keep feature state and dependency wiring in feature-owned Riverpod providers.
+  Keep Notifiers independent of Forui, AutoRoute, and `BuildContext`; keep
+  Models, Preferences, Repositories, Services, and Domain code independent of
+  Riverpod as well.
+- Use generated typed AutoRoute objects for navigation. Never edit generated
+  router source or add a second routing system.
+- Use `snake_case`, `*_page.dart`/`*Page`, specific `*_provider.dart` names,
+  and one primary public responsibility per file. Avoid vague utility
+  collections.
+- Protect legal notices, package/application/bundle identifiers, signing
+  configuration, and still-used native capabilities.
+- Do not include credentials, customer data, production logs, proprietary
+  assets, or unverifiable build, simulator, signing, installation, or device
+  claims.
 
 ## Workflow
 
-Use Flutter 3.44.1 and Dart 3.12.1. Keep changes scoped, add focused tests for
-behavior changes, and use a Conventional Commit subject when a commit is
-requested.
+Use Flutter 3.47.2 and Dart 3.13.2. Commit dependency and generated route
+changes when the contribution requires them, but do not regenerate unrelated
+sources. Before opening a change, run:
 
-Run the checks in the canonical [validation guide](docs/validation/README.md).
-Its build and evidence rules are part of upstream review. An unsigned iOS build
-does not prove signing, installation, cold launch, or device behavior. Record
-unexecuted device and assistive-technology checks as `Unknown`.
+```bash
+flutter pub get --enforce-lockfile
+dart run build_runner build
+git diff --exit-code
+test -z "$(git status --porcelain --untracked-files=all)"
+dart format --output=none --set-exit-if-changed lib test integration_test
+flutter analyze
+flutter test
+git diff --check
+```
+
+Run generation drift checks from a clean checkout. Add focused unit or Widget
+tests for changed behavior. Android/iOS builds, simulator checks, signing,
+installation, and physical-device acceptance are separate scopes; report
+anything not actually executed as `Unknown`.
+
+Use a Conventional Commit subject only when a commit is explicitly requested.

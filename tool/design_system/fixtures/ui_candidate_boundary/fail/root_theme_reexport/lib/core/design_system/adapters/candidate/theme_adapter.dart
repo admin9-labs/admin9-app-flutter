@@ -1,1 +1,0 @@
-Object buildCandidateTheme() => Object();

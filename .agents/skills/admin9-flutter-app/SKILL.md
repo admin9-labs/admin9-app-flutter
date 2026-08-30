@@ -61,8 +61,9 @@ document take precedence.
   construction. Use generated Route objects and never hand-edit generated router
   files. Typed route generation is baseline; nested Tab Routers, Guards,
   Observers, and deep links still require a consumer.
-- EasyLocalization owns App copy. `FLocalizations.delegate` owns Forui component
-  copy and is appended exactly once to the App localization delegates.
+- EasyLocalization owns App copy. Add Flutter 3.47 external
+  `material_ui`/`cupertino_ui` delegates for the App host, then append exactly
+  one `FLocalizations.delegate` for Forui component copy.
 - Services and Repositories own external and persistence boundaries. Models,
   Preferences, Services, Repositories, and Domain code remain independent of UI,
   Riverpod, AutoRoute, and `BuildContext`.

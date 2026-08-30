@@ -16,6 +16,9 @@ authoritative.
 - Protect `LICENSE`, security and trademark policies, required third-party
   notices, Android application IDs, iOS bundle IDs, signing configuration, and
   native capabilities that still have a current consumer.
+- The upstream Starter installation identity is `dev.admin9.starter`: use it as
+  the Android namespace/application ID and iOS Runner bundle ID. Changing it
+  creates a separately installed App and requires an explicitly reviewed task.
 - Old code, tests, Goldens, tools, and documents with no current runtime, CI,
   legal, or delivery consumer are deleted directly when deletion is authorized.
   Do not create archive, legacy, or deprecated copies.
@@ -79,7 +82,8 @@ authoritative.
   interop; generate both sides with one pinned Pigeon version and keep the bridge
   internal.
 - Chinese is the initial supported product locale. Use `easy_localization` for
-  App-owned copy. Use EasyLocalization's delegates and append exactly one
+  App-owned copy. Combine its delegates with Flutter 3.47 external
+  `material_ui`/`cupertino_ui` delegates, then append exactly one
   `FLocalizations.delegate` for Forui component copy; do not merge the complete
   `FLocalizations.localizationsDelegates` list. Add another locale only with
   approved, complete translations and acceptance coverage.

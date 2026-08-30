@@ -1,0 +1,5 @@
+package dev.admin9.starter
+
+import io.flutter.embedding.android.FlutterActivity
+
+class MainActivity : FlutterActivity()

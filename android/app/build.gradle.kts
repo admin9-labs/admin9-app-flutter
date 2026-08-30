@@ -5,13 +5,9 @@ plugins {
 }
 
 android {
-    namespace = "com.admin9.app.foundation"
+    namespace = "dev.admin9.starter"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
-
-    buildFeatures {
-        buildConfig = true
-    }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -19,7 +15,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.admin9.app.foundation"
+        applicationId = "dev.admin9.starter"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
@@ -45,10 +41,4 @@ kotlin {
 
 flutter {
     source = "../.."
-}
-
-tasks.withType<JavaCompile>().configureEach {
-    if (name.startsWith("compile") && name.endsWith("ReleaseJavaWithJavac")) {
-        exclude("io/flutter/plugins/GeneratedPluginRegistrant.java")
-    }
 }
