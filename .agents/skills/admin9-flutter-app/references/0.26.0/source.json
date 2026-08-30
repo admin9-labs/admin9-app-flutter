@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "package": {
+    "name": "forui",
+    "version": "0.26.0",
+    "versionEvidenceUrl": "https://pub.dev/api/packages/forui/versions/0.26.0",
+    "publishedAt": "2026-08-24T10:32:54.853067Z",
+    "archiveSha256": "a00251e8db89430f388990049ea30ec62f7d1c9270f1fe6ab0d316b1a9415a72",
+    "environment": {
+      "dart": ">=3.13.0-0 <4.0.0",
+      "flutter": ">=3.47.0-0"
+    }
+  },
+  "documentation": {
+    "referencePageUrl": "https://forui.dev/docs/reference/llms",
+    "licensePath": "LICENSE",
+    "licenseSource": "forui 0.26.0 package archive",
+    "licenseSha256": "e9f8c8cc65177efb3796f2e00f799ee1da58ce9279f291d9f16f6145b5be666b",
+    "capturedAt": "2026-08-29T23:16:08Z",
+    "versioningNote": "The Forui documentation endpoints are live and unversioned. These files were captured while pub.dev reported 0.26.0 as the current release and are bound to this directory by their hashes.",
+    "files": [
+      {
+        "path": "llms.txt",
+        "sourceUrl": "https://forui.dev/docs/llms.txt",
+        "bytes": 12226,
+        "lines": 116,
+        "sha256": "526ba4af5d51a2dc082aed9eee53cbeecfd7046c02b3a033c8afba6b7061440c"
+      },
+      {
+        "path": "llms-full.txt",
+        "sourceUrl": "https://forui.dev/docs/llms-full.txt",
+        "bytes": 497726,
+        "lines": 19007,
+        "sha256": "1c2cc85868edc289bf873a611334a1abf80da1a76f926eac000ebd571ec4f8d2"
+      }
+    ]
+  }
+}

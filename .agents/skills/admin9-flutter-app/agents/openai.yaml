@@ -1,0 +1,4 @@
+interface:
+  display_name: "Admin9 Flutter App"
+  short_description: "Project workflow with versioned Forui guidance"
+  default_prompt: "Use $admin9-flutter-app to implement this Flutter App change within the repository architecture and verification rules."
