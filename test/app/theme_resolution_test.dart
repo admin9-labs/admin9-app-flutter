@@ -28,19 +28,28 @@ void main() {
       isNot(contains(RegExp(r'\bextensions\s*:'))),
     );
     for (final preset in AppThemePreset.values) {
-      for (final radius in AppRadiusPreference.values) {
-        final pair = AppThemeCatalog.resolve(preset: preset, radius: radius);
-        for (final theme in [pair.light, pair.dark]) {
-          expect(theme.colors.extensions, isEmpty);
-          expect(theme.style.extensions, hasLength(1));
-          expect(theme.style.extensions.single, isA<AGridStyle>());
-          expect(theme.style.aGrid.minimumTouchSize, greaterThanOrEqualTo(44));
+      for (final fontSize in AppFontSizePreference.values) {
+        for (final radius in AppRadiusPreference.values) {
+          final pair = AppThemeCatalog.resolve(
+            preset: preset,
+            fontSize: fontSize,
+            radius: radius,
+          );
+          for (final theme in [pair.light, pair.dark]) {
+            expect(theme.colors.extensions, isEmpty);
+            expect(theme.style.extensions, hasLength(1));
+            expect(theme.style.extensions.single, isA<AGridStyle>());
+            expect(
+              theme.style.aGrid.minimumTouchSize,
+              greaterThanOrEqualTo(44),
+            );
+          }
         }
       }
     }
   });
 
-  testWidgets('resolves brightness, preset, and radius for both theme layers', (
+  testWidgets('resolves every appearance axis for both theme layers', (
     tester,
   ) async {
     tester.platformDispatcher.platformBrightnessTestValue = Brightness.light;
@@ -58,6 +67,7 @@ void main() {
     final next = const AppAppearancePreference(
       brightness: AppBrightnessPreference.dark,
       preset: AppThemePreset.forest,
+      fontSize: AppFontSizePreference.extraLarge,
       radius: AppRadiusPreference.large,
     );
 
@@ -68,12 +78,21 @@ void main() {
     _expectBrightness(tester, Brightness.dark);
     final expected = AppThemeCatalog.resolve(
       preset: next.preset,
+      fontSize: next.fontSize,
       radius: next.radius,
     ).dark;
     expect(FTheme.of(context).colors.primary, expected.colors.primary);
     expect(
       FTheme.of(context).style.borderRadius.md,
       expected.style.borderRadius.md,
+    );
+    expect(
+      FTheme.of(context).typography.body.sm.fontSize,
+      expected.typography.body.sm.fontSize,
+    );
+    expect(
+      material.Theme.of(context).textTheme.bodyMedium?.fontSize,
+      expected.typography.body.sm.fontSize,
     );
 
     tester.platformDispatcher.platformBrightnessTestValue = Brightness.dark;

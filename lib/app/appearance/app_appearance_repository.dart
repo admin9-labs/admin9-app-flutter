@@ -38,6 +38,11 @@ final class SharedPreferencesAppAppearanceRepository
           value['preset'],
           AppAppearancePreference.defaults.preset,
         ),
+        fontSize: _enumByName(
+          AppFontSizePreference.values,
+          value['fontSize'],
+          AppAppearancePreference.defaults.fontSize,
+        ),
         radius: _enumByName(
           AppRadiusPreference.values,
           value['radius'],
@@ -54,6 +59,7 @@ final class SharedPreferencesAppAppearanceRepository
     jsonEncode({
       'brightness': preference.brightness.name,
       'preset': preference.preset.name,
+      'fontSize': preference.fontSize.name,
       'radius': preference.radius.name,
     }),
   );

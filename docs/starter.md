@@ -13,9 +13,9 @@ together.
 The reference App targets Android and iOS. Its five persistent destinations are
 Foundation, Forms, Content, Feedback, and Settings. The first four are owned by
 one removable `lib/features/examples/` feature. Settings is an independent real
-feature that demonstrates persisted brightness, complete Theme preset, and
-radius preference through Riverpod, a Repository, and a SharedPreferences
-Service.
+feature that demonstrates persisted brightness, complete Theme preset, five
+font-size preferences, and radius preference through Riverpod, a Repository,
+and a SharedPreferences Service.
 
 Examples has one App Router integration point in
 `lib/app/routing/examples_routes.dart`. It contributes four sibling Tab branches
@@ -28,7 +28,7 @@ not add an extra runtime shell.
 | Forms | `/forms` | Examples | Action, input, selection, value, and scheduling Playgrounds |
 | Content | `/content` | Examples | Overview, calendar, and list Playgrounds |
 | Feedback | `/feedback` | Examples | Status, confirmation, and contextual-feedback Playgrounds |
-| Settings | `/settings` | Settings | Persisted brightness, Theme preset, and radius preference |
+| Settings | `/settings` | Settings | Persisted brightness, Theme preset, font size, and radius preference |
 
 ## Installation Identity
 

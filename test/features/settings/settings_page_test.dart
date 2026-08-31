@@ -7,6 +7,7 @@ import 'package:admin9_app_flutter/app/appearance/app_appearance_preference.dart
 import 'package:admin9_app_flutter/app/appearance/app_appearance_provider.dart';
 import 'package:admin9_app_flutter/app/appearance/app_appearance_repository.dart';
 import 'package:admin9_app_flutter/app/appearance/app_theme_catalog.dart';
+import 'package:admin9_app_flutter/features/settings/presentation/pages/settings_page.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -43,6 +44,7 @@ void main() {
       material.theme?.colorScheme.primary,
       AppThemeCatalog.resolve(
         preset: AppThemePreset.ocean,
+        fontSize: AppFontSizePreference.standard,
         radius: AppRadiusPreference.medium,
       ).light.colors.primary,
     );
@@ -59,6 +61,26 @@ void main() {
     pending.complete();
     await tester.pumpAndSettle();
     expect(find.text('设置已保存'), findsOneWidget);
+  });
+
+  testWidgets('font size updates both theme layers and persists immediately', (
+    tester,
+  ) async {
+    final repository = _FakeRepository();
+    await _pumpApp(tester, repository, translations);
+    await _openSettings(tester);
+
+    final extraLarge = find.byKey(
+      const ValueKey('settings-font-size-extraLarge'),
+    );
+    await tester.ensureVisible(extraLarge);
+    await tester.tap(extraLarge);
+    await tester.pumpAndSettle();
+
+    final context = tester.element(find.byType(SettingsPage));
+    expect(FTheme.of(context).typography.body.sm.fontSize, 20);
+    expect(Theme.of(context).textTheme.bodyMedium?.fontSize, 20);
+    expect(repository.value.fontSize, AppFontSizePreference.extraLarge);
   });
 
   testWidgets('rolls back a failed change and reports it', (tester) async {
@@ -85,7 +107,7 @@ void main() {
     await _pumpApp(tester, repository, translations);
     await _openSettings(tester);
 
-    expect(find.text('无法读取本地主题偏好。'), findsOneWidget);
+    expect(find.text('无法读取本地外观偏好。'), findsOneWidget);
     repository
       ..loadError = null
       ..value = AppAppearancePreference.defaults.copyWith(
@@ -94,7 +116,7 @@ void main() {
     await tester.tap(find.text('重试'));
     await tester.pumpAndSettle();
 
-    expect(find.text('无法读取本地主题偏好。'), findsNothing);
+    expect(find.text('无法读取本地外观偏好。'), findsNothing);
     expect(repository.loadCalls, 2);
   });
 }

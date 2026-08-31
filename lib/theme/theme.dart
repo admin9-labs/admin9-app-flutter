@@ -33,10 +33,14 @@ const largeAppBorderRadius = FBorderRadius(
 
 FThemeData buildForuiTheme({
   required FColors colors,
+  double typographyScale = 1,
   required FBorderRadius borderRadius,
 }) {
   const touch = true;
-  final typography = _typography(colors: colors, touch: touch);
+  final typography = _typography(
+    colors: colors,
+    touch: touch,
+  ).scale(sizeScalar: typographyScale);
   final icons = _icons();
   final style = _style(
     colors: colors,

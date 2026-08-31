@@ -5,6 +5,7 @@ import 'dart:ui' as ui show TextDirection;
 import 'package:admin9_app_flutter/app/appearance/app_appearance_preference.dart';
 import 'package:admin9_app_flutter/app/appearance/app_appearance_provider.dart';
 import 'package:admin9_app_flutter/app/appearance/app_appearance_repository.dart';
+import 'package:admin9_app_flutter/app/appearance/app_theme_catalog.dart';
 import 'package:admin9_app_flutter/features/examples/presentation/pages/concepts/themes/themes_page.dart';
 import 'package:admin9_app_flutter/shared/ui/layout/grid/a_grid.dart';
 import 'package:admin9_app_flutter/theme/theme.dart';
@@ -75,6 +76,13 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(repository.value.preset, AppThemePreset.forest);
+
+    final extraLarge = find.byKey(const ValueKey('theme-font-size-extraLarge'));
+    await tester.ensureVisible(extraLarge);
+    await tester.tap(extraLarge);
+    await tester.pumpAndSettle();
+
+    expect(repository.value.fontSize, AppFontSizePreference.extraLarge);
     expect(
       tester
           .widget<Text>(
@@ -83,17 +91,25 @@ void main() {
           .data,
       contains('preset=forest'),
     );
+    expect(
+      tester
+          .widget<Text>(
+            find.byKey(const ValueKey('playground-parameter-summary')),
+          )
+          .data,
+      contains('fontSize=extraLarge'),
+    );
     expect(find.byType(AGrid), findsOneWidget);
     expect(find.byType(FTextField), findsOneWidget);
 
     await tester.pump(const Duration(seconds: 6));
     final copy = find.byKey(const ValueKey('playground-copy'));
     await tester.ensureVisible(copy);
-    await tester.drag(find.byType(Scrollable).last, const Offset(0, -180));
     await tester.pumpAndSettle();
     await tester.tap(copy);
     await tester.pump(const Duration(milliseconds: 200));
     expect(copied, contains('AppThemePreset.forest'));
+    expect(copied, contains('AppFontSizePreference.extraLarge'));
     await tester.pump(const Duration(seconds: 6));
   });
 
@@ -104,6 +120,7 @@ void main() {
       value: const AppAppearancePreference(
         brightness: AppBrightnessPreference.dark,
         preset: AppThemePreset.ocean,
+        fontSize: AppFontSizePreference.extraLarge,
         radius: AppRadiusPreference.large,
       ),
     );
@@ -188,7 +205,11 @@ void main() {
     addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
     await _pumpPage(
       tester,
-      _FakeRepository(),
+      _FakeRepository(
+        value: AppAppearancePreference.defaults.copyWith(
+          fontSize: AppFontSizePreference.extraLarge,
+        ),
+      ),
       translations,
       size: const Size(320, 700),
     );
@@ -226,23 +247,34 @@ Future<void> _pumpPage(
   await tester.pumpAndSettle();
 }
 
-class _ThemePageHost extends StatelessWidget {
+class _ThemePageHost extends ConsumerWidget {
   const _ThemePageHost();
 
   @override
-  Widget build(BuildContext context) => MaterialApp(
-    locale: context.locale,
-    supportedLocales: context.supportedLocales,
-    localizationsDelegates: [
-      ...context.localizationDelegates,
-      ...GlobalMaterialLocalizations.delegates,
-      FLocalizations.delegate,
-    ],
-    home: FTheme(
-      data: lightTheme,
-      child: FToaster(child: const ThemesPage()),
-    ),
-  );
+  Widget build(BuildContext context, WidgetRef ref) {
+    final preference =
+        ref.watch(appAppearanceProvider).value?.preference ??
+        AppAppearancePreference.defaults;
+    final theme = AppThemeCatalog.resolve(
+      preset: preference.preset,
+      fontSize: preference.fontSize,
+      radius: preference.radius,
+    ).light;
+    return MaterialApp(
+      locale: context.locale,
+      supportedLocales: context.supportedLocales,
+      localizationsDelegates: [
+        ...context.localizationDelegates,
+        ...GlobalMaterialLocalizations.delegates,
+        FLocalizations.delegate,
+      ],
+      theme: theme.toApproximateMaterialTheme(),
+      home: FTheme(
+        data: theme,
+        child: FToaster(child: const ThemesPage()),
+      ),
+    );
+  }
 }
 
 final class _InMemoryAssetLoader extends AssetLoader {

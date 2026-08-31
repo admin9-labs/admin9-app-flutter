@@ -73,6 +73,19 @@ class SettingsPage extends ConsumerWidget {
         ),
       ),
       ComponentExampleSection(
+        title: context.tr('settings.font_size'),
+        description: context.tr('settings.font_size_description'),
+        child: _ChoiceGroup<AppFontSizePreference>(
+          groupKey: 'settings-font-size',
+          enabled: !saving,
+          value: preference.fontSize,
+          values: AppFontSizePreference.values,
+          label: _fontSizeLabel,
+          onChanged: (value) =>
+              _save(context, ref, preference.copyWith(fontSize: value)),
+        ),
+      ),
+      ComponentExampleSection(
         title: context.tr('settings.theme_radius'),
         description: context.tr('settings.theme_radius_description'),
         child: _ChoiceGroup<AppRadiusPreference>(
@@ -223,6 +236,14 @@ String _presetLabel(AppThemePreset value) => switch (value) {
   AppThemePreset.neutral => 'settings.theme_preset_neutral'.tr(),
   AppThemePreset.ocean => 'settings.theme_preset_ocean'.tr(),
   AppThemePreset.forest => 'settings.theme_preset_forest'.tr(),
+};
+
+String _fontSizeLabel(AppFontSizePreference value) => switch (value) {
+  AppFontSizePreference.extraSmall => 'settings.font_size_extra_small'.tr(),
+  AppFontSizePreference.small => 'settings.font_size_small'.tr(),
+  AppFontSizePreference.standard => 'settings.font_size_standard'.tr(),
+  AppFontSizePreference.large => 'settings.font_size_large'.tr(),
+  AppFontSizePreference.extraLarge => 'settings.font_size_extra_large'.tr(),
 };
 
 String _radiusLabel(AppRadiusPreference value) => switch (value) {

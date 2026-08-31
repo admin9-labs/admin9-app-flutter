@@ -101,9 +101,11 @@ documentation, and tests. Give every generated source file a specific name.
 The Showroom Theme Playground is the control surface for the App's global Theme,
 not a swatch gallery. It provides at least three visually distinct,
 contrast-checked presets, each with complete light and dark Forui themes, plus
-system/light/dark mode selection. Any radius, control-scale, or other global
-option must be supported coherently by the real Forui Theme/style contract; do
-not expose a partial setting or arbitrary color picker.
+system/light/dark mode selection and five global font-size preferences. Font
+sizes scale the complete Forui typography before widget styles and Material
+mapping are built. Any radius, control-scale, or other global option must be
+supported coherently by the real Forui Theme/style contract; do not expose a
+partial setting or arbitrary color picker.
 
 Changes apply immediately across the App through one state source and persist
 through the Settings persistence boundary. The Playground previews buttons,

@@ -25,6 +25,7 @@ class _Admin9AppState extends ConsumerState<Admin9App> {
         AppAppearancePreference.defaults;
     final themes = AppThemeCatalog.resolve(
       preset: preference.preset,
+      fontSize: preference.fontSize,
       radius: preference.radius,
     );
 

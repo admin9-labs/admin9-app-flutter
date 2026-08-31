@@ -53,7 +53,28 @@ void main() {
         const AppAppearancePreference(
           brightness: AppBrightnessPreference.dark,
           preset: AppThemePreset.neutral,
+          fontSize: AppFontSizePreference.standard,
           radius: AppRadiusPreference.large,
+        ),
+      );
+
+      final invalidFontSize = repositoryWith(
+        InMemorySharedPreferencesAsync.withData({
+          AppAppearanceService.key: jsonEncode({
+            'brightness': 'light',
+            'preset': 'forest',
+            'fontSize': 'unknown',
+            'radius': 'small',
+          }),
+        }),
+      );
+      expect(
+        await invalidFontSize.load(),
+        const AppAppearancePreference(
+          brightness: AppBrightnessPreference.light,
+          preset: AppThemePreset.forest,
+          fontSize: AppFontSizePreference.standard,
+          radius: AppRadiusPreference.small,
         ),
       );
     },
@@ -65,6 +86,7 @@ void main() {
     const expected = AppAppearancePreference(
       brightness: AppBrightnessPreference.dark,
       preset: AppThemePreset.forest,
+      fontSize: AppFontSizePreference.extraLarge,
       radius: AppRadiusPreference.small,
     );
 
@@ -79,7 +101,12 @@ void main() {
           const SharedPreferencesOptions(),
         ))!,
       ),
-      {'brightness': 'dark', 'preset': 'forest', 'radius': 'small'},
+      {
+        'brightness': 'dark',
+        'preset': 'forest',
+        'fontSize': 'extraLarge',
+        'radius': 'small',
+      },
     );
   });
 

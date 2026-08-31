@@ -72,6 +72,15 @@ class _ThemesPageState extends ConsumerState<ThemesPage> {
             label: _brightnessLabel,
             onChanged: (value) => _save(preference.copyWith(brightness: value)),
           ),
+          _ChoiceSection<AppFontSizePreference>(
+            title: 'settings.font_size'.tr(),
+            groupKey: 'theme-font-size',
+            enabled: !saving,
+            value: preference.fontSize,
+            values: AppFontSizePreference.values,
+            label: _fontSizeLabel,
+            onChanged: (value) => _save(preference.copyWith(fontSize: value)),
+          ),
           _ChoiceSection<AppRadiusPreference>(
             title: 'settings.theme_radius'.tr(),
             groupKey: 'theme-radius',
@@ -364,7 +373,7 @@ class _ColorSample extends StatelessWidget {
 
 String _summary(AppAppearancePreference value) =>
     'preset=${value.preset.name}, brightness=${value.brightness.name}, '
-    'radius=${value.radius.name}';
+    'fontSize=${value.fontSize.name}, radius=${value.radius.name}';
 
 Widget _flexibleButtonLabel(
   BuildContext context,
@@ -379,6 +388,7 @@ String _code(AppAppearancePreference value) =>
     '''const AppAppearancePreference(
   brightness: AppBrightnessPreference.${value.brightness.name},
   preset: AppThemePreset.${value.preset.name},
+  fontSize: AppFontSizePreference.${value.fontSize.name},
   radius: AppRadiusPreference.${value.radius.name},
 )''';
 
@@ -392,6 +402,14 @@ String _presetLabel(AppThemePreset value) => switch (value) {
   AppThemePreset.neutral => 'settings.theme_preset_neutral'.tr(),
   AppThemePreset.ocean => 'settings.theme_preset_ocean'.tr(),
   AppThemePreset.forest => 'settings.theme_preset_forest'.tr(),
+};
+
+String _fontSizeLabel(AppFontSizePreference value) => switch (value) {
+  AppFontSizePreference.extraSmall => 'settings.font_size_extra_small'.tr(),
+  AppFontSizePreference.small => 'settings.font_size_small'.tr(),
+  AppFontSizePreference.standard => 'settings.font_size_standard'.tr(),
+  AppFontSizePreference.large => 'settings.font_size_large'.tr(),
+  AppFontSizePreference.extraLarge => 'settings.font_size_extra_large'.tr(),
 };
 
 String _radiusLabel(AppRadiusPreference value) => switch (value) {

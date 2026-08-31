@@ -57,7 +57,11 @@ void main() {
   test('selected title meets contrast on every selected item surface', () {
     for (final preset in AppThemePreset.values) {
       for (final radius in AppRadiusPreference.values) {
-        final pair = AppThemeCatalog.resolve(preset: preset, radius: radius);
+        final pair = AppThemeCatalog.resolve(
+          preset: preset,
+          fontSize: AppFontSizePreference.standard,
+          radius: radius,
+        );
         for (final theme in [pair.light, pair.dark]) {
           final style = theme.style.aGrid;
           final foreground = style.titleTextStyle.resolve({

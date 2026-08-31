@@ -90,6 +90,7 @@ void main() {
       ..value = const AppAppearancePreference(
         brightness: AppBrightnessPreference.light,
         preset: AppThemePreset.forest,
+        fontSize: AppFontSizePreference.large,
         radius: AppRadiusPreference.large,
       );
 

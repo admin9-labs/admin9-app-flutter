@@ -75,6 +75,7 @@ void main() {
       );
       final pair = AppThemeCatalog.resolve(
         preset: AppThemePreset.neutral,
+        fontSize: AppFontSizePreference.standard,
         radius: AppRadiusPreference.medium,
       );
       final expectedTheme = scenario.expectedBrightness == Brightness.light

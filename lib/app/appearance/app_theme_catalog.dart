@@ -16,20 +16,25 @@ final class AppThemePair {
 }
 
 abstract final class AppThemeCatalog {
-  static final Map<(AppThemePreset, AppRadiusPreference), AppThemePair>
-  _themes = {
-    for (final preset in AppThemePreset.values)
-      for (final radius in AppRadiusPreference.values)
-        (preset, radius): _build(preset, radius),
-  };
+  static final Map<
+    (AppThemePreset, AppFontSizePreference, AppRadiusPreference),
+    AppThemePair
+  >
+  _themes = {};
 
   static AppThemePair resolve({
     required AppThemePreset preset,
+    required AppFontSizePreference fontSize,
     required AppRadiusPreference radius,
-  }) => _themes[(preset, radius)]!;
+  }) => _themes.putIfAbsent((
+    preset,
+    fontSize,
+    radius,
+  ), () => _build(preset, fontSize, radius));
 
   static AppThemePair _build(
     AppThemePreset preset,
+    AppFontSizePreference fontSize,
     AppRadiusPreference radius,
   ) {
     final colors = switch (preset) {
@@ -48,9 +53,24 @@ abstract final class AppThemeCatalog {
       AppRadiusPreference.medium => mediumAppBorderRadius,
       AppRadiusPreference.large => largeAppBorderRadius,
     };
+    final typographyScale = switch (fontSize) {
+      AppFontSizePreference.extraSmall => 0.875,
+      AppFontSizePreference.small => 0.9375,
+      AppFontSizePreference.standard => 1.0,
+      AppFontSizePreference.large => 1.125,
+      AppFontSizePreference.extraLarge => 1.25,
+    };
     return AppThemePair(
-      light: buildForuiTheme(colors: colors.light, borderRadius: borderRadius),
-      dark: buildForuiTheme(colors: colors.dark, borderRadius: borderRadius),
+      light: buildForuiTheme(
+        colors: colors.light,
+        typographyScale: typographyScale,
+        borderRadius: borderRadius,
+      ),
+      dark: buildForuiTheme(
+        colors: colors.dark,
+        typographyScale: typographyScale,
+        borderRadius: borderRadius,
+      ),
     );
   }
 }
