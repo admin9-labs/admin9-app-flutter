@@ -5,6 +5,7 @@ import 'package:admin9_app_flutter/shared/ui/layout/grid/a_grid.dart';
 import 'package:admin9_app_flutter/shared/ui/layout/grid/a_grid_item.dart';
 import 'package:admin9_app_flutter/shared/ui/layout/grid/a_grid_style.dart';
 import 'package:admin9_app_flutter/theme/theme.dart';
+import 'package:flutter/rendering.dart' show RenderParagraph;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:forui/forui.dart';
@@ -584,19 +585,11 @@ Color? _surfaceColor(WidgetTester tester, Key itemKey) {
 
 void _expectCompleteLine(WidgetTester tester, String text) {
   final finder = find.text(text);
-  final context = tester.element(finder);
-  final style = DefaultTextStyle.of(context).style;
-  final painter = TextPainter(
-    text: TextSpan(text: text, style: style),
-    textDirection: Directionality.of(context),
-    textScaler: MediaQuery.textScalerOf(context),
-    locale: Localizations.maybeLocaleOf(context),
-    maxLines: 1,
-  )..layout(maxWidth: tester.getSize(finder).width);
+  final paragraph = tester.renderObject<RenderParagraph>(finder);
   expect(
-    tester.getSize(finder).height,
-    greaterThanOrEqualTo(painter.height),
-    reason: '$text must receive at least one complete text line',
+    paragraph.didExceedMaxLines,
+    isFalse,
+    reason: '$text must render without ellipsis',
   );
 }
 

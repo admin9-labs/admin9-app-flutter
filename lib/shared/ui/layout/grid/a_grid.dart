@@ -110,7 +110,7 @@ class AGrid extends StatelessWidget {
                 titleLineHeight +
                 (child.description == null
                     ? 0
-                    : resolved.textSpacing + descriptionLineHeight);
+                    : resolved.textSpacing + descriptionLineHeight * 2);
             final visualHeight =
                 minimumTouchSize + (child.badge == null ? 0 : 4);
             final vertical =
