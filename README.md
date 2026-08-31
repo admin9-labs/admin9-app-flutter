@@ -8,11 +8,11 @@ finished product, backend, or compatibility layer for superseded APIs.
 ## Current Release
 
 The current release line starts with
-[Admin9 App Starter v1.0.0](https://github.com/admin9-labs/admin9-app-flutter/releases/tag/app-starter-v1.0.0).
-Earlier `design-system-*` releases describe the superseded `App*` architecture
-and remain historical references, not compatibility contracts for this Forui
-Starter. The App Starter release is source-only; its UI acceptance package is
-evidence, not a distributable App binary.
+[Admin9 App Starter v1.0.0](https://github.com/admin9-labs/admin9-app-flutter/releases/tag/v1.0.0).
+The Git history contains the superseded `App*` architecture as historical
+context, not a compatibility contract for this Forui Starter. The App Starter
+release is source-only. Its GitHub CI results verify the release source; no App
+binary, screenshot, or UI evidence ZIP is distributed with the release.
 
 ## Included
 
@@ -70,10 +70,13 @@ flutter run
 The source checks used by CI are:
 
 ```bash
+flutter pub get --enforce-lockfile
+git diff --check
 dart run build_runner build
 git diff --exit-code
 test -z "$(git status --porcelain --untracked-files=all)"
-dart format --output=none --set-exit-if-changed lib test integration_test
+dart format --output=none --set-exit-if-changed lib test integration_test tool
+dart run tool/check_markdown_links.dart
 flutter analyze
 flutter test
 flutter build apk --debug

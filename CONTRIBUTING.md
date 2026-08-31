@@ -43,7 +43,8 @@ flutter pub get --enforce-lockfile
 dart run build_runner build
 git diff --exit-code
 test -z "$(git status --porcelain --untracked-files=all)"
-dart format --output=none --set-exit-if-changed lib test integration_test
+dart format --output=none --set-exit-if-changed lib test integration_test tool
+dart run tool/check_markdown_links.dart
 flutter analyze
 flutter test
 git diff --check
@@ -53,5 +54,8 @@ Run generation drift checks from a clean checkout. Add focused unit or Widget
 tests for changed behavior. Android/iOS builds, simulator checks, signing,
 installation, and physical-device acceptance are separate scopes; report
 anything not actually executed as `Unknown`.
+
+Release tags use bare semantic versions such as `v1.0.0`. Do not add project or
+component prefixes to tag names.
 
 Use a Conventional Commit subject only when a commit is explicitly requested.

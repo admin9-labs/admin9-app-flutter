@@ -76,8 +76,9 @@ example and its removal contract live in [Upstream Starter](docs/starter.md).
 - Validate only from the current source. Do not inherit pass claims from
   superseded tests, Goldens, screenshots, logs, builds, or device runs.
 - Run focused tests plus `flutter pub get --enforce-lockfile`,
-  `dart format --output=none --set-exit-if-changed lib test`, `flutter analyze`,
-  `flutter test`, Markdown local-link validation, and `git diff --check`.
+  `dart format --output=none --set-exit-if-changed lib test integration_test tool`,
+  `flutter analyze`, `flutter test`, Markdown local-link validation, and
+  `git diff --check`.
 - On a clean checkout, run `dart run build_runner build`, then require both
   `git diff --exit-code` and an empty
   `git status --porcelain --untracked-files=all` result.
