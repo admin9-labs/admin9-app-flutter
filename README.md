@@ -5,6 +5,15 @@ runnable reference for application structure, mobile UI capabilities, typed
 routing, localized copy, and a small persisted-settings feature. It is not a
 finished product, backend, or compatibility layer for superseded APIs.
 
+## Current Release
+
+The current release line starts with
+[Admin9 App Starter v1.0.0](https://github.com/admin9-labs/admin9-app-flutter/releases/tag/app-starter-v1.0.0).
+Earlier `design-system-*` releases describe the superseded `App*` architecture
+and remain historical references, not compatibility contracts for this Forui
+Starter. The App Starter release is source-only; its UI acceptance package is
+evidence, not a distributable App binary.
+
 ## Included
 
 - Flutter 3.47.2 and Dart 3.13.2.
