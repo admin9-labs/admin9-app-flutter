@@ -1,6 +1,8 @@
 import 'package:admin9_app_flutter/app/admin9_app.dart';
+import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_preview.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/rendering.dart' show RenderParagraph;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -71,9 +73,13 @@ void main() {
     await tester.pumpAndSettle();
     await _show(tester, const ValueKey('grid-playground-preview'));
     _expectCompleteTextLine(tester, '待处理');
-    _expectCompleteTextLine(tester, '今天还有 12 项任务');
+    _expectCompleteTextLine(tester, '今日还有 12 项');
     _expectCompleteTextLine(tester, '消息');
     _expectCompleteTextLine(tester, '还有 8 条未读消息');
+    _expectCompleteTextLine(tester, '已完成');
+    _expectCompleteTextLine(tester, '本周已处理 24 项');
+    _expectCompleteTextLine(tester, '暂不可用');
+    _expectCompleteTextLine(tester, '同步完成后开放');
     await binding.takeScreenshot('07_agrid_status_selected_disabled_light');
 
     expect(await tester.binding.handlePopRoute(), isTrue);
@@ -104,8 +110,23 @@ Future<void> _show(WidgetTester tester, Key key) async {
 }
 
 Future<void> _showThemePreview(WidgetTester tester) async {
-  await _show(tester, const ValueKey('theme-preview-primary'));
-  await tester.drag(find.byType(Scrollable).first, const Offset(0, -240));
+  final preview = find.ancestor(
+    of: find.byKey(const ValueKey('theme-preview-primary')),
+    matching: find.byType(PlaygroundPreview),
+  );
+  expect(preview, findsOneWidget);
+  final scrollable = find.byType(Scrollable).first;
+  final position = tester.state<ScrollableState>(scrollable).position;
+  final targetOffset =
+      position.pixels +
+      tester.getTopLeft(preview).dy -
+      tester.getTopLeft(scrollable).dy -
+      16;
+  position.jumpTo(
+    targetOffset
+        .clamp(position.minScrollExtent, position.maxScrollExtent)
+        .toDouble(),
+  );
   await tester.pumpAndSettle();
 }
 
@@ -116,18 +137,10 @@ Future<void> _dismissToasts(WidgetTester tester) async {
 
 void _expectCompleteTextLine(WidgetTester tester, String text) {
   final finder = find.text(text);
-  final context = tester.element(finder);
-  final style = DefaultTextStyle.of(context).style;
-  final painter = TextPainter(
-    text: TextSpan(text: text, style: style),
-    textDirection: Directionality.of(context),
-    textScaler: MediaQuery.textScalerOf(context),
-    locale: Localizations.maybeLocaleOf(context),
-    maxLines: 1,
-  )..layout(maxWidth: tester.getSize(finder).width);
+  final paragraph = tester.renderObject<RenderParagraph>(finder);
   expect(
-    tester.getSize(finder).height,
-    greaterThanOrEqualTo(painter.height),
-    reason: '$text must receive at least one complete text line',
+    paragraph.didExceedMaxLines,
+    isFalse,
+    reason: '$text must render without ellipsis',
   );
 }
