@@ -18,18 +18,37 @@ class PlaygroundCatalogTile extends StatelessWidget {
   final VoidCallback onPress;
 
   @override
-  Widget build(BuildContext context) => FTile(
-    prefix: Icon(icon),
-    title: Text(title),
-    subtitle: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 6,
-      children: [
-        Text(description),
-        FBadge(variant: .secondary, child: Text(capabilitySummary)),
-      ],
-    ),
-    suffix: const Icon(FLucideIcons.chevronRight),
-    onPress: onPress,
-  );
+  Widget build(BuildContext context) {
+    final capabilities = capabilitySummary
+        .split('、')
+        .where((capability) => capability.isNotEmpty);
+    return FTile(
+      prefix: Icon(icon),
+      title: Text(title),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: 6,
+        children: [
+          Text(description, maxLines: 2, overflow: TextOverflow.visible),
+          Wrap(
+            spacing: 4,
+            runSpacing: 4,
+            children: [
+              for (final capability in capabilities)
+                FBadge(
+                  variant: .secondary,
+                  child: Text(
+                    capability,
+                    maxLines: 1,
+                    overflow: TextOverflow.visible,
+                  ),
+                ),
+            ],
+          ),
+        ],
+      ),
+      suffix: const Icon(FLucideIcons.chevronRight),
+      onPress: onPress,
+    );
+  }
 }

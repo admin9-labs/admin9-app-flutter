@@ -4,6 +4,7 @@ import 'package:admin9_app_flutter/features/examples/presentation/widgets/playgr
 import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_preview.dart';
 import 'package:admin9_app_flutter/theme/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart' show RenderParagraph;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:forui/forui.dart';
 
@@ -98,6 +99,43 @@ void main() {
     await tester.tap(find.byType(FTile));
     await tester.pump(const Duration(milliseconds: 200));
     expect(opened, isTrue);
+  });
+
+  testWidgets('catalog tile wraps complete copy at 320px', (tester) async {
+    tester.view.physicalSize = const Size(320, 640);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(
+      _Harness(
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: PlaygroundCatalogTile(
+            icon: FLucideIcons.panelTop,
+            title: '移动页面框架实验台',
+            description: '在同一移动页面中验证头部、底栏、响应式与安全区。',
+            capabilitySummary: 'Scaffold、Header、Bottom bar、Responsive',
+            onPress: () {},
+          ),
+        ),
+      ),
+    );
+
+    expect(find.byType(FBadge), findsNWidgets(4));
+    for (final text in [
+      '在同一移动页面中验证头部、底栏、响应式与安全区。',
+      'Scaffold',
+      'Header',
+      'Bottom bar',
+      'Responsive',
+    ]) {
+      expect(
+        tester.renderObject<RenderParagraph>(find.text(text)).didExceedMaxLines,
+        isFalse,
+        reason: '$text must render without ellipsis',
+      );
+    }
+    expect(tester.takeException(), isNull);
   });
 }
 
