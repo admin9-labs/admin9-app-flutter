@@ -5,6 +5,7 @@ import 'package:admin9_app_flutter/app/appearance/app_appearance_service.dart';
 import 'package:admin9_app_flutter/features/examples/presentation/pages/catalog/forms_page.dart';
 import 'package:admin9_app_flutter/features/examples/presentation/pages/form/text_input/text_input_playground_page.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -57,8 +58,12 @@ void main() {
     await tester.tap(textFieldEntry);
     await tester.pumpAndSettle();
     expect(find.byType(TextInputPlaygroundPage), findsOneWidget);
-    expect(await tester.binding.handlePopRoute(), isTrue);
-    await tester.pumpAndSettle();
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      await _verifyIosEdgeBack(tester);
+    } else {
+      expect(await tester.binding.handlePopRoute(), isTrue);
+      await tester.pumpAndSettle();
+    }
     expect(find.byType(FormsPage), findsOneWidget);
 
     await _selectDestination(tester, '设置');
@@ -73,6 +78,26 @@ void main() {
       contains('"brightness":"dark"'),
     );
   });
+}
+
+Future<void> _verifyIosEdgeBack(WidgetTester tester) async {
+  final viewSize = tester.view.physicalSize / tester.view.devicePixelRatio;
+  final start = Offset(1, viewSize.height / 2);
+  final cancelDistance = viewSize.width * 0.2;
+  final cancelGesture = await tester.startGesture(start);
+  await cancelGesture.moveBy(Offset(cancelDistance, 0));
+  await tester.pump(const Duration(milliseconds: 120));
+  await cancelGesture.moveBy(Offset(-cancelDistance, 0));
+  await cancelGesture.up();
+  await tester.pumpAndSettle();
+  expect(find.byType(TextInputPlaygroundPage), findsOneWidget);
+
+  await tester.timedDragFrom(
+    start,
+    Offset(viewSize.width * 0.9, 0),
+    const Duration(milliseconds: 300),
+  );
+  await tester.pumpAndSettle();
 }
 
 Future<void> _selectDestination(WidgetTester tester, String label) async {
