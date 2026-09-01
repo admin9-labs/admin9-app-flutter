@@ -7,8 +7,8 @@ finished product, backend, or compatibility layer for superseded APIs.
 
 ## Current Release
 
-The current release line starts with
-[Admin9 App Starter v1.0.0](https://github.com/admin9-labs/admin9-app-flutter/releases/tag/v1.0.0).
+The current release is
+[Admin9 App Starter v1.1.0](https://github.com/admin9-labs/admin9-app-flutter/releases/tag/v1.1.0).
 The Git history contains the superseded `App*` architecture as historical
 context, not a compatibility contract for this Forui Starter. The App Starter
 release is source-only. Its GitHub CI results verify the release source; no App
@@ -24,8 +24,8 @@ binary, screenshot, or UI evidence ZIP is distributed with the release.
 - Riverpod presentation state and dependency wiring.
 - Simplified Chinese App copy through EasyLocalization, plus Forui's own
   localization delegate.
-- A Settings example that persists the system/light/dark theme preference
-  through a Repository and SharedPreferences Service.
+- A Settings example that persists brightness, Theme preset, five font-size
+  preferences, and radius through a Repository and SharedPreferences Service.
 - Reusable App-level page patterns under `lib/shared/ui/`, each backed by real
   consumers and tests.
 - `dev.admin9.starter` as the Android application ID/namespace and iOS Runner
