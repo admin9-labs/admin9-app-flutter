@@ -170,8 +170,7 @@ scenario with all of the following:
 - a live preview that changes from those controls and exposes applicable
   enabled, selected, loading, error, confirmation, and content states;
 - executable interaction with visible, accessible feedback;
-- a minimal Dart usage or parameter summary synchronized with the current
-  configuration, plus copy feedback and a reset command; and
+- a reset command that restores the documented defaults; and
 - Chinese long-copy, narrow-screen, large-text, light/dark, directionality,
   focus, semantics, and no-overflow evidence appropriate to that capability.
 
@@ -185,8 +184,8 @@ complete scenario. Coverage is retained by recording each capability's axes and
 focused evidence in the version-bound ledger, not by creating a page for every
 type. Merely rendering an `F*` widget is not direct coverage.
 
-Preview frames, configuration sections, synchronized usage summaries, copy
-feedback, and reset controls are Examples-owned UI under
+Preview frames, configuration sections, interaction feedback, and reset
+controls are Examples-owned UI under
 `features/examples/presentation/widgets/`. They do not enter `shared/ui/` unless
 they independently become a stable App-wide or Admin9 brand responsibility with
 a non-Showroom consumer.
@@ -285,7 +284,7 @@ requirement.
 | Area | Required coverage |
 | --- | --- |
 | Theme and language | Chinese App translations, Forui component translations, missing-key behavior, font fallback, light and dark themes, readable contrast, and states |
-| Showroom closure | configuration changes the preview, interactions produce visible feedback, usage/parameter summaries remain synchronized, copy reports success or failure, and reset restores documented defaults |
+| Showroom closure | configuration changes the preview, interactions produce visible feedback, and reset restores documented defaults |
 | Responsive layout | narrow supported screens, large system text, long Chinese labels, safe content growth, and no overflow |
 | Navigation | typed AutoRoute generation, adaptive Route behavior, basic stack/back behavior, Forui navigation controls, and each actually implemented Tab stack, Guard, Observer, or deep-link reconstruction path |
 | Forms | labels, validation, focus order, disabled/loading/error states, password/input behavior, and system keyboard interaction |

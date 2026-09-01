@@ -1,6 +1,4 @@
 import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_action_bar.dart';
-import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_clipboard.dart';
-import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_code_panel.dart';
 import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_preview.dart';
 import 'package:admin9_app_flutter/shared/ui/component_example_section.dart';
 import 'package:admin9_app_flutter/shared/ui/responsive_page_body.dart';
@@ -30,19 +28,6 @@ class _SelectionControlsPlaygroundPageState
   Set<String> _channels = {'email'};
   String _status = 'examples.forms.playgrounds.common.ready'.tr();
 
-  String get _summary =>
-      'enabled: $_enabled, updates: $_updates, marketing: $_marketing, '
-      'frequency: ${_frequency.single}, channels: ${_channels.join(',')}, '
-      'error: $_showError, leadingLabel: $_leadingLabels';
-
-  String get _code =>
-      '''FSwitch(
-  value: $_updates,
-  enabled: $_enabled,
-  leadingLabel: $_leadingLabels,
-  onChange: updatePreference,
-)''';
-
   void _save() {
     final valid = _formKey.currentState?.validate() ?? false;
     if (valid) _formKey.currentState?.save();
@@ -66,13 +51,6 @@ class _SelectionControlsPlaygroundPageState
     _formKey.currentState?.reset();
     _status = 'examples.forms.playgrounds.common.reset_done'.tr();
   });
-
-  Future<void> _copy() => copyPlaygroundText(
-    context,
-    text: _code,
-    title: 'examples.forms.playgrounds.common.copied'.tr(),
-    description: 'examples.forms.playgrounds.common.copied_description'.tr(),
-  );
 
   @override
   Widget build(BuildContext context) => FScaffold(
@@ -271,15 +249,8 @@ class _SelectionControlsPlaygroundPageState
             ],
           ),
         ),
-        PlaygroundCodePanel(
-          title: 'examples.forms.playgrounds.common.current_parameters'.tr(),
-          summary: _summary,
-          code: _code,
-        ),
         PlaygroundActionBar(
-          copyLabel: 'examples.forms.playgrounds.common.copy'.tr(),
           resetLabel: 'examples.forms.playgrounds.common.reset'.tr(),
-          onCopy: _copy,
           onReset: _reset,
         ),
       ],

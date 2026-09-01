@@ -1,8 +1,6 @@
 import 'dart:convert';
 
 import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_action_bar.dart';
-import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_clipboard.dart';
-import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_code_panel.dart';
 import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_preview.dart';
 import 'package:admin9_app_flutter/shared/ui/component_example_section.dart';
 import 'package:admin9_app_flutter/shared/ui/responsive_page_body.dart';
@@ -28,28 +26,6 @@ class _OverviewPlaygroundPageState extends State<OverviewPlaygroundPage> {
   bool _following = false;
   int _members = _defaultMembers;
   String _statusKey = 'examples.content.playgrounds.common.ready';
-
-  String get _summary =>
-      'showBadge: $_showBadge, showDescription: $_showDescription, '
-      'expanded: ${_expandedSections.toList()}, members: $_members, '
-      'following: $_following';
-
-  String get _code =>
-      '''FCard(
-  child: Column(
-    children: [
-      FAvatar.raw(child: const Text('A9')),
-      ${_showBadge ? "FBadge(child: const Text('$_members'))," : ''}
-      FAccordion(
-        control: FAccordionControl.lifted(
-          expanded: (index) => ${_expandedSections.contains(0)},
-          onChange: onExpandedChanged,
-        ),
-        children: projectSections,
-      ),
-    ],
-  ),
-)''';
 
   void _reset() => setState(() {
     _showBadge = true;
@@ -319,21 +295,8 @@ class _OverviewPlaygroundPageState extends State<OverviewPlaygroundPage> {
             ],
           ),
         ),
-        PlaygroundCodePanel(
-          title: 'examples.content.playgrounds.common.current_parameters'.tr(),
-          summary: _summary,
-          code: _code,
-        ),
         PlaygroundActionBar(
-          copyLabel: 'examples.content.playgrounds.common.copy'.tr(),
           resetLabel: 'examples.content.playgrounds.common.reset'.tr(),
-          onCopy: () => copyPlaygroundText(
-            context,
-            text: _code,
-            title: 'examples.content.playgrounds.common.copied'.tr(),
-            description:
-                'examples.content.playgrounds.common.copied_description'.tr(),
-          ),
           onReset: _reset,
         ),
       ],

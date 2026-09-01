@@ -48,11 +48,11 @@ example and its removal contract live in [Upstream Starter](docs/starter.md).
   needs a clear responsibility, a real consumer, documentation, and tests. Do
   not create empty directories, vague `utils.dart`, `helpers.dart`, or
   `common.dart` files, placeholder interfaces, or pass-through Use Cases.
-- Playground-only preview, configuration, usage-summary, copy, and reset UI
-  stays in Examples. A `direct` capability claim requires a realistic scenario,
-  configuration-driven preview, observable interaction feedback, synchronized
-  usage summary, copy and reset behavior, responsive/accessibility coverage,
-  and focused tests; rendering an `F*` type is not coverage.
+- Playground-only preview, configuration, and reset UI stays in Examples. A
+  `direct` capability claim requires a realistic scenario,
+  configuration-driven preview, observable interaction feedback, reset
+  behavior, responsive/accessibility coverage, and focused tests; rendering an
+  `F*` type is not coverage.
 - Use `snake_case`; route pages use `*_page.dart` and `*Page`; feature Riverpod
   declarations use specific `*_provider.dart` names. Keep one primary public
   responsibility per file.

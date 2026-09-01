@@ -226,7 +226,7 @@ void main() {
 
       await _selectDestination(tester, '表单');
       expect(find.byType(FormsPage), findsOneWidget);
-      expect(find.text('在完整表单流程中配置、输入、校验、反馈并复制用法。'), findsOneWidget);
+      expect(find.text('在完整表单流程中配置、输入、校验、反馈并恢复默认状态。'), findsOneWidget);
       _expectInsets(tester, find.byType(FormsPage), scenario);
       expect(tester.takeException(), isNull);
 

@@ -1,6 +1,4 @@
 import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_action_bar.dart';
-import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_clipboard.dart';
-import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_code_panel.dart';
 import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_preview.dart';
 import 'package:admin9_app_flutter/shared/ui/component_example_section.dart';
 import 'package:admin9_app_flutter/shared/ui/responsive_page_body.dart';
@@ -30,7 +28,6 @@ class _SchedulingPlaygroundPageState extends State<SchedulingPlaygroundPage>
   FTime? _time = const FTime(14, 30);
   FTime _wheelTime = const FTime(14, 30);
   String _dateMode = 'calendar';
-  bool _popoverShown = false;
   bool _hour24 = true;
   bool _enabled = true;
   int _minuteInterval = 15;
@@ -49,21 +46,6 @@ class _SchedulingPlaygroundPageState extends State<SchedulingPlaygroundPage>
     );
     _timePopoverController = FPopoverController(vsync: this);
   }
-
-  String get _summary =>
-      'hour24: $_hour24, minuteInterval: $_minuteInterval, '
-      'enabled: $_enabled, dateField: $_dateMode, '
-      'popoverShown: $_popoverShown, dateTime: ${_dateTime.toIso8601String()}';
-
-  String get _code =>
-      '''FDateTimePicker(
-  control: FDateTimePickerControl.lifted(
-    dateTime: DateTime(2026, 9, 8, ${_dateTime.hour}, ${_dateTime.minute}),
-    onChange: updateSchedule,
-  ),
-  hour24: $_hour24,
-  minuteInterval: $_minuteInterval,
-)''';
 
   void _save() {
     final valid = _formKey.currentState?.validate() ?? false;
@@ -103,19 +85,11 @@ class _SchedulingPlaygroundPageState extends State<SchedulingPlaygroundPage>
     _date = DateTime(2026, 9, 8);
     _time = const FTime(14, 30);
     _dateMode = 'calendar';
-    _popoverShown = false;
     _hour24 = true;
     _enabled = true;
     _minuteInterval = 15;
     _status = 'examples.forms.playgrounds.common.reset_done'.tr();
   });
-
-  Future<void> _copy() => copyPlaygroundText(
-    context,
-    text: _code,
-    title: 'examples.forms.playgrounds.common.copied'.tr(),
-    description: 'examples.forms.playgrounds.common.copied_description'.tr(),
-  );
 
   @override
   void dispose() {
@@ -214,10 +188,7 @@ class _SchedulingPlaygroundPageState extends State<SchedulingPlaygroundPage>
                     time: _time,
                     onChange: (value) => setState(() => _time = value),
                   ),
-                  popoverControl: .managed(
-                    controller: _timePopoverController,
-                    onChange: (shown) => setState(() => _popoverShown = shown),
-                  ),
+                  popoverControl: .managed(controller: _timePopoverController),
                   enabled: _enabled,
                   clearable: true,
                   hour24: _hour24,
@@ -328,15 +299,8 @@ class _SchedulingPlaygroundPageState extends State<SchedulingPlaygroundPage>
             ],
           ),
         ),
-        PlaygroundCodePanel(
-          title: 'examples.forms.playgrounds.common.current_parameters'.tr(),
-          summary: _summary,
-          code: _code,
-        ),
         PlaygroundActionBar(
-          copyLabel: 'examples.forms.playgrounds.common.copy'.tr(),
           resetLabel: 'examples.forms.playgrounds.common.reset'.tr(),
-          onCopy: _copy,
           onReset: _reset,
         ),
       ],

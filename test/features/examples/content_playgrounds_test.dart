@@ -8,7 +8,6 @@ import 'package:admin9_app_flutter/features/examples/presentation/pages/data/pla
 import 'package:admin9_app_flutter/theme/theme.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:forui/forui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -94,7 +93,6 @@ void main() {
           matching: find.text('暂时无法加载'),
         ),
       );
-      expect(_summary(tester), contains('0, 1'));
       expect(
         tester.widget<FCollapsible>(find.byType(FCollapsible).at(1)).value,
         1,
@@ -120,30 +118,26 @@ void main() {
         find.byKey(const ValueKey('overview-member-badge')),
         findsOneWidget,
       );
-      expect(_summary(tester), contains('members: 12'));
 
       await _tap(tester, find.byKey(const ValueKey('overview-show-badge')));
       expect(find.byKey(const ValueKey('overview-member-badge')), findsNothing);
-      expect(_summary(tester), contains('showBadge: false'));
 
       await _tap(
         tester,
         find.byKey(const ValueKey('overview-members-increase')),
       );
-      expect(_summary(tester), contains('members: 13'));
+      expect(find.semantics.byLabel('项目成员 13 人'), findsWidgets);
 
       await _tap(tester, find.byKey(const ValueKey('overview-follow')));
       expect(find.text('已关注项目'), findsOneWidget);
-      expect(_summary(tester), contains('following: true'));
 
       await _tap(tester, find.byKey(const ValueKey('playground-reset')));
       expect(
         find.byKey(const ValueKey('overview-member-badge')),
         findsOneWidget,
       );
-      expect(_summary(tester), contains('showBadge: true'));
-      expect(_summary(tester), contains('members: 12'));
-      expect(_summary(tester), contains('following: false'));
+      expect(find.semantics.byLabel('项目成员 12 人'), findsWidgets);
+      expect(find.text('关注项目'), findsOneWidget);
       expect(tester.takeException(), isNull);
       semantics.dispose();
     },
@@ -160,7 +154,12 @@ void main() {
       findsOneWidget,
     );
     expect(find.byType(FLineCalendar), findsOneWidget);
-    expect(_summary(tester), contains('mode: single'));
+    expect(
+      tester
+          .widget<FButton>(find.byKey(const ValueKey('calendar-mode-single')))
+          .selected,
+      isTrue,
+    );
 
     var calendar = tester.widget<FCalendar>(find.byType(FCalendar));
     final navigation = calendar.control as FGridCalendarControl;
@@ -177,7 +176,7 @@ void main() {
         calendar.selectionControl as FDateSelectionLiftedControl<DateTime?>;
     single.onChange(DateTime.utc(2026, 9, 3));
     await tester.pump();
-    expect(_summary(tester), contains('2026-09-03'));
+    expect(_status(tester), contains('2026-09-03'));
     final blockedDay = find.semantics.byLabel(RegExp(r'^2026年9月8日'));
     final weekendDay = find.semantics.byLabel(RegExp(r'^2026年9月6日'));
     expect(
@@ -208,7 +207,6 @@ void main() {
           .isEnabled,
       Tristate.isFalse,
     );
-    expect(_summary(tester), contains('2026-09-03'));
     expect(
       weekendDay
           .evaluate()
@@ -221,7 +219,7 @@ void main() {
           .isEnabled,
       Tristate.isFalse,
     );
-    expect(_summary(tester), contains('2026-09-03'));
+    expect(_status(tester), contains('2026-09-03'));
 
     await _tap(tester, find.byKey(const ValueKey('calendar-mode-multiple')));
     calendar = tester.widget<FCalendar>(find.byType(FCalendar));
@@ -229,23 +227,32 @@ void main() {
         calendar.selectionControl as FDateSelectionLiftedControl<Set<DateTime>>;
     multiple.onChange({DateTime.utc(2026, 9, 3), DateTime.utc(2026, 9, 4)});
     await tester.pump();
-    expect(_summary(tester), contains('mode: multiple'));
-    expect(_summary(tester), contains('2026-09-03,2026-09-04'));
+    expect(
+      tester
+          .widget<FButton>(find.byKey(const ValueKey('calendar-mode-multiple')))
+          .selected,
+      isTrue,
+    );
+    expect(_status(tester), contains('2026-09-03,2026-09-04'));
 
     await _tap(tester, find.byKey(const ValueKey('calendar-mode-range')));
     expect(
       find.byKey(const ValueKey('calendar-playground-range')),
       findsOneWidget,
     );
-    expect(_summary(tester), contains('mode: range'));
-    expect(_code(tester), contains('liftedRange'));
+    expect(
+      tester
+          .widget<FButton>(find.byKey(const ValueKey('calendar-mode-range')))
+          .selected,
+      isTrue,
+    );
 
     final selection =
         tester.widget<FCalendar>(find.byType(FCalendar)).selectionControl
             as FDateSelectionLiftedControl<(DateTime, DateTime)?>;
     selection.onChange((DateTime.utc(2026, 9, 7), DateTime.utc(2026, 9, 9)));
     await tester.pump();
-    expect(_summary(tester), contains('2026-09-07..2026-09-09'));
+    expect(_status(tester), contains('2026-09-07..2026-09-09'));
 
     await _tap(tester, find.byKey(const ValueKey('calendar-exclude-weekends')));
     await _tap(tester, find.byKey(const ValueKey('calendar-mode-single')));
@@ -268,7 +275,7 @@ void main() {
             as FDateSelectionLiftedControl<DateTime?>;
     enabledSingle.onChange(DateTime.utc(2026, 9, 6));
     await tester.pump();
-    expect(_summary(tester), contains('2026-09-06'));
+    expect(_status(tester), contains('2026-09-06'));
 
     final line = tester.widget<FLineCalendar>(find.byType(FLineCalendar));
     final lineScroll =
@@ -285,15 +292,30 @@ void main() {
     final dynamic lineControl = line.control;
     lineControl.onChange(DateTime.utc(2026, 9, 2));
     await tester.pump();
-    expect(_summary(tester), contains('2026-09-02'));
+    expect(_status(tester), contains('2026-09-02'));
 
     await _tap(tester, find.byKey(const ValueKey('calendar-show-line')));
     expect(find.byType(FLineCalendar), findsNothing);
-    expect(_summary(tester), contains('lineCalendar: false'));
+    expect(
+      tester
+          .widget<FSwitch>(find.byKey(const ValueKey('calendar-show-line')))
+          .value,
+      isFalse,
+    );
 
     await _tap(tester, find.byKey(const ValueKey('playground-reset')));
-    expect(_summary(tester), contains('mode: single'));
-    expect(_summary(tester), contains('lineCalendar: true'));
+    expect(
+      tester
+          .widget<FButton>(find.byKey(const ValueKey('calendar-mode-single')))
+          .selected,
+      isTrue,
+    );
+    expect(
+      tester
+          .widget<FSwitch>(find.byKey(const ValueKey('calendar-show-line')))
+          .value,
+      isTrue,
+    );
     expect(find.byType(FLineCalendar), findsOneWidget);
     expect(tester.takeException(), isNull);
     semantics.dispose();
@@ -337,7 +359,7 @@ void main() {
     );
     firstItem.onPress!();
     await tester.pump();
-    expect(_summary(tester), contains('selected: members-1'));
+    expect(_status(tester), contains('members-1'));
 
     final itemScroll = itemGroup.scrollController!;
     itemScroll.jumpTo(itemScroll.position.maxScrollExtent);
@@ -355,10 +377,10 @@ void main() {
 
     await _tap(tester, find.byKey(const ValueKey('lists-menu-comfortable')));
     await _tap(tester, find.byKey(const ValueKey('lists-menu-compact-option')));
-    expect(_summary(tester), contains('layout: compact'));
+    expect(_status(tester), contains('compact'));
 
     await _tap(tester, find.byKey(const ValueKey('lists-layout-compact')));
-    expect(_summary(tester), contains('layout: compact'));
+    expect(_status(tester), contains('compact'));
 
     await _tap(tester, find.byKey(const ValueKey('lists-section-updates')));
     await _tap(tester, find.byKey(const ValueKey('lists-save-selection')));
@@ -391,7 +413,6 @@ void main() {
     expect(_status(tester), '离线缓存已清理');
 
     await _tap(tester, find.byKey(const ValueKey('lists-descriptions')));
-    expect(_summary(tester), contains('descriptions: false'));
     expect(find.text('查看项目成员及协作角色。'), findsNothing);
 
     await _tap(tester, find.byKey(const ValueKey('lists-full-dividers')));
@@ -410,44 +431,19 @@ void main() {
     );
 
     await _tap(tester, find.byKey(const ValueKey('playground-reset')));
-    expect(_summary(tester), contains('enabled: true'));
-    expect(_summary(tester), contains('descriptions: true'));
-    expect(_summary(tester), contains('divider: indented'));
-    expect(_summary(tester), contains('layout: comfortable'));
-    expect(_summary(tester), contains('sections: updates'));
+    expect(tester.widget<FItemGroup>(find.byType(FItemGroup)).enabled, isTrue);
+    expect(
+      tester.widget<FItemGroup>(find.byType(FItemGroup)).divider,
+      FItemDivider.indented,
+    );
+    expect(
+      tester
+          .widget<FTileGroup>(find.byKey(const ValueKey('lists-tile-group')))
+          .enabled,
+      isTrue,
+    );
+    expect(find.text('查看项目成员及协作角色。'), findsWidgets);
     expect(tester.takeException(), isNull);
-  });
-
-  testWidgets('every content playground copies its synchronized code', (
-    tester,
-  ) async {
-    final calls = <MethodCall>[];
-    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-      SystemChannels.platform,
-      (call) async {
-        if (call.method == 'Clipboard.setData') calls.add(call);
-        return null;
-      },
-    );
-    addTearDown(
-      () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-        SystemChannels.platform,
-        null,
-      ),
-    );
-
-    for (final page in const [
-      OverviewPlaygroundPage(),
-      CalendarPlaygroundPage(),
-      ListsPlaygroundPage(),
-    ]) {
-      await _pumpPage(tester, page);
-      final expected = _code(tester);
-      await _tap(tester, find.byKey(const ValueKey('playground-copy')));
-      expect(calls.last.arguments, {'text': expected});
-      expect(find.text('代码已复制'), findsOneWidget);
-    }
-    expect(calls, hasLength(3));
   });
 
   testWidgets('content playgrounds fit narrow and large-text viewports', (
@@ -461,26 +457,21 @@ void main() {
       ]) {
         await _pumpPage(tester, page, size: size, textScale: 2);
         await tester.scrollUntilVisible(
-          find.byKey(const ValueKey('playground-copy')),
+          find.byKey(const ValueKey('playground-reset')),
           300,
           scrollable: find.byType(Scrollable).first,
         );
         await tester.pump();
         expect(tester.takeException(), isNull, reason: '$page at $size');
+        expect(find.byKey(const ValueKey('playground-code')), findsNothing);
+        expect(find.byKey(const ValueKey('playground-copy')), findsNothing);
       }
     }
   });
 }
 
-String _summary(WidgetTester tester) => tester
-    .widget<Text>(find.byKey(const ValueKey('playground-parameter-summary')))
-    .data!;
-
 String _status(WidgetTester tester) =>
     tester.widget<Text>(find.byKey(const ValueKey('playground-status'))).data!;
-
-String _code(WidgetTester tester) =>
-    tester.widget<Text>(find.byKey(const ValueKey('playground-code'))).data!;
 
 Future<void> _tap(WidgetTester tester, Finder finder) async {
   await tester.ensureVisible(finder);

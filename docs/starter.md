@@ -5,10 +5,9 @@
 This document defines the Admin9 UI Showroom bundled with the upstream Flutter
 Starter. The Showroom is a usable Playground for finding UI capabilities,
 configuring realistic mobile scenarios, observing interaction feedback,
-inspecting and copying matching Dart usage, and resetting state. It is not a
-downstream product contract. A derived project may remove the Examples Feature,
-but must update its routes, tests, translations, and local acceptance claims
-together.
+and resetting state. It is not a downstream product contract. A derived project
+may remove the Examples Feature, but must update its routes, tests, translations,
+and local acceptance claims together.
 
 The reference App targets Android and iOS. Its five persistent destinations are
 Foundation, Forms, Content, Feedback, and Settings. The first four are owned by
@@ -79,11 +78,10 @@ page count is not a coverage metric.
 
 `direct` requires a complete mobile scenario, configuration controls backed by
 real public API parameters, a configuration-driven preview, executable
-interaction with visible feedback, synchronized Dart usage or parameter summary,
-copy feedback, reset behavior, Chinese copy, and focused responsive and
-accessibility evidence. `indirect` requires a real higher-level consumer and
-focused test. `documented` is a non-runtime source or command contract.
-`excluded` records why the mobile Starter deliberately omits it.
+interaction with visible feedback, reset behavior, Chinese UI text, and focused
+responsive and accessibility evidence. `indirect` requires a real higher-level
+consumer and focused test. `documented` is a non-runtime source or command
+contract. `excluded` records why the mobile Starter deliberately omits it.
 
 The presence of an `F*` type in source is not coverage. Each direct Playground must
 exercise the axes named below. A Forui version or snapshot hash change

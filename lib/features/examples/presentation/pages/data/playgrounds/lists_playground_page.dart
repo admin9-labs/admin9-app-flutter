@@ -1,6 +1,4 @@
 import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_action_bar.dart';
-import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_clipboard.dart';
-import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_code_panel.dart';
 import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_preview.dart';
 import 'package:admin9_app_flutter/shared/ui/component_example_section.dart';
 import 'package:admin9_app_flutter/shared/ui/responsive_page_body.dart';
@@ -27,23 +25,6 @@ class _ListsPlaygroundPageState extends State<ListsPlaygroundPage> {
   Set<String> _sections = {'updates'};
   String _selectedEntry = 'updates';
   String _statusKey = 'examples.content.playgrounds.common.ready';
-
-  String get _summary =>
-      'enabled: $_enabled, descriptions: $_showDescriptions, '
-      'divider: ${_fullDividers ? 'full' : 'indented'}, layout: $_layout, '
-      'sections: ${_sections.join(',')}, selected: $_selectedEntry';
-
-  String get _code =>
-      '''FItemGroup(
-  enabled: $_enabled,
-  divider: FItemDivider.${_fullDividers ? 'full' : 'indented'},
-  children: items,
-)
-FTileGroup(
-  enabled: $_enabled,
-  divider: FItemDivider.${_fullDividers ? 'full' : 'indented'},
-  children: tiles,
-)''';
 
   void _reset() {
     _formKey.currentState?.reset();
@@ -314,21 +295,8 @@ FTileGroup(
             ],
           ),
         ),
-        PlaygroundCodePanel(
-          title: 'examples.content.playgrounds.common.current_parameters'.tr(),
-          summary: _summary,
-          code: _code,
-        ),
         PlaygroundActionBar(
-          copyLabel: 'examples.content.playgrounds.common.copy'.tr(),
           resetLabel: 'examples.content.playgrounds.common.reset'.tr(),
-          onCopy: () => copyPlaygroundText(
-            context,
-            text: _code,
-            title: 'examples.content.playgrounds.common.copied'.tr(),
-            description:
-                'examples.content.playgrounds.common.copied_description'.tr(),
-          ),
           onReset: _reset,
         ),
       ],

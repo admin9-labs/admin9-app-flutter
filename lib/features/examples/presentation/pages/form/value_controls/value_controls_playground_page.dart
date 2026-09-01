@@ -1,6 +1,4 @@
 import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_action_bar.dart';
-import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_clipboard.dart';
-import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_code_panel.dart';
 import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_preview.dart';
 import 'package:admin9_app_flutter/shared/ui/component_example_section.dart';
 import 'package:admin9_app_flutter/shared/ui/responsive_page_body.dart';
@@ -58,31 +56,6 @@ class _ValueControlsPlaygroundPageState
     });
   }
 
-  String get _summary => _rangeMode
-      ? 'mode: range, min: ${(_range.min * 100).round()}%, '
-            'max: ${(_range.max * 100).round()}%, '
-            'stepPercentage: $_step, enabled: $_enabled'
-      : 'mode: value, value: ${(_value.max * 100).round()}%, '
-            'bounds: 25%-75%, stepPercentage: $_step, enabled: $_enabled';
-
-  String get _code => _rangeMode
-      ? '''FSlider(
-  control: FSliderControl.liftedContinuousRange(
-    value: FSliderValue(min: ${_range.min}, max: ${_range.max}),
-    stepPercentage: $_step,
-    onChange: updateRange,
-  ),
-  enabled: $_enabled,
-)'''
-      : '''FSlider(
-  control: FSliderControl.liftedContinuous(
-    value: FSliderValue(max: ${_value.max}),
-    stepPercentage: $_step,
-    onChange: updateValue,
-  ),
-  enabled: $_enabled,
-)''';
-
   void _reset() => setState(() {
     _value = FSliderValue(max: 0.45, constraints: (min: 0.25, max: 0.75));
     _range = FSliderValue(min: 0.2, max: 0.75);
@@ -93,13 +66,6 @@ class _ValueControlsPlaygroundPageState
     _step = 0.05;
     _status = 'value: 45%';
   });
-
-  Future<void> _copy() => copyPlaygroundText(
-    context,
-    text: _code,
-    title: 'examples.forms.playgrounds.common.copied'.tr(),
-    description: 'examples.forms.playgrounds.common.copied_description'.tr(),
-  );
 
   @override
   void dispose() {
@@ -248,15 +214,8 @@ class _ValueControlsPlaygroundPageState
               ],
             ),
           ),
-          PlaygroundCodePanel(
-            title: 'examples.forms.playgrounds.common.current_parameters'.tr(),
-            summary: _summary,
-            code: _code,
-          ),
           PlaygroundActionBar(
-            copyLabel: 'examples.forms.playgrounds.common.copy'.tr(),
             resetLabel: 'examples.forms.playgrounds.common.reset'.tr(),
-            onCopy: _copy,
             onReset: _reset,
           ),
         ],

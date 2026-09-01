@@ -1,6 +1,4 @@
 import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_action_bar.dart';
-import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_clipboard.dart';
-import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_code_panel.dart';
 import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_preview.dart';
 import 'package:admin9_app_flutter/shared/ui/component_example_section.dart';
 import 'package:admin9_app_flutter/shared/ui/responsive_page_body.dart';
@@ -34,10 +32,6 @@ class _IconsPageState extends State<IconsPage> {
   String get _summary =>
       'icon: $_selected, size: ${_size.toStringAsFixed(0)}, '
       'themeMapping: $_themeMapping';
-
-  String get _code => _themeMapping
-      ? 'context.theme.icons.${_selectedEntry.themeToken!.name}(context)'
-      : 'Icon(FLucideIcons.${_selectedEntry.lucideName}, size: ${_size.toStringAsFixed(0)})';
 
   void _reset() => setState(() {
     _searchController.clear();
@@ -193,20 +187,8 @@ class _IconsPageState extends State<IconsPage> {
             ],
           ),
         ),
-        PlaygroundCodePanel(
-          title: 'examples.playground.usage'.tr(),
-          summary: _summary,
-          code: _code,
-        ),
         PlaygroundActionBar(
-          copyLabel: 'examples.playground.copy'.tr(),
           resetLabel: 'examples.playground.reset'.tr(),
-          onCopy: () => copyPlaygroundText(
-            context,
-            text: _code,
-            title: 'examples.playground.copied'.tr(),
-            description: _summary,
-          ),
           onReset: _reset,
         ),
       ],

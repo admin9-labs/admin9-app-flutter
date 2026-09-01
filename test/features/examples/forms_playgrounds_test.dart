@@ -7,7 +7,6 @@ import 'package:admin9_app_flutter/features/examples/presentation/pages/form/sel
 import 'package:admin9_app_flutter/features/examples/presentation/pages/form/selects/selects_playground_page.dart';
 import 'package:admin9_app_flutter/features/examples/presentation/pages/form/text_input/text_input_playground_page.dart';
 import 'package:admin9_app_flutter/features/examples/presentation/pages/form/value_controls/value_controls_playground_page.dart';
-import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_code_panel.dart';
 import 'package:admin9_app_flutter/theme/theme.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -57,7 +56,6 @@ void main() {
       );
       expect(preview.variant, FButtonVariant.destructive);
       expect(preview.size, FButtonSizeVariant.lg);
-      expect(_summary(tester), contains('variant: destructive'));
 
       await _tap(tester, 'buttons-kind-icon');
       expect(
@@ -102,7 +100,10 @@ void main() {
       );
       expect(preview.variant, FButtonVariant.primary);
       expect(preview.size, FButtonSizeVariant.md);
-      expect(_summary(tester), contains('kind: standard'));
+      expect(
+        find.byKey(const ValueKey('buttons-preview-standard')),
+        findsOneWidget,
+      );
       semantics.dispose();
     },
   );
@@ -193,6 +194,8 @@ void main() {
     expect(tester.widget<EditableText>(otpInput).focusNode.hasFocus, isTrue);
     expect(find.semantics.byLabel('验证码'), findsWidgets);
 
+    FocusManager.instance.primaryFocus?.unfocus();
+    await tester.pumpAndSettle();
     await _tap(tester, 'text-submit');
     expect(
       tester.widget<Text>(find.byKey(const ValueKey('text-saved-value'))).data,
@@ -208,14 +211,18 @@ void main() {
       '键盘提交',
     );
 
-    await _tap(tester, 'text-size-lg');
-    await _tap(tester, 'text-enabled-toggle');
+    tester
+        .widget<FButton>(find.byKey(const ValueKey('text-size-lg')))
+        .onPress!();
+    tester
+        .widget<FSwitch>(find.byKey(const ValueKey('text-enabled-toggle')))
+        .onChange!(false);
+    await tester.pump(const Duration(milliseconds: 300));
     final field = tester.widget<FTextField>(
       find.byKey(const ValueKey('text-preview-field')),
     );
     expect(field.size, FTextFieldSizeVariant.lg);
     expect(field.enabled, isFalse);
-    expect(_summary(tester), contains('enabled: false'));
 
     await _tapAction(tester, 'playground-reset');
     expect(
@@ -303,7 +310,6 @@ void main() {
           .enabled,
       isFalse,
     );
-    expect(_summary(tester), contains('enabled: false'));
     expect(find.semantics.byLabel('接收活动消息'), findsWidgets);
     expect(find.semantics.byLabel('仅重要更新'), findsWidgets);
 
@@ -330,12 +336,11 @@ void main() {
     await tester.pump(const Duration(milliseconds: 300));
     await tester.tap(find.text('高').last);
     await tester.pump(const Duration(milliseconds: 300));
-    expect(_summary(tester), contains('priority: high'));
+    expect(find.text('高'), findsWidgets);
     expect(find.semantics.byLabel('清除'), findsWidgets);
 
     await _tap(tester, 'selects-state-error');
     expect(find.byKey(const ValueKey('selects-preview-error')), findsOneWidget);
-    expect(_summary(tester), contains('state: error'));
     final search = find.byKey(const ValueKey('selects-search-priority'));
     final dynamic errorSearch = tester.widget<FSelect<String>>(search);
     expect(errorSearch.contentErrorBuilder, isNotNull);
@@ -370,7 +375,10 @@ void main() {
     final dynamic multiControl = multiWidget.control;
     multiControl.onChange({'email', 'push'});
     await tester.pump();
-    expect(_summary(tester), contains('email,push'));
+    final dynamic updatedMultiControl = tester
+        .widget<FMultiSelect<String>>(multi)
+        .control;
+    expect(updatedMultiControl.value, {'email', 'push'});
     await _tap(tester, 'selects-save');
     expect(_status(tester), contains('保存'));
     semantics.dispose();
@@ -388,8 +396,6 @@ void main() {
     await tester.tapAt(Offset(rect.left + rect.width * 0.8, rect.center.dy));
     await tester.pump(const Duration(milliseconds: 300));
     expect(_status(tester), isNot(before));
-    expect(_summary(tester), contains('value:'));
-    expect(_summary(tester), contains('bounds: 25%-75%'));
     final sliderWidget = tester.widget<FSlider>(slider);
     expect(sliderWidget.marks, hasLength(3));
     final tappedStatus = _status(tester);
@@ -410,9 +416,20 @@ void main() {
     );
 
     await _tap(tester, 'value-range-toggle');
-    expect(_summary(tester), contains('mode: range'));
+    expect(
+      tester
+          .widget<FSwitch>(find.byKey(const ValueKey('value-range-toggle')))
+          .value,
+      isTrue,
+    );
     await _tapAction(tester, 'playground-reset');
-    expect(_summary(tester), contains('value: 45%'));
+    expect(
+      tester
+          .widget<FSwitch>(find.byKey(const ValueKey('value-range-toggle')))
+          .value,
+      isFalse,
+    );
+    expect(_status(tester), 'value: 45%');
 
     final period = find.semantics.byLabel('时间段');
     final channel = find.semantics.byLabel('通知渠道');
@@ -493,7 +510,6 @@ void main() {
     final popover = timeField.popoverControl as FPopoverManagedControl;
     await popover.controller!.show(animated: false);
     await tester.pump();
-    expect(_summary(tester), contains('popoverShown: true'));
     expect(find.byType(FTimePicker), findsNWidgets(2));
     await tester.tapAt(const Offset(8, 80));
     await tester.pump(const Duration(milliseconds: 300));
@@ -506,7 +522,6 @@ void main() {
     );
     expect(picker.hour24, isFalse);
     expect(picker.minuteInterval, 30);
-    expect(_summary(tester), contains('minuteInterval: 30'));
     final timePicker = tester.widget<FTimePicker>(
       find.byKey(const ValueKey('schedule-preview-time-picker')),
     );
@@ -570,19 +585,12 @@ void main() {
           textScale: scenario.scale,
         );
         expect(tester.takeException(), isNull, reason: '$page');
-        expect(
-          find.byType(PlaygroundCodePanel),
-          findsOneWidget,
-          reason: '$page',
-        );
+        expect(find.byKey(const ValueKey('playground-code')), findsNothing);
+        expect(find.byKey(const ValueKey('playground-copy')), findsNothing);
       }
     });
   }
 }
-
-String _summary(WidgetTester tester) => tester
-    .widget<Text>(find.byKey(const ValueKey('playground-parameter-summary')))
-    .data!;
 
 String _status(WidgetTester tester) =>
     tester.widget<Text>(find.byKey(const ValueKey('playground-status'))).data!;
@@ -592,7 +600,12 @@ Finder _editableWithin(Key key) =>
 
 Future<void> _tapAction(WidgetTester tester, String key) async {
   final finder = find.byKey(ValueKey(key));
-  await tester.ensureVisible(finder);
+  await tester.scrollUntilVisible(
+    finder,
+    300,
+    scrollable: find.byType(Scrollable).first,
+  );
+  await tester.pump();
   await tester.tap(finder);
   await tester.pump(const Duration(milliseconds: 300));
 }

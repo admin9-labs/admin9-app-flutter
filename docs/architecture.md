@@ -78,9 +78,8 @@ The Starter has one approved runnable Admin9 UI Showroom Feature at
 `lib/features/examples/`. It owns the Foundation, Forms, Content, and Feedback
 groups and their Playgrounds, translations, tests, and routes. Settings remains
 an independent real Feature. The Showroom lets adopters browse a capability,
-configure a realistic scenario, interact with its states, inspect and copy the
-matching usage, and reset the scenario. It does not turn its scenarios into
-downstream product requirements.
+configure a realistic scenario, interact with its states, and reset the
+scenario. It does not turn its scenarios into downstream product requirements.
 
 Official capability ownership and route ownership are deliberately different.
 Several related Forui capabilities may map to one complete Playground when they
@@ -91,9 +90,9 @@ mapping and its focused evidence.
 
 Reusable structure that exists only to compose a Playground belongs under
 `lib/features/examples/presentation/widgets/`. This includes preview frames,
-configuration sections, synchronized usage summaries, copy feedback, and reset
-controls. It does not move to `shared/ui/` merely because several Showroom pages
-use it; `shared/ui/` remains reserved for stable App-wide or Admin9 brand APIs.
+configuration sections, interaction feedback, and reset controls. It does not
+move to `shared/ui/` merely because several Showroom pages use it; `shared/ui/`
+remains reserved for stable App-wide or Admin9 brand APIs.
 
 Examples may depend on `shared/ui/`; `shared/ui/` must not import Examples,
 AutoRoute, App routing, or a business Feature. Existing root-level shared UI

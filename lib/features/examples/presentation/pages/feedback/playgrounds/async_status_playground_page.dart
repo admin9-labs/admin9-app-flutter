@@ -1,6 +1,4 @@
 import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_action_bar.dart';
-import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_clipboard.dart';
-import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_code_panel.dart';
 import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_preview.dart';
 import 'package:admin9_app_flutter/shared/ui/component_example_section.dart';
 import 'package:admin9_app_flutter/shared/ui/responsive_page_body.dart';
@@ -30,20 +28,6 @@ class _AsyncStatusPlaygroundPageState extends State<AsyncStatusPlaygroundPage> {
   bool _running = false;
   int _operationGeneration = 0;
   String _statusKey = 'examples.feedback.playgrounds.async.status_ready';
-
-  String get _summary =>
-      'value: ${_progress.max.toStringAsFixed(2)}, '
-      'enabled: $_enabled, error: $_simulateError, '
-      'alignment: ${_toastAtTop ? 'topCenter' : 'bottomCenter'}, '
-      'duration: ${_shortToast ? '1s' : '5s'}, '
-      'circularSize: ${_largeCircular ? 'xl' : 'sm'}';
-
-  String get _code =>
-      'FDeterminateProgress(value: ${_progress.max.toStringAsFixed(2)});\n'
-      'FCircularProgress(size: FCircularProgressSizeVariant.${_largeCircular ? 'xl' : 'sm'});\n'
-      'showFToast(alignment: FToastAlignment.${_toastAtTop ? 'topCenter' : 'bottomCenter'}, '
-      'duration: Duration(seconds: ${_shortToast ? 1 : 5}), '
-      'variant: ${_simulateError ? 'FToastVariant.destructive' : 'FToastVariant.primary'});';
 
   Future<void> _run() async {
     if (!_enabled || _running) return;
@@ -113,13 +97,6 @@ class _AsyncStatusPlaygroundPageState extends State<AsyncStatusPlaygroundPage> {
       _statusKey = 'examples.feedback.playgrounds.async.status_ready';
     });
   }
-
-  Future<void> _copy() => copyPlaygroundText(
-    context,
-    text: _code,
-    title: 'examples.feedback.playgrounds.common.copied_title'.tr(),
-    description: 'examples.feedback.playgrounds.common.copied_description'.tr(),
-  );
 
   @override
   void dispose() {
@@ -272,15 +249,8 @@ class _AsyncStatusPlaygroundPageState extends State<AsyncStatusPlaygroundPage> {
             ],
           ),
         ),
-        PlaygroundCodePanel(
-          title: 'examples.feedback.playgrounds.common.usage'.tr(),
-          summary: _summary,
-          code: _code,
-        ),
         PlaygroundActionBar(
-          copyLabel: 'examples.feedback.playgrounds.common.copy'.tr(),
           resetLabel: 'examples.feedback.playgrounds.common.reset'.tr(),
-          onCopy: _copy,
           onReset: _reset,
         ),
       ],

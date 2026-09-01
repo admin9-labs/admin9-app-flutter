@@ -1,8 +1,6 @@
 import 'package:admin9_app_flutter/app/appearance/app_appearance_preference.dart';
 import 'package:admin9_app_flutter/app/appearance/app_appearance_provider.dart';
 import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_action_bar.dart';
-import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_clipboard.dart';
-import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_code_panel.dart';
 import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_preview.dart';
 import 'package:admin9_app_flutter/shared/ui/error_state_view.dart';
 import 'package:admin9_app_flutter/shared/ui/layout/grid/a_grid.dart';
@@ -204,16 +202,9 @@ class _ThemesPageState extends ConsumerState<ThemesPage> {
               ],
             ),
           ),
-          PlaygroundCodePanel(
-            title: 'examples.playground.code_title'.tr(),
-            summary: _summary(preference),
-            code: _code(preference),
-          ),
           PlaygroundActionBar(
-            copyLabel: 'examples.playground.copy'.tr(),
             resetLabel: 'settings.reset'.tr(),
             enabled: !saving,
-            onCopy: () => _copy(preference),
             onReset: _reset,
           ),
         ],
@@ -247,13 +238,6 @@ class _ThemesPageState extends ConsumerState<ThemesPage> {
     setState(() => _selected = true);
     await _save(AppAppearancePreference.defaults);
   }
-
-  Future<void> _copy(AppAppearancePreference preference) => copyPlaygroundText(
-    context,
-    text: _code(preference),
-    title: 'examples.playground.copied'.tr(),
-    description: 'examples.playground.copy_done'.tr(),
-  );
 
   Future<void> _showPreviewDialog(BuildContext context) => showFDialog<void>(
     context: context,
@@ -371,10 +355,6 @@ class _ColorSample extends StatelessWidget {
   );
 }
 
-String _summary(AppAppearancePreference value) =>
-    'preset=${value.preset.name}, brightness=${value.brightness.name}, '
-    'fontSize=${value.fontSize.name}, radius=${value.radius.name}';
-
 Widget _flexibleButtonLabel(
   BuildContext context,
   FButtonStyle style,
@@ -383,14 +363,6 @@ Widget _flexibleButtonLabel(
   FCircularProgressStyle progressStyle,
   Widget? child,
 ) => Flexible(child: child!);
-
-String _code(AppAppearancePreference value) =>
-    '''const AppAppearancePreference(
-  brightness: AppBrightnessPreference.${value.brightness.name},
-  preset: AppThemePreset.${value.preset.name},
-  fontSize: AppFontSizePreference.${value.fontSize.name},
-  radius: AppRadiusPreference.${value.radius.name},
-)''';
 
 String _brightnessLabel(AppBrightnessPreference value) => switch (value) {
   AppBrightnessPreference.system => 'settings.theme_system'.tr(),

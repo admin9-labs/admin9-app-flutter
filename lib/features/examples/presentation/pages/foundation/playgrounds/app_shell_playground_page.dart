@@ -1,6 +1,4 @@
 import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_action_bar.dart';
-import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_clipboard.dart';
-import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_code_panel.dart';
 import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_preview.dart';
 import 'package:admin9_app_flutter/shared/ui/component_example_section.dart';
 import 'package:admin9_app_flutter/shared/ui/responsive_page_body.dart';
@@ -22,20 +20,6 @@ class _AppShellPlaygroundPageState extends State<AppShellPlaygroundPage> {
   bool _safeAreaBottom = true;
   bool _headerActionEnabled = true;
   int _searchCount = 0;
-
-  String get _summary =>
-      'index: $_index, safeAreaBottom: $_safeAreaBottom, '
-      'headerActionEnabled: $_headerActionEnabled';
-
-  String get _code =>
-      '''FScaffold(
-  header: FHeader(...),
-  footer: FBottomNavigationBar(
-    index: $_index,
-    safeAreaBottom: $_safeAreaBottom,
-    onChange: onTabChanged,
-  ),
-)''';
 
   void _reset() => setState(() {
     _index = 0;
@@ -231,20 +215,8 @@ class _AppShellPlaygroundPageState extends State<AppShellPlaygroundPage> {
             ),
           ),
         ),
-        PlaygroundCodePanel(
-          title: 'examples.playground.usage'.tr(),
-          summary: _summary,
-          code: _code,
-        ),
         PlaygroundActionBar(
-          copyLabel: 'examples.playground.copy'.tr(),
           resetLabel: 'examples.playground.reset'.tr(),
-          onCopy: () => copyPlaygroundText(
-            context,
-            text: _code,
-            title: 'examples.playground.copied'.tr(),
-            description: _summary,
-          ),
           onReset: _reset,
         ),
       ],

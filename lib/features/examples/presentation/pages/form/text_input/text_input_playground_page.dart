@@ -1,6 +1,4 @@
 import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_action_bar.dart';
-import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_clipboard.dart';
-import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_code_panel.dart';
 import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_preview.dart';
 import 'package:admin9_app_flutter/shared/ui/component_example_section.dart';
 import 'package:admin9_app_flutter/shared/ui/responsive_page_body.dart';
@@ -45,19 +43,6 @@ class _TextInputPlaygroundPageState extends State<TextInputPlaygroundPage> {
     _ => .md,
   };
 
-  String get _summary =>
-      'size: $_size, enabled: $_enabled, clearable: $_clearable, '
-      'maxLines: ${_multiline ? 4 : 1}, validation: required';
-
-  String get _code =>
-      '''FTextField(
-  size: FTextFieldSizeVariant.$_size,
-  enabled: $_enabled,
-  clearable: ${_clearable ? '(value) => value.text.isNotEmpty' : 'null'},
-  maxLines: ${_multiline ? 4 : 1},
-  label: Text('${'examples.forms.playgrounds.text_input.name_label'.tr()}'),
-)''';
-
   void _submit() {
     final valid = _formKey.currentState?.validate() ?? false;
     if (valid) _formKey.currentState?.save();
@@ -87,13 +72,6 @@ class _TextInputPlaygroundPageState extends State<TextInputPlaygroundPage> {
     _submittedValue = '';
     _status = 'examples.forms.playgrounds.common.reset_done'.tr();
   });
-
-  Future<void> _copy() => copyPlaygroundText(
-    context,
-    text: _code,
-    title: 'examples.forms.playgrounds.common.copied'.tr(),
-    description: 'examples.forms.playgrounds.common.copied_description'.tr(),
-  );
 
   @override
   void dispose() {
@@ -335,15 +313,8 @@ class _TextInputPlaygroundPageState extends State<TextInputPlaygroundPage> {
             ],
           ),
         ),
-        PlaygroundCodePanel(
-          title: 'examples.forms.playgrounds.common.current_parameters'.tr(),
-          summary: _summary,
-          code: _code,
-        ),
         PlaygroundActionBar(
-          copyLabel: 'examples.forms.playgrounds.common.copy'.tr(),
           resetLabel: 'examples.forms.playgrounds.common.reset'.tr(),
-          onCopy: _copy,
           onReset: _reset,
         ),
       ],

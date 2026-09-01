@@ -1,8 +1,6 @@
 import 'dart:math' as math;
 
 import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_action_bar.dart';
-import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_clipboard.dart';
-import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_code_panel.dart';
 import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_preview.dart';
 import 'package:admin9_app_flutter/shared/ui/component_example_section.dart';
 import 'package:admin9_app_flutter/shared/ui/responsive_page_body.dart';
@@ -37,29 +35,6 @@ class _CalendarPlaygroundPageState extends State<CalendarPlaygroundPage> {
   (DateTime, DateTime)? _range = (_today, DateTime.utc(2026, 9, 2));
   DateTime? _lineDate = _today;
   String _statusKey = 'examples.content.playgrounds.common.ready';
-
-  String get _summary =>
-      'mode: ${_mode.name}, '
-      'excludeWeekends: $_excludeWeekends, '
-      'lineCalendar: $_showLineCalendar, selection: ${_selectionText()}';
-
-  String get _code =>
-      '''FCalendar.grid(
-  control: FGridCalendarControl(selectable: selectable),
-  selectionControl: FDateSelectionControl.${switch (_mode) {
-        _CalendarMode.single => 'liftedSingle',
-        _CalendarMode.multiple => 'liftedMulti',
-        _CalendarMode.range => 'liftedRange',
-      }}(
-    value: ${switch (_mode) {
-        _CalendarMode.single => 'selectedDate',
-        _CalendarMode.multiple => 'selectedDates',
-        _CalendarMode.range => 'selectedRange',
-      }},
-    onChange: onSelectionChanged,
-  ),
-)
-${_showLineCalendar ? 'FLineCalendar(control: FLineCalendarControl.lifted(...))' : ''}''';
 
   @override
   void initState() {
@@ -307,21 +282,8 @@ ${_showLineCalendar ? 'FLineCalendar(control: FLineCalendarControl.lifted(...))'
             ],
           ),
         ),
-        PlaygroundCodePanel(
-          title: 'examples.content.playgrounds.common.current_parameters'.tr(),
-          summary: _summary,
-          code: _code,
-        ),
         PlaygroundActionBar(
-          copyLabel: 'examples.content.playgrounds.common.copy'.tr(),
           resetLabel: 'examples.content.playgrounds.common.reset'.tr(),
-          onCopy: () => copyPlaygroundText(
-            context,
-            text: _code,
-            title: 'examples.content.playgrounds.common.copied'.tr(),
-            description:
-                'examples.content.playgrounds.common.copied_description'.tr(),
-          ),
           onReset: _reset,
         ),
       ],

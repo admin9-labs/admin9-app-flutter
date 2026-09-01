@@ -2,8 +2,6 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_action_bar.dart';
-import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_clipboard.dart';
-import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_code_panel.dart';
 import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_preview.dart';
 import 'package:admin9_app_flutter/shared/ui/component_example_section.dart';
 import 'package:admin9_app_flutter/shared/ui/layout/grid/a_grid.dart';
@@ -107,23 +105,6 @@ class _GridPageState extends State<GridPage> {
       context: context,
       title: Text('examples.playground.reset_done'.tr()),
       icon: const Icon(FLucideIcons.rotateCcw),
-    );
-  }
-
-  Future<void> _copyCode() async {
-    final copied = await copyPlaygroundText(
-      context,
-      text: _code,
-      title: 'examples.playground.copied'.tr(),
-      description: _summary,
-    );
-    if (!mounted) {
-      return;
-    }
-    setState(
-      () => _status = copied
-          ? 'examples.playground.copied'.tr()
-          : 'examples.playground.copy_failed'.tr(),
     );
   }
 
@@ -346,15 +327,8 @@ class _GridPageState extends State<GridPage> {
             ],
           ),
         ),
-        PlaygroundCodePanel(
-          title: 'examples.playground.code'.tr(),
-          summary: _summary,
-          code: _code,
-        ),
         PlaygroundActionBar(
-          copyLabel: 'examples.playground.copy'.tr(),
           resetLabel: 'examples.playground.reset'.tr(),
-          onCopy: _copyCode,
           onReset: _reset,
         ),
       ],
@@ -513,60 +487,6 @@ class _GridPageState extends State<GridPage> {
       child: Text('examples.foundation.layout.grid.playground.new_label'.tr()),
     ),
     _GridBadge.dot => const _NotificationDot(),
-  };
-
-  String get _summary => [
-    'columns=$_columns',
-    'horizontalGap=${_horizontalGap.toStringAsFixed(0)}',
-    'verticalGap=${_verticalGap.toStringAsFixed(0)}',
-    'ratio=${_childAspectRatio.toStringAsFixed(2)}',
-    'padding=${_padding.toStringAsFixed(0)}',
-    'layout=${_layout.name}',
-    'visual=${_visual.name}',
-    'badge=${_badge.name}',
-    'enabled=$_enabled',
-    'selected=$_selected',
-  ].join(' · ');
-
-  String get _code =>
-      '''AGrid(
-  columns: $_columns,
-  horizontalGap: ${_horizontalGap.toStringAsFixed(0)},
-  verticalGap: ${_verticalGap.toStringAsFixed(0)},
-  childAspectRatio: ${_childAspectRatio.toStringAsFixed(2)},
-  padding: const EdgeInsets.all(${_padding.toStringAsFixed(0)}),
-  children: [
-    AGridItem(
-      layout: AGridItemLayout.${_layout.name},
-      visual: $_visualCode,
-      title: const Text('入口'),
-      badge: $_badgeCode,
-      enabled: $_enabled,
-      selected: $_selected,
-      onPress: () {},
-    ),
-  ],
-)''';
-
-  String get _visualCode => switch (_visual) {
-    _GridVisual.icon => 'const Icon(FLucideIcons.layoutGrid)',
-    _GridVisual.image =>
-      'Image.memory(thumbnailBytes, width: 44, height: 44, fit: BoxFit.cover)',
-    _GridVisual.custom => "const Text('12')",
-  };
-
-  String get _badgeCode => switch (_badge) {
-    _GridBadge.none => 'null',
-    _GridBadge.count => "FBadge(child: Text('\$badgeCount'))",
-    _GridBadge.label => "const FBadge(child: Text('新'))",
-    _GridBadge.dot =>
-      '''DecoratedBox(
-        decoration: BoxDecoration(
-          color: context.theme.colors.destructive,
-          shape: BoxShape.circle,
-        ),
-        child: const SizedBox.square(dimension: 10),
-      )''',
   };
 
   String _itemSemanticsLabel(

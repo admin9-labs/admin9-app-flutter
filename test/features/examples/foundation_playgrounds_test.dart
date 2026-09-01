@@ -28,27 +28,27 @@ void main() {
   ) async {
     await _pumpPage(tester, const AppShellPlaygroundPage());
 
-    final initialSummary = _summary(tester);
-    await tester.ensureVisible(
-      find.byKey(const ValueKey('app-shell-safe-area')),
-    );
-    await tester.tap(find.byKey(const ValueKey('app-shell-safe-area')));
+    final safeArea = find.byKey(const ValueKey('app-shell-safe-area'));
+    await tester.ensureVisible(safeArea);
+    expect(tester.widget<FSwitch>(safeArea).value, isTrue);
+    await tester.tap(safeArea);
     await tester.pump(const Duration(milliseconds: 200));
-    expect(_summary(tester), isNot(initialSummary));
+    expect(tester.widget<FSwitch>(safeArea).value, isFalse);
 
-    await tester.ensureVisible(
-      find.byKey(const ValueKey('app-shell-bottom-navigation')),
+    final navigation = find.byKey(
+      const ValueKey('app-shell-bottom-navigation'),
     );
+    await tester.ensureVisible(navigation);
     final items = find.byType(FBottomNavigationBarItem);
     await tester.tap(items.at(1));
     await tester.pump(const Duration(milliseconds: 200));
-    expect(_summary(tester), contains('index: 1'));
+    expect(tester.widget<FBottomNavigationBar>(navigation).index, 1);
 
     await tester.ensureVisible(find.byKey(const ValueKey('playground-reset')));
     await tester.tap(find.byKey(const ValueKey('playground-reset')));
     await tester.pump(const Duration(milliseconds: 200));
-    expect(_summary(tester), contains('safeAreaBottom: true'));
-    expect(_summary(tester), contains('index: 0'));
+    expect(tester.widget<FSwitch>(safeArea).value, isTrue);
+    expect(tester.widget<FBottomNavigationBar>(navigation).index, 0);
   });
 
   testWidgets(
@@ -177,14 +177,14 @@ void main() {
     );
     await tester.tap(find.byKey(const ValueKey('interaction-tappable')));
     await tester.pump(const Duration(milliseconds: 200));
-    expect(_summary(tester), contains('presses: 1'));
-    expect(_summary(tester), contains('selected: true'));
+    expect(_status(tester), contains('presses: 1'));
+    expect(_status(tester), contains('selected: true'));
 
     await tester.ensureVisible(find.byKey(const ValueKey('playground-reset')));
     await tester.tap(find.byKey(const ValueKey('playground-reset')));
     await tester.pump(const Duration(milliseconds: 200));
-    expect(_summary(tester), contains('presses: 0'));
-    expect(_summary(tester), contains('selected: false'));
+    expect(_status(tester), contains('presses: 0'));
+    expect(_status(tester), contains('selected: false'));
   });
 
   testWidgets(
@@ -227,7 +227,7 @@ void main() {
         const Offset(-260, 0),
       );
       await tester.pumpAndSettle();
-      expect(_summary(tester), contains('tabIndex: 1'));
+      expect(_status(tester), contains('tabIndex: 1'));
 
       final swipe = find.byKey(const ValueKey('interaction-swipe'));
       tester.widget<FSwitch>(swipe).onChange!(false);
@@ -312,23 +312,7 @@ void main() {
     },
   );
 
-  testWidgets('G04/R02 icons search, size, source, copy, and reset', (
-    tester,
-  ) async {
-    MethodCall? clipboardCall;
-    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-      SystemChannels.platform,
-      (call) async {
-        if (call.method == 'Clipboard.setData') clipboardCall = call;
-        return null;
-      },
-    );
-    addTearDown(
-      () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-        SystemChannels.platform,
-        null,
-      ),
-    );
+  testWidgets('G04/R02 icons search, size, source, and reset', (tester) async {
     await _pumpPage(tester, const IconsPage());
 
     await tester.enterText(
@@ -344,23 +328,14 @@ void main() {
     await tester.ensureVisible(mapping);
     tester.widget<FSwitch>(mapping).onChange!(false);
     await tester.pump(const Duration(milliseconds: 200));
-    expect(_summary(tester), contains('size: 36'));
-    expect(_summary(tester), contains('themeMapping: false'));
+    expect(_status(tester), contains('size: 36'));
+    expect(_status(tester), contains('themeMapping: false'));
 
-    await tester.ensureVisible(find.byKey(const ValueKey('playground-copy')));
-    await tester.tap(find.byKey(const ValueKey('playground-copy')));
-    await tester.pump(const Duration(milliseconds: 200));
-    expect(
-      (clipboardCall?.arguments as Map<String, dynamic>)['text'],
-      contains('FLucideIcons'),
-    );
-
-    await tester.pump(const Duration(seconds: 6));
     await tester.ensureVisible(find.byKey(const ValueKey('playground-reset')));
     await tester.tap(find.byKey(const ValueKey('playground-reset')));
     await tester.pump(const Duration(milliseconds: 200));
-    expect(_summary(tester), contains('size: 28'));
-    expect(_summary(tester), contains('themeMapping: true'));
+    expect(_status(tester), contains('size: 28'));
+    expect(_status(tester), contains('themeMapping: true'));
     expect(
       tester
           .widget<EditableText>(
@@ -378,8 +353,8 @@ void main() {
     await tester.ensureVisible(home);
     await tester.tap(home);
     await tester.pump(const Duration(milliseconds: 200));
-    expect(_summary(tester), contains('icon: home'));
-    expect(_summary(tester), contains('themeMapping: false'));
+    expect(_status(tester), contains('icon: home'));
+    expect(_status(tester), contains('themeMapping: false'));
     expect(tester.widget<FSwitch>(mapping).enabled, isFalse);
     expect(
       tester
@@ -387,8 +362,6 @@ void main() {
           .icon,
       FLucideIcons.house,
     );
-    expect(find.textContaining('FLucideIcons.house'), findsOneWidget);
-    expect(find.textContaining('context.theme.icons.home'), findsNothing);
   });
 
   testWidgets('foundation playgrounds fit 320px with 2x text', (tester) async {
@@ -399,13 +372,14 @@ void main() {
     ]) {
       await _pumpPage(tester, page, size: const Size(320, 844), textScale: 2);
       expect(tester.takeException(), isNull, reason: '$page');
+      expect(find.byKey(const ValueKey('playground-code')), findsNothing);
+      expect(find.byKey(const ValueKey('playground-copy')), findsNothing);
     }
   });
 }
 
-String _summary(WidgetTester tester) => tester
-    .widget<Text>(find.byKey(const ValueKey('playground-parameter-summary')))
-    .data!;
+String _status(WidgetTester tester) =>
+    tester.widget<Text>(find.byKey(const ValueKey('playground-status'))).data!;
 
 Color? _decorationColor(WidgetTester tester, Key key) =>
     (tester.widget<DecoratedBox>(find.byKey(key)).decoration as BoxDecoration)

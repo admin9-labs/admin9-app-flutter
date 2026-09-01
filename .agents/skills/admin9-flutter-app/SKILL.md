@@ -36,9 +36,9 @@ its repository-local documents take precedence.
    [Starter registry](../../../docs/starter.md#current-playground-registry).
    Group related official capabilities into a coherent Playground; do not create
    one shallow route per capability or count an `F*` type occurrence as coverage.
-5. Keep Playground preview, configuration, synchronized usage, copy feedback,
-   and reset widgets inside Examples. Do not promote them to `shared/ui/` or
-   build a generic dynamic component renderer.
+5. Keep Playground preview, configuration, interaction feedback, and reset
+   widgets inside Examples. Do not promote them to `shared/ui/` or build a
+   generic dynamic component renderer.
 6. For AGrid or another approved Admin9 API, verify a real consumer, documented
    difference, Forui Theme/style integration, accessibility and directionality,
    tests, and the dependency boundary. The current scope uses official `FTabs`
@@ -80,8 +80,8 @@ sed -n '<start>,<end>p' .agents/skills/admin9-flutter-app/references/0.26.0/llms
 - For Showroom work, verify all 72 official capability IDs once, the many-to-one
   Playground registry, required axes, coverage modes, and focused evidence.
 - For every `direct` claim, verify a realistic scenario, configuration-driven
-  preview, observable interaction feedback, synchronized usage summary, copy,
-  reset, Chinese copy, responsive layout, accessibility, and focused tests.
+  preview, observable interaction feedback, reset, Chinese UI text, responsive
+  layout, accessibility, and focused tests.
 - Verify every registered Playground Page, typed route, translation namespace,
   and test; reject orphan routes, old generated routes, and untracked pages.
 - Verify `shared/ui/` does not depend on Examples, AutoRoute, App routing, or a

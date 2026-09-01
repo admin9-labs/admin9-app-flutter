@@ -1,6 +1,4 @@
 import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_action_bar.dart';
-import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_clipboard.dart';
-import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_code_panel.dart';
 import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_preview.dart';
 import 'package:admin9_app_flutter/shared/ui/component_example_section.dart';
 import 'package:admin9_app_flutter/shared/ui/responsive_page_body.dart';
@@ -36,19 +34,6 @@ class _InteractionPlaygroundPageState extends State<InteractionPlaygroundPage> {
       'scrollable: $_scrollable, swipe: $_swipe, '
       'expanded: $_expanded, enabled: $_enabled, '
       'selected: $_selected, presses: $_pressCount';
-
-  String get _code =>
-      '''FTabs(
-  control: FTabControl.${_controlMode.name}(...),
-  scrollable: $_scrollable,
-  expands: true,
-  contentPhysics: ${_swipe ? 'BouncingScrollPhysics()' : 'NeverScrollableScrollPhysics()'},
-  children: entries,
-)
-FTappable(
-  selected: $_selected,
-  onPress: ${_enabled ? 'onPress' : 'null'},
-)''';
 
   void _reset() => setState(() {
     _tabIndex = 0;
@@ -342,20 +327,8 @@ FTappable(
             ],
           ),
         ),
-        PlaygroundCodePanel(
-          title: 'examples.playground.usage'.tr(),
-          summary: _summary,
-          code: _code,
-        ),
         PlaygroundActionBar(
-          copyLabel: 'examples.playground.copy'.tr(),
           resetLabel: 'examples.playground.reset'.tr(),
-          onCopy: () => copyPlaygroundText(
-            context,
-            text: _code,
-            title: 'examples.playground.copied'.tr(),
-            description: _summary,
-          ),
           onReset: _reset,
         ),
       ],

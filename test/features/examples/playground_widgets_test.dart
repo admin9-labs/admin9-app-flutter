@@ -1,5 +1,4 @@
 import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_action_bar.dart';
-import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_code_panel.dart';
 import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_catalog_tile.dart';
 import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_preview.dart';
 import 'package:admin9_app_flutter/theme/theme.dart';
@@ -10,9 +9,8 @@ import 'package:forui/forui.dart';
 
 void main() {
   testWidgets(
-    'playground structure exposes preview, summary, copy, and reset',
+    'playground structure exposes preview and reset without code or copy',
     (tester) async {
-      var copied = false;
       var reset = false;
 
       await tester.pumpWidget(
@@ -25,15 +23,8 @@ void main() {
                 status: '保存成功',
                 child: Text('预览内容'),
               ),
-              const PlaygroundCodePanel(
-                title: '当前参数',
-                summary: 'enabled: true',
-                code: 'FButton(onPress: save)',
-              ),
               PlaygroundActionBar(
-                copyLabel: '复制',
                 resetLabel: '重置',
-                onCopy: () => copied = true,
                 onReset: () => reset = true,
               ),
             ],
@@ -44,19 +35,18 @@ void main() {
       expect(find.byKey(const ValueKey('playground-status')), findsOneWidget);
       expect(
         find.byKey(const ValueKey('playground-parameter-summary')),
-        findsOneWidget,
+        findsNothing,
       );
-      expect(find.byKey(const ValueKey('playground-code')), findsOneWidget);
+      expect(find.byKey(const ValueKey('playground-code')), findsNothing);
+      expect(find.byKey(const ValueKey('playground-copy')), findsNothing);
 
-      await tester.tap(find.byKey(const ValueKey('playground-copy')));
       await tester.tap(find.byKey(const ValueKey('playground-reset')));
       await tester.pump(const Duration(milliseconds: 200));
-      expect(copied, isTrue);
       expect(reset, isTrue);
     },
   );
 
-  testWidgets('action bar wraps at 320px with large text', (tester) async {
+  testWidgets('reset action fills 320px width with large text', (tester) async {
     tester.view.physicalSize = const Size(320, 640);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
@@ -64,16 +54,33 @@ void main() {
     await tester.pumpWidget(
       _Harness(
         textScaler: const TextScaler.linear(2),
-        child: PlaygroundActionBar(
-          copyLabel: '复制当前参数摘要',
-          resetLabel: '恢复这个实验台默认值',
-          onCopy: () {},
-          onReset: () {},
-        ),
+        child: PlaygroundActionBar(resetLabel: '恢复这个实验台默认值', onReset: () {}),
       ),
     );
 
+    expect(
+      tester.getSize(find.byKey(const ValueKey('playground-reset'))).width,
+      320,
+    );
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('reset action right aligns above the mobile breakpoint', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(600, 640);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(
+      _Harness(
+        child: PlaygroundActionBar(resetLabel: '重置', onReset: () {}),
+      ),
+    );
+
+    final rect = tester.getRect(find.byKey(const ValueKey('playground-reset')));
+    expect(rect.width, lessThan(600));
+    expect(rect.right, 600);
   });
 
   testWidgets('catalog tile exposes scenario summary and semantic callback', (

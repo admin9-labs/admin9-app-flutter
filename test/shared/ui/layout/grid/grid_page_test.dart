@@ -7,7 +7,6 @@ import 'package:admin9_app_flutter/shared/ui/layout/grid/a_grid.dart';
 import 'package:admin9_app_flutter/shared/ui/layout/grid/a_grid_item.dart';
 import 'package:admin9_app_flutter/theme/theme.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:forui/forui.dart';
@@ -95,9 +94,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('configuration changes preview, summary, clipboard, and reset', (
-    tester,
-  ) async {
+  testWidgets('configuration changes preview and reset', (tester) async {
     await _pumpPage(tester);
 
     await _scrollTo(tester, find.byKey(const ValueKey('grid-layout-end')));
@@ -163,46 +160,6 @@ void main() {
     expect(grid.childAspectRatio, 3.25);
     expect(grid.padding, const EdgeInsets.all(24));
 
-    await _scrollTo(
-      tester,
-      find.byKey(const ValueKey('playground-parameter-summary')),
-    );
-    final summary = tester.widget<Text>(
-      find.byKey(const ValueKey('playground-parameter-summary')),
-    );
-    expect(summary.data, contains('columns=4'));
-    expect(summary.data, contains('layout=horizontalEnd'));
-    expect(summary.data, contains('visual=custom'));
-    expect(summary.data, contains('badge=dot'));
-    expect(summary.data, contains('enabled=false'));
-
-    MethodCall? clipboardCall;
-    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-      SystemChannels.platform,
-      (call) async {
-        if (call.method == 'Clipboard.setData') {
-          clipboardCall = call;
-        }
-        return null;
-      },
-    );
-    addTearDown(
-      () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-        SystemChannels.platform,
-        null,
-      ),
-    );
-    await _scrollTo(tester, find.byKey(const ValueKey('playground-copy')));
-    await tester.tap(find.byKey(const ValueKey('playground-copy')));
-    await tester.pump();
-    expect(clipboardCall?.arguments, isA<Map<String, dynamic>>());
-    expect(
-      (clipboardCall?.arguments as Map<String, dynamic>)['text'],
-      contains('columns: 4'),
-    );
-
-    await tester.pump(const Duration(seconds: 6));
-    await tester.pumpAndSettle();
     await _scrollTo(tester, find.byKey(const ValueKey('playground-reset')));
     await tester.tap(find.byKey(const ValueKey('playground-reset')));
     await tester.pump();
@@ -221,46 +178,15 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('image usage matches the memory-backed preview', (tester) async {
+  testWidgets('image scenario uses a memory-backed preview', (tester) async {
     await _pumpPage(tester);
 
     await tester.tap(find.byKey(const ValueKey('grid-scenario-content')));
     await tester.pumpAndSettle();
-    await _scrollTo(tester, find.byKey(const ValueKey('playground-code')));
-
-    expect(find.textContaining('Image.memory(thumbnailBytes'), findsOneWidget);
-    expect(find.textContaining("assets/images/thumbnail.png"), findsNothing);
-  });
-
-  testWidgets('clipboard failure is reported in the preview status', (
-    tester,
-  ) async {
-    await _pumpPage(tester);
-    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-      SystemChannels.platform,
-      (call) async {
-        if (call.method == 'Clipboard.setData') {
-          throw PlatformException(code: 'clipboard-unavailable');
-        }
-        return null;
-      },
+    final image = tester.widget<Image>(
+      find.byKey(const ValueKey('grid-preview-image')),
     );
-    addTearDown(
-      () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-        SystemChannels.platform,
-        null,
-      ),
-    );
-
-    await _scrollTo(tester, find.byKey(const ValueKey('playground-copy')));
-    await tester.tap(find.byKey(const ValueKey('playground-copy')));
-    await tester.pump(const Duration(milliseconds: 200));
-
-    expect(find.text('复制失败'), findsWidgets);
-    expect(find.byKey(const ValueKey('playground-status')), findsOneWidget);
-    expect(tester.takeException(), isNull);
-    await tester.pump(const Duration(seconds: 6));
-    await tester.pumpAndSettle();
+    expect(image.image, isA<MemoryImage>());
   });
 
   testWidgets('320/390, large text, RTL, and light/dark stay overflow-free', (
@@ -278,6 +204,8 @@ void main() {
           );
           expect(find.byType(AGrid), findsOneWidget);
           expect(tester.takeException(), isNull);
+          expect(find.byKey(const ValueKey('playground-code')), findsNothing);
+          expect(find.byKey(const ValueKey('playground-copy')), findsNothing);
         }
       }
     }

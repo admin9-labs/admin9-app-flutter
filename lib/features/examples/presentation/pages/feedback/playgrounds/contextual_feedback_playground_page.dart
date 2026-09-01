@@ -1,6 +1,4 @@
 import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_action_bar.dart';
-import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_clipboard.dart';
-import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_code_panel.dart';
 import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_preview.dart';
 import 'package:admin9_app_flutter/shared/ui/component_example_section.dart';
 import 'package:admin9_app_flutter/shared/ui/responsive_page_body.dart';
@@ -25,14 +23,6 @@ class _ContextualFeedbackPlaygroundPageState
   bool _popoverShown = false;
   bool _tooltipShown = false;
   String _statusKey = 'examples.feedback.playgrounds.contextual.status_ready';
-
-  String get _summary =>
-      'enabled: $_enabled, placement: ${_above ? 'above' : 'below'}';
-
-  String get _code =>
-      'FPopover(popoverAnchor: AlignmentGeometry.${_above ? 'bottomCenter' : 'topCenter'}, ...);\n'
-      'FPopoverMenu(menuBuilder: ...);\n'
-      'FTooltip(longPress: $_enabled, ...);';
 
   void _setPopoverShown(bool shown) {
     if (!_enabled && shown) return;
@@ -65,13 +55,6 @@ class _ContextualFeedbackPlaygroundPageState
     _tooltipShown = false;
     _statusKey = 'examples.feedback.playgrounds.contextual.status_ready';
   });
-
-  Future<void> _copy() => copyPlaygroundText(
-    context,
-    text: _code,
-    title: 'examples.feedback.playgrounds.common.copied_title'.tr(),
-    description: 'examples.feedback.playgrounds.common.copied_description'.tr(),
-  );
 
   @override
   Widget build(BuildContext context) {
@@ -252,15 +235,8 @@ class _ContextualFeedbackPlaygroundPageState
               ],
             ),
           ),
-          PlaygroundCodePanel(
-            title: 'examples.feedback.playgrounds.common.usage'.tr(),
-            summary: _summary,
-            code: _code,
-          ),
           PlaygroundActionBar(
-            copyLabel: 'examples.feedback.playgrounds.common.copy'.tr(),
             resetLabel: 'examples.feedback.playgrounds.common.reset'.tr(),
-            onCopy: _copy,
             onReset: _reset,
           ),
         ],

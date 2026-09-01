@@ -7,7 +7,6 @@ import 'package:admin9_app_flutter/features/examples/presentation/pages/feedback
 import 'package:admin9_app_flutter/theme/theme.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:forui/forui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -15,30 +14,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 late Map<String, dynamic> _translations;
 
 void main() {
-  final clipboardCalls = <MethodCall>[];
-
   setUpAll(() async {
     SharedPreferences.setMockInitialValues({});
     await EasyLocalization.ensureInitialized();
     _translations = jsonDecode(
       File('assets/translations/zh-CN.json').readAsStringSync(),
     ) as Map<String, dynamic>;
-  });
-
-  setUp(() {
-    clipboardCalls.clear();
-    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .setMockMethodCallHandler(SystemChannels.platform, (call) async {
-          if (call.method == 'Clipboard.setData') {
-            clipboardCalls.add(call);
-          }
-          return null;
-        });
-  });
-
-  tearDown(() {
-    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-        .setMockMethodCallHandler(SystemChannels.platform, null);
   });
 
   testWidgets('WFB01/WFB02/WFB03/WFB04/WO07 cover async status and Toast', (
@@ -51,7 +32,6 @@ void main() {
     expect(find.byType(FCircularProgress), findsWidgets);
     expect(find.byType(FDeterminateProgress), findsOneWidget);
     expect(find.byType(FProgress), findsOneWidget);
-    expect(_summary(tester), contains('value: 0.35'));
     expect(find.text('同步配置可用'), findsOneWidget);
     expect(find.text('等待开始上传与同步。'), findsWidgets);
     expect(
@@ -114,7 +94,6 @@ void main() {
       tester.widget<FAlert>(find.byKey(const ValueKey('async-alert'))).variant,
       FAlertVariant.destructive,
     );
-    expect(_summary(tester), contains('error: true'));
 
     tester
         .widget<FSwitch>(find.byKey(const ValueKey('async-enabled-control')))
@@ -177,8 +156,6 @@ void main() {
     expect(toast, findsOneWidget);
     expect(tester.widget<FToast>(toast).variant, FToastVariant.destructive);
     expect(tester.getCenter(toast).dy, lessThan(844 / 2));
-    expect(_summary(tester), contains('alignment: topCenter'));
-    expect(_summary(tester), contains('duration: 1s'));
     await tester.pump(const Duration(milliseconds: 800));
     expect(toast, findsOneWidget);
     await tester.pump(const Duration(milliseconds: 500));
@@ -186,12 +163,32 @@ void main() {
     expect(toast, findsNothing);
     expect(triggerFocus.hasFocus, isTrue);
 
-    await _copyAndExpect(tester, clipboardCalls);
     await _pressButton(tester, const ValueKey('playground-reset'));
     await tester.pump(const Duration(milliseconds: 300));
-    expect(_summary(tester), contains('value: 0.35'));
-    expect(_summary(tester), contains('alignment: bottomCenter'));
-    expect(_summary(tester), contains('duration: 5s'));
+    expect(
+      tester
+          .widget<FDeterminateProgress>(
+            find.byKey(const ValueKey('async-determinate-progress')),
+          )
+          .value,
+      0.35,
+    );
+    expect(
+      tester
+          .widget<FSwitch>(
+            find.byKey(const ValueKey('async-toast-top-control')),
+          )
+          .value,
+      isFalse,
+    );
+    expect(
+      tester
+          .widget<FSwitch>(
+            find.byKey(const ValueKey('async-toast-short-control')),
+          )
+          .value,
+      isFalse,
+    );
     expect(find.text('等待开始上传与同步。'), findsWidgets);
     semantics.dispose();
     await _disposePage(tester);
@@ -209,7 +206,14 @@ void main() {
     await _pressButton(tester, const ValueKey('playground-reset'));
     await tester.pump(const Duration(milliseconds: 300));
 
-    expect(_summary(tester), contains('value: 0.35'));
+    expect(
+      tester
+          .widget<FDeterminateProgress>(
+            find.byKey(const ValueKey('async-determinate-progress')),
+          )
+          .value,
+      0.35,
+    );
     expect(find.text('等待开始上传与同步。'), findsWidgets);
     expect(find.byType(FToast), findsNothing);
     await _disposePage(tester);
@@ -277,8 +281,6 @@ void main() {
     await _pressButton(tester, const ValueKey('confirmation-sheet-cancel'));
     await tester.pump(const Duration(milliseconds: 300));
     expect(find.text('本次操作已取消。'), findsOneWidget);
-    expect(_summary(tester), contains('Admin9 Starter'));
-    expect(_summary(tester), isNot(contains('取消不应保存')));
     expect(triggerFocus.hasFocus, isTrue);
 
     await _pressButton(tester, const ValueKey('confirmation-open'));
@@ -286,13 +288,15 @@ void main() {
     editable = find.descendant(
       of: find.byKey(const ValueKey('confirmation-draft')),
       matching: find.byType(EditableText),
+    );
+    expect(
+      tester.widget<EditableText>(editable).controller.text,
+      'Admin9 Starter',
     );
     await tester.enterText(editable, '遮罩不应保存');
     await _dismissActiveBarrier(tester);
     await tester.pump(const Duration(milliseconds: 300));
     expect(find.text('本次操作已取消。'), findsOneWidget);
-    expect(_summary(tester), contains('Admin9 Starter'));
-    expect(_summary(tester), isNot(contains('遮罩不应保存')));
 
     await _pressButton(tester, const ValueKey('confirmation-open'));
     await tester.pump(const Duration(milliseconds: 300));
@@ -300,12 +304,28 @@ void main() {
       of: find.byKey(const ValueKey('confirmation-draft')),
       matching: find.byType(EditableText),
     );
+    expect(
+      tester.widget<EditableText>(editable).controller.text,
+      'Admin9 Starter',
+    );
     await tester.enterText(editable, '新的 Starter 名称');
     await _pressButton(tester, const ValueKey('confirmation-save'));
     await tester.pump(const Duration(milliseconds: 300));
     expect(find.text('编辑内容已保存。'), findsOneWidget);
-    expect(_summary(tester), contains('新的 Starter 名称'));
     expect(triggerFocus.hasFocus, isTrue);
+
+    await _pressButton(tester, const ValueKey('confirmation-open'));
+    await tester.pump(const Duration(milliseconds: 300));
+    editable = find.descendant(
+      of: find.byKey(const ValueKey('confirmation-draft')),
+      matching: find.byType(EditableText),
+    );
+    expect(
+      tester.widget<EditableText>(editable).controller.text,
+      '新的 Starter 名称',
+    );
+    await _pressButton(tester, const ValueKey('confirmation-sheet-cancel'));
+    await tester.pump(const Duration(milliseconds: 300));
 
     await tester.ensureVisible(find.text('持续显示的信息面板'));
     await tester.tap(find.text('持续显示的信息面板'));
@@ -322,7 +342,6 @@ void main() {
       const ValueKey('confirmation-underlying-action'),
     );
     await tester.pump(const Duration(milliseconds: 100));
-    expect(_summary(tester), contains('underlyingPresses: 1'));
     expect(
       find.byKey(const ValueKey('confirmation-persistent-content')),
       findsOneWidget,
@@ -342,12 +361,28 @@ void main() {
     await _pressButton(tester, const ValueKey('confirmation-persistent-close'));
     await tester.pump(const Duration(milliseconds: 300));
 
-    await _copyAndExpect(tester, clipboardCalls);
     await _pressButton(tester, const ValueKey('playground-reset'));
     await tester.pump(const Duration(milliseconds: 300));
-    expect(_summary(tester), contains('mode: dialog'));
-    expect(_summary(tester), contains('Admin9 Starter'));
-    expect(_summary(tester), contains('underlyingPresses: 0'));
+    await _pressButton(tester, const ValueKey('confirmation-open'));
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.byKey(const ValueKey('confirmation-dialog')), findsOneWidget);
+    await _pressButton(tester, const ValueKey('confirmation-cancel'));
+    await tester.pump(const Duration(milliseconds: 300));
+    await tester.ensureVisible(find.text('编辑底部面板'));
+    await tester.tap(find.text('编辑底部面板'));
+    await tester.pump(const Duration(milliseconds: 300));
+    await _pressButton(tester, const ValueKey('confirmation-open'));
+    await tester.pump(const Duration(milliseconds: 300));
+    editable = find.descendant(
+      of: find.byKey(const ValueKey('confirmation-draft')),
+      matching: find.byType(EditableText),
+    );
+    expect(
+      tester.widget<EditableText>(editable).controller.text,
+      'Admin9 Starter',
+    );
+    await _pressButton(tester, const ValueKey('confirmation-sheet-cancel'));
+    await tester.pump(const Duration(milliseconds: 300));
     await _disposePage(tester);
   });
 
@@ -388,7 +423,6 @@ void main() {
         )
         .onChange!(true);
     await tester.pump();
-    expect(_summary(tester), contains('placement: above'));
     final popover = tester.widget<FPopover>(
       find.byKey(const ValueKey('contextual-popover')),
     );
@@ -483,11 +517,25 @@ void main() {
     await tester.pump(const Duration(milliseconds: 300));
     expect(find.text('查看这个操作的简短说明'), findsNothing);
 
-    await _copyAndExpect(tester, clipboardCalls);
     await _pressButton(tester, const ValueKey('playground-reset'));
     await tester.pump(const Duration(milliseconds: 300));
     await tester.pump(const Duration(milliseconds: 400));
-    expect(_summary(tester), 'enabled: true, placement: below');
+    expect(
+      tester
+          .widget<FSwitch>(
+            find.byKey(const ValueKey('contextual-enabled-control')),
+          )
+          .value,
+      isTrue,
+    );
+    expect(
+      tester
+          .widget<FSwitch>(
+            find.byKey(const ValueKey('contextual-placement-control')),
+          )
+          .value,
+      isFalse,
+    );
     expect(find.text('等待选择上下文操作。'), findsOneWidget);
     expect(find.text('查看这个操作的简短说明'), findsNothing);
     semantics.dispose();
@@ -511,22 +559,11 @@ void main() {
           isNull,
           reason: '${page.runtimeType} at $width',
         );
+        expect(find.byKey(const ValueKey('playground-code')), findsNothing);
+        expect(find.byKey(const ValueKey('playground-copy')), findsNothing);
       }
     }
   });
-}
-
-String _summary(WidgetTester tester) => tester
-    .widget<Text>(find.byKey(const ValueKey('playground-parameter-summary')))
-    .data!;
-
-Future<void> _copyAndExpect(WidgetTester tester, List<MethodCall> calls) async {
-  await tester.ensureVisible(find.byKey(const ValueKey('playground-copy')));
-  await _pressButton(tester, const ValueKey('playground-copy'));
-  await tester.pump(const Duration(milliseconds: 300));
-  expect(calls, isNotEmpty);
-  expect(calls.last.arguments, isA<Map<Object?, Object?>>());
-  expect(find.text('代码已复制'), findsOneWidget);
 }
 
 Future<void> _pressButton(WidgetTester tester, Key key) async {

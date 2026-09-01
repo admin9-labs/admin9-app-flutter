@@ -1,6 +1,4 @@
 import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_action_bar.dart';
-import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_clipboard.dart';
-import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_code_panel.dart';
 import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_preview.dart';
 import 'package:admin9_app_flutter/shared/ui/component_example_section.dart';
 import 'package:admin9_app_flutter/shared/ui/responsive_page_body.dart';
@@ -32,24 +30,6 @@ class _ConfirmationPlaygroundPageState
   bool _enabled = true;
   int _underlyingPresses = 0;
   String _statusKey = 'examples.feedback.playgrounds.confirmation.status_ready';
-
-  String get _modeName => switch (_mode) {
-    _ConfirmationMode.dialog => 'dialog',
-    _ConfirmationMode.sheet => 'sheet',
-    _ConfirmationMode.persistentSheet => 'persistentSheet',
-  };
-
-  String get _summary =>
-      'mode: $_modeName, enabled: $_enabled, draft: ${_draft.text}, '
-      'underlyingPresses: $_underlyingPresses';
-
-  String get _code => switch (_mode) {
-    _ConfirmationMode.dialog => 'showFDialog<bool>(context: context, ...);',
-    _ConfirmationMode.sheet =>
-      'showFSheet<bool>(context: context, side: FLayout.btt, ...);',
-    _ConfirmationMode.persistentSheet =>
-      'showFPersistentSheet(context: context, side: FLayout.btt, ...);',
-  };
 
   @override
   void dispose() {
@@ -154,13 +134,6 @@ class _ConfirmationPlaygroundPageState
     });
   }
 
-  Future<void> _copy() => copyPlaygroundText(
-    context,
-    text: _code,
-    title: 'examples.feedback.playgrounds.common.copied_title'.tr(),
-    description: 'examples.feedback.playgrounds.common.copied_description'.tr(),
-  );
-
   @override
   Widget build(BuildContext context) => FScaffold(
     childPad: false,
@@ -253,15 +226,8 @@ class _ConfirmationPlaygroundPageState
             ),
           ),
         ),
-        PlaygroundCodePanel(
-          title: 'examples.feedback.playgrounds.common.usage'.tr(),
-          summary: _summary,
-          code: _code,
-        ),
         PlaygroundActionBar(
-          copyLabel: 'examples.feedback.playgrounds.common.copy'.tr(),
           resetLabel: 'examples.feedback.playgrounds.common.reset'.tr(),
-          onCopy: _copy,
           onReset: _reset,
         ),
       ],

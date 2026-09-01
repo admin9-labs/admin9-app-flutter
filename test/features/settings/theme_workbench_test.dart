@@ -10,7 +10,6 @@ import 'package:admin9_app_flutter/features/examples/presentation/pages/concepts
 import 'package:admin9_app_flutter/shared/ui/layout/grid/a_grid.dart';
 import 'package:admin9_app_flutter/theme/theme.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:forui/forui.dart';
@@ -32,22 +31,6 @@ void main() {
     tester,
   ) async {
     final repository = _FakeRepository();
-    String? copied;
-    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-      SystemChannels.platform,
-      (call) async {
-        if (call.method == 'Clipboard.setData') {
-          copied = (call.arguments as Map<Object?, Object?>)['text'] as String?;
-        }
-        return null;
-      },
-    );
-    addTearDown(
-      () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-        SystemChannels.platform,
-        null,
-      ),
-    );
     await _pumpPage(tester, repository, translations);
 
     final base = lightTheme.buttonStyles.primary.md;
@@ -83,34 +66,10 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(repository.value.fontSize, AppFontSizePreference.extraLarge);
-    expect(
-      tester
-          .widget<Text>(
-            find.byKey(const ValueKey('playground-parameter-summary')),
-          )
-          .data,
-      contains('preset=forest'),
-    );
-    expect(
-      tester
-          .widget<Text>(
-            find.byKey(const ValueKey('playground-parameter-summary')),
-          )
-          .data,
-      contains('fontSize=extraLarge'),
-    );
     expect(find.byType(AGrid), findsOneWidget);
     expect(find.byType(FTextField), findsOneWidget);
-
-    await tester.pump(const Duration(seconds: 6));
-    final copy = find.byKey(const ValueKey('playground-copy'));
-    await tester.ensureVisible(copy);
-    await tester.pumpAndSettle();
-    await tester.tap(copy);
-    await tester.pump(const Duration(milliseconds: 200));
-    expect(copied, contains('AppThemePreset.forest'));
-    expect(copied, contains('AppFontSizePreference.extraLarge'));
-    await tester.pump(const Duration(seconds: 6));
+    expect(find.byKey(const ValueKey('playground-code')), findsNothing);
+    expect(find.byKey(const ValueKey('playground-copy')), findsNothing);
   });
 
   testWidgets('reset restores every axis and the dialog is interactive', (
@@ -148,40 +107,6 @@ void main() {
     await tester.pumpAndSettle();
     expect(repository.value, AppAppearancePreference.defaults);
     expect(tester.widget<FButton>(previewButton).selected, isTrue);
-  });
-
-  testWidgets('clipboard failure shows destructive copy feedback', (
-    tester,
-  ) async {
-    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-      SystemChannels.platform,
-      (call) async {
-        if (call.method == 'Clipboard.setData') {
-          throw PlatformException(code: 'clipboard-unavailable');
-        }
-        return null;
-      },
-    );
-    addTearDown(
-      () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
-        SystemChannels.platform,
-        null,
-      ),
-    );
-    await _pumpPage(tester, _FakeRepository(), translations);
-
-    final copy = find.byKey(const ValueKey('playground-copy'));
-    await tester.ensureVisible(copy);
-    await tester.tap(copy);
-    await tester.pump(const Duration(milliseconds: 200));
-
-    expect(find.text('复制失败'), findsOneWidget);
-    expect(find.text('未能写入剪贴板，请重试。'), findsOneWidget);
-    expect(
-      tester.widget<FToast>(find.byType(FToast)).variant,
-      FToastVariant.destructive,
-    );
-    await tester.pump(const Duration(seconds: 6));
   });
 
   testWidgets('save failure rolls back and remains visible', (tester) async {

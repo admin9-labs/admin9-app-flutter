@@ -1,6 +1,4 @@
 import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_action_bar.dart';
-import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_clipboard.dart';
-import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_code_panel.dart';
 import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_preview.dart';
 import 'package:admin9_app_flutter/shared/ui/component_example_section.dart';
 import 'package:admin9_app_flutter/shared/ui/responsive_page_body.dart';
@@ -43,40 +41,6 @@ class _ButtonsPlaygroundPageState extends State<ButtonsPlaygroundPage> {
     _ => .md,
   };
 
-  String get _summary =>
-      'kind: $_kind, variant: $_variant, size: $_size, enabled: $_enabled, '
-      'selected: $_selected, loading: $_loading, '
-      'mainAxisSize: ${_expanded ? 'max' : 'min'}';
-
-  String get _code => switch (_kind) {
-    'icon' =>
-      '''FButton.icon(
-  variant: FButtonVariant.$_variant,
-  size: FButtonSizeVariant.$_size,
-  semanticsLabel: '${'examples.forms.playgrounds.buttons.publish'.tr()}',
-  onPress: ${_enabled && !_loading ? '_publish' : 'null'},
-  child: const Icon(FLucideIcons.send),
-)''',
-    'raw' =>
-      '''FButton.raw(
-  variant: FButtonVariant.$_variant,
-  size: FButtonSizeVariant.$_size,
-  semanticsLabel: '${'examples.forms.playgrounds.buttons.publish'.tr()}',
-  onPress: ${_enabled && !_loading ? '_publish' : 'null'},
-  child: const Padding(padding: EdgeInsets.all(12), child: Text('Raw')),
-)''',
-    _ =>
-      '''FButton(
-  variant: FButtonVariant.$_variant,
-  size: FButtonSizeVariant.$_size,
-  selected: $_selected,
-  mainAxisSize: MainAxisSize.${_expanded ? 'max' : 'min'},
-  prefix: ${_withIcons ? 'const Icon(FLucideIcons.send)' : 'null'},
-  onPress: ${_enabled && !_loading ? '_publish' : 'null'},
-  child: Text('${'examples.forms.playgrounds.buttons.publish'.tr()}'),
-)''',
-  };
-
   void _reset() => setState(() {
     _kind = 'standard';
     _variant = 'primary';
@@ -95,13 +59,6 @@ class _ButtonsPlaygroundPageState extends State<ButtonsPlaygroundPage> {
         ? 'examples.forms.playgrounds.buttons.published'.tr()
         : 'examples.forms.playgrounds.buttons.unselected'.tr();
   });
-
-  Future<void> _copy() => copyPlaygroundText(
-    context,
-    text: _code,
-    title: 'examples.forms.playgrounds.common.copied'.tr(),
-    description: 'examples.forms.playgrounds.common.copied_description'.tr(),
-  );
 
   Widget _buildPreviewButton() {
     final onPress = _enabled && !_loading ? _publish : null;
@@ -289,15 +246,8 @@ class _ButtonsPlaygroundPageState extends State<ButtonsPlaygroundPage> {
             ],
           ),
         ),
-        PlaygroundCodePanel(
-          title: 'examples.forms.playgrounds.common.current_parameters'.tr(),
-          summary: _summary,
-          code: _code,
-        ),
         PlaygroundActionBar(
-          copyLabel: 'examples.forms.playgrounds.common.copy'.tr(),
           resetLabel: 'examples.forms.playgrounds.common.reset'.tr(),
-          onCopy: _copy,
           onReset: _reset,
         ),
       ],
