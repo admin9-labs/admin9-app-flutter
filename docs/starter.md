@@ -14,8 +14,8 @@ The reference App targets Android and iOS. Its five persistent destinations are
 Foundation, Forms, Content, Feedback, and Settings. The first four are owned by
 one removable `lib/features/examples/` feature. Settings is an independent real
 feature that demonstrates persisted brightness, complete Theme preset, five
-font-size preferences, and radius preference through Riverpod, a Repository,
-and a SharedPreferences Service.
+[font-size preferences](ui.md#font-size-preference-contract), and radius
+preference through Riverpod, a Repository, and a SharedPreferences Service.
 
 Examples has one App Router integration point in
 `lib/app/routing/examples_routes.dart`. It contributes four sibling Tab branches

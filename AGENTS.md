@@ -40,6 +40,10 @@ example and its removal contract live in [Upstream Starter](docs/starter.md).
   location. It must follow the Forui Theme, typography, icons, variants,
   interaction, focus, accessibility, directionality, and light/dark contracts.
   Do not create a parallel Theme or token system.
+- App copy uses semantic tokens from the active Forui Typography. Feature and
+  Shared UI must not arbitrarily hardcode font sizes; preserve system text
+  scaling and Theme-owned minimum touch sizes. See the
+  [Font Size Preference Contract](docs/ui.md#font-size-preference-contract).
 - Feature-only UI stays in that Feature. Every shared API or optional layer
   needs a clear responsibility, a real consumer, documentation, and tests. Do
   not create empty directories, vague `utils.dart`, `helpers.dart`, or

@@ -113,6 +113,37 @@ input, card, tile, status color, dialog, and AGrid together, provides a default
 reset, and shows read or write failures visibly. It does not create `ATheme` or a
 second token system.
 
+### Font Size Preference Contract
+
+This section is the complete authority for the font-size preference. The global
+preference controls the App's reading scale, not per-page typography.
+`AppThemeCatalog` resolves the selected preference,
+`buildForuiTheme` scales the complete active `FTypography`, and the scaled
+typography is then used to build Forui Widget Styles and the approximate
+Material Theme. Global scaling changes the reading size without changing the
+visual relationship between semantic levels.
+
+- Pages and components select semantic tokens such as `body.sm`, `body.md`, or
+  `display.lg`. They do not read the font-size preference or introduce local
+  scale factors. The App Theme composition and the Settings and Theme Workbench
+  control surfaces may read or write the preference; control surfaces must not
+  use it to derive local text styles.
+- Readable App copy follows the active typography. This includes page titles,
+  body copy, buttons, menus, forms, lists, dialogs, Toasts, and equivalent
+  labels or messages.
+- Logo images, icons, decorative symbols, purely visual graphics, and non-text
+  geometry are outside the font-size preference.
+- `lib/features/` and `lib/shared/ui/` must not directly hardcode `fontSize`.
+  Theme token definitions and special non-copy elements with a stable visual
+  reason are allowed. Every special exception needs a specific owner, a stated
+  reason, and responsive and accessibility tests; it must not create a second
+  typography system.
+- The system `TextScaler` or Dynamic Type remains additive. The App must not
+  replace, clamp, cap, or otherwise suppress the system accessibility scale.
+- Smaller App text must not reduce the Theme-owned minimum touch area. Larger
+  text is handled through wrapping, scrolling, and responsive layout rather
+  than compressed or clipped text.
+
 ## Shared UI APIs And Patterns
 
 The Starter may provide `shared/ui/<category>/` before a second Feature exists
