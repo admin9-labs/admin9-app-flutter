@@ -26,8 +26,8 @@ tests, and tools do not.
 - Use `snake_case`, `*_page.dart`/`*Page`, specific `*_provider.dart` names,
   and one primary public responsibility per file. Avoid vague utility
   collections.
-- Protect legal notices, package/application/bundle identifiers, signing
-  configuration, and still-used native capabilities.
+- Do not include unrelated changes to platform application identifiers,
+  signing configuration, or still-used native capabilities.
 - Do not include credentials, customer data, production logs, proprietary
   assets, or unverifiable build, simulator, signing, installation, or device
   claims.

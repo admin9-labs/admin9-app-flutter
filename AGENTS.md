@@ -10,11 +10,17 @@ example and its removal contract live in [Upstream Starter](docs/starter.md).
 - Change only the requested scope. Do not add speculative Features,
   dependencies, compatibility APIs, empty layers, placeholder files, or
   generated assets.
-- Do not automatically commit, push, publish, tag, release, change signing or
-  installation identities, or operate simulators or physical devices.
-- Protect legal and security policies, required third-party notices,
-  `dev.admin9.starter`, signing configuration, and native capabilities with a
-  current consumer.
+- Do not automatically commit, push, publish, tag, release, or operate
+  simulators or physical devices. Change platform application identifiers or
+  signing configuration only when the current task explicitly includes product
+  initialization or native delivery.
+- Protect legal and security policies, required third-party notices, and native
+  capabilities with a current consumer.
+- Keep product-specific names, Features, routes, platform identifiers,
+  exclusions, and acceptance evidence in this repository's authority documents
+  and source. Change the bundled Admin9 Flutter Skill or expert Agent template
+  only when their reusable workflow or role changes, not to mirror a derived
+  product.
 - When deletion is authorized, delete obsolete code, tests, Goldens, tools, and
   documents only after confirming that they have no runtime, CI, legal, or
   current delivery consumer. Do not create archive, legacy, or deprecated copies.

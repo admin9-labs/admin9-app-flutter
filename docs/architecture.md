@@ -427,13 +427,5 @@ Ordinary business pages have one Forui presentation. Do not build separate
 Android and iOS page implementations. Platform-specific code is reserved for a
 real capability or behavior difference that Flutter cannot represent uniformly.
 
-Legal policies, required third-party notices, Android application IDs, iOS
-bundle IDs, signing configuration, and still-used native capabilities are
-protected boundaries. Their age is not a deletion criterion.
-
-The upstream runnable Starter uses `dev.admin9.starter` for its Android
-namespace/application ID and iOS Runner bundle ID; its test bundle uses
-`dev.admin9.starter.RunnerTests`. This identity belongs to the upstream example
-described in [Upstream Starter](starter.md), not to every derived product.
-Changing an installation identity creates a separately installed App and needs
-an explicit data, signing, delivery, and upgrade review.
+Legal policies, required third-party notices, and still-used native capabilities
+are protected boundaries. Their age is not a deletion criterion.

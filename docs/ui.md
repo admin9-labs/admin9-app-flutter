@@ -243,11 +243,6 @@ native capability, follow the Pigeon boundary in
 generates the typed bridge but does not implement the native behavior or visible
 Forui UI.
 
-Installation identity is not a visual-theme concern. The upstream Android/iOS
-identifier and its new-App installation behavior are defined in
-[Upstream Starter](starter.md#installation-identity); UI or brand customization
-must not silently change that identity or signing configuration.
-
 ## Language And Localization
 
 Use `easy_localization: ^3.0.8` for App-owned product copy. Chinese is the initial

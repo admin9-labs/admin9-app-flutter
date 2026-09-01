@@ -1,6 +1,6 @@
 ---
 name: admin9-flutter-app
-description: Use when initializing, implementing, reviewing, or extending this repository or a derived Flutter App, including Forui UI and CLI work, Riverpod state, AutoRoute routing, Feature/data boundaries, dependency adoption, and verification. Do not use for unrelated generic Flutter projects.
+description: Use when initializing, implementing, reviewing, or extending an Admin9 Flutter Starter repository or derived App, including Forui UI, Riverpod state, AutoRoute routing, Feature/data boundaries, dependency adoption, and verification. Read product scope from the active repository; do not use for unrelated Flutter projects.
 ---
 
 # Admin9 Flutter App
@@ -8,47 +8,48 @@ description: Use when initializing, implementing, reviewing, or extending this r
 Use this Skill as an execution guide. It does not replace repository authority
 or expand user authorization.
 
+Keep this Skill reusable across the Starter and derived Apps. Product names,
+Pages, routes, platform identifiers, Feature inventories, exclusions, and
+acceptance snapshots belong to the active repository's authority and source,
+not to this Skill.
+
 ## Read Authority First
 
 Resolve the active Git root and read its current local authority before acting:
 
 - [Repository Working Agreements](../../../AGENTS.md)
-- [Application Architecture](../../../docs/architecture.md)
-- [UI System](../../../docs/ui.md)
-- [Upstream Starter](../../../docs/starter.md) for bundled Showroom work
+- `docs/architecture.md`, when present
+- `docs/ui.md`, when present
+- `docs/starter.md`, when present and relevant to the task
 
-A derived project may replace upstream scope, identities, routes, or evidence;
-its repository-local documents take precedence.
+Then inspect the current source, tests, `pubspec.yaml`, and `pubspec.lock`.
+Repository-local authority and actual consumers take precedence over upstream
+examples and historical evidence.
 
 ## Execution Decision Tree
 
-1. Read `pubspec.yaml` and `pubspec.lock`. Match Forui work to the resolved
-   version; the current checked-in snapshot is `references/0.26.0/`.
+1. Resolve the actual Flutter and package versions from `pubspec.yaml` and
+   `pubspec.lock`; do not infer them from this Skill.
 2. Inventory the real consumer and public API axes before choosing a layer,
    dependency, generator, route, or component. Do not infer generic size,
    color, state, or variant controls that the API does not provide.
-3. For UI ownership, follow [UI Ownership](../../../docs/ui.md#ui-ownership-model):
-   use `F*` directly when it satisfies the requirement, create an `A*` API only
-   for a stable observable Admin9 difference, and keep Feature-only UI with its
-   Feature.
-4. For Examples work, follow the
-   [Showroom contract](../../../docs/ui.md#showroom-playground-contract) and the
-   [Starter registry](../../../docs/starter.md#current-playground-registry).
-   Group related official capabilities into a coherent Playground; do not create
-   one shallow route per capability or count an `F*` type occurrence as coverage.
-5. Keep Playground preview, configuration, interaction feedback, and reset
-   widgets inside Examples. Do not promote them to `shared/ui/` or build a
-   generic dynamic component renderer.
-6. For AGrid or another approved Admin9 API, verify a real consumer, documented
-   difference, Forui Theme/style integration, accessibility and directionality,
-   tests, and the dependency boundary. The current scope uses official `FTabs`
-   and does not create `ATabs` or a tabs experiment.
+3. Follow the active repository's UI ownership rules. Use `F*` directly when it
+   satisfies the requirement, create an `A*` API only for a stable observable
+   Admin9 difference, and keep Feature-only UI with its Feature.
+4. Keep shared UI limited to stable App-wide or Admin9 responsibilities with
+   real consumers, documentation, tests, and the active Forui Theme contract.
+5. Keep Feature UI and state with the owning Feature. Add Data or Domain layers
+   only when a real source or business rule gives them a concrete responsibility.
+6. Use generated typed AutoRoute routes where the repository has adopted
+   AutoRoute. Route Pages may navigate; reusable leaf Widgets receive semantic
+   callbacks. Never hand-edit generated source.
 7. For routing, state, persistence, localization, dependencies, generators, and
-   native work, use the boundaries in [Architecture](../../../docs/architecture.md)
-   rather than duplicating them here. Never hand-edit generated router source.
+   native work, use `docs/architecture.md` when present; otherwise follow the
+   active repository's established boundaries. Do not duplicate product
+   decisions here.
 8. Check authorization separately for builds, simulators, signing,
-   installation, and physical devices. Source implementation does not authorize
-   those actions.
+   installation, physical devices, publishing, and release operations. Source
+   implementation does not authorize those actions.
 
 Do not create empty layers, placeholder APIs, mechanically renamed Forui
 primitives, compatibility code for superseded implementations, or speculative
@@ -56,45 +57,25 @@ Features and dependencies.
 
 ## Version-Matched Forui Lookup
 
-1. Read the compact index first: `references/0.26.0/llms.txt`.
-2. Prefer the matching official single-page documentation when live access and
-   version context are available.
-3. For offline or cross-page questions, search narrow terms in
-   `references/0.26.0/llms-full.txt`; do not load the full file by default.
-4. Read [snapshot metadata](references/0.26.0/source.json) when provenance,
-   capture time, constraints, or hashes matter.
-5. If documentation and resolved package source disagree, inspect the package
-   source and report the mismatch instead of guessing.
-
-Useful commands:
-
-```shell
-rg -n -i "button|FButton" .agents/skills/admin9-flutter-app/references/0.26.0/llms.txt
-rg -n -i "FButton|button style|button variant" .agents/skills/admin9-flutter-app/references/0.26.0/llms-full.txt
-sed -n '<start>,<end>p' .agents/skills/admin9-flutter-app/references/0.26.0/llms-full.txt
-```
+After resolving the Forui version, look for a matching
+`references/<version>/llms.txt` snapshot. Prefer matching official documentation
+when live version context is available. For offline or cross-page questions,
+search narrow terms in `llms-full.txt` rather than loading it in full. Read the
+matching `source.json` when provenance or capture constraints matter. If the
+documentation and resolved package source disagree, inspect the package source
+and report the mismatch instead of guessing.
 
 ## Verification Checklist
 
-- Confirm the resolved Forui version and version-bound snapshot.
-- For Showroom work, verify all 72 official capability IDs once, the many-to-one
-  Playground registry, required axes, coverage modes, and focused evidence.
-- For every `direct` claim, verify a realistic scenario, configuration-driven
-  preview, observable interaction feedback, reset, Chinese UI text, responsive
-  layout, accessibility, and focused tests.
-- Verify every registered Playground Page, typed route, translation namespace,
-  and test; reject orphan routes, old generated routes, and untracked pages.
-- Verify `shared/ui/` does not depend on Examples, AutoRoute, App routing, or a
-  business Feature, and that Playground-only UI remains Examples-owned.
-- Run focused tests and the repository source gates, Markdown local-link check,
-  and `git diff --check`.
+- Confirm resolved dependency versions and use only matching reference material.
+- Verify affected ownership, public APIs, generated routes, translations,
+  responsive layout, accessibility, and interaction behavior in proportion to
+  the change.
+- Run focused tests plus the current repository's source gates, Markdown link
+  check, and `git diff --check`.
 - On a clean checkout, run `dart run build_runner build`, then require
   `git diff --exit-code` and an empty
   `git status --porcelain --untracked-files=all` result.
 - Treat Android/iOS builds, platform delivery, simulator behavior, signing,
   installation, and physical-device acceptance as `Unknown` unless that exact
   scope was authorized and executed against the current source.
-
-When removing Examples in a derived project, follow the
-[removal contract](../../../docs/starter.md#examples-removal-contract) without
-deleting independent Admin9 UI such as AGrid or the Settings Feature.

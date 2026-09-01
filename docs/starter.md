@@ -9,6 +9,12 @@ and resetting state. It is not a downstream product contract. A derived project
 may remove the Examples Feature, but must update its routes, tests, translations,
 and local acceptance claims together.
 
+Product-specific authority belongs in a derived repository's `AGENTS.md`,
+project documents, configuration, and source. The bundled Admin9 Flutter Skill
+and expert Agent template are reusable workflow assets; derived projects do not
+rewrite them to mirror product names, Features, routes, platform identifiers,
+exclusions, or acceptance snapshots.
+
 The reference App targets Android and iOS. Its five persistent destinations are
 Foundation, Forms, Content, Feedback, and Settings. The first four are owned by
 one removable `lib/features/examples/` feature. Settings is an independent real
@@ -28,14 +34,6 @@ not add an extra runtime shell.
 | Content | `/content` | Examples | Overview, calendar, and list Playgrounds |
 | Feedback | `/feedback` | Examples | Status, confirmation, and contextual-feedback Playgrounds |
 | Settings | `/settings` | Settings | Persisted brightness, Theme preset, font size, and radius preference |
-
-## Installation Identity
-
-The upstream Starter uses `dev.admin9.starter` as its Android namespace and
-application ID and as the iOS Runner bundle identifier. The iOS test bundle is
-`dev.admin9.starter.RunnerTests`. The Apple development team, Automatic Signing,
-certificate selection, and all other signing settings remain protected and
-independent of this identity.
 
 ## Admin9 UI Extensions
 

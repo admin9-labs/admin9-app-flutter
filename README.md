@@ -28,8 +28,6 @@ binary, screenshot, or UI evidence ZIP is distributed with the release.
   preferences, and radius through a Repository and SharedPreferences Service.
 - Reusable App-level page patterns under `lib/shared/ui/`, each backed by real
   consumers and tests.
-- `dev.admin9.starter` as the Android application ID/namespace and iOS Runner
-  bundle identifier.
 
 The catalog covers Forui 0.26.0 capabilities relevant to Android and iOS. It
 does not claim desktop or complete package coverage. Pointer-first or
@@ -97,11 +95,11 @@ output path into the owning Feature or a justified shared pattern. Do not keep
 a generic snippets directory, run `style create --all` without a demonstrated
 need, or use `--force` to overwrite hand-edited files.
 
-Android application IDs, iOS bundle IDs, signing configuration, and native
-capabilities are installation identity, not casual customization points. Change
-them only as an explicitly reviewed task. The bundled Starter uses
-`dev.admin9.starter`; replacing an older identifier installs a separate App and
-does not overwrite or migrate that App's data.
+Before distributing a derived App, configure its product-owned Android
+application ID, namespace, and Kotlin package and its iOS Bundle Identifier and
+Team in the native project settings. Follow Flutter's
+[Android](https://docs.flutter.dev/deployment/android) and
+[iOS](https://docs.flutter.dev/deployment/ios) deployment guidance.
 
 ## Contributing And License
 
