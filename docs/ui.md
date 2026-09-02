@@ -48,6 +48,12 @@ The current Examples Showroom demonstrates the official `FTabs` directly. This
 scope does not create `ATabs`, a tabs feasibility experiment, or a shared tabs
 directory. The approved Admin9 brand component in this iteration is AGrid; its
 current implementation and coverage belong in [Upstream Starter](starter.md).
+AGrid is an icon action grid with a centered icon-and-label stack. Its default
+surface is transparent; callers explicitly choose Theme-owned muted or outlined
+surfaces when needed. Compact semantic badges overlay the top-end corner without
+adding a layout row or moving the centered content. Badges anchor to a fixed,
+transparent icon slot rather than the item border. AGrid does not add a second
+visual well around the icon or accept arbitrary badge colors and Widgets.
 
 ## Theme And CLI Ownership
 
@@ -205,6 +211,21 @@ Do not turn every local interaction into a Provider. Text editing, focus,
 scrolling, animation, and temporary Widget-only state remain with their owning
 Widget. Hooks and Riverpod code generation are not part of the initial baseline.
 
+## Media Presentation
+
+`AImageViewer` is the only formal Admin9 media UI API in this version. It wraps
+`extended_image` behind an App-owned item model and provides full-screen paging,
+pinch and double-tap zoom, pan, page count, loading, failure, retry, close, slide
+dismissal, Theme integration, and semantics. Its public API does not expose
+third-party controllers or types. Ordinary images continue to use Flutter
+`Image` or `ExtendedImage.network` directly.
+
+Video and audio controls are Media Feature UI rather than mechanically renamed
+`A*` components. Forui owns their visible buttons, progress, loading, failure,
+retry, Theme, focus, and semantics. Live media must not display fabricated
+duration or seek behavior. Image and video full-screen routes sit above
+MainShell so persistent navigation is not visible.
+
 ## Navigation Presentation
 
 AutoRoute owns route matching, typed arguments, nested Tab Routers, Guards, and
@@ -221,6 +242,10 @@ Reusable leaf Widgets receive semantic callbacks rather than importing the App
 router. Navigation state must not be stored in Riverpod merely to mirror the
 AutoRoute stack.
 
+When a persistent `FScaffold.footer` already owns the system bottom inset, a
+nested scroll page must set `ResponsivePageBody.safeAreaBottom` to false. The
+footer and the page must not reserve the same inset twice.
+
 ## Brand And Platform Boundaries
 
 Use Forui's existing design language, Theme, components, and interaction states.
@@ -235,6 +260,16 @@ native capabilities. Use system keyboards, permissions, sharing, text selection,
 safe areas, and native pickers rather than rebuilding them as branded controls.
 An ordinary business page has one Forui implementation, not separate Android and
 iOS versions.
+
+### Product Startup Surfaces
+
+The native launch screen, Flutter initialization state, privacy page,
+onboarding, startup advertisement, and Home transition have separate visual
+responsibilities and must not be collapsed into a generic `splash`. Their real
+media, reduced-motion, safe-area, responsive, large-text, and screen-reader
+acceptance is defined in [Product Startup Flow](product-startup-flow.md). An
+explanatory Card/Alert/button composition is not a substitute for onboarding or
+advertisement media.
 
 Use an existing maintained Flutter plugin for system capabilities before adding
 project-owned Kotlin or Swift. When no suitable plugin can expose an approved

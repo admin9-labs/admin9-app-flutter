@@ -4,6 +4,7 @@ import 'package:admin9_app_flutter/features/examples/presentation/widgets/playgr
 import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_preview.dart';
 import 'package:admin9_app_flutter/shared/ui/error_state_view.dart';
 import 'package:admin9_app_flutter/shared/ui/layout/grid/a_grid.dart';
+import 'package:admin9_app_flutter/shared/ui/layout/grid/a_grid_badge.dart';
 import 'package:admin9_app_flutter/shared/ui/layout/grid/a_grid_item.dart';
 import 'package:admin9_app_flutter/shared/ui/loading_state_view.dart';
 import 'package:admin9_app_flutter/shared/ui/responsive_page_body.dart';
@@ -51,6 +52,7 @@ class _ThemesPageState extends ConsumerState<ThemesPage> {
 
   Widget _workbench(AppAppearancePreference preference, bool saving) =>
       ResponsivePageBody(
+        safeAreaBottom: false,
         children: [
           _ChoiceSection<AppThemePreset>(
             title: 'settings.theme_preset'.tr(),
@@ -172,26 +174,31 @@ class _ThemesPageState extends ConsumerState<ThemesPage> {
                 _StatusColors(),
                 AGrid(
                   columns: 3,
+                  surface: AGridSurface.outlined,
                   children: [
                     AGridItem(
-                      visual: const Icon(FLucideIcons.house),
-                      title: Text(
+                      icon: const Icon(FLucideIcons.house),
+                      label: Text(
                         'examples.foundation.concepts.themes.grid_home'.tr(),
                       ),
                       selected: true,
                       onPress: () {},
                     ),
                     AGridItem(
-                      visual: const Icon(FLucideIcons.bell),
-                      title: Text(
+                      icon: const Icon(FLucideIcons.bell),
+                      label: Text(
                         'examples.foundation.concepts.themes.grid_alerts'.tr(),
                       ),
-                      badge: FBadge(child: const Text('3')),
+                      badge: AGridBadge.count(
+                        3,
+                        semanticsLabel: 'examples.foundation.layout.grid.playground.badge_count_semantics'
+                            .tr(namedArgs: {'count': '3'}),
+                      ),
                       onPress: () {},
                     ),
                     AGridItem(
-                      visual: const Icon(FLucideIcons.settings),
-                      title: Text(
+                      icon: const Icon(FLucideIcons.settings),
+                      label: Text(
                         'examples.foundation.concepts.themes.grid_settings'
                             .tr(),
                       ),

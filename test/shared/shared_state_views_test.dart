@@ -37,6 +37,21 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('responsive body can defer bottom inset to a parent footer', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      const _Harness(
+        child: ResponsivePageBody(
+          safeAreaBottom: false,
+          children: [SizedBox(height: 20)],
+        ),
+      ),
+    );
+
+    expect(tester.widget<SafeArea>(find.byType(SafeArea)).bottom, isFalse);
+  });
+
   testWidgets('error state renders and invokes retry', (tester) async {
     var retryCalls = 0;
     await tester.pumpWidget(

@@ -6,50 +6,53 @@ import 'package:forui/forui.dart';
 import 'a_grid_item.dart';
 import 'a_grid_style.dart';
 
-/// A finite, non-scrolling Admin9 grid for page-level actions and content.
+enum AGridSurface { transparent, muted, outlined }
+
+/// A finite, non-scrolling Admin9 grid for icon actions.
 class AGrid extends StatelessWidget {
   const AGrid({
     super.key,
     required this.children,
-    this.columns = 2,
+    this.columns = 4,
     this.horizontalGap,
     this.verticalGap,
     this.childAspectRatio,
     this.padding,
     this.style,
+    this.surface = AGridSurface.transparent,
   }) : assert(columns > 0),
        assert(horizontalGap == null || horizontalGap >= 0),
        assert(verticalGap == null || verticalGap >= 0),
        assert(childAspectRatio == null || childAspectRatio > 0);
 
-  /// The grid items. Wrapping an item would hide the layout metadata AGrid
-  /// needs to preserve its content and touch geometry.
   final List<AGridItem> children;
 
-  /// The maximum number of columns. Fewer columns are used when needed to
-  /// preserve [AGridStyle.minimumTouchSize].
+  /// The maximum number of columns. Narrow constraints reduce this value.
   final int columns;
   final double? horizontalGap;
   final double? verticalGap;
   final double? childAspectRatio;
   final EdgeInsetsGeometry? padding;
   final AGridStyle? style;
+  final AGridSurface surface;
 
-  /// Resolves the nearest grid override, then falls back to the Forui theme.
   static AGridStyle styleOf(BuildContext context) =>
-      context.dependOnInheritedWidgetOfExactType<_AGridStyleScope>()?.style ??
+      context.dependOnInheritedWidgetOfExactType<_AGridScope>()?.style ??
       context.theme.style.aGrid;
+
+  static AGridSurface surfaceOf(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<_AGridScope>()?.surface ??
+      AGridSurface.transparent;
 
   @override
   Widget build(BuildContext context) {
-    final inheritedTheme = context.theme;
-    final resolved = style ?? inheritedTheme.style.aGrid;
+    final resolved = style ?? context.theme.style.aGrid;
     final gridPadding = padding ?? resolved.gridPadding;
     final crossAxisSpacing = horizontalGap ?? resolved.horizontalGap;
     final mainAxisSpacing = verticalGap ?? resolved.verticalGap;
     final requestedAspectRatio = childAspectRatio ?? resolved.childAspectRatio;
     final minimumTouchSize = resolved.minimumTouchSize;
-    final grid = LayoutBuilder(
+    return LayoutBuilder(
       builder: (context, constraints) {
         if (!constraints.hasBoundedWidth) {
           throw FlutterError('AGrid requires a bounded width.');
@@ -63,18 +66,10 @@ class AGrid extends StatelessWidget {
         final direction = Directionality.of(context);
         final resolvedPadding = gridPadding.resolve(direction);
         final resolvedItemPadding = resolved.itemPadding.resolve(direction);
-        final titleStyle = resolved.titleTextStyle.resolve({});
-        final descriptionStyle = resolved.descriptionTextStyle.resolve({});
         final textScaler = MediaQuery.textScalerOf(context);
         final locale = Localizations.maybeLocaleOf(context);
-        final titleLineHeight = _textLineHeight(
-          style: titleStyle,
-          direction: direction,
-          textScaler: textScaler,
-          locale: locale,
-        );
-        final descriptionLineHeight = _textLineHeight(
-          style: descriptionStyle,
+        final labelLineHeight = _textLineHeight(
+          style: resolved.labelTextStyle.resolve({}),
           direction: direction,
           textScaler: textScaler,
           locale: locale,
@@ -100,55 +95,38 @@ class AGrid extends StatelessWidget {
         final cellWidth =
             (availableWidth - (effectiveColumns - 1) * crossAxisSpacing) /
             effectiveColumns;
-        final horizontalFits =
-            cellWidth - resolvedItemPadding.horizontal >=
-            minimumTouchSize * 2 + resolved.visualSpacing;
-        final minimumCellHeight = children.fold<double>(
-          minimumTouchSize + titleLineHeight + resolvedItemPadding.vertical,
-          (height, child) {
-            final labelHeight =
-                titleLineHeight +
-                (child.description == null
-                    ? 0
-                    : resolved.textSpacing + descriptionLineHeight * 2);
-            final visualHeight =
-                minimumTouchSize + (child.badge == null ? 0 : 4);
-            final vertical =
-                child.layout == AGridItemLayout.vertical || !horizontalFits;
-            final contentHeight = vertical
-                ? visualHeight + resolved.visualSpacing + labelHeight
-                : math.max(visualHeight, labelHeight);
-            return math.max(
-              height,
-              contentHeight + resolvedItemPadding.vertical + 4,
-            );
-          },
+        final minimumCellHeight = math.max(
+          minimumTouchSize,
+          resolvedItemPadding.vertical +
+              resolved.iconSlotSize +
+              resolved.iconLabelSpacing +
+              labelLineHeight,
         );
         final effectiveAspectRatio = math.min(
           requestedAspectRatio,
           cellWidth / minimumCellHeight,
         );
 
-        return DecoratedBox(
-          decoration: resolved.gridDecoration,
-          child: GridView.count(
-            primary: false,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            padding: gridPadding,
-            crossAxisCount: effectiveColumns,
-            crossAxisSpacing: crossAxisSpacing,
-            mainAxisSpacing: mainAxisSpacing,
-            childAspectRatio: effectiveAspectRatio,
-            children: children,
+        return _AGridScope(
+          style: resolved,
+          surface: surface,
+          child: DecoratedBox(
+            decoration: resolved.gridDecoration,
+            child: GridView.count(
+              primary: false,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              padding: gridPadding,
+              crossAxisCount: effectiveColumns,
+              crossAxisSpacing: crossAxisSpacing,
+              mainAxisSpacing: mainAxisSpacing,
+              childAspectRatio: effectiveAspectRatio,
+              children: children,
+            ),
           ),
         );
       },
     );
-
-    return style == null
-        ? grid
-        : _AGridStyleScope(style: resolved, child: grid);
   }
 }
 
@@ -168,12 +146,17 @@ double _textLineHeight({
   return painter.height;
 }
 
-class _AGridStyleScope extends InheritedWidget {
-  const _AGridStyleScope({required this.style, required super.child});
+class _AGridScope extends InheritedWidget {
+  const _AGridScope({
+    required this.style,
+    required this.surface,
+    required super.child,
+  });
 
   final AGridStyle style;
+  final AGridSurface surface;
 
   @override
-  bool updateShouldNotify(_AGridStyleScope oldWidget) =>
-      style != oldWidget.style;
+  bool updateShouldNotify(_AGridScope oldWidget) =>
+      style != oldWidget.style || surface != oldWidget.surface;
 }

@@ -2,88 +2,82 @@ import 'package:auto_route/auto_route.dart';
 
 import 'app_router.gr.dart';
 
-const foundationTab = EmptyShellRoute('FoundationTab');
-const formsTab = EmptyShellRoute('FormsTab');
-const contentTab = EmptyShellRoute('ContentTab');
-const feedbackTab = EmptyShellRoute('FeedbackTab');
+const componentsTab = EmptyShellRoute('ComponentsTab');
 
-final List<AutoRoute> examplesTabRoutes = [
+final List<AutoRoute> examplesRoutes = [
   AutoRoute(
-    page: foundationTab.page,
-    path: 'foundation',
-    initial: true,
+    page: componentsTab.page,
+    path: 'components',
     children: [
-      AutoRoute(page: FoundationRoute.page, path: '', initial: true),
-      AutoRoute(page: ThemesRoute.page, path: 'concepts/themes'),
-      AutoRoute(page: IconsRoute.page, path: 'reference/icons'),
+      AutoRoute(page: ComponentsRoute.page, path: '', initial: true),
+      AutoRoute(page: FoundationRoute.page, path: 'forui/foundation'),
+      AutoRoute(
+        page: ThemesRoute.page,
+        path: 'forui/foundation/concepts/themes',
+      ),
+      AutoRoute(
+        page: IconsRoute.page,
+        path: 'forui/foundation/reference/icons',
+      ),
       AutoRoute(
         page: AppShellPlaygroundRoute.page,
-        path: 'playground/app-shell',
+        path: 'forui/foundation/playground/app-shell',
       ),
       AutoRoute(
         page: InteractionPlaygroundRoute.page,
-        path: 'playground/interaction',
+        path: 'forui/foundation/playground/interaction',
       ),
-      AutoRoute(page: GridRoute.page, path: 'layout/grid'),
-    ],
-  ),
-  AutoRoute(
-    page: formsTab.page,
-    path: 'forms',
-    children: [
-      AutoRoute(page: FormsRoute.page, path: '', initial: true),
-      AutoRoute(page: ButtonsPlaygroundRoute.page, path: 'playground/buttons'),
+      AutoRoute(page: GridRoute.page, path: 'admin9/grid'),
+      AutoRoute(page: FormsRoute.page, path: 'forui/forms'),
+      AutoRoute(
+        page: ButtonsPlaygroundRoute.page,
+        path: 'forui/forms/playground/buttons',
+      ),
       AutoRoute(
         page: TextInputPlaygroundRoute.page,
-        path: 'playground/text-input',
+        path: 'forui/forms/playground/text-input',
       ),
       AutoRoute(
         page: SelectionControlsPlaygroundRoute.page,
-        path: 'playground/selection-controls',
+        path: 'forui/forms/playground/selection-controls',
       ),
-      AutoRoute(page: SelectsPlaygroundRoute.page, path: 'playground/selects'),
+      AutoRoute(
+        page: SelectsPlaygroundRoute.page,
+        path: 'forui/forms/playground/selects',
+      ),
       AutoRoute(
         page: ValueControlsPlaygroundRoute.page,
-        path: 'playground/value-controls',
+        path: 'forui/forms/playground/value-controls',
       ),
       AutoRoute(
         page: SchedulingPlaygroundRoute.page,
-        path: 'playground/scheduling',
+        path: 'forui/forms/playground/scheduling',
       ),
-    ],
-  ),
-  AutoRoute(
-    page: contentTab.page,
-    path: 'content',
-    children: [
-      AutoRoute(page: ContentRoute.page, path: '', initial: true),
+      AutoRoute(page: ContentRoute.page, path: 'forui/content'),
       AutoRoute(
         page: OverviewPlaygroundRoute.page,
-        path: 'playground/overview',
+        path: 'forui/content/playground/overview',
       ),
       AutoRoute(
         page: CalendarPlaygroundRoute.page,
-        path: 'playground/calendar',
+        path: 'forui/content/playground/calendar',
       ),
-      AutoRoute(page: ListsPlaygroundRoute.page, path: 'playground/lists'),
-    ],
-  ),
-  AutoRoute(
-    page: feedbackTab.page,
-    path: 'feedback',
-    children: [
-      AutoRoute(page: FeedbackRoute.page, path: '', initial: true),
+      AutoRoute(
+        page: ListsPlaygroundRoute.page,
+        path: 'forui/content/playground/lists',
+      ),
+      AutoRoute(page: FeedbackRoute.page, path: 'forui/feedback'),
       AutoRoute(
         page: AsyncStatusPlaygroundRoute.page,
-        path: 'playground/status',
+        path: 'forui/feedback/playground/status',
       ),
       AutoRoute(
         page: ConfirmationPlaygroundRoute.page,
-        path: 'playground/confirmation',
+        path: 'forui/feedback/playground/confirmation',
       ),
       AutoRoute(
         page: ContextualFeedbackPlaygroundRoute.page,
-        path: 'playground/contextual',
+        path: 'forui/feedback/playground/contextual',
       ),
     ],
   ),

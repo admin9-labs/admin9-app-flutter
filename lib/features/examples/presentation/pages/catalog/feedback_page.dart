@@ -14,7 +14,10 @@ class FeedbackPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) => FScaffold(
     childPad: false,
-    header: FHeader(title: Text('examples.feedback.title'.tr())),
+    header: FHeader.nested(
+      title: Text('examples.feedback.title'.tr()),
+      prefixes: [FHeaderAction.back(onPress: context.maybePop)],
+    ),
     child: ResponsivePageBody(
       children: [
         ComponentExampleSection(

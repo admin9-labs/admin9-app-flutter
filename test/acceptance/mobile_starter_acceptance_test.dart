@@ -6,11 +6,13 @@ import 'package:admin9_app_flutter/app/appearance/app_appearance_preference.dart
 import 'package:admin9_app_flutter/app/appearance/app_appearance_provider.dart';
 import 'package:admin9_app_flutter/app/appearance/app_appearance_repository.dart';
 import 'package:admin9_app_flutter/app/appearance/app_theme_catalog.dart';
-import 'package:admin9_app_flutter/app/routing/starter_shell_page.dart';
+import 'package:admin9_app_flutter/app/routing/main_shell_page.dart';
+import 'package:admin9_app_flutter/app/startup/startup_provider.dart';
 import 'package:admin9_app_flutter/features/examples/presentation/pages/catalog/content_page.dart';
 import 'package:admin9_app_flutter/features/examples/presentation/pages/catalog/feedback_page.dart';
 import 'package:admin9_app_flutter/features/examples/presentation/pages/catalog/forms_page.dart';
 import 'package:admin9_app_flutter/features/examples/presentation/pages/catalog/foundation_page.dart';
+import 'package:admin9_app_flutter/features/examples/presentation/pages/concepts/themes/themes_page.dart';
 import 'package:admin9_app_flutter/features/examples/presentation/pages/feedback/playgrounds/async_status_playground_page.dart';
 import 'package:admin9_app_flutter/features/examples/presentation/pages/feedback/playgrounds/confirmation_playground_page.dart';
 import 'package:admin9_app_flutter/features/settings/presentation/pages/settings_page.dart';
@@ -22,6 +24,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:forui/forui.dart';
 import 'package:material_ui/material_ui.dart' as material_ui;
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../app/support/test_admin9_app.dart';
 
 const _locale = Locale('zh', 'CN');
 late Map<String, dynamic> _translations;
@@ -68,7 +72,7 @@ void main() {
         platformBrightness: scenario.platformBrightness,
       );
 
-      final shell = find.byType(StarterShellPage);
+      final shell = find.byType(MainShellPage);
       final context = tester.element(shell);
       final foruiTheme = tester.widget<FTheme>(
         find.ancestor(of: shell, matching: find.byType(FTheme)),
@@ -97,6 +101,49 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   }
+
+  testWidgets('theme options scroll completely above persistent navigation', (
+    tester,
+  ) async {
+    await _pumpStarter(
+      tester,
+      size: const Size(390, 844),
+      viewPadding: const FakeViewPadding(top: 24, bottom: 34),
+    );
+
+    final themes = find.byKey(const ValueKey('foundation-themes'));
+    await tester.ensureVisible(themes);
+    await tester.tap(themes);
+    await tester.pumpAndSettle();
+    expect(find.byType(ThemesPage), findsOneWidget);
+
+    final lastFontSize = find.byKey(
+      const ValueKey('theme-font-size-extraLarge'),
+    );
+    await tester.ensureVisible(lastFontSize);
+    await tester.pumpAndSettle();
+
+    final navigationTop = tester
+        .getTopLeft(find.byType(FBottomNavigationBar))
+        .dy;
+    expect(
+      tester.getBottomLeft(lastFontSize).dy,
+      lessThanOrEqualTo(navigationTop),
+    );
+    final themeScrollView = find.descendant(
+      of: find.byType(ThemesPage),
+      matching: find.byType(SingleChildScrollView),
+    );
+    expect(
+      tester.getBottomLeft(themeScrollView).dy,
+      closeTo(navigationTop, 0.01),
+    );
+    final themeSafeArea = tester.widget<SafeArea>(
+      find.ancestor(of: themeScrollView, matching: find.byType(SafeArea)).first,
+    );
+    expect(themeSafeArea.bottom, isFalse);
+    expect(tester.takeException(), isNull);
+  });
 
   for (final scenario in [
     const (
@@ -127,27 +174,27 @@ void main() {
         final items = find.byType(FBottomNavigationBarItem);
         final barRect = tester.getRect(bar);
         final itemRects = [
-          for (var index = 0; index < 5; index++)
+          for (var index = 0; index < 4; index++)
             tester.getRect(items.at(index)),
         ];
         final labelRects = [
-          for (final label in ['基础', '表单', '内容', '反馈', '设置'])
+          for (final label in ['首页', '组件', '媒体', '设置'])
             tester.getRect(
               find.descendant(of: bar, matching: find.text(label)),
             ),
         ];
         final selectedStyle = DefaultTextStyle.of(
-          tester.element(find.descendant(of: bar, matching: find.text('基础'))),
+          tester.element(find.descendant(of: bar, matching: find.text('组件'))),
         ).style;
         final unselectedStyle = DefaultTextStyle.of(
-          tester.element(find.descendant(of: bar, matching: find.text('表单'))),
+          tester.element(find.descendant(of: bar, matching: find.text('首页'))),
         ).style;
 
         expect(
           tester.widget<FBottomNavigationBar>(bar).safeAreaBottom,
           isFalse,
         );
-        expect(items, findsNWidgets(5));
+        expect(items, findsNWidgets(4));
         for (var index = 1; index < itemRects.length; index++) {
           expect(itemRects[index].width, closeTo(itemRects.first.width, 0.01));
           expect(
@@ -208,7 +255,7 @@ void main() {
       viewInsets: FakeViewPadding.zero,
     ),
   ]) {
-    testWidgets('five destinations fit ${scenario.size.width.toInt()}px at '
+    testWidgets('component catalogs fit ${scenario.size.width.toInt()}px at '
         '${scenario.textScale}x text', (tester) async {
       await _pumpStarter(
         tester,
@@ -358,15 +405,29 @@ Future<void> _pumpStarter(
               AppAppearancePreference.defaults.copyWith(brightness: preference),
             ),
           ),
+          startupPreferencesRepositoryProvider.overrideWithValue(
+            FakeCompletedStartupRepository(),
+          ),
         ],
         child: const Admin9App(),
       ),
     ),
   );
   await tester.pumpAndSettle();
+  await tester.tap(find.byKey(const ValueKey('home-open-components')));
+  await tester.pumpAndSettle();
+  await tester.tap(find.byKey(const ValueKey('components-forui-foundation')));
+  await tester.pumpAndSettle();
 }
 
 Future<void> _selectDestination(WidgetTester tester, String label) async {
+  if (const {'基础', '表单', '内容', '反馈'}.contains(label)) {
+    expect(await tester.binding.handlePopRoute(), isTrue);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(label));
+    await tester.pumpAndSettle();
+    return;
+  }
   final navigation = find.byType(FBottomNavigationBar);
   await tester.tap(find.descendant(of: navigation, matching: find.text(label)));
   await tester.pumpAndSettle();

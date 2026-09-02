@@ -1,16 +1,27 @@
 import 'dart:ui';
 
 import 'package:easy_localization/easy_localization.dart';
+import 'package:audio_service/audio_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'admin9_app.dart';
+import '../features/media/data/services/media_audio_handler.dart';
+import '../features/media/presentation/providers/media_audio_provider.dart';
 
 Future<void> bootstrap() async {
   WidgetsFlutterBinding.ensureInitialized();
   installAppErrorBoundary();
   await EasyLocalization.ensureInitialized();
+  final audioHandler = await AudioService.init<MediaAudioHandler>(
+    builder: MediaAudioHandler.new,
+    config: const AudioServiceConfig(
+      androidNotificationChannelId: 'dev.admin9.starter.audio',
+      androidNotificationChannelName: '媒体播放',
+      androidNotificationOngoing: false,
+    ),
+  );
 
   runApp(
     EasyLocalization(
@@ -18,7 +29,10 @@ Future<void> bootstrap() async {
       fallbackLocale: const Locale('zh', 'CN'),
       path: 'assets/translations',
       saveLocale: false,
-      child: const ProviderScope(child: Admin9App()),
+      child: ProviderScope(
+        overrides: [mediaAudioHandlerProvider.overrideWithValue(audioHandler)],
+        child: const Admin9App(),
+      ),
     ),
   );
 }

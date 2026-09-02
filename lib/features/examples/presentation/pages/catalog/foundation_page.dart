@@ -14,7 +14,10 @@ class FoundationPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) => FScaffold(
     childPad: false,
-    header: FHeader(title: Text('examples.foundation.title'.tr())),
+    header: FHeader.nested(
+      title: Text('examples.foundation.title'.tr()),
+      prefixes: [FHeaderAction.back(onPress: context.maybePop)],
+    ),
     child: ResponsivePageBody(
       children: [
         ComponentExampleSection(

@@ -1,5 +1,10 @@
 import 'package:admin9_app_flutter/app/appearance/app_appearance_preference.dart';
 import 'package:admin9_app_flutter/app/appearance/app_appearance_provider.dart';
+import 'package:admin9_app_flutter/app/routing/app_router.gr.dart';
+import 'package:admin9_app_flutter/app/startup/startup_provider.dart';
+import 'package:admin9_app_flutter/app/startup/startup_state.dart';
+import 'package:admin9_app_flutter/features/legal/domain/legal_document.dart';
+import 'package:admin9_app_flutter/features/startup_ad/presentation/providers/startup_ad_provider.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/widgets.dart';
@@ -98,6 +103,7 @@ class SettingsPage extends ConsumerWidget {
               _save(context, ref, preference.copyWith(radius: value)),
         ),
       ),
+      const _PrivacyAndCacheSettings(),
       FButton(
         key: const ValueKey('settings-reset'),
         variant: .outline,
@@ -186,6 +192,182 @@ class SettingsPage extends ConsumerWidget {
       await _save(context, ref, AppAppearancePreference.defaults);
     }
   }
+}
+
+class _PrivacyAndCacheSettings extends ConsumerWidget {
+  const _PrivacyAndCacheSettings();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final startup = ref.watch(startupCoordinatorProvider);
+    final cacheSize = ref.watch(startupAdCacheSizeProvider);
+    return ComponentExampleSection(
+      title: context.tr('settings.privacy_title'),
+      description: context.tr('settings.privacy_description'),
+      child: FItemGroup(
+        divider: .indented,
+        children: [
+          FItem(
+            key: const ValueKey('settings-privacy-policy'),
+            prefix: const Icon(FLucideIcons.fileText),
+            title: Text(context.tr('privacy.policy')),
+            suffix: const Icon(FLucideIcons.chevronRight),
+            onPress: () => context.pushRoute(
+              LegalDocumentRoute(document: LegalDocument.privacyPolicy),
+            ),
+          ),
+          FItem(
+            key: const ValueKey('settings-privacy-consent'),
+            variant: startup.accessMode == AccessMode.full
+                ? .destructive
+                : .primary,
+            prefix: Icon(
+              startup.accessMode == AccessMode.full
+                  ? FLucideIcons.shieldOff
+                  : FLucideIcons.shieldCheck,
+            ),
+            title: Text(
+              context.tr(
+                startup.accessMode == AccessMode.full
+                    ? 'settings.privacy_withdraw'
+                    : 'settings.privacy_enable',
+              ),
+            ),
+            subtitle: Text(
+              context.tr(
+                startup.accessMode == AccessMode.full
+                    ? 'settings.privacy_full'
+                    : 'settings.privacy_limited',
+              ),
+            ),
+            suffix: const Icon(FLucideIcons.chevronRight),
+            onPress: () => startup.accessMode == AccessMode.full
+                ? _withdraw(context, ref)
+                : _review(context, ref),
+          ),
+          FItem(
+            key: const ValueKey('settings-startup-ad-cache'),
+            prefix: const Icon(FLucideIcons.database),
+            title: Text(context.tr('settings.startup_cache')),
+            subtitle: Text(context.tr('settings.startup_cache_description')),
+            details: Text(
+              cacheSize.when(
+                data: _formatBytes,
+                error: (_, _) => context.tr('settings.cache_unknown'),
+                loading: () => context.tr('common.loading'),
+              ),
+            ),
+            suffix: const Icon(FLucideIcons.trash2),
+            onPress: cacheSize.isLoading
+                ? null
+                : () => _clearCache(context, ref),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _withdraw(BuildContext context, WidgetRef ref) async {
+    final confirmed = await showFDialog<bool>(
+      context: context,
+      useSafeArea: true,
+      builder: (dialogContext, _, animation) => FDialog(
+        animation: animation,
+        semanticsLabel: context.tr('settings.privacy_withdraw'),
+        builder: (_, style) => Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            spacing: 16,
+            children: [
+              Text(
+                context.tr('settings.privacy_withdraw'),
+                style: style.titleTextStyle,
+              ),
+              Text(
+                context.tr('settings.privacy_withdraw_message'),
+                style: style.bodyTextStyle,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                spacing: 8,
+                children: [
+                  FButton(
+                    variant: .outline,
+                    mainAxisSize: MainAxisSize.min,
+                    onPress: () => Navigator.of(dialogContext).pop(false),
+                    child: Text(context.tr('common.cancel')),
+                  ),
+                  FButton(
+                    key: const ValueKey('settings-privacy-withdraw-confirm'),
+                    variant: .destructive,
+                    mainAxisSize: MainAxisSize.min,
+                    onPress: () => Navigator.of(dialogContext).pop(true),
+                    child: Text(context.tr('common.confirm')),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    if (confirmed != true || !context.mounted) return;
+    final succeeded = await ref
+        .read(startupCoordinatorProvider.notifier)
+        .withdrawPrivacy();
+    if (!context.mounted) return;
+    showFToast(
+      context: context,
+      alignment: .bottomCenter,
+      variant: succeeded ? .primary : .destructive,
+      title: Text(
+        context.tr(
+          succeeded ? 'settings.privacy_withdrawn' : 'common.save_failed',
+        ),
+      ),
+    );
+  }
+
+  void _review(BuildContext context, WidgetRef ref) {
+    ref.read(startupCoordinatorProvider.notifier).requestPrivacyReview();
+    context.router.replaceAll([StartupGateRoute(reviewPrivacy: true)]);
+  }
+
+  Future<void> _clearCache(BuildContext context, WidgetRef ref) async {
+    try {
+      await ref.read(startupAdRepositoryProvider).clearCache();
+      ref.invalidate(startupAdCacheSizeProvider);
+      final remaining = await ref.read(startupAdRepositoryProvider).cacheSize();
+      if (!context.mounted) return;
+      showFToast(
+        context: context,
+        alignment: .bottomCenter,
+        title: Text(
+          context.tr(
+            remaining == 0
+                ? 'settings.cache_cleared'
+                : 'settings.cache_clear_partial',
+          ),
+        ),
+      );
+    } on Object {
+      if (!context.mounted) return;
+      showFToast(
+        context: context,
+        alignment: .bottomCenter,
+        variant: .destructive,
+        title: Text(context.tr('settings.cache_clear_failed')),
+      );
+    }
+  }
+}
+
+String _formatBytes(int bytes) {
+  if (bytes < 1024) return '$bytes B';
+  if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
+  return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
 }
 
 class _ChoiceGroup<T> extends StatelessWidget {

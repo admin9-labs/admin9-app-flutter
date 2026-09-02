@@ -17,6 +17,9 @@ have been checked. Git history, tags, and remotes are not rewritten or deleted.
 See [UI](ui.md) for the Forui, theme, generation, and UI acceptance rules. The
 upstream repository's bundled example is intentionally separated into
 [Upstream Starter](starter.md); it is not a downstream product contract.
+The non-removable startup state machine and its privacy, routing, persistence,
+media, and failure rules are defined by
+[Product Startup Flow](product-startup-flow.md).
 
 ## Minimal Structure
 
@@ -74,10 +77,11 @@ Shared ownership follows two rules:
 - the Starter may provide one canonical pattern earlier when a current example
   consumes it and its behavior is runnable, tested, and documented.
 
-The Starter has one approved runnable Admin9 UI Showroom Feature at
-`lib/features/examples/`. It owns the Foundation, Forms, Content, and Feedback
-groups and their Playgrounds, translations, tests, and routes. Settings remains
-an independent real Feature. The Showroom lets adopters browse a capability,
+When present, the Starter has one approved runnable Admin9 UI Showroom Feature
+at `lib/features/examples/`. It owns the Components destination, the Forui
+Foundation, Forms, Content, and Feedback catalogs, the Admin9 catalog, and their
+Playgrounds, translations, tests, and routes. Home, Media, and Settings remain
+independent real Features. The Showroom lets adopters browse a capability,
 configure a realistic scenario, interact with its states, and reset the
 scenario. It does not turn its scenarios into downstream product requirements.
 
@@ -99,21 +103,20 @@ AutoRoute, App routing, or a business Feature. Existing root-level shared UI
 files are not moved merely to make the category tree look complete. New shared
 UI uses a responsibility-specific category such as `layout/grid/`.
 
-The App router consumes Examples through one route-group integration point. The
-current five destinations remain Foundation, Forms, Content, Feedback, and
-Settings. The four visible Showroom destinations may retain separate nested
-stacks, but their
-route declarations remain owned by the Examples group rather than four separate
-Features. Removing the bundled Examples Feature requires removing that one
-mount, regenerating AutoRoute output, and deleting its routes, tests,
-`examples.*` translations, and Starter coverage claims. The removal must not
-delete independent shared UI APIs or the Settings Feature.
+The App router consumes Examples through one route-group integration point at
+`/app/components`. MainShell owns Home, Components, Media, and Settings branch
+stacks; Foundation, Forms, Content, and Feedback are routes inside Components.
+Removing Examples removes Components and its Home contribution, regenerates
+AutoRoute output, and deletes its tests, translations, screenshots, and Starter
+claims. It must not delete startup, Home, Media, Settings, Legal, or independent
+shared UI APIs.
 
 The approved reusable Admin9 brand component for this iteration is owned at:
 
 ```text
 lib/shared/ui/layout/grid/
 |-- a_grid.dart
+|-- a_grid_badge.dart
 |-- a_grid_item.dart
 `-- a_grid_style.dart
 ```
@@ -123,6 +126,14 @@ Showroom without removing the brand API. Its style extends the existing Forui
 Theme contract; it does not introduce a parallel App Theme. Other category
 directories and APIs are created only after their own responsibility and
 consumer are approved.
+
+Media is a formal App Feature at `lib/features/media/`. A local Scenario
+Repository owns prototype article, image, video, and audio data. `extended_image`
+owns image caching and gestures; `video_player` delegates decoding and HLS to the
+platform engines; `just_audio`, `audio_service`, and `audio_session` own audio
+decoding, background service, system controls, and interruption integration.
+Media maps these engines to Forui UI and semantic state without exposing
+third-party types through `AImageViewer`.
 
 Data, Domain, Repository, Service, Use Case, and shared layers require a real
 consumer and a specific responsibility. Do not create empty layers or placeholder
@@ -188,6 +199,13 @@ are optional implementation tools and require a demonstrated benefit before they
 are added. Repository, Service, Model, Preferences, and Domain implementations
 remain ordinary Dart or platform-boundary classes; providers construct or expose
 them without making those classes depend on Riverpod.
+
+`StartupCoordinator` is App-owned state. It may consume startup preferences and
+the startup-ad Repository through providers, but it does not import AutoRoute,
+Forui, `BuildContext`, HTTP, file-system, or video APIs. `StartupGatePage` maps
+its terminal state to generated routes. Notification, share, and deep-link
+adapters produce a `LaunchReason` and allowlisted `PendingDestination`; they do
+not bypass the privacy decision.
 
 ## Routing Architecture
 
@@ -303,7 +321,9 @@ platform behavior. Only an explicit project decision can change its status.
 | `worker_manager` | Dart isolate worker pool | Profiling confirms a CPU-bound workload | Conditional preferred |
 | WebSocket or Socket.IO | Realtime transport | Approved backend realtime protocol is defined | Protocol-dependent |
 | Pigeon | Typed Dart-to-native bridge generation | Approved native capability lacks a suitable maintained Flutter plugin | Conditional preferred |
-| Media player package | Video, live, or audio playback | Approved media formats and platform capabilities are defined | Requirement-dependent |
+| `extended_image` | Cached multi-image preview, zoom, pan, paging, and slide dismissal | Approved image-preview Feature | Adopted |
+| `video_player` | Local/MP4/HLS video through AVPlayer and ExoPlayer | Approved video scenarios and lifecycle | Adopted |
+| `just_audio`, `audio_service`, `audio_session` | Audio queue, streaming, background service, system controls, and focus | Approved audio and background contract | Adopted |
 | `mocktail` | Test doubles | A hand-written fake is less clear or more costly | Test-as-needed |
 
 ### Baseline Engineering

@@ -8,16 +8,25 @@ environment:
   flutter: '>=3.47.2'
 
 dependencies:
+  audio_service: ^0.18.19
+  audio_session: ^0.2.4
   auto_route: ^11.1.0
+  crypto: ^3.0.7
   easy_localization: ^3.0.8
+  extended_image: ^10.1.0
   flutter:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
   flutter_riverpod: ^3.4.2
   forui: ^0.26.0
+  http: ^1.6.0
+  just_audio: ^0.10.6
   material_ui: ^1.0.0
+  path_provider: ^2.1.5
   shared_preferences: ^2.5.5
+  url_launcher: ^6.3.2
+  video_player: 2.11.1
 
 dev_dependencies:
   auto_route_generator: ^10.6.0
@@ -33,4 +42,7 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
+    - assets/images/brand/
+    - assets/images/onboarding/
+    - assets/media/
     - assets/translations/

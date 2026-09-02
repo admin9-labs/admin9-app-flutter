@@ -1,0 +1,1 @@
+enum LegalDocument { userAgreement, privacyPolicy }

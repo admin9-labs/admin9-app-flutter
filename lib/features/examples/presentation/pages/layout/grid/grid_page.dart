@@ -1,10 +1,8 @@
-import 'dart:convert';
-import 'dart:typed_data';
-
 import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_action_bar.dart';
 import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_preview.dart';
 import 'package:admin9_app_flutter/shared/ui/component_example_section.dart';
 import 'package:admin9_app_flutter/shared/ui/layout/grid/a_grid.dart';
+import 'package:admin9_app_flutter/shared/ui/layout/grid/a_grid_badge.dart';
 import 'package:admin9_app_flutter/shared/ui/layout/grid/a_grid_item.dart';
 import 'package:admin9_app_flutter/shared/ui/responsive_page_body.dart';
 import 'package:auto_route/auto_route.dart';
@@ -20,76 +18,27 @@ class GridPage extends StatefulWidget {
   State<GridPage> createState() => _GridPageState();
 }
 
-enum _GridScenario { quickActions, contentEntries, statusPanel }
-
-enum _GridVisual { icon, image, custom }
-
 enum _GridBadge { none, count, label, dot }
 
 class _GridPageState extends State<GridPage> {
-  _GridScenario _scenario = _GridScenario.quickActions;
-  int _columns = 3;
+  int _columns = 4;
   double _horizontalGap = 8;
   double _verticalGap = 8;
-  double _childAspectRatio = 0.9;
+  double _childAspectRatio = 1;
   double _padding = 0;
-  AGridItemLayout _layout = AGridItemLayout.vertical;
-  _GridVisual _visual = _GridVisual.icon;
-  _GridBadge _badge = _GridBadge.none;
+  AGridSurface _surface = AGridSurface.transparent;
+  _GridBadge _badge = _GridBadge.count;
   bool _enabled = true;
-  bool _selected = false;
+  String? _selectedId;
   int _actionCount = 0;
   String? _status;
 
-  void _selectScenario(_GridScenario scenario) {
-    setState(() {
-      _scenario = scenario;
-      _applyScenarioDefaults(scenario);
-    });
-  }
-
-  void _applyScenarioDefaults(_GridScenario scenario) {
-    switch (scenario) {
-      case _GridScenario.quickActions:
-        _columns = 3;
-        _horizontalGap = 8;
-        _verticalGap = 8;
-        _childAspectRatio = 0.9;
-        _padding = 0;
-        _layout = AGridItemLayout.vertical;
-        _visual = _GridVisual.icon;
-        _badge = _GridBadge.none;
-      case _GridScenario.contentEntries:
-        _columns = 1;
-        _horizontalGap = 12;
-        _verticalGap = 12;
-        _childAspectRatio = 3.2;
-        _padding = 0;
-        _layout = AGridItemLayout.horizontalStart;
-        _visual = _GridVisual.image;
-        _badge = _GridBadge.label;
-      case _GridScenario.statusPanel:
-        _columns = 2;
-        _horizontalGap = 12;
-        _verticalGap = 12;
-        _childAspectRatio = 1.05;
-        _padding = 0;
-        _layout = AGridItemLayout.vertical;
-        _visual = _GridVisual.custom;
-        _badge = _GridBadge.count;
-    }
-    _enabled = true;
-    _selected = false;
-    _actionCount = 0;
-    _status = null;
-  }
-
-  void _activate(String label) {
+  void _activate(String id, String label) {
     final status = 'examples.foundation.layout.grid.playground.action_result'
         .tr(namedArgs: {'label': label, 'count': '${_actionCount + 1}'});
     setState(() {
       _actionCount++;
-      _selected = true;
+      _selectedId = id;
       _status = status;
     });
     showFToast(
@@ -100,7 +49,19 @@ class _GridPageState extends State<GridPage> {
   }
 
   void _reset() {
-    setState(() => _applyScenarioDefaults(_scenario));
+    setState(() {
+      _columns = 4;
+      _horizontalGap = 8;
+      _verticalGap = 8;
+      _childAspectRatio = 1;
+      _padding = 0;
+      _surface = AGridSurface.transparent;
+      _badge = _GridBadge.count;
+      _enabled = true;
+      _selectedId = null;
+      _actionCount = 0;
+      _status = null;
+    });
     showFToast(
       context: context,
       title: Text('examples.playground.reset_done'.tr()),
@@ -117,39 +78,6 @@ class _GridPageState extends State<GridPage> {
     ),
     child: ResponsivePageBody(
       children: [
-        ComponentExampleSection(
-          title: 'examples.foundation.layout.grid.playground.scenario.title'
-              .tr(),
-          description:
-              'examples.foundation.layout.grid.playground.scenario.description'
-                  .tr(),
-          child: _ChoiceControl<_GridScenario>(
-            value: _scenario,
-            onChanged: _selectScenario,
-            choices: [
-              (
-                value: _GridScenario.quickActions,
-                label:
-                    'examples.foundation.layout.grid.playground.scenario.quick'
-                        .tr(),
-                key: const ValueKey('grid-scenario-quick'),
-              ),
-              (
-                value: _GridScenario.contentEntries,
-                label: 'examples.foundation.layout.grid.playground.scenario.content'
-                    .tr(),
-                key: const ValueKey('grid-scenario-content'),
-              ),
-              (
-                value: _GridScenario.statusPanel,
-                label:
-                    'examples.foundation.layout.grid.playground.scenario.status'
-                        .tr(),
-                key: const ValueKey('grid-scenario-status'),
-              ),
-            ],
-          ),
-        ),
         PlaygroundPreview(
           title: 'examples.playground.preview'.tr(),
           status: _status,
@@ -160,7 +88,8 @@ class _GridPageState extends State<GridPage> {
             verticalGap: _verticalGap,
             childAspectRatio: _childAspectRatio,
             padding: EdgeInsets.all(_padding),
-            children: _scenarioItems,
+            surface: _surface,
+            children: _items,
           ),
         ),
         ComponentExampleSection(
@@ -174,7 +103,7 @@ class _GridPageState extends State<GridPage> {
                 label: 'examples.foundation.layout.grid.playground.columns'
                     .tr(),
                 value: _columns.toDouble(),
-                min: 1,
+                min: 2,
                 max: 4,
                 step: 1,
                 formatter: (value) => '${value.round()}',
@@ -206,7 +135,7 @@ class _GridPageState extends State<GridPage> {
                 label: 'examples.foundation.layout.grid.playground.ratio'.tr(),
                 value: _childAspectRatio,
                 min: 0.75,
-                max: 3.25,
+                max: 1.25,
                 step: 0.25,
                 formatter: (value) => value.toStringAsFixed(2),
                 onChanged: (value) => setState(() => _childAspectRatio = value),
@@ -221,55 +150,29 @@ class _GridPageState extends State<GridPage> {
                 step: 4,
                 onChanged: (value) => setState(() => _padding = value),
               ),
-              _ChoiceControl<AGridItemLayout>(
-                label: 'examples.foundation.layout.grid.playground.layout'.tr(),
-                value: _layout,
-                onChanged: (value) => setState(() => _layout = value),
+              _ChoiceControl<AGridSurface>(
+                label: 'examples.foundation.layout.grid.playground.surface'
+                    .tr(),
+                value: _surface,
+                onChanged: (value) => setState(() => _surface = value),
                 choices: [
                   (
-                    value: AGridItemLayout.vertical,
-                    label: 'examples.foundation.layout.grid.playground.layout_vertical'
+                    value: AGridSurface.transparent,
+                    label: 'examples.foundation.layout.grid.playground.surface_transparent'
                         .tr(),
-                    key: const ValueKey('grid-layout-vertical'),
+                    key: const ValueKey('grid-surface-transparent'),
                   ),
                   (
-                    value: AGridItemLayout.horizontalStart,
-                    label: 'examples.foundation.layout.grid.playground.layout_start'
+                    value: AGridSurface.muted,
+                    label: 'examples.foundation.layout.grid.playground.surface_muted'
                         .tr(),
-                    key: const ValueKey('grid-layout-start'),
+                    key: const ValueKey('grid-surface-muted'),
                   ),
                   (
-                    value: AGridItemLayout.horizontalEnd,
-                    label:
-                        'examples.foundation.layout.grid.playground.layout_end'
-                            .tr(),
-                    key: const ValueKey('grid-layout-end'),
-                  ),
-                ],
-              ),
-              _ChoiceControl<_GridVisual>(
-                label: 'examples.foundation.layout.grid.playground.visual'.tr(),
-                value: _visual,
-                onChanged: (value) => setState(() => _visual = value),
-                choices: [
-                  (
-                    value: _GridVisual.icon,
-                    label:
-                        'examples.foundation.layout.grid.playground.visual_icon'
-                            .tr(),
-                    key: const ValueKey('grid-visual-icon'),
-                  ),
-                  (
-                    value: _GridVisual.image,
-                    label: 'examples.foundation.layout.grid.playground.visual_image'
+                    value: AGridSurface.outlined,
+                    label: 'examples.foundation.layout.grid.playground.surface_outlined'
                         .tr(),
-                    key: const ValueKey('grid-visual-image'),
-                  ),
-                  (
-                    value: _GridVisual.custom,
-                    label: 'examples.foundation.layout.grid.playground.visual_custom'
-                        .tr(),
-                    key: const ValueKey('grid-visual-custom'),
+                    key: const ValueKey('grid-surface-outlined'),
                   ),
                 ],
               ),
@@ -321,8 +224,9 @@ class _GridPageState extends State<GridPage> {
                 label: Text(
                   'examples.foundation.layout.grid.playground.selected'.tr(),
                 ),
-                value: _selected,
-                onChange: (value) => setState(() => _selected = value),
+                value: _selectedId == 'scan',
+                onChange: (value) =>
+                    setState(() => _selectedId = value ? 'scan' : null),
               ),
             ],
           ),
@@ -335,169 +239,112 @@ class _GridPageState extends State<GridPage> {
     ),
   );
 
-  List<AGridItem> get _scenarioItems => switch (_scenario) {
-    _GridScenario.quickActions => [
-      _targetItem(
-        title: 'examples.foundation.layout.grid.playground.items.scan'.tr(),
-        icon: FLucideIcons.search,
+  List<AGridItem> get _items => [
+    _item(
+      id: 'scan',
+      label: 'examples.foundation.layout.grid.playground.items.scan'.tr(),
+      icon: FLucideIcons.scanLine,
+      badge: _targetBadge,
+      enabled: _enabled,
+      key: const ValueKey('grid-preview-target'),
+    ),
+    _item(
+      id: 'messages',
+      label: 'examples.foundation.layout.grid.playground.items.messages'.tr(),
+      icon: FLucideIcons.messageCircle,
+      badge: AGridBadge.count(
+        3,
+        semanticsLabel:
+            'examples.foundation.layout.grid.playground.badge_count_semantics'
+                .tr(namedArgs: {'count': '3'}),
+        key: const ValueKey('grid-preview-count-badge'),
       ),
-      _contextItem(
-        title: 'examples.foundation.layout.grid.playground.items.share'.tr(),
-        icon: FLucideIcons.messageCircle,
+    ),
+    _item(
+      id: 'pending',
+      label: 'examples.foundation.layout.grid.playground.items.pending'.tr(),
+      icon: FLucideIcons.bell,
+      badge: AGridBadge.dot(
+        semanticsLabel:
+            'examples.foundation.layout.grid.playground.badge_dot_semantics'
+                .tr(),
+        key: const ValueKey('grid-preview-dot-badge'),
       ),
-      _contextItem(
-        title: 'examples.foundation.layout.grid.playground.items.favorite'.tr(),
-        icon: FLucideIcons.heart,
+    ),
+    _item(
+      id: 'icons',
+      label: 'examples.foundation.layout.grid.playground.items.icon_library'
+          .tr(),
+      icon: FLucideIcons.layoutGrid,
+      badge: AGridBadge.label(
+        'examples.foundation.layout.grid.playground.new_label'.tr(),
+        key: const ValueKey('grid-preview-label-badge'),
       ),
-      _contextItem(
-        title: 'examples.foundation.layout.grid.playground.items.settings'.tr(),
-        icon: FLucideIcons.settings,
-      ),
-    ],
-    _GridScenario.contentEntries => [
-      _targetItem(
-        title: 'examples.foundation.layout.grid.playground.items.brand_assets'
-            .tr(),
-        description: 'examples.foundation.layout.grid.playground.items.brand_assets_description'
-            .tr(),
-        icon: FLucideIcons.image,
-      ),
-      _contextItem(
-        title: 'examples.foundation.layout.grid.playground.items.theme_guide'
-            .tr(),
-        description: 'examples.foundation.layout.grid.playground.items.theme_guide_description'
-            .tr(),
-        icon: FLucideIcons.palette,
-      ),
-      _contextItem(
-        title: 'examples.foundation.layout.grid.playground.items.icon_library'
-            .tr(),
-        description: 'examples.foundation.layout.grid.playground.items.icon_library_description'
-            .tr(),
-        icon: FLucideIcons.layoutGrid,
-      ),
-    ],
-    _GridScenario.statusPanel => [
-      _targetItem(
-        title: 'examples.foundation.layout.grid.playground.items.pending'.tr(),
-        description: 'examples.foundation.layout.grid.playground.items.pending_description'
-            .tr(),
-        icon: FLucideIcons.bell,
-      ),
-      _contextItem(
-        title: 'examples.foundation.layout.grid.playground.items.messages'.tr(),
-        description: 'examples.foundation.layout.grid.playground.items.messages_description'
-            .tr(),
-        icon: FLucideIcons.messageCircle,
-        badge: FBadge(child: const Text('8')),
-        badgeSemantics: '8 条未读消息',
-      ),
-      _contextItem(
-        title: 'examples.foundation.layout.grid.playground.items.completed'
-            .tr(),
-        description: 'examples.foundation.layout.grid.playground.items.completed_description'
-            .tr(),
-        icon: FLucideIcons.circleCheck,
-        selected: true,
-      ),
-      _contextItem(
-        title: 'examples.foundation.layout.grid.playground.items.disabled'.tr(),
-        description: 'examples.foundation.layout.grid.playground.items.disabled_description'
-            .tr(),
-        icon: FLucideIcons.lock,
-        enabled: false,
-      ),
-    ],
+    ),
+    _item(
+      id: 'share',
+      label: 'examples.foundation.layout.grid.playground.items.share'.tr(),
+      icon: FLucideIcons.share2,
+    ),
+    _item(
+      id: 'favorite',
+      label: 'examples.foundation.layout.grid.playground.items.favorite'.tr(),
+      icon: FLucideIcons.heart,
+    ),
+    _item(
+      id: 'settings',
+      label: 'examples.foundation.layout.grid.playground.items.settings'.tr(),
+      icon: FLucideIcons.settings,
+    ),
+    _item(
+      id: 'disabled',
+      label: 'examples.foundation.layout.grid.playground.items.disabled'.tr(),
+      icon: FLucideIcons.lock,
+      enabled: false,
+    ),
+  ];
+
+  AGridBadge? get _targetBadge => switch (_badge) {
+    _GridBadge.none => null,
+    _GridBadge.count => AGridBadge.count(
+      8,
+      semanticsLabel:
+          'examples.foundation.layout.grid.playground.badge_count_semantics'.tr(
+            namedArgs: {'count': '8'},
+          ),
+      key: const ValueKey('grid-preview-target-count-badge'),
+    ),
+    _GridBadge.label => AGridBadge.label(
+      'examples.foundation.layout.grid.playground.new_label'.tr(),
+      key: const ValueKey('grid-preview-target-label-badge'),
+    ),
+    _GridBadge.dot => AGridBadge.dot(
+      semanticsLabel:
+          'examples.foundation.layout.grid.playground.badge_dot_semantics'.tr(),
+      key: const ValueKey('grid-preview-target-dot-badge'),
+    ),
   };
 
-  AGridItem _targetItem({
-    required String title,
+  AGridItem _item({
+    required String id,
+    required String label,
     required IconData icon,
-    String? description,
+    AGridBadge? badge,
+    bool enabled = true,
+    Key? key,
   }) => AGridItem(
-    key: const ValueKey('grid-preview-target'),
-    visual: _targetVisual(icon),
-    title: Text(title),
-    description: description == null ? null : Text(description),
-    badge: _targetBadge,
-    layout: _layout,
-    enabled: _enabled,
-    selected: _selected,
-    semanticsLabel: _itemSemanticsLabel(
-      title,
-      description,
-      visualLabel: _visual == _GridVisual.custom
-          ? '${12 + _actionCount}'
-          : null,
-    ),
-    semanticsHint: _enabled
+    key: key,
+    icon: Icon(icon, key: ValueKey('grid-preview-icon-$id')),
+    label: Text(label),
+    badge: badge,
+    enabled: enabled,
+    selected: _selectedId == id,
+    semanticsLabel: label,
+    semanticsHint: enabled
         ? 'examples.foundation.layout.grid.playground.activate_hint'.tr()
         : null,
-    badgeSemanticsLabel: _badge == _GridBadge.none
-        ? null
-        : 'examples.foundation.layout.grid.playground.badge_semantics'.tr(),
-    onPress: () => _activate(title),
+    onPress: () => _activate(id, label),
   );
-
-  AGridItem _contextItem({
-    required String title,
-    required IconData icon,
-    String? description,
-    Widget? badge,
-    String? badgeSemantics,
-    bool selected = false,
-    bool enabled = true,
-  }) => AGridItem(
-    visual: Icon(icon),
-    title: Text(title),
-    description: description == null ? null : Text(description),
-    badge: badge,
-    layout: _layout,
-    enabled: enabled,
-    selected: selected,
-    semanticsLabel: _itemSemanticsLabel(title, description),
-    badgeSemanticsLabel: badgeSemantics,
-    onPress: () => _activate(title),
-  );
-
-  Widget _targetVisual(IconData icon) => switch (_visual) {
-    _GridVisual.icon => Icon(icon),
-    _GridVisual.image => ClipRRect(
-      borderRadius: BorderRadius.circular(6),
-      child: Image.memory(
-        _admin9Thumbnail,
-        key: const ValueKey('grid-preview-image'),
-        width: 44,
-        height: 44,
-        fit: BoxFit.cover,
-      ),
-    ),
-    _GridVisual.custom => _MetricVisual(value: '${12 + _actionCount}'),
-  };
-
-  Widget? get _targetBadge => switch (_badge) {
-    _GridBadge.none => null,
-    _GridBadge.count => FBadge(
-      key: const ValueKey('grid-preview-badge-count'),
-      child: Text('${8 + _actionCount}'),
-    ),
-    _GridBadge.label => FBadge(
-      key: const ValueKey('grid-preview-badge-label'),
-      variant: .secondary,
-      child: Text('examples.foundation.layout.grid.playground.new_label'.tr()),
-    ),
-    _GridBadge.dot => const _NotificationDot(),
-  };
-
-  String _itemSemanticsLabel(
-    String title,
-    String? description, {
-    String? visualLabel,
-  }) => [
-    visualLabel,
-    title,
-    description,
-  ].whereType<String>().where((value) => value.isNotEmpty).join('，');
 }
 
 class _ChoiceControl<T> extends StatelessWidget {
@@ -582,37 +429,3 @@ class _GridSliderControl extends StatelessWidget {
     );
   }
 }
-
-class _MetricVisual extends StatelessWidget {
-  const _MetricVisual({required this.value});
-
-  final String value;
-
-  @override
-  Widget build(BuildContext context) => Text(
-    value,
-    key: const ValueKey('grid-preview-custom-visual'),
-    style: context.theme.typography.body.lg.copyWith(
-      color: IconTheme.of(context).color,
-      fontWeight: FontWeight.w700,
-    ),
-  );
-}
-
-class _NotificationDot extends StatelessWidget {
-  const _NotificationDot();
-
-  @override
-  Widget build(BuildContext context) => DecoratedBox(
-    key: const ValueKey('grid-preview-badge-dot'),
-    decoration: BoxDecoration(
-      color: context.theme.colors.destructive,
-      shape: BoxShape.circle,
-    ),
-    child: const SizedBox.square(dimension: 10),
-  );
-}
-
-final Uint8List _admin9Thumbnail = base64Decode(
-  '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',
-);

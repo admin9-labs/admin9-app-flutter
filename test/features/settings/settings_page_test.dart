@@ -7,6 +7,7 @@ import 'package:admin9_app_flutter/app/appearance/app_appearance_preference.dart
 import 'package:admin9_app_flutter/app/appearance/app_appearance_provider.dart';
 import 'package:admin9_app_flutter/app/appearance/app_appearance_repository.dart';
 import 'package:admin9_app_flutter/app/appearance/app_theme_catalog.dart';
+import 'package:admin9_app_flutter/app/startup/startup_provider.dart';
 import 'package:admin9_app_flutter/features/settings/presentation/pages/settings_page.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -14,6 +15,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:forui/forui.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../app/support/test_admin9_app.dart';
 
 void main() {
   late Map<String, dynamic> translations;
@@ -119,6 +122,25 @@ void main() {
     expect(find.text('无法读取本地外观偏好。'), findsNothing);
     expect(repository.loadCalls, 2);
   });
+
+  testWidgets('withdraws privacy consent and reports the real cache size', (
+    tester,
+  ) async {
+    await _pumpApp(tester, _FakeRepository(), translations);
+    await _openSettings(tester);
+
+    final privacy = find.byKey(const ValueKey('settings-privacy-consent'));
+    await tester.ensureVisible(privacy);
+    expect(find.text('0 B'), findsOneWidget);
+    await tester.tap(privacy);
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.byKey(const ValueKey('settings-privacy-withdraw-confirm')),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('当前处于有限浏览模式。'), findsOneWidget);
+  });
 }
 
 Future<void> _pumpApp(
@@ -141,6 +163,9 @@ Future<void> _pumpApp(
       child: ProviderScope(
         overrides: [
           appAppearanceRepositoryProvider.overrideWithValue(repository),
+          startupPreferencesRepositoryProvider.overrideWithValue(
+            FakeCompletedStartupRepository(),
+          ),
         ],
         child: const Admin9App(),
       ),

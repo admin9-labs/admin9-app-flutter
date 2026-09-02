@@ -2,8 +2,14 @@ import 'package:admin9_app_flutter/app/admin9_app.dart';
 import 'package:admin9_app_flutter/app/appearance/app_appearance_provider.dart';
 import 'package:admin9_app_flutter/app/appearance/app_appearance_repository.dart';
 import 'package:admin9_app_flutter/app/appearance/app_appearance_service.dart';
-import 'package:admin9_app_flutter/features/examples/presentation/pages/catalog/forms_page.dart';
-import 'package:admin9_app_flutter/features/examples/presentation/pages/form/text_input/text_input_playground_page.dart';
+import 'package:admin9_app_flutter/app/startup/startup_preferences.dart';
+import 'package:admin9_app_flutter/app/startup/startup_preferences_repository.dart';
+import 'package:admin9_app_flutter/app/startup/startup_preferences_service.dart';
+import 'package:admin9_app_flutter/app/startup/startup_provider.dart';
+import 'package:admin9_app_flutter/features/home/presentation/pages/home_page.dart';
+import 'package:admin9_app_flutter/features/media/presentation/pages/article_page.dart';
+import 'package:admin9_app_flutter/features/media/presentation/pages/media_page.dart';
+import 'package:admin9_app_flutter/features/settings/presentation/pages/settings_page.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
@@ -31,6 +37,18 @@ void main() {
     final repository = SharedPreferencesAppAppearanceRepository(
       AppAppearanceService(SharedPreferencesAsync()),
     );
+    final startupRepository = SharedPreferencesStartupRepository(
+      StartupPreferencesService(SharedPreferencesAsync()),
+    );
+    await startupRepository.save(
+      StartupPreferences(
+        privacyConsent: PrivacyConsentRecord(
+          policyVersion: currentPrivacyPolicyVersion,
+          acceptedAt: DateTime.utc(2026, 9, 1),
+        ),
+        onboardingVersion: currentOnboardingVersion,
+      ),
+    );
 
     await tester.pumpWidget(
       EasyLocalization(
@@ -42,31 +60,33 @@ void main() {
         child: ProviderScope(
           overrides: [
             appAppearanceRepositoryProvider.overrideWithValue(repository),
+            startupPreferencesRepositoryProvider.overrideWithValue(
+              startupRepository,
+            ),
           ],
           child: const Admin9App(),
         ),
       ),
     );
     await tester.pumpAndSettle();
+    expect(find.byType(HomePage), findsOneWidget);
+    expect(find.byType(FBottomNavigationBarItem), findsNWidgets(4));
 
-    expect(find.byType(FBottomNavigationBarItem), findsNWidgets(5));
-
-    await _selectDestination(tester, '表单');
-    expect(find.byType(FormsPage), findsOneWidget);
-    final textFieldEntry = find.text('资料表单实验台');
-    await tester.ensureVisible(textFieldEntry);
-    await tester.tap(textFieldEntry);
+    await _selectDestination(tester, '媒体');
+    expect(find.byType(MediaPage), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('media-open-article')));
     await tester.pumpAndSettle();
-    expect(find.byType(TextInputPlaygroundPage), findsOneWidget);
+    expect(find.byType(ArticlePage), findsOneWidget);
     if (defaultTargetPlatform == TargetPlatform.iOS) {
       await _verifyIosEdgeBack(tester);
     } else {
       expect(await tester.binding.handlePopRoute(), isTrue);
       await tester.pumpAndSettle();
     }
-    expect(find.byType(FormsPage), findsOneWidget);
+    expect(find.byType(MediaPage), findsOneWidget);
 
     await _selectDestination(tester, '设置');
+    expect(find.byType(SettingsPage), findsOneWidget);
     await tester.tap(find.text('暗色'));
     await tester.pumpAndSettle();
 
@@ -90,7 +110,7 @@ Future<void> _verifyIosEdgeBack(WidgetTester tester) async {
   await cancelGesture.moveBy(Offset(-cancelDistance, 0));
   await cancelGesture.up();
   await tester.pumpAndSettle();
-  expect(find.byType(TextInputPlaygroundPage), findsOneWidget);
+  expect(find.byType(ArticlePage), findsOneWidget);
 
   await tester.timedDragFrom(
     start,

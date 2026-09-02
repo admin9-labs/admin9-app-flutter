@@ -9,9 +9,16 @@ import 'package:forui/forui.dart';
 void main() {
   test('G01 AGridStyle is registered for light and dark Forui styles', () {
     for (final theme in [lightTheme, darkTheme]) {
+      final style = theme.style.aGrid;
       expect(theme.style.extensions, contains(isA<AGridStyle>()));
-      expect(theme.style.aGrid, isA<AGridStyle>());
-      expect(theme.style.aGrid.minimumTouchSize, greaterThanOrEqualTo(44));
+      expect(style.minimumTouchSize, greaterThanOrEqualTo(44));
+      expect(style.horizontalGap, 8);
+      expect(style.verticalGap, 8);
+      expect(style.childAspectRatio, 1);
+      expect(style.iconStyle.resolve({}).size, 24);
+      expect(style.iconSlotSize, 44);
+      expect(style.badgeTopOffset, -4);
+      expect(style.badgeEndOffset, -6);
     }
   });
 
@@ -21,19 +28,31 @@ void main() {
     final copy = light.copyWith(
       horizontalGap: 20,
       verticalGap: 24,
-      childAspectRatio: 1.5,
+      childAspectRatio: 1.25,
       itemPadding: const EdgeInsets.all(18),
-      visualPadding: const EdgeInsets.all(10),
+      badgeDotSize: 10,
+      badgeLabelMaxWidth: 56,
+      badgeDisabledOpacity: 0.35,
+      iconSlotSize: 48,
+      badgeTopOffset: -2,
+      badgeEndOffset: -4,
     );
 
     expect(copy.horizontalGap, 20);
     expect(copy.verticalGap, 24);
-    expect(copy.childAspectRatio, 1.5);
+    expect(copy.childAspectRatio, 1.25);
     expect(copy.itemPadding, const EdgeInsets.all(18));
-    expect(copy.visualPadding, const EdgeInsets.all(10));
+    expect(copy.badgeDotSize, 10);
+    expect(copy.badgeLabelMaxWidth, 56);
+    expect(copy.badgeDisabledOpacity, 0.35);
+    expect(copy.iconSlotSize, 48);
+    expect(copy.badgeTopOffset, -2);
+    expect(copy.badgeEndOffset, -4);
     expect(copy.gridDecoration, light.gridDecoration);
-    expect(copy.itemDecoration, light.itemDecoration);
-    expect(copy.visualDecoration, light.visualDecoration);
+    expect(copy.transparentItemDecoration, light.transparentItemDecoration);
+    expect(copy.mutedItemDecoration, light.mutedItemDecoration);
+    expect(copy.outlinedItemDecoration, light.outlinedItemDecoration);
+    expect(copy.attentionBadgeDecoration, light.attentionBadgeDecoration);
 
     final midpoint = light.lerp(dark, 0.5);
     final styleMidpoint = lightTheme.style.lerp(darkTheme.style, 0.5).aGrid;
@@ -41,20 +60,28 @@ void main() {
     expect(styleMidpoint, isA<AGridStyle>());
     expect(midpoint.minimumTouchSize, light.minimumTouchSize);
     expect(
-      midpoint.itemDecoration.resolve({FTappableVariant.selected}),
+      midpoint.transparentItemDecoration.resolve({FTappableVariant.selected}),
       isA<Decoration>(),
     );
+    final transparentSelected = light.transparentItemDecoration.resolve({
+      FTappableVariant.selected,
+    }) as BoxDecoration;
+    expect(transparentSelected.color, const Color(0x00000000));
+    expect((transparentSelected.border! as Border).top.width, 1.5);
+    final pressed = light.mutedItemDecoration.resolve({
+      FTappableVariant.pressed,
+    }) as BoxDecoration;
+    expect(pressed.color, lightTheme.colors.secondary);
+    expect(pressed.border, Border.all(color: lightTheme.colors.primary));
     expect(
-      midpoint.titleTextStyle.resolve({FTappableVariant.disabled}),
+      midpoint.labelTextStyle.resolve({FTappableVariant.disabled}),
       isA<TextStyle>(),
     );
-    expect(
-      midpoint.visualDecoration.resolve({FTappableVariant.selected}),
-      isA<Decoration>(),
-    );
+    expect(midpoint.attentionBadgeDecoration, isA<Decoration>());
+    expect(midpoint.neutralBadgeTextStyle, isA<TextStyle>());
   });
 
-  test('selected title meets contrast on every selected item surface', () {
+  test('item and badge text meet contrast across all App themes', () {
     for (final preset in AppThemePreset.values) {
       for (final radius in AppRadiusPreference.values) {
         final pair = AppThemeCatalog.resolve(
@@ -64,19 +91,36 @@ void main() {
         );
         for (final theme in [pair.light, pair.dark]) {
           final style = theme.style.aGrid;
-          final foreground = style.titleTextStyle.resolve({
+          final itemForeground = style.labelTextStyle.resolve({
             FTappableVariant.selected,
           }).color!;
-          final decoration = style.itemDecoration.resolve({
+          final itemBackground = (style.mutedItemDecoration.resolve({
             FTappableVariant.selected,
-          });
-          final background = (decoration as BoxDecoration).color!;
+          }) as BoxDecoration).color!;
+          final attentionBackground =
+              (style.attentionBadgeDecoration as BoxDecoration).color!;
+          final neutralBackground =
+              (style.neutralBadgeDecoration as BoxDecoration).color!;
+          final reason =
+              '${preset.name}/${radius.name}/${theme.colors.brightness.name}';
+
           expect(
-            _contrast(foreground, background),
+            _contrast(itemForeground, itemBackground),
             greaterThanOrEqualTo(4.5),
-            reason:
-                '${preset.name}/${radius.name}/'
-                '${theme.colors.brightness.name}',
+            reason: 'item $reason',
+          );
+          expect(
+            _contrast(
+              style.attentionBadgeTextStyle.color!,
+              attentionBackground,
+            ),
+            greaterThanOrEqualTo(4.5),
+            reason: 'attention badge $reason',
+          );
+          expect(
+            _contrast(style.neutralBadgeTextStyle.color!, neutralBackground),
+            greaterThanOrEqualTo(4.5),
+            reason: 'neutral badge $reason',
           );
         }
       }

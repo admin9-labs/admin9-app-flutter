@@ -15,25 +15,30 @@ and expert Agent template are reusable workflow assets; derived projects do not
 rewrite them to mirror product names, Features, routes, platform identifiers,
 exclusions, or acceptance snapshots.
 
-The reference App targets Android and iOS. Its five persistent destinations are
-Foundation, Forms, Content, Feedback, and Settings. The first four are owned by
-one removable `lib/features/examples/` feature. Settings is an independent real
-feature that demonstrates persisted brightness, complete Theme preset, five
+The [Product Startup Flow](product-startup-flow.md) is an App baseline rather
+than Showroom content. Removing or relocating Examples must not remove the
+startup gate, versioned privacy/onboarding state, Home route, first-party startup
+placement boundary, or their tests. Conversely, the startup flow must not import
+Examples or use a Playground as its product Home.
+
+The reference App targets Android and iOS. Its persistent destinations are Home,
+Components, Media, and Settings. Components is owned by one removable
+`lib/features/examples/` Feature; Foundation, Forms, Content, and Feedback are
+its internal Forui catalogs. Media and Settings are independent real Features.
+Settings demonstrates persisted brightness, complete Theme preset, five
 [font-size preferences](ui.md#font-size-preference-contract), and radius
 preference through Riverpod, a Repository, and a SharedPreferences Service.
 
 Examples has one App Router integration point in
-`lib/app/routing/examples_routes.dart`. It contributes four sibling Tab branches
-so the five visible destinations retain independent in-process stacks. It does
-not add an extra runtime shell.
+`lib/app/routing/examples_routes.dart`. It contributes one Components Tab branch
+and does not add an extra runtime shell.
 
 | Destination | Root path | Owner | Runtime responsibility |
 | --- | --- | --- | --- |
-| Foundation | `/foundation` | Examples | Theme, icon, App shell, interaction, and AGrid Playgrounds |
-| Forms | `/forms` | Examples | Action, input, selection, value, and scheduling Playgrounds |
-| Content | `/content` | Examples | Overview, calendar, and list Playgrounds |
-| Feedback | `/feedback` | Examples | Status, confirmation, and contextual-feedback Playgrounds |
-| Settings | `/settings` | Settings | Persisted brightness, Theme preset, font size, and radius preference |
+| Home | `/app/home` | Home | Product/version identity, reference updates, media, and shortcuts |
+| Components | `/app/components` | Examples | Forui and Admin9 catalogs with complete Playgrounds |
+| Media | `/app/media` | Media | Image preview, video, and background audio scenarios |
+| Settings | `/app/settings` | Settings | Persisted brightness, Theme preset, font size, and radius preference |
 
 ## Admin9 UI Extensions
 
@@ -42,26 +47,35 @@ not add an extra runtime shell.
 only a consumer and demonstration of that shared API. Its `columns` value is a
 maximum: narrow constraints reduce the effective column count and cap the
 effective aspect ratio so every cell preserves the Theme-owned minimum touch
-size. Its `children` contract is `List<AGridItem>` so every accepted child
-provides the content metadata needed for responsive height calculation.
+size. Its default maximum is four columns; an actual 320px mobile page resolves
+to three columns and a 390px page resolves to four. Its `children` contract is
+`List<AGridItem>` so every accepted child provides the icon, label, state, and
+optional badge metadata needed for responsive geometry.
 
-The Grid Playground demonstrates three real scenarios: quick actions,
-image/title/description content entry, and status panels with counts, badges,
-dots, or selection. It configures columns, horizontal and vertical gaps, aspect
-ratio, padding, layout direction, visual kind, badge, enabled, and selected
-states through AGrid's real public API. It must preserve visual hierarchy,
-pressed/selected/disabled/focused distinction, touch geometry, 320/390 widths,
-large text, RTL, and light/dark behavior without adding Showroom-only parameters
-to the production API. `AGridStyle.visualDecoration` and `visualPadding` define
-the Theme-owned visual well without creating a parallel token system. At narrow
-widths or large text scales, AGrid reduces effective columns, constrains aspect
-ratio, compacts the visual well, and falls back from horizontal item layout when
-needed to preserve content and touch geometry. Fresh screenshots are evidence
-for human visual review, not an automated claim that the result is attractive.
+The Grid Playground demonstrates one complete icon action grid with eight
+entries. It configures columns, horizontal and vertical gaps, aspect ratio,
+padding, surface, badge kind, enabled, and selected states through AGrid's real
+public API. Each item keeps one centered icon-and-label stack; it does not
+support descriptions, images, custom visual panels, or horizontal content
+layouts. `AGridSurface.transparent` is the default and adds no fixed background;
+callers may explicitly select `muted` or `outlined`. `AGridBadge.count`,
+`AGridBadge.dot`, and `AGridBadge.label` provide bounded semantic badges. Count
+and dot badges use the Theme destructive colors, while label badges use
+secondary colors. Each icon is centered in a transparent, fixed-size visual
+slot; its badge overlaps that slot's top-end corner instead of the item border.
+The slot adds no background or second surface, and badge presence does not move
+the centered icon-and-label stack.
+
+The implementation must preserve pressed/selected/disabled/focused distinction,
+touch geometry, 320/390 widths, large text, RTL, and light/dark behavior without
+adding Showroom-only parameters to the production API. At narrow widths or large
+text scales, AGrid reduces effective columns and constrains the requested aspect
+ratio to preserve content and touch geometry. Fresh screenshots are evidence for
+human visual review, not an automated claim that the result is attractive.
 
 | API | Production source | Example route | Automated evidence |
 | --- | --- | --- | --- |
-| AGrid | `lib/shared/ui/layout/grid/` | `/foundation/layout/grid` | `test/shared/ui/layout/grid/a_grid_test.dart`, `test/shared/ui/layout/grid/grid_page_test.dart`, and `test/app/theme_resolution_test.dart` |
+| AGrid | `lib/shared/ui/layout/grid/` | `/app/components/admin9/grid` | `test/shared/ui/layout/grid/a_grid_test.dart`, `test/shared/ui/layout/grid/grid_page_test.dart`, and `test/app/theme_resolution_test.dart` |
 
 The Starter does not define `ATabs`. The Tabs Playground uses Forui `FTabs`
 directly. No `shared/ui/navigation/tabs/` directory, compatibility wrapper, or
@@ -94,23 +108,23 @@ mapping. Multiple official capabilities intentionally share one complete page.
 
 | Playground ID | Page source | Typed route | Translation prefix | Focused test | Capability mapping |
 | --- | --- | --- | --- | --- | --- |
-| `foundation.theme` | `concepts/themes/themes_page.dart` | `/foundation/concepts/themes` | `examples.foundation.concepts.themes` | `test/features/settings/theme_workbench_test.dart` | C01, G01, G03 |
-| `foundation.icons` | `reference/icons/icons_page.dart` | `/foundation/reference/icons` | `examples.foundation.playgrounds.icons` | `test/features/examples/foundation_playgrounds_test.dart` | G04, R02 |
-| `foundation.app_shell` | `foundation/playgrounds/app_shell_playground_page.dart` | `/foundation/playground/app-shell` | `examples.foundation.playgrounds.app_shell` | `test/features/examples/foundation_playgrounds_test.dart` | C03, C04, WL01, WL03, WN01, WN03 |
-| `foundation.interaction` | `foundation/playgrounds/interaction_playground_page.dart` | `/foundation/playground/interaction` | `examples.foundation.playgrounds.interaction` | `test/features/examples/foundation_playgrounds_test.dart` | C02, WN06, WFD01, WFD02, WFD06 |
-| `foundation.grid` | `layout/grid/grid_page.dart` | `/foundation/layout/grid` | `examples.foundation.layout.grid.playground` | `test/shared/ui/layout/grid/grid_page_test.dart` | Admin9 AGrid extension |
-| `forms.buttons` | `form/buttons/buttons_playground_page.dart` | `/forms/playground/buttons` | `examples.forms.playgrounds.buttons` | `test/features/examples/forms_playgrounds_test.dart` | WF02 |
-| `forms.text_input` | `form/text_input/text_input_playground_page.dart` | `/forms/playground/text-input` | `examples.forms.playgrounds.text_input` | `test/features/examples/forms_playgrounds_test.dart` | WF01, WF06, WF08, WF15, WF16 |
-| `forms.selection_controls` | `form/selection_controls/selection_controls_playground_page.dart` | `/forms/playground/selection-controls` | `examples.forms.playgrounds.selection_controls` | `test/features/examples/forms_playgrounds_test.dart` | WF03, WF10, WF11, WF14 |
-| `forms.selects` | `form/selects/selects_playground_page.dart` | `/forms/playground/selects` | `examples.forms.playgrounds.selects` | `test/features/examples/forms_playgrounds_test.dart` | WF07, WF12 |
-| `forms.value_controls` | `form/value_controls/value_controls_playground_page.dart` | `/forms/playground/value-controls` | `examples.forms.playgrounds.value_controls` | `test/features/examples/forms_playgrounds_test.dart` | WF09, WF13 |
-| `forms.scheduling` | `form/scheduling/scheduling_playground_page.dart` | `/forms/playground/scheduling` | `examples.forms.playgrounds.scheduling` | `test/features/examples/forms_playgrounds_test.dart` | WF04, WF05, WF17, WF18 |
-| `content.overview` | `data/playgrounds/overview_playground_page.dart` | `/content/playground/overview` | `examples.content.playgrounds.overview` | `test/features/examples/content_playgrounds_test.dart` | WD01, WD02, WD03, WD05 |
-| `content.calendar` | `data/playgrounds/calendar_playground_page.dart` | `/content/playground/calendar` | `examples.content.playgrounds.calendar` | `test/features/examples/content_playgrounds_test.dart` | WD04, WD08 |
-| `content.lists` | `data/playgrounds/lists_playground_page.dart` | `/content/playground/lists` | `examples.content.playgrounds.lists` | `test/features/examples/content_playgrounds_test.dart` | WD06, WD07, WT01, WT02, WT03, WT04 |
-| `feedback.status` | `feedback/playgrounds/async_status_playground_page.dart` | `/feedback/playground/status` | `examples.feedback.playgrounds.async` | `test/features/examples/feedback_playgrounds_test.dart` | WFB01, WFB02, WFB03, WFB04, WO07 |
-| `feedback.confirmation` | `feedback/playgrounds/confirmation_playground_page.dart` | `/feedback/playground/confirmation` | `examples.feedback.playgrounds.confirmation` | `test/features/examples/feedback_playgrounds_test.dart` | WO02, WO03, WO06, WFD03 |
-| `feedback.contextual` | `feedback/playgrounds/contextual_feedback_playground_page.dart` | `/feedback/playground/contextual` | `examples.feedback.playgrounds.contextual` | `test/features/examples/feedback_playgrounds_test.dart` | WO04, WO05, WO08, WFD05 |
+| `foundation.theme` | `concepts/themes/themes_page.dart` | `/app/components/forui/foundation/concepts/themes` | `examples.foundation.concepts.themes` | `test/features/settings/theme_workbench_test.dart` | C01, G01, G03 |
+| `foundation.icons` | `reference/icons/icons_page.dart` | `/app/components/forui/foundation/reference/icons` | `examples.foundation.playgrounds.icons` | `test/features/examples/foundation_playgrounds_test.dart` | G04, R02 |
+| `foundation.app_shell` | `foundation/playgrounds/app_shell_playground_page.dart` | `/app/components/forui/foundation/playground/app-shell` | `examples.foundation.playgrounds.app_shell` | `test/features/examples/foundation_playgrounds_test.dart` | C03, C04, WL01, WL03, WN01, WN03 |
+| `foundation.interaction` | `foundation/playgrounds/interaction_playground_page.dart` | `/app/components/forui/foundation/playground/interaction` | `examples.foundation.playgrounds.interaction` | `test/features/examples/foundation_playgrounds_test.dart` | C02, WN06, WFD01, WFD02, WFD06 |
+| `foundation.grid` | `layout/grid/grid_page.dart` | `/app/components/admin9/grid` | `examples.foundation.layout.grid.playground` | `test/shared/ui/layout/grid/grid_page_test.dart` | Admin9 AGrid extension |
+| `forms.buttons` | `form/buttons/buttons_playground_page.dart` | `/app/components/forui/forms/playground/buttons` | `examples.forms.playgrounds.buttons` | `test/features/examples/forms_playgrounds_test.dart` | WF02 |
+| `forms.text_input` | `form/text_input/text_input_playground_page.dart` | `/app/components/forui/forms/playground/text-input` | `examples.forms.playgrounds.text_input` | `test/features/examples/forms_playgrounds_test.dart` | WF01, WF06, WF08, WF15, WF16 |
+| `forms.selection_controls` | `form/selection_controls/selection_controls_playground_page.dart` | `/app/components/forui/forms/playground/selection-controls` | `examples.forms.playgrounds.selection_controls` | `test/features/examples/forms_playgrounds_test.dart` | WF03, WF10, WF11, WF14 |
+| `forms.selects` | `form/selects/selects_playground_page.dart` | `/app/components/forui/forms/playground/selects` | `examples.forms.playgrounds.selects` | `test/features/examples/forms_playgrounds_test.dart` | WF07, WF12 |
+| `forms.value_controls` | `form/value_controls/value_controls_playground_page.dart` | `/app/components/forui/forms/playground/value-controls` | `examples.forms.playgrounds.value_controls` | `test/features/examples/forms_playgrounds_test.dart` | WF09, WF13 |
+| `forms.scheduling` | `form/scheduling/scheduling_playground_page.dart` | `/app/components/forui/forms/playground/scheduling` | `examples.forms.playgrounds.scheduling` | `test/features/examples/forms_playgrounds_test.dart` | WF04, WF05, WF17, WF18 |
+| `content.overview` | `data/playgrounds/overview_playground_page.dart` | `/app/components/forui/content/playground/overview` | `examples.content.playgrounds.overview` | `test/features/examples/content_playgrounds_test.dart` | WD01, WD02, WD03, WD05 |
+| `content.calendar` | `data/playgrounds/calendar_playground_page.dart` | `/app/components/forui/content/playground/calendar` | `examples.content.playgrounds.calendar` | `test/features/examples/content_playgrounds_test.dart` | WD04, WD08 |
+| `content.lists` | `data/playgrounds/lists_playground_page.dart` | `/app/components/forui/content/playground/lists` | `examples.content.playgrounds.lists` | `test/features/examples/content_playgrounds_test.dart` | WD06, WD07, WT01, WT02, WT03, WT04 |
+| `feedback.status` | `feedback/playgrounds/async_status_playground_page.dart` | `/app/components/forui/feedback/playground/status` | `examples.feedback.playgrounds.async` | `test/features/examples/feedback_playgrounds_test.dart` | WFB01, WFB02, WFB03, WFB04, WO07 |
+| `feedback.confirmation` | `feedback/playgrounds/confirmation_playground_page.dart` | `/app/components/forui/feedback/playground/confirmation` | `examples.feedback.playgrounds.confirmation` | `test/features/examples/feedback_playgrounds_test.dart` | WO02, WO03, WO06, WFD03 |
+| `feedback.contextual` | `feedback/playgrounds/contextual_feedback_playground_page.dart` | `/app/components/forui/feedback/playground/contextual` | `examples.feedback.playgrounds.contextual` | `test/features/examples/feedback_playgrounds_test.dart` | WO04, WO05, WO08, WFD05 |
 
 The official capability ledger below joins to this registry through Playground
 ID. Documented and excluded entries continue to name their authoritative source
@@ -170,7 +184,7 @@ is not counted as one of Forui's 72 official capabilities.
 | WT02 | [Select Tile Group](https://forui.dev/docs/widgets/tile/select-tile-group) | radio/checkbox selection, form and disabled state | `content.lists` | direct | `test/features/examples/content_playgrounds_test.dart` |
 | WT03 | [Tile Group](https://forui.dev/docs/widgets/tile/tile-group) | touch grouping, dividers and interaction | `content.lists` | direct | `test/features/examples/content_playgrounds_test.dart` |
 | WT04 | [Tile](https://forui.dev/docs/widgets/tile/tile) | touch target, prefix/suffix, disabled and destructive | `content.lists` | direct | `test/features/examples/content_playgrounds_test.dart` |
-| WN01 | [Bottom Navigation Bar](https://forui.dev/docs/widgets/navigation/bottom-navigation-bar) | five items, selected state, equal geometry, nested no-double-inset and App Shell safe area | `foundation.app_shell` | direct | `test/features/examples/foundation_playgrounds_test.dart`; `test/acceptance/mobile_starter_acceptance_test.dart` |
+| WN01 | [Bottom Navigation Bar](https://forui.dev/docs/widgets/navigation/bottom-navigation-bar) | four items, selected state, equal geometry, nested no-double-inset and MainShell safe area | `foundation.app_shell` | direct | `test/features/examples/foundation_playgrounds_test.dart`; `test/acceptance/mobile_starter_acceptance_test.dart` |
 | WN02 | [Breadcrumb](https://forui.dev/docs/widgets/navigation/breadcrumb) | hierarchical pointer navigation | `docs/starter.md` | excluded | Desktop/large information architecture |
 | WN03 | [Header](https://forui.dev/docs/widgets/navigation/header) | root/nested, prefix/suffix actions and semantics | `foundation.app_shell` | direct | `test/features/examples/foundation_playgrounds_test.dart` |
 | WN04 | [Pagination](https://forui.dev/docs/widgets/navigation/pagination) | paged pointer navigation | `docs/starter.md` | excluded | Desktop/data-table interaction |
@@ -198,16 +212,17 @@ is not counted as one of Forui's 72 official capabilities.
 
 ## Examples Removal Contract
 
-A derived project that removes Examples must remove
+A derived project removes Examples with
+`dart run tool/remove_examples.dart --apply`. The operation removes
 `lib/features/examples/`, its Playground-only widgets, the single
-`examples_routes.dart` integration, the four Showroom destinations in the shell,
-the `/foundation` fallback, Playground registry and capability ledger, Examples
-tests, all `examples.*` translations, and current Showroom screenshots or
-acceptance claims. It must regenerate AutoRoute output and verify that removed
-Pages, generated routes, translation namespaces, and tests have no residual
-consumer.
+`examples_routes.dart` integration, Components in the shell, the Examples-owned
+Home contribution, Playground registry and capability ledger, Examples tests,
+all `examples.*` and `components.*` translations, and current screenshots or
+acceptance claims. It regenerates AutoRoute output and verifies that removed
+Pages, routes, translation namespaces, and tests have no residual consumer.
 
-Do not remove AGrid with Examples. Retain Settings and every shared pattern it
+Do not remove AGrid with Examples. Retain startup, base Home, Media, Settings,
+Legal, AImageViewer, and every shared pattern they
 still consumes. Re-evaluate any shared pattern that loses its final real
 consumer instead of retaining an empty compatibility API.
 

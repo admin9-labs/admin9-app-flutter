@@ -1,4 +1,7 @@
 import 'package:admin9_app_flutter/app/admin9_app.dart';
+import 'package:admin9_app_flutter/app/startup/startup_preferences.dart';
+import 'package:admin9_app_flutter/app/startup/startup_preferences_repository.dart';
+import 'package:admin9_app_flutter/app/startup/startup_provider.dart';
 import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_preview.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/foundation.dart';
@@ -20,9 +23,20 @@ void main() {
         startLocale: const Locale('zh', 'CN'),
         path: 'assets/translations',
         saveLocale: false,
-        child: const ProviderScope(child: Admin9App()),
+        child: ProviderScope(
+          overrides: [
+            startupPreferencesRepositoryProvider.overrideWithValue(
+              _CompletedStartupRepository(),
+            ),
+          ],
+          child: const Admin9App(),
+        ),
       ),
     );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('home-open-components')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('components-forui-foundation')));
     await tester.pumpAndSettle();
     if (defaultTargetPlatform == TargetPlatform.android) {
       await binding.convertFlutterSurfaceToImage();
@@ -56,31 +70,18 @@ void main() {
 
     await _tap(tester, const ValueKey('foundation-grid'));
     await _show(tester, const ValueKey('grid-playground-preview'));
-    await binding.takeScreenshot('05_agrid_quick_light');
+    await binding.takeScreenshot('05_agrid_icons_light');
 
-    await _tap(tester, const ValueKey('grid-scenario-content'));
-    await _show(tester, const ValueKey('grid-playground-preview'));
-    await binding.takeScreenshot('06_agrid_content_light');
-
-    await _tap(tester, const ValueKey('grid-scenario-status'));
+    await _tap(tester, const ValueKey('grid-surface-muted'));
+    await _tap(tester, const ValueKey('grid-badge-label'));
     await _tap(tester, const ValueKey('grid-selected-switch'));
     await _tap(tester, const ValueKey('grid-enabled-switch'));
-    await tester.fling(
-      find.byType(Scrollable).first,
-      const Offset(0, 2000),
-      3000,
-    );
-    await tester.pumpAndSettle();
     await _show(tester, const ValueKey('grid-playground-preview'));
-    _expectCompleteTextLine(tester, '待处理');
-    _expectCompleteTextLine(tester, '今日还有 12 项');
+    _expectCompleteTextLine(tester, '扫一扫');
     _expectCompleteTextLine(tester, '消息');
-    _expectCompleteTextLine(tester, '还有 8 条未读消息');
-    _expectCompleteTextLine(tester, '已完成');
-    _expectCompleteTextLine(tester, '本周已处理 24 项');
+    _expectCompleteTextLine(tester, '图标库');
     _expectCompleteTextLine(tester, '暂不可用');
-    _expectCompleteTextLine(tester, '同步完成后开放');
-    await binding.takeScreenshot('07_agrid_status_selected_disabled_light');
+    await binding.takeScreenshot('06_agrid_badges_states_light');
 
     expect(await tester.binding.handlePopRoute(), isTrue);
     await tester.pumpAndSettle();
@@ -92,8 +93,27 @@ void main() {
     await tester.pumpAndSettle();
     await _tap(tester, const ValueKey('foundation-grid'));
     await _show(tester, const ValueKey('grid-playground-preview'));
-    await binding.takeScreenshot('08_agrid_quick_dark');
+    await binding.takeScreenshot('07_agrid_icons_dark');
   });
+}
+
+final class _CompletedStartupRepository
+    implements StartupPreferencesRepository {
+  StartupPreferences value = StartupPreferences(
+    privacyConsent: PrivacyConsentRecord(
+      policyVersion: currentPrivacyPolicyVersion,
+      acceptedAt: DateTime.utc(2026, 9, 1),
+    ),
+    onboardingVersion: currentOnboardingVersion,
+  );
+
+  @override
+  Future<StartupPreferences> load() async => value;
+
+  @override
+  Future<void> save(StartupPreferences preferences) async {
+    value = preferences;
+  }
 }
 
 Future<void> _tap(WidgetTester tester, Key key) async {

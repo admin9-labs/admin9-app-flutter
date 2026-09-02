@@ -116,8 +116,12 @@ void main() {
         expect(forui.typography.display.lg.fontSize, 20 * entry.value / 16);
         expect(material.textTheme.bodyMedium?.fontSize, entry.value);
         expect(
-          forui.style.aGrid.descriptionTextStyle.resolve({}).fontSize,
-          entry.value,
+          forui.style.aGrid.labelTextStyle.resolve({}).fontSize,
+          forui.typography.body.xs.fontSize,
+        );
+        expect(
+          forui.style.aGrid.attentionBadgeTextStyle.fontSize,
+          forui.typography.body.xs.fontSize,
         );
       }
     }

@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:forui/forui.dart';
 import 'package:material_ui/material_ui.dart';
@@ -7,6 +10,9 @@ import 'appearance/app_appearance_preference.dart';
 import 'appearance/app_appearance_provider.dart';
 import 'appearance/app_theme_catalog.dart';
 import 'routing/app_router.dart';
+import 'routing/app_router.gr.dart';
+import 'startup/startup_state.dart';
+import 'startup/startup_provider.dart';
 
 class Admin9App extends ConsumerStatefulWidget {
   const Admin9App({super.key});
@@ -15,8 +21,35 @@ class Admin9App extends ConsumerStatefulWidget {
   ConsumerState<Admin9App> createState() => _Admin9AppState();
 }
 
-class _Admin9AppState extends ConsumerState<Admin9App> {
+class _Admin9AppState extends ConsumerState<Admin9App>
+    with WidgetsBindingObserver {
   final AppRouter _router = AppRouter();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _router.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    final coordinator = ref.read(startupCoordinatorProvider.notifier);
+    if (state == AppLifecycleState.hidden ||
+        state == AppLifecycleState.paused) {
+      coordinator.handleBackgrounded();
+      return;
+    }
+    if (state == AppLifecycleState.resumed) {
+      unawaited(coordinator.refreshCampaign());
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +72,20 @@ class _Admin9AppState extends ConsumerState<Admin9App> {
         ...GlobalMaterialLocalizations.delegates,
         FLocalizations.delegate,
       ],
-      routerConfig: _router.config(),
+      routerConfig: _router.config(
+        rebuildStackOnDeepLink: true,
+        deepLinkBuilder: (deepLink) {
+          if (deepLink.path == '/') {
+            return DeepLink([StartupGateRoute()]);
+          }
+          return DeepLink([
+            StartupGateRoute(
+              launchReason: LaunchReason.deepLink,
+              initialPath: deepLink.path,
+            ),
+          ]);
+        },
+      ),
       theme: themes.lightMaterial,
       darkTheme: themes.darkMaterial,
       themeMode: switch (preference.brightness) {

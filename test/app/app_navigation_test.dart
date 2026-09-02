@@ -1,8 +1,8 @@
-import 'package:admin9_app_flutter/features/examples/presentation/pages/catalog/content_page.dart';
-import 'package:admin9_app_flutter/features/examples/presentation/pages/catalog/feedback_page.dart';
 import 'package:admin9_app_flutter/features/examples/presentation/pages/catalog/forms_page.dart';
-import 'package:admin9_app_flutter/features/examples/presentation/pages/catalog/foundation_page.dart';
+import 'package:admin9_app_flutter/features/examples/presentation/pages/components_page.dart';
 import 'package:admin9_app_flutter/features/examples/presentation/pages/form/text_input/text_input_playground_page.dart';
+import 'package:admin9_app_flutter/features/home/presentation/pages/home_page.dart';
+import 'package:admin9_app_flutter/features/media/presentation/pages/media_page.dart';
 import 'package:admin9_app_flutter/features/settings/presentation/pages/settings_page.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:forui/forui.dart';
@@ -10,7 +10,7 @@ import 'package:forui/forui.dart';
 import 'support/test_admin9_app.dart';
 
 void main() {
-  testWidgets('starts five tabs and retains a typed detail route per branch', (
+  testWidgets('starts four tabs and retains the Components detail stack', (
     tester,
   ) async {
     await pumpTestAdmin9App(tester);
@@ -22,17 +22,20 @@ void main() {
         of: navigation,
         matching: find.byType(FBottomNavigationBarItem),
       ),
-      findsNWidgets(5),
+      findsNWidgets(4),
     );
-    for (final label in ['基础', '表单', '内容', '反馈', '设置']) {
+    for (final label in ['首页', '组件', '媒体', '设置']) {
       expect(
         find.descendant(of: navigation, matching: find.text(label)),
         findsOneWidget,
       );
     }
-    expect(find.byType(FoundationPage), findsOneWidget);
+    expect(find.byType(HomePage), findsOneWidget);
 
-    await _selectDestination(tester, '表单');
+    await _selectDestination(tester, '组件');
+    expect(find.byType(ComponentsPage), findsOneWidget);
+    await tester.tap(find.text('表单'));
+    await tester.pumpAndSettle();
     expect(find.byType(FormsPage), findsOneWidget);
 
     final textFieldEntry = find.text('资料表单实验台');
@@ -41,16 +44,11 @@ void main() {
     await tester.pump(const Duration(milliseconds: 500));
     expect(find.byType(TextInputPlaygroundPage), findsOneWidget);
 
-    await _selectDestination(tester, '内容');
-    expect(find.byType(ContentPage), findsOneWidget);
-
-    await _selectDestination(tester, '反馈');
-    expect(find.byType(FeedbackPage), findsOneWidget);
-
+    await _selectDestination(tester, '媒体');
+    expect(find.byType(MediaPage), findsOneWidget);
     await _selectDestination(tester, '设置');
     expect(find.byType(SettingsPage), findsOneWidget);
-
-    await _selectDestination(tester, '表单');
+    await _selectDestination(tester, '组件');
     expect(find.byType(TextInputPlaygroundPage), findsOneWidget);
 
     expect(await tester.binding.handlePopRoute(), isTrue);

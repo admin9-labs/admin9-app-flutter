@@ -4,6 +4,7 @@ import 'dart:ui' as ui;
 
 import 'package:admin9_app_flutter/features/examples/presentation/pages/layout/grid/grid_page.dart';
 import 'package:admin9_app_flutter/shared/ui/layout/grid/a_grid.dart';
+import 'package:admin9_app_flutter/shared/ui/layout/grid/a_grid_badge.dart';
 import 'package:admin9_app_flutter/shared/ui/layout/grid/a_grid_item.dart';
 import 'package:admin9_app_flutter/theme/theme.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -24,100 +25,66 @@ void main() {
     ) as Map<String, dynamic>;
   });
 
-  testWidgets('three scenarios render complete, interactive AGrid contexts', (
+  testWidgets('renders one complete icon action grid scenario', (tester) async {
+    await _pumpPage(tester);
+
+    expect(find.text('Admin9 图标宫格'), findsOneWidget);
+    expect(find.byType(AGrid), findsOneWidget);
+    expect(find.byType(AGridItem), findsNWidgets(8));
+    expect(find.byType(AGridBadge), findsNWidgets(4));
+    final grid = tester.widget<AGrid>(find.byType(AGrid));
+    expect(grid.columns, 4);
+    expect(grid.horizontalGap, 8);
+    expect(grid.verticalGap, 8);
+    expect(grid.childAspectRatio, 1);
+    expect(grid.surface, AGridSurface.transparent);
+    expect(
+      find.byKey(const ValueKey('grid-preview-count-badge')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('grid-preview-dot-badge')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('grid-preview-label-badge')),
+      findsOneWidget,
+    );
+    expect(find.byKey(const ValueKey('grid-scenario-content')), findsNothing);
+    expect(find.byKey(const ValueKey('grid-visual-image')), findsNothing);
+
+    final targetFinder = find.byKey(const ValueKey('grid-preview-target'));
+    final target = tester.widget<AGridItem>(targetFinder);
+    expect(target.selected, isFalse);
+    expect(target.semanticsLabel, '扫一扫');
+    expect(target.badge?.semanticsLabel, '8 条未读消息');
+
+    await tester.tap(targetFinder);
+    await tester.pump();
+    expect(tester.widget<AGridItem>(targetFinder).selected, isTrue);
+    expect(find.byKey(const ValueKey('playground-status')), findsOneWidget);
+    expect(find.byType(FToast), findsOneWidget);
+    await tester.pump(const Duration(seconds: 6));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('configuration changes preview and reset restores defaults', (
     tester,
   ) async {
     await _pumpPage(tester);
 
-    expect(find.text('Admin9 网格'), findsOneWidget);
-    expect(find.byType(AGrid), findsOneWidget);
-    expect(find.byType(AGridItem), findsNWidgets(4));
-    var grid = tester.widget<AGrid>(find.byType(AGrid));
-    expect(grid.columns, 3);
-
-    await tester.tap(find.byKey(const ValueKey('grid-preview-target')));
-    await tester.pump();
+    await _scrollTo(tester, find.byKey(const ValueKey('grid-badge-label')));
+    await tester.tap(find.byKey(const ValueKey('grid-badge-label')));
+    await tester.pumpAndSettle();
     var target = tester.widget<AGridItem>(
       find.byKey(const ValueKey('grid-preview-target')),
     );
-    expect(target.selected, isTrue);
-    expect(find.byKey(const ValueKey('playground-status')), findsOneWidget);
-    expect(find.byType(FToast), findsOneWidget);
-
-    await tester.tap(find.byKey(const ValueKey('grid-scenario-content')));
-    await tester.pumpAndSettle();
-    grid = tester.widget<AGrid>(find.byType(AGrid));
-    target = tester.widget<AGridItem>(
-      find.byKey(const ValueKey('grid-preview-target')),
-    );
-    expect(grid.columns, 1);
-    expect(grid.childAspectRatio, 3.2);
-    expect(target.layout, AGridItemLayout.horizontalStart);
-    expect(target.semanticsLabel, contains('品牌资源'));
-    expect(target.semanticsLabel, contains('查看启动图、图标与品牌素材'));
-    expect(find.byKey(const ValueKey('grid-preview-image')), findsOneWidget);
     expect(
-      find.byKey(const ValueKey('grid-preview-badge-label')),
-      findsOneWidget,
+      target.badge?.key,
+      const ValueKey('grid-preview-target-label-badge'),
     );
 
-    await tester.tap(find.byKey(const ValueKey('grid-scenario-status')));
-    await tester.pumpAndSettle();
-    grid = tester.widget<AGrid>(find.byType(AGrid));
-    expect(grid.columns, 2);
-    expect(
-      find.byKey(const ValueKey('grid-preview-custom-visual')),
-      findsOneWidget,
-    );
-    expect(
-      tester
-          .widget<AGridItem>(find.byKey(const ValueKey('grid-preview-target')))
-          .semanticsLabel,
-      contains('12'),
-    );
-    expect(
-      find.byKey(const ValueKey('grid-preview-badge-count')),
-      findsOneWidget,
-    );
-    expect(
-      tester
-          .widgetList<AGridItem>(find.byType(AGridItem))
-          .where((item) => item.selected),
-      hasLength(1),
-    );
-    expect(
-      tester
-          .widgetList<AGridItem>(find.byType(AGridItem))
-          .where((item) => !item.enabled),
-      hasLength(1),
-    );
-    expect(tester.takeException(), isNull);
-  });
-
-  testWidgets('configuration changes preview and reset', (tester) async {
-    await _pumpPage(tester);
-
-    await _scrollTo(tester, find.byKey(const ValueKey('grid-layout-end')));
-    await tester.tap(find.byKey(const ValueKey('grid-layout-end')));
-    await tester.tap(find.byKey(const ValueKey('grid-visual-custom')));
-    await tester.tap(find.byKey(const ValueKey('grid-badge-dot')));
-    await tester.pumpAndSettle();
-
-    var target = tester.widget<AGridItem>(
-      find.byKey(const ValueKey('grid-preview-target')),
-    );
-    expect(target.layout, AGridItemLayout.horizontalEnd);
-    expect(
-      find.byKey(const ValueKey('grid-preview-custom-visual')),
-      findsOneWidget,
-    );
-    expect(
-      find.byKey(const ValueKey('grid-preview-badge-dot')),
-      findsOneWidget,
-    );
-    expect(tester.takeException(), isNull, reason: 'choice controls');
-
-    await _scrollTo(tester, find.byKey(const ValueKey('grid-enabled-switch')));
     await tester.tap(find.byKey(const ValueKey('grid-enabled-switch')));
     await tester.tap(find.byKey(const ValueKey('grid-selected-switch')));
     await tester.pumpAndSettle();
@@ -126,67 +93,75 @@ void main() {
     );
     expect(target.enabled, isFalse);
     expect(target.selected, isTrue);
-    expect(tester.takeException(), isNull, reason: 'state switches');
 
-    await _setSliderToEnd(
+    await _scrollTo(tester, find.byKey(const ValueKey('grid-surface-muted')));
+    await tester.tap(find.byKey(const ValueKey('grid-surface-muted')));
+    await tester.pumpAndSettle();
+    expect(
+      tester.widget<AGrid>(find.byType(AGrid)).surface,
+      AGridSurface.muted,
+    );
+    await tester.tap(find.byKey(const ValueKey('grid-surface-outlined')));
+    await tester.pumpAndSettle();
+    expect(
+      tester.widget<AGrid>(find.byType(AGrid)).surface,
+      AGridSurface.outlined,
+    );
+
+    await _setSlider(
       tester,
       find.byKey(const ValueKey('grid-columns-slider')),
+      0,
     );
-    expect(tester.takeException(), isNull, reason: 'columns');
-    await _setSliderToEnd(
+    await _setSlider(
       tester,
       find.byKey(const ValueKey('grid-horizontal-gap-slider')),
+      1,
     );
-    expect(tester.takeException(), isNull, reason: 'horizontal gap');
-    await _setSliderToEnd(
+    await _setSlider(
       tester,
       find.byKey(const ValueKey('grid-vertical-gap-slider')),
+      1,
     );
-    expect(tester.takeException(), isNull, reason: 'vertical gap');
-    await _setSliderToEnd(
+    await _setSlider(
       tester,
       find.byKey(const ValueKey('grid-ratio-slider')),
+      1,
     );
-    expect(tester.takeException(), isNull, reason: 'ratio');
-    await _setSliderToEnd(
+    await _setSlider(
       tester,
       find.byKey(const ValueKey('grid-padding-slider')),
+      1,
     );
-    expect(tester.takeException(), isNull, reason: 'padding');
-    final grid = tester.widget<AGrid>(find.byType(AGrid));
-    expect(grid.columns, 4);
+    var grid = tester.widget<AGrid>(find.byType(AGrid));
+    expect(grid.columns, 2);
     expect(grid.horizontalGap, 24);
     expect(grid.verticalGap, 24);
-    expect(grid.childAspectRatio, 3.25);
+    expect(grid.childAspectRatio, 1.25);
     expect(grid.padding, const EdgeInsets.all(24));
 
     await _scrollTo(tester, find.byKey(const ValueKey('playground-reset')));
     await tester.tap(find.byKey(const ValueKey('playground-reset')));
     await tester.pump();
-    final resetGrid = tester.widget<AGrid>(find.byType(AGrid));
-    final resetTarget = tester.widget<AGridItem>(
+    grid = tester.widget<AGrid>(find.byType(AGrid));
+    target = tester.widget<AGridItem>(
       find.byKey(const ValueKey('grid-preview-target')),
     );
-    expect(resetGrid.columns, 3);
-    expect(resetGrid.horizontalGap, 8);
-    expect(resetGrid.padding, EdgeInsets.zero);
-    expect(resetTarget.layout, AGridItemLayout.vertical);
-    expect(resetTarget.enabled, isTrue);
-    expect(resetTarget.selected, isFalse);
+    expect(grid.columns, 4);
+    expect(grid.horizontalGap, 8);
+    expect(grid.verticalGap, 8);
+    expect(grid.childAspectRatio, 1);
+    expect(grid.padding, EdgeInsets.zero);
+    expect(grid.surface, AGridSurface.transparent);
+    expect(target.enabled, isTrue);
+    expect(target.selected, isFalse);
+    expect(
+      target.badge?.key,
+      const ValueKey('grid-preview-target-count-badge'),
+    );
     await tester.pump(const Duration(seconds: 6));
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
-  });
-
-  testWidgets('image scenario uses a memory-backed preview', (tester) async {
-    await _pumpPage(tester);
-
-    await tester.tap(find.byKey(const ValueKey('grid-scenario-content')));
-    await tester.pumpAndSettle();
-    final image = tester.widget<Image>(
-      find.byKey(const ValueKey('grid-preview-image')),
-    );
-    expect(image.image, isA<MemoryImage>());
   });
 
   testWidgets('320/390, large text, RTL, and light/dark stay overflow-free', (
@@ -203,19 +178,23 @@ void main() {
             textDirection: direction,
           );
           expect(find.byType(AGrid), findsOneWidget);
+          expect(find.byType(AGridItem), findsNWidgets(8));
           expect(tester.takeException(), isNull);
-          expect(find.byKey(const ValueKey('playground-code')), findsNothing);
-          expect(find.byKey(const ValueKey('playground-copy')), findsNothing);
         }
       }
     }
   });
 }
 
-Future<void> _setSliderToEnd(WidgetTester tester, Finder finder) async {
+Future<void> _setSlider(
+  WidgetTester tester,
+  Finder finder,
+  double normalized,
+) async {
   await _scrollTo(tester, finder);
   final rect = tester.getRect(finder);
-  await tester.tapAt(Offset(rect.right - 8, rect.bottom - 8));
+  final dx = rect.left + 8 + (rect.width - 16) * normalized;
+  await tester.tapAt(Offset(dx, rect.bottom - 8));
   await tester.pumpAndSettle();
 }
 

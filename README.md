@@ -1,9 +1,10 @@
 # Admin9 App Starter
 
-Admin9 App Starter is an Android/iOS Flutter skeleton built on Forui. It is a
-runnable reference for application structure, mobile UI capabilities, typed
-routing, localized copy, and a small persisted-settings feature. It is not a
-finished product, backend, or compatibility layer for superseded APIs.
+Admin9 App Starter is an Android/iOS Admin9 UI and mobile engineering reference
+application built on Forui. It demonstrates a store-deliverable application
+baseline through real startup, routing, state, persistence, media lifecycle,
+responsive, accessibility, and test behavior. It is not a backend or a
+compatibility layer for superseded APIs.
 
 ## Current Release
 
@@ -18,8 +19,7 @@ binary, screenshot, or UI evidence ZIP is distributed with the release.
 
 - Flutter 3.47.2 and Dart 3.13.2.
 - Forui 0.26.0 as the visible UI design system and base component source.
-- Five persistent capability destinations: Foundation, Forms, Content,
-  Feedback, and Settings.
+- Four persistent destinations: Home, Components, Media, and Settings.
 - AutoRoute typed routes with independent nested Tab stacks.
 - Riverpod presentation state and dependency wiring.
 - Simplified Chinese App copy through EasyLocalization, plus Forui's own
@@ -50,10 +50,12 @@ Forui primitives behind parallel `App*` wrappers. Services, Repositories,
 preferences, and models stay independent of Forui, AutoRoute, Riverpod, and
 `BuildContext`; feature-owned providers connect those layers to presentation.
 
-See [Application Architecture](docs/architecture.md) and
+See [Product Definition](docs/product.md),
+[Application Architecture](docs/architecture.md), and
 [UI System](docs/ui.md) for the authoritative ownership, routing, generation,
-and generic UI rules. See [Upstream Starter](docs/starter.md) for this
-repository's five catalog destinations, exclusions, and acceptance matrix.
+and generic UI rules. See [Upstream Starter](docs/starter.md) for the removable
+Components catalog, exclusions, and acceptance matrix. Media source provenance
+lives in [Media Scenario Sources](docs/media-sources.md).
 
 ## Getting Started
 

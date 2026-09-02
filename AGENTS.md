@@ -4,6 +4,11 @@ These rules apply to the entire repository and derived projects until a derived
 project replaces them with explicit local authority. Detailed rules live in
 [Architecture](docs/architecture.md) and [UI](docs/ui.md); the bundled runnable
 example and its removal contract live in [Upstream Starter](docs/starter.md).
+The mandatory startup state machine, privacy boundary, first-party startup
+placement, and visual acceptance live in
+[Product](docs/product.md) and
+[Product Startup Flow](docs/product-startup-flow.md). Implementations, tests,
+reviews, and backend contract changes must preserve that authority.
 
 ## Scope And Authority
 
@@ -33,7 +38,8 @@ example and its removal contract live in [Upstream Starter](docs/starter.md).
 - Keep the top-level source structure at `lib/main.dart`, `lib/app/`,
   `lib/theme/`, `lib/shared/ui/`, and `lib/features/<feature>/`. Do not add
   top-level `lib/examples/` or `lib/widgets/` directories.
-- The upstream Admin9 UI Showroom has one owner: `lib/features/examples/`.
+- When present, the upstream Admin9 UI Showroom has one owner:
+  `lib/features/examples/`.
   Foundation, Forms, Content, and Feedback belong to that Feature; Settings
   remains an independent real Feature. Multiple official capabilities may share
   one complete Playground; do not create one shallow page per capability. The

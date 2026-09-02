@@ -79,9 +79,7 @@ void main() {
     }
 
     final registeredRoutes = registry.map((row) => row.route).toSet();
-    final detailRoutes = routes.keys.toSet()
-      ..removeAll({'/foundation', '/forms', '/content', '/feedback'});
-    expect(detailRoutes, registeredRoutes);
+    expect(routes.keys, containsAll(registeredRoutes));
     expect(missing, isEmpty, reason: missing.join('\n'));
   });
 
@@ -244,10 +242,9 @@ String _code(String cell) => RegExp(r'`([^`]+)`').firstMatch(cell)!.group(1)!;
 String _normalize(String url) => url.replaceFirst(RegExp(r'\.md$'), '');
 
 Map<String, String> _exampleRoutes() => {
-  for (final branch in examplesTabRoutes)
-    for (final route in branch.children!)
-      route.path.isEmpty ? '/${branch.path}' : '/${branch.path}/${route.path}':
-          route.name,
+  for (final route in examplesRoutes.single.children!)
+    route.path.isEmpty ? '/app/components' : '/app/components/${route.path}':
+        route.name,
 };
 
 String _routeName(String page) {

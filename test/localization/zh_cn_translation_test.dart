@@ -43,6 +43,15 @@ void main() {
     final exampleTranslations = translations.keys
         .where((key) => key.startsWith('examples.'))
         .toSet();
+    if (!Directory('lib/features/examples').existsSync()) {
+      expect(exampleSourceKeys, isEmpty);
+      expect(exampleTranslations, isEmpty);
+      expect(
+        translations.keys.where((key) => key.startsWith('components.')),
+        isEmpty,
+      );
+      return;
+    }
     expect(exampleSourceKeys, isNotEmpty);
     expect(
       exampleSourceKeys.difference(exampleTranslations),
