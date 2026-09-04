@@ -20,11 +20,31 @@ Resolve the active Git root and read its current local authority before acting:
 - [Repository Working Agreements](../../../AGENTS.md)
 - `docs/architecture.md`, when present
 - `docs/ui.md`, when present
+- `docs/product.md`, when present
 - `docs/starter.md`, when present and relevant to the task
 
 Then inspect the current source, tests, `pubspec.yaml`, and `pubspec.lock`.
 Repository-local authority and actual consumers take precedence over upstream
 examples and historical evidence.
+
+## Impeccable Coordination
+
+This Skill may be combined with an installed `impeccable` Skill on the same UI
+task. Establish the repository's technical, component, ownership, version, and
+acceptance boundaries here first; then route general design review, visual
+critique, copy clarity, and experience refinement to Impeccable within those
+boundaries, including its `audit`, `critique`, `polish`, `clarify`, `harden`,
+or `adapt` playbooks.
+
+Impeccable must not introduce a second Theme, token, typography, icon, routing,
+or state-management system, and it does not expand authorization for files,
+dependencies, platform builds, simulators, physical devices, or releases. For
+Flutter-native review, use its native source-review references rather than its
+Web detector. Do not install or enable its optional automatic Hook unless both
+the active repository and the user explicitly authorize it. When guidance
+conflicts, the active repository and this Skill take precedence. Missing
+Impeccable-specific root artifacts does not authorize creating or relocating
+repository product or design authority.
 
 ## Execution Decision Tree
 

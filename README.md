@@ -113,4 +113,5 @@ changing the Starter.
 The project is licensed under the [Apache License 2.0](LICENSE). The license
 does not grant permission to imply Admin9 endorsement or unrestricted use of
 Admin9 trademarks; see [Trademark Notice](TRADEMARKS.md). Dependencies, fonts,
-images, and other third-party materials remain subject to their own notices.
+images, and other third-party materials remain subject to their own
+[Third-Party Notices](THIRD_PARTY_NOTICES.md).

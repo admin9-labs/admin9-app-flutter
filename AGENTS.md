@@ -30,6 +30,22 @@ reviews, and backend contract changes must preserve that authority.
   documents only after confirming that they have no runtime, CI, legal, or
   current delivery consumer. Do not create archive, legacy, or deprecated copies.
 
+## UI Skill Coexistence
+
+- `admin9-flutter-app` and the official `impeccable` Skill may be used together
+  on one UI task. Apply `admin9-flutter-app` first to resolve repository
+  authority, actual versions, Forui components, ownership, architecture, and
+  acceptance boundaries.
+- Within those boundaries, use Impeccable for general `audit`, `critique`,
+  `polish`, `clarify`, `harden`, or `adapt` work. Its advice must not introduce
+  another Theme, token, typography, icon, routing, or state-management system,
+  or expand file, dependency, build, simulator, device, or release authority.
+- Flutter-native review uses Impeccable's native source-review references, not
+  its Web detector. Do not install or enable the optional automatic Hook in
+  this project. Missing Impeccable-specific root artifacts does not authorize
+  creating or relocating repository product or design authority. If guidance
+  conflicts, this file, `docs/`, and `admin9-flutter-app` take precedence.
+
 ## Implementation Rules
 
 - Use Flutter 3.47.2, Dart 3.13.2, `forui: ^0.26.0`,
