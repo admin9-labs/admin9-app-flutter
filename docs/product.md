@@ -37,8 +37,9 @@ contract is defined only by [Product Startup Flow](product-startup-flow.md).
 
 Components has separate Forui and Admin9 catalogs. Foundation, Forms, Content,
 and Feedback are Forui catalog categories rather than persistent destinations.
-The current formal Admin9 component catalog contains one family: `AGrid`,
-`AGridItem`, `AGridBadge`, and `AGridStyle` together count as one component.
+The formal Admin9 component catalog contains two families from `admin9_ui`:
+`AGrid`, `AGridItem`, `AGridBadge`, and `AGridStyle` form the action-grid family;
+`ACarousel` and `ACarouselItem` form the horizontal-carousel family.
 
 Every direct Playground must provide a realistic scenario, configuration-driven
 preview, observable interaction feedback, reset behavior, responsive and

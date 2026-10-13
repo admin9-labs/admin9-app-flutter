@@ -1,10 +1,9 @@
+import 'package:admin9_ui/admin9_ui.dart';
+
 import 'dart:ui' show Tristate;
 
-import 'package:admin9_app_flutter/shared/ui/layout/grid/a_grid.dart';
-import 'package:admin9_app_flutter/shared/ui/layout/grid/a_grid_badge.dart';
-import 'package:admin9_app_flutter/shared/ui/layout/grid/a_grid_item.dart';
-import 'package:admin9_app_flutter/shared/ui/layout/grid/a_grid_style.dart';
-import 'package:admin9_app_flutter/theme/theme.dart';
+import '../support/test_theme.dart';
+
 import 'package:flutter/rendering.dart' show RenderParagraph;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -402,6 +401,160 @@ void main() {
         greaterThanOrEqualTo(48),
       );
     }
+  });
+  testWidgets(
+    'measurable labels reduce columns at large text and retain full semantics',
+    (tester) async {
+      final semantics = tester.ensureSemantics();
+      await _pump(
+        tester,
+        AGrid(
+          children: [
+            for (var i = 0; i < 4; i++)
+              AGridItem.text(
+                key: ValueKey('text-$i'),
+                icon: const SizedBox.square(dimension: 44),
+                label: '很长的服务入口名称$i',
+                onPress: _noop,
+              ),
+          ],
+        ),
+        size: const Size(320, 844),
+        textScale: 2,
+      );
+      expect(
+        tester.getTopLeft(find.byKey(const ValueKey('text-1'))).dy,
+        greaterThan(tester.getTopLeft(find.byKey(const ValueKey('text-0'))).dy),
+      );
+      expect(find.bySemanticsLabel('很长的服务入口名称0'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+      semantics.dispose();
+    },
+  );
+
+  testWidgets(
+    'paged rows keep equal height and the last item remains actionable',
+    (tester) async {
+      var opened = -1;
+      await _pump(
+        tester,
+        AGrid(
+          rowsPerPage: 1,
+          children: [
+            for (var i = 0; i < 9; i++)
+              AGridItem.text(
+                key: ValueKey('entry-$i'),
+                icon: const Icon(FLucideIcons.layoutGrid),
+                label: '入口$i',
+                onPress: () => opened = i,
+              ),
+          ],
+        ),
+      );
+      final height = tester.getSize(find.byType(PageView)).height;
+      await tester.drag(find.byType(PageView), const Offset(-390, 0));
+      await tester.pumpAndSettle();
+      await tester.drag(find.byType(PageView), const Offset(-390, 0));
+      await tester.pumpAndSettle();
+      expect(tester.getSize(find.byType(PageView)).height, height);
+      await tester.tap(find.byKey(const ValueKey('entry-8')));
+      await tester.pumpAndSettle();
+      expect(opened, 8);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets(
+    'paging restores across removal and resets safely when geometry changes',
+    (tester) async {
+      final bucket = PageStorageBucket();
+      Widget content({bool visible = true, int columns = 4}) => PageStorage(
+        bucket: bucket,
+        child: visible
+            ? AGrid(
+                key: const PageStorageKey('entries'),
+                columns: columns,
+                rowsPerPage: 1,
+                showIndicators: false,
+                children: [
+                  for (var i = 0; i < 9; i++)
+                    AGridItem.text(
+                      key: ValueKey('restore-$i'),
+                      icon: const Icon(FLucideIcons.layoutGrid),
+                      label: '入口$i',
+                    ),
+                ],
+              )
+            : const SizedBox(),
+      );
+      await _pump(tester, content());
+      await tester.drag(find.byType(PageView), const Offset(-390, 0));
+      await tester.pumpAndSettle();
+      await _pump(tester, content(visible: false));
+      await _pump(tester, content());
+      expect(
+        tester.widget<PageView>(find.byType(PageView)).controller!.page,
+        1,
+      );
+      await _pump(tester, content(columns: 2));
+      expect(
+        tester.widget<PageView>(find.byType(PageView)).controller!.page,
+        0,
+      );
+      expect(tester.takeException(), isNull);
+    },
+  );
+  testWidgets('paging scopes use key equality rather than printed identities', (
+    tester,
+  ) async {
+    final first = [for (var i = 0; i < 9; i++) Object()];
+    final second = [for (var i = 0; i < 9; i++) Object()];
+    Widget grid(List<Object> ids) => AGrid(
+      key: const PageStorageKey('identity-grid'),
+      rowsPerPage: 1,
+      children: [
+        for (var i = 0; i < ids.length; i++)
+          AGridItem.text(
+            key: ValueKey(ids[i]),
+            icon: const SizedBox(),
+            label: '入口$i',
+          ),
+      ],
+    );
+    await _pump(tester, grid(first));
+    await tester.drag(find.byType(PageView), const Offset(-390, 0));
+    await tester.pumpAndSettle();
+    expect(find.text('入口4'), findsOneWidget);
+    await _pump(tester, grid(second));
+    await tester.pumpAndSettle();
+    expect(find.text('入口0'), findsOneWidget);
+    expect(tester.widget<PageView>(find.byType(PageView)).controller!.page, 0);
+  });
+  testWidgets('two-line text labels wrap within themed cells at large scale', (
+    tester,
+  ) async {
+    await _pump(
+      tester,
+      const AGrid(
+        children: [
+          AGridItem.text(
+            icon: Icon(FLucideIcons.layoutGrid),
+            label: '服务入口',
+            labelMaxLines: 2,
+          ),
+          AGridItem.text(
+            icon: Icon(FLucideIcons.layoutGrid),
+            label: '个人设置',
+            labelMaxLines: 2,
+          ),
+        ],
+      ),
+      size: const Size(320, 844),
+      textScale: 2,
+    );
+    final label = tester.renderObject<RenderParagraph>(find.text('服务入口'));
+    expect(label.didExceedMaxLines, isFalse);
+    expect(tester.takeException(), isNull);
   });
 }
 

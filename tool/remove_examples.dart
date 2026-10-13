@@ -103,7 +103,7 @@ List<String> _preflight() {
     'docs/product-startup-flow.md',
     'lib/features/media',
     'lib/features/settings',
-    'lib/shared/ui/layout/grid',
+    'packages/admin9_ui',
   ]) {
     if (!FileSystemEntity.typeSync(path).isPresent) {
       problems.add('Protected App baseline is missing: $path');

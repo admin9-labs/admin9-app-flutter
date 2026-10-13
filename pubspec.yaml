@@ -8,6 +8,8 @@ environment:
   flutter: '>=3.47.2'
 
 dependencies:
+  admin9_ui:
+    path: packages/admin9_ui
   audio_service: ^0.18.19
   audio_session: ^0.2.4
   auto_route: ^11.1.0
@@ -19,7 +21,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   flutter_riverpod: ^3.4.2
-  forui: ^0.26.0
+  forui: ^0.27.3
   http: ^1.6.0
   just_audio: ^0.10.6
   material_ui: ^1.0.0
@@ -34,7 +36,7 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   flutter_test:
     sdk: flutter
-  forui_cli: ^0.26.0
+  forui_cli: ^0.27.0
   integration_test:
     sdk: flutter
   shared_preferences_platform_interface: ^2.4.2

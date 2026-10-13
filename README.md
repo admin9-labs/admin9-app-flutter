@@ -18,7 +18,7 @@ binary, screenshot, or UI evidence ZIP is distributed with the release.
 ## Included
 
 - Flutter 3.47.2 and Dart 3.13.2.
-- Forui 0.26.0 as the visible UI design system and base component source.
+- Forui 0.27.3 as the visible UI design system and base component source.
 - Four persistent destinations: Home, Components, Media, and Settings.
 - AutoRoute typed routes with independent nested Tab stacks.
 - Riverpod presentation state and dependency wiring.
@@ -29,7 +29,8 @@ binary, screenshot, or UI evidence ZIP is distributed with the release.
 - Reusable App-level page patterns under `lib/shared/ui/`, each backed by real
   consumers and tests.
 
-The catalog covers Forui 0.26.0 capabilities relevant to Android and iOS. It
+The runtime uses Forui 0.27.3; the historical documentation catalogue and
+[upgrade evidence](docs/forui-upgrade.md) bound the capability claims. It
 does not claim desktop or complete package coverage. Pointer-first or
 desktop-oriented examples such as Sidebar, Breadcrumb, Pagination, Resizable,
 and Context Menu are intentionally excluded.
@@ -115,3 +116,10 @@ does not grant permission to imply Admin9 endorsement or unrestricted use of
 Admin9 trademarks; see [Trademark Notice](TRADEMARKS.md). Dependencies, fonts,
 images, and other third-party materials remain subject to their own
 [Third-Party Notices](THIRD_PARTY_NOTICES.md).
+
+## Packaged Admin9 UI
+
+[admin9_ui](packages/admin9_ui/README.md) contains the action grid and horizontal
+carousel. The Starter is a consumer and runnable demonstration; downstream Apps
+can depend on the package without copying App or business source. admin9_ui is
+a local unpublished package pilot.

@@ -2,12 +2,12 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:ui' as ui show TextDirection;
 
+import 'package:admin9_ui/admin9_ui.dart';
 import 'package:admin9_app_flutter/app/appearance/app_appearance_preference.dart';
 import 'package:admin9_app_flutter/app/appearance/app_appearance_provider.dart';
 import 'package:admin9_app_flutter/app/appearance/app_appearance_repository.dart';
 import 'package:admin9_app_flutter/app/appearance/app_theme_catalog.dart';
 import 'package:admin9_app_flutter/features/examples/presentation/pages/concepts/themes/themes_page.dart';
-import 'package:admin9_app_flutter/shared/ui/layout/grid/a_grid.dart';
 import 'package:admin9_app_flutter/theme/theme.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

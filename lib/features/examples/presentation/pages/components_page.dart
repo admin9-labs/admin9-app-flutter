@@ -55,6 +55,13 @@ class ComponentsPage extends StatelessWidget {
                   subtitle: context.tr('components.admin9.grid_family'),
                   onPress: () => context.pushRoute(const GridRoute()),
                 ),
+                _Entry(
+                  key: const ValueKey('components-admin9-carousel'),
+                  icon: FLucideIcons.galleryHorizontal,
+                  title: context.tr('examples.admin9.carousel.title'),
+                  subtitle: context.tr('examples.admin9.carousel.description'),
+                  onPress: () => context.pushRoute(const CarouselRoute()),
+                ),
               ],
             ),
           ],

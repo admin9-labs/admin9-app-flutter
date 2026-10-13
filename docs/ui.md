@@ -37,23 +37,42 @@ focused-outline behavior, accessibility semantics, directionality, and
 light/dark states. Flutter layout and platform primitives remain available where
 Forui does not own the capability.
 
-Reusable `A*` APIs live in a responsibility-specific `shared/ui/<category>/`
-location, have a real consumer, documentation, and tests, and receive semantic
-callbacks rather than importing AutoRoute. A Theme-backed default is a typed
+Distributable `A*` APIs live in `packages/admin9_ui/lib/src/<category>/`;
+App-only shared patterns remain in `shared/ui/<category>/`. They have a real
+consumer, documentation, and tests, and receive semantic callbacks rather than importing AutoRoute. A Theme-backed default is a typed
 extension of the existing Forui Theme or widget-style contract, not an `ATheme`
 or parallel token source. Do not create an empty style extension before a real
 Theme contract exists.
 
 The current Examples Showroom demonstrates the official `FTabs` directly. This
 scope does not create `ATabs`, a tabs feasibility experiment, or a shared tabs
-directory. The approved Admin9 brand component in this iteration is AGrid; its
-current implementation and coverage belong in [Upstream Starter](starter.md).
+directory. The approved packaged Admin9 components are AGrid and ACarousel; their
+current implementations and coverage belong in [Upstream Starter](starter.md).
 AGrid is an icon action grid with a centered icon-and-label stack. Its default
 surface is transparent; callers explicitly choose Theme-owned muted or outlined
 surfaces when needed. Compact semantic badges overlay the top-end corner without
 adding a layout row or moving the centered content. Badges anchor to a fixed,
 transparent icon slot rather than the item border. AGrid does not add a second
 visual well around the icon or accept arbitrary badge colors and Widgets.
+
+### Carousel And Paged Grid Pilot
+
+ACarousel owns horizontal paging, stable item identity, bounded indicators and
+opt-in lifecycle-aware autoplay. Keyboard focus and accessible navigation keep
+paging under user control. Caller-owned decorative children provide image rendering.
+Caption modes are none, a one-line image overlay, or wrapping supporting copy
+below the image. The title uses active Forui body typography; overlay copy uses
+a Forui card surface and foreground for contrast. Indicators, radius, spacing,
+focus and motion derive from the active Forui styles. Hosts explicitly mark
+retained offscreen content inactive. No URL, business destination, cache or
+fullscreen behavior belongs in the package.
+
+AGrid retains its default icon stack, surfaces, badges and state semantics.
+AGridItem.text supplies a measurable full label, optionally using an image in
+the existing icon slot. Narrow width and large text reduce columns; paging
+limits rows and preserves page height. Null rowsPerPage preserves expanded
+layout. The Playground owns image selection, one/two-line selection and paging
+controls; the package owns only their actual presentation behavior.
 
 ## Theme And CLI Ownership
 

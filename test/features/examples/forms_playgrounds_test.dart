@@ -310,8 +310,23 @@ void main() {
           .enabled,
       isFalse,
     );
-    expect(find.semantics.byLabel('接收活动消息'), findsWidgets);
-    expect(find.semantics.byLabel('仅重要更新'), findsWidgets);
+    expect(
+      find.semantics.byPredicate(
+        (node) =>
+            node.label == '接收活动消息' &&
+            node.flagsCollection.isEnabled == ui.Tristate.isFalse &&
+            node.flagsCollection.isChecked == ui.CheckedState.isFalse,
+      ),
+      findsWidgets,
+    );
+    expect(
+      find.semantics.byPredicate(
+        (node) =>
+            node.label == '仅重要更新' &&
+            node.flagsCollection.isEnabled == ui.Tristate.isFalse,
+      ),
+      findsWidgets,
+    );
 
     await _tapAction(tester, 'playground-reset');
     expect(

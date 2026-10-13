@@ -1,4 +1,4 @@
-import 'package:admin9_app_flutter/shared/ui/layout/grid/a_grid_style.dart';
+import 'package:admin9_ui/admin9_ui.dart';
 import 'package:forui/forui.dart';
 import 'package:material_ui/material_ui.dart';
 

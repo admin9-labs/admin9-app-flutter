@@ -8,23 +8,26 @@ void main() {
   final ledger = _ledgerRows();
   final registry = _registryRows();
 
-  test('Forui 0.26.0 ledger contains every official capability once', () {
-    expect(ledger, hasLength(72));
-    expect(ledger.map((row) => row.id).toSet(), hasLength(72));
-    expect(
-      ledger.every(
-        (row) =>
-            row.axes.isNotEmpty &&
-            row.target.isNotEmpty &&
-            row.evidence.isNotEmpty,
-      ),
-      isTrue,
-    );
+  test(
+    'historical Forui catalogue retains every referenced capability once',
+    () {
+      expect(ledger, hasLength(72));
+      expect(ledger.map((row) => row.id).toSet(), hasLength(72));
+      expect(
+        ledger.every(
+          (row) =>
+              row.axes.isNotEmpty &&
+              row.target.isNotEmpty &&
+              row.evidence.isNotEmpty,
+        ),
+        isTrue,
+      );
 
-    final official = _officialUrls();
-    expect(official, hasLength(72));
-    expect(ledger.map((row) => _normalize(row.url)).toSet(), official);
-  });
+      final official = _officialUrls();
+      expect(official, hasLength(72));
+      expect(ledger.map((row) => _normalize(row.url)).toSet(), official);
+    },
+  );
 
   test('ledger coverage modes and widget totals match the mobile contract', () {
     const modes = {'direct', 'indirect', 'documented', 'excluded'};
@@ -38,10 +41,10 @@ void main() {
     expect(widgets.where((row) => row.coverage == 'excluded'), hasLength(6));
   });
 
-  test('17 Playgrounds join source, route, translation, test, and ledger', () {
-    expect(registry, hasLength(17));
-    expect(registry.map((row) => row.id).toSet(), hasLength(17));
-    expect(registry.map((row) => row.route).toSet(), hasLength(17));
+  test('18 Playgrounds join source, route, translation, test, and ledger', () {
+    expect(registry, hasLength(18));
+    expect(registry.map((row) => row.id).toSet(), hasLength(18));
+    expect(registry.map((row) => row.route).toSet(), hasLength(18));
 
     final routes = _exampleRoutes();
     final translations = Map<String, dynamic>.from(

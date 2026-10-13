@@ -111,21 +111,21 @@ AutoRoute output, and deletes its tests, translations, screenshots, and Starter
 claims. It must not delete startup, Home, Media, Settings, Legal, or independent
 shared UI APIs.
 
-The approved reusable Admin9 brand component for this iteration is owned at:
+The distributable Admin9 UI package is [admin9_ui](../packages/admin9_ui/README.md).
+Its production components are under `packages/admin9_ui/lib/src/grid/` and
+`packages/admin9_ui/lib/src/carousel/`; consumers import only
+`package:admin9_ui/admin9_ui.dart`. Starter-only page patterns stay in
+`lib/shared/ui/`. The package depends on Flutter, Forui and the existing
+material_ui ThemeExtension contract, never on this App, routing, Features,
+Riverpod, backend configuration or persistence.
 
-```text
-lib/shared/ui/layout/grid/
-|-- a_grid.dart
-|-- a_grid_badge.dart
-|-- a_grid_item.dart
-`-- a_grid_style.dart
-```
-
-AGrid remains independent of Examples so a derived project can remove the
-Showroom without removing the brand API. Its style extends the existing Forui
-Theme contract; it does not introduce a parallel App Theme. Other category
-directories and APIs are created only after their own responsibility and
-consumer are approved.
+AGrid and ACarousel remain independent of Examples. AGridStyle extends the
+existing Forui Theme contract and is registered by the host. Playground state,
+translations and assets stay in Examples/the App. The package has its own
+manifest, tests and changelog; the root App uses a path dependency. Downstream
+Apps consume a fixed Git revision or a future published version, without copying
+source or committing local overrides. Package changes belong in the upstream
+contribution branch and pass independent analysis/tests before consumers upgrade.
 
 Media is a formal App Feature at `lib/features/media/`. A local Scenario
 Repository owns prototype article, image, video, and audio data. `extended_image`
@@ -425,7 +425,7 @@ or package APIs.
 - Do not add Riverpod hooks, Riverpod generation, model generation, offline
   storage, background execution, workers, or realtime transport without an
   approved consumer and the applicable capability contract.
-- Do not build a parallel UI package; Forui is this Starter's UI foundation.
+- Do not build a parallel design system; admin9_ui enhances the existing Forui foundation.
 - Do not add unapproved locales or a second App localization framework.
   EasyLocalization and Forui localization have the separate responsibilities
   described in [UI](ui.md#language-and-localization).

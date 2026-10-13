@@ -43,7 +43,7 @@ and does not add an extra runtime shell.
 ## Admin9 UI Extensions
 
 `AGrid` is a formal Admin9 brand UI API. Its production source remains under
-`lib/shared/ui/layout/grid/` when Examples is removed. The runnable grid page is
+`packages/admin9_ui/lib/src/grid/` when Examples is removed. The runnable grid page is
 only a consumer and demonstration of that shared API. Its `columns` value is a
 maximum: narrow constraints reduce the effective column count and cap the
 effective aspect ratio so every cell preserves the Theme-owned minimum touch
@@ -55,9 +55,9 @@ optional badge metadata needed for responsive geometry.
 The Grid Playground demonstrates one complete icon action grid with eight
 entries. It configures columns, horizontal and vertical gaps, aspect ratio,
 padding, surface, badge kind, enabled, and selected states through AGrid's real
-public API. Each item keeps one centered icon-and-label stack; it does not
-support descriptions, images, custom visual panels, or horizontal content
-layouts. `AGridSurface.transparent` is the default and adds no fixed background;
+public API. Each item keeps one centered icon-and-label stack. The same Playground
+configures images in the visual slot, measurable one/two-line labels and optional
+row paging. Description/card panels and horizontal content layouts are excluded. `AGridSurface.transparent` is the default and adds no fixed background;
 callers may explicitly select `muted` or `outlined`. `AGridBadge.count`,
 `AGridBadge.dot`, and `AGridBadge.label` provide bounded semantic badges. Count
 and dot badges use the Theme destructive colors, while label badges use
@@ -75,7 +75,15 @@ human visual review, not an automated claim that the result is attractive.
 
 | API | Production source | Example route | Automated evidence |
 | --- | --- | --- | --- |
-| AGrid | `lib/shared/ui/layout/grid/` | `/app/components/admin9/grid` | `test/shared/ui/layout/grid/a_grid_test.dart`, `test/shared/ui/layout/grid/grid_page_test.dart`, and `test/app/theme_resolution_test.dart` |
+| AGrid | `packages/admin9_ui/lib/src/grid/` | `/app/components/admin9/grid` | `packages/admin9_ui/test/grid/a_grid_test.dart`, `test/shared/ui/layout/grid/grid_page_test.dart`, and `test/app/theme_resolution_test.dart` |
+| ACarousel | `packages/admin9_ui/lib/src/carousel/` | `/app/components/admin9/carousel` | `packages/admin9_ui/test/carousel/a_carousel_test.dart` and `test/features/examples/carousel_playground_test.dart` |
+
+ACarousel is the packaged horizontal carousel. Its Playground uses the existing
+licensed onboarding images and configures three caption modes, ratios, autoplay,
+looping, interval and indicators. Swipe/click feedback and reset are observable.
+Package tests own paging/lifecycle behavior; the Playground test owns controls,
+translation, reset and responsive integration. It does not restore downstream
+business modules into the Starter.
 
 The Starter does not define `ATabs`. The Tabs Playground uses Forui `FTabs`
 directly. No `shared/ui/navigation/tabs/` directory, compatibility wrapper, or
@@ -83,7 +91,10 @@ experimental Tabs API belongs to the current implementation.
 
 ## Showroom Coverage Contract
 
-The ledger is bound to the checked-in Forui 0.26.0 documentation snapshot. It
+The runtime is Forui 0.27.3. The ledger retains the historical checked-in
+0.26.0 documentation catalogue; the [upgrade evidence](forui-upgrade.md) records
+the version-specific source and behavioral review. This is not a new 0.27.3
+documentation snapshot. The reference catalogue
 contains 4 Concepts, 7 Guides, 4 Reference entries, and 57 Widgets: 72 official
 capabilities in total. Several capabilities may map to the same Playground;
 page count is not a coverage metric.
@@ -101,7 +112,7 @@ invalidates this ledger and requires a full review.
 
 ### Current Playground Registry
 
-The current implementation has 4 group roots and 17 complete Playgrounds. The
+The current implementation has 4 group roots and 18 complete Playgrounds. The
 registry is the authoritative join between a Playground ID, source Page, typed
 route, translation namespace, focused behavior test, and official capability
 mapping. Multiple official capabilities intentionally share one complete page.
@@ -113,6 +124,7 @@ mapping. Multiple official capabilities intentionally share one complete page.
 | `foundation.app_shell` | `foundation/playgrounds/app_shell_playground_page.dart` | `/app/components/forui/foundation/playground/app-shell` | `examples.foundation.playgrounds.app_shell` | `test/features/examples/foundation_playgrounds_test.dart` | C03, C04, WL01, WL03, WN01, WN03 |
 | `foundation.interaction` | `foundation/playgrounds/interaction_playground_page.dart` | `/app/components/forui/foundation/playground/interaction` | `examples.foundation.playgrounds.interaction` | `test/features/examples/foundation_playgrounds_test.dart` | C02, WN06, WFD01, WFD02, WFD06 |
 | `foundation.grid` | `layout/grid/grid_page.dart` | `/app/components/admin9/grid` | `examples.foundation.layout.grid.playground` | `test/shared/ui/layout/grid/grid_page_test.dart` | Admin9 AGrid extension |
+| `content.carousel` | `content/carousel/carousel_page.dart` | `/app/components/admin9/carousel` | `examples.admin9.carousel` | `test/features/examples/carousel_playground_test.dart` | Admin9 ACarousel extension |
 | `forms.buttons` | `form/buttons/buttons_playground_page.dart` | `/app/components/forui/forms/playground/buttons` | `examples.forms.playgrounds.buttons` | `test/features/examples/forms_playgrounds_test.dart` | WF02 |
 | `forms.text_input` | `form/text_input/text_input_playground_page.dart` | `/app/components/forui/forms/playground/text-input` | `examples.forms.playgrounds.text_input` | `test/features/examples/forms_playgrounds_test.dart` | WF01, WF06, WF08, WF15, WF16 |
 | `forms.selection_controls` | `form/selection_controls/selection_controls_playground_page.dart` | `/app/components/forui/forms/playground/selection-controls` | `examples.forms.playgrounds.selection_controls` | `test/features/examples/forms_playgrounds_test.dart` | WF03, WF10, WF11, WF14 |
@@ -128,8 +140,8 @@ mapping. Multiple official capabilities intentionally share one complete page.
 
 The official capability ledger below joins to this registry through Playground
 ID. Documented and excluded entries continue to name their authoritative source
-or rationale directly. AGrid remains in the registry as an Admin9 extension and
-is not counted as one of Forui's 72 official capabilities.
+or rationale directly. AGrid and ACarousel remain in the registry as Admin9 extensions and
+are not counted as part of Forui's 72 official capabilities.
 
 ### Current Capability Ledger
 

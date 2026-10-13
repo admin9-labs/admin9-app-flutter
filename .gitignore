@@ -43,3 +43,7 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Reusable package development outputs
+/packages/admin9_ui/pubspec.lock
+/packages/admin9_ui/build/

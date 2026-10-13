@@ -48,7 +48,7 @@ reviews, and backend contract changes must preserve that authority.
 
 ## Implementation Rules
 
-- Use Flutter 3.47.2, Dart 3.13.2, `forui: ^0.26.0`,
+- Use Flutter 3.47.2, Dart 3.13.2, `forui: ^0.27.3`,
   `flutter_riverpod: ^3.4.2`, `easy_localization: ^3.0.8`, and
   `auto_route: ^11.1.0`. Commit and enforce `pubspec.lock`.
 - Keep the top-level source structure at `lib/main.dart`, `lib/app/`,
@@ -64,8 +64,8 @@ reviews, and backend contract changes must preserve that authority.
   the requirement. An Admin9 `A*` API is allowed only for a stable, observable
   brand visual, interaction, behavior, or API difference; it may wrap, extend,
   or independently implement a Forui gap. Mechanical renaming is prohibited.
-- Keep reusable Admin9 UI in a specifically named `shared/ui/<category>/`
-  location. It must follow the Forui Theme, typography, icons, variants,
+- Keep distributable Admin9 components in `packages/admin9_ui/lib/src/<category>/`.
+  App-only shared UI remains in `shared/ui/<category>/`. It must follow the Forui Theme, typography, icons, variants,
   interaction, focus, accessibility, directionality, and light/dark contracts.
   Do not create a parallel Theme or token system.
 - App copy uses semantic tokens from the active Forui Typography. Feature and
@@ -108,9 +108,11 @@ reviews, and backend contract changes must preserve that authority.
 - Validate only from the current source. Do not inherit pass claims from
   superseded tests, Goldens, screenshots, logs, builds, or device runs.
 - Run focused tests plus `flutter pub get --enforce-lockfile`,
-  `dart format --output=none --set-exit-if-changed lib test integration_test tool`,
+  `dart format --output=none --set-exit-if-changed lib test integration_test tool packages/admin9_ui/lib packages/admin9_ui/test`,
   `flutter analyze`, `flutter test`, Markdown local-link validation, and
   `git diff --check`.
+- Run independent `flutter analyze` and `flutter test` in `packages/admin9_ui/`.
+  Application consumers import only its public entry point.
 - On a clean checkout, run `dart run build_runner build`, then require both
   `git diff --exit-code` and an empty
   `git status --porcelain --untracked-files=all` result.

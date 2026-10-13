@@ -1,9 +1,7 @@
+import 'package:admin9_ui/admin9_ui.dart';
 import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_action_bar.dart';
 import 'package:admin9_app_flutter/features/examples/presentation/widgets/playground_preview.dart';
 import 'package:admin9_app_flutter/shared/ui/component_example_section.dart';
-import 'package:admin9_app_flutter/shared/ui/layout/grid/a_grid.dart';
-import 'package:admin9_app_flutter/shared/ui/layout/grid/a_grid_badge.dart';
-import 'package:admin9_app_flutter/shared/ui/layout/grid/a_grid_item.dart';
 import 'package:admin9_app_flutter/shared/ui/responsive_page_body.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -28,7 +26,7 @@ class _GridPageState extends State<GridPage> {
   double _padding = 0;
   AGridSurface _surface = AGridSurface.transparent;
   _GridBadge _badge = _GridBadge.count;
-  bool _enabled = true;
+  bool _enabled = true, _paged = false, _images = false, _compact = false;
   String? _selectedId;
   int _actionCount = 0;
   String? _status;
@@ -58,6 +56,9 @@ class _GridPageState extends State<GridPage> {
       _surface = AGridSurface.transparent;
       _badge = _GridBadge.count;
       _enabled = true;
+      _paged = false;
+      _images = false;
+      _compact = false;
       _selectedId = null;
       _actionCount = 0;
       _status = null;
@@ -84,6 +85,7 @@ class _GridPageState extends State<GridPage> {
           child: AGrid(
             key: const ValueKey('grid-playground-preview'),
             columns: _columns,
+            rowsPerPage: _paged ? 1 : null,
             horizontalGap: _horizontalGap,
             verticalGap: _verticalGap,
             childAspectRatio: _childAspectRatio,
@@ -98,13 +100,37 @@ class _GridPageState extends State<GridPage> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             spacing: 20,
             children: [
+              FSwitch(
+                key: const ValueKey('grid-paged'),
+                label: Text(
+                  'examples.foundation.layout.grid.playground.paged'.tr(),
+                ),
+                value: _paged,
+                onChange: (value) => setState(() => _paged = value),
+              ),
+              FSwitch(
+                key: const ValueKey('grid-images'),
+                label: Text(
+                  'examples.foundation.layout.grid.playground.images'.tr(),
+                ),
+                value: _images,
+                onChange: (value) => setState(() => _images = value),
+              ),
+              FSwitch(
+                key: const ValueKey('grid-compact'),
+                label: Text(
+                  'examples.foundation.layout.grid.playground.compact'.tr(),
+                ),
+                value: _compact,
+                onChange: (value) => setState(() => _compact = value),
+              ),
               _GridSliderControl(
                 key: const ValueKey('grid-columns-slider'),
                 label: 'examples.foundation.layout.grid.playground.columns'
                     .tr(),
                 value: _columns.toDouble(),
                 min: 2,
-                max: 4,
+                max: 5,
                 step: 1,
                 formatter: (value) => '${value.round()}',
                 onChanged: (value) => setState(() => _columns = value.round()),
@@ -332,10 +358,20 @@ class _GridPageState extends State<GridPage> {
     AGridBadge? badge,
     bool enabled = true,
     Key? key,
-  }) => AGridItem(
-    key: key,
-    icon: Icon(icon, key: ValueKey('grid-preview-icon-$id')),
-    label: Text(label),
+  }) => AGridItem.text(
+    key: key ?? ValueKey('grid-entry-$id'),
+    icon: _images
+        ? ClipRRect(
+            borderRadius: context.theme.style.borderRadius.md,
+            child: Image.asset(
+              'assets/images/onboarding/read.jpg',
+              fit: BoxFit.cover,
+              key: ValueKey('grid-preview-image-$id'),
+            ),
+          )
+        : Icon(icon, key: ValueKey('grid-preview-icon-$id')),
+    label: label,
+    labelMaxLines: _compact ? 1 : 2,
     badge: badge,
     enabled: enabled,
     selected: _selectedId == id,
