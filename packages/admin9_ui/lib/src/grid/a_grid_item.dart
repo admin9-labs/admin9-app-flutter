@@ -16,10 +16,29 @@ class AGridItem extends StatelessWidget {
     this.onPress,
     this.semanticsLabel,
     this.semanticsHint,
-  });
+  }) : labelText = null,
+       labelMaxLines = 2;
 
+  /// A measurable text label, including an image or icon in the visual slot.
+  const AGridItem.text({
+    required this.icon,
+    required String label,
+    this.labelMaxLines = 1,
+    this.badge,
+    this.enabled = true,
+    this.selected = false,
+    this.onPress,
+    this.semanticsLabel,
+    this.semanticsHint,
+    super.key,
+  }) : assert(labelMaxLines > 0),
+       labelText = label,
+       label = null;
+
+  final String? labelText;
+  final int labelMaxLines;
   final Widget icon;
-  final Widget label;
+  final Widget? label;
   final AGridBadge? badge;
   final bool enabled;
   final bool selected;
@@ -33,7 +52,7 @@ class AGridItem extends StatelessWidget {
     final badge = this.badge;
     final visibleBadge = badge != null && badge.visible ? badge : null;
     final mergedSemanticsLabel = [
-      semanticsLabel,
+      semanticsLabel ?? labelText,
       visibleBadge?.semanticsLabel,
     ].whereType<String>().where((label) => label.isNotEmpty).join('，');
     final itemDecoration = switch (AGrid.surfaceOf(context)) {
@@ -48,7 +67,7 @@ class AGridItem extends StatelessWidget {
           : mergedSemanticsLabel,
       semanticsHint: semanticsHint,
       semanticsButton: true,
-      excludeSemantics: semanticsLabel?.isNotEmpty ?? false,
+      excludeSemantics: (semanticsLabel ?? labelText)?.isNotEmpty ?? false,
       focusedOutlineStyle: style.focusedOutlineStyle,
       onPress: enabled ? onPress : null,
       builder: (context, variants, _) => AnimatedContainer(
@@ -95,9 +114,9 @@ class AGridItem extends StatelessWidget {
               child: DefaultTextStyle(
                 style: style.labelTextStyle.resolve(variants),
                 textAlign: TextAlign.center,
-                maxLines: 2,
+                maxLines: labelMaxLines,
                 overflow: TextOverflow.ellipsis,
-                child: label,
+                child: label ?? Text(labelText!),
               ),
             ),
           ],

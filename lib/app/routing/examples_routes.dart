@@ -28,6 +28,8 @@ final List<AutoRoute> examplesRoutes = [
         path: 'forui/foundation/playground/interaction',
       ),
       AutoRoute(page: GridRoute.page, path: 'admin9/grid'),
+      AutoRoute(page: CarouselRoute.page, path: 'admin9/carousel'),
+      AutoRoute(page: ContentFeedRoute.page, path: 'admin9/content-feed'),
       AutoRoute(page: FormsRoute.page, path: 'forui/forms'),
       AutoRoute(
         page: ButtonsPlaygroundRoute.page,

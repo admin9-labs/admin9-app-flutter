@@ -37,23 +37,67 @@ focused-outline behavior, accessibility semantics, directionality, and
 light/dark states. Flutter layout and platform primitives remain available where
 Forui does not own the capability.
 
-Reusable `A*` APIs live in a responsibility-specific `shared/ui/<category>/`
-location, have a real consumer, documentation, and tests, and receive semantic
-callbacks rather than importing AutoRoute. A Theme-backed default is a typed
+Distributable `A*` APIs live in `packages/admin9_ui/lib/src/<category>/`;
+App-only shared patterns remain in `shared/ui/<category>/`. They have a real
+consumer, documentation, and tests, and receive semantic callbacks rather than importing AutoRoute. A Theme-backed default is a typed
 extension of the existing Forui Theme or widget-style contract, not an `ATheme`
 or parallel token source. Do not create an empty style extension before a real
 Theme contract exists.
 
 The current Examples Showroom demonstrates the official `FTabs` directly. This
 scope does not create `ATabs`, a tabs feasibility experiment, or a shared tabs
-directory. The approved Admin9 brand component in this iteration is AGrid; its
-current implementation and coverage belong in [Upstream Starter](starter.md).
+directory. The approved packaged Admin9 components are AGrid, ACarousel, AFeedCard,
+AAnnouncement and ABanner; their
+current implementations and coverage belong in [Upstream Starter](starter.md).
 AGrid is an icon action grid with a centered icon-and-label stack. Its default
 surface is transparent; callers explicitly choose Theme-owned muted or outlined
 surfaces when needed. Compact semantic badges overlay the top-end corner without
 adding a layout row or moving the centered content. Badges anchor to a fixed,
 transparent icon slot rather than the item border. AGrid does not add a second
 visual well around the icon or accept arbitrary badge colors and Widgets.
+
+### Carousel And Paged Grid Pilot
+
+ACarousel owns horizontal paging, stable item identity, bounded indicators and
+opt-in lifecycle-aware autoplay. Keyboard focus and accessible navigation keep
+paging under user control. Caller-owned decorative children provide image rendering.
+Caption modes are none, a one-line image overlay, or wrapping supporting copy
+below the image. The title uses active Forui body typography; overlay copy uses
+a Forui card surface and foreground for contrast. Indicators, radius, spacing,
+focus and motion derive from the active Forui styles. Hosts explicitly mark
+retained offscreen content inactive. No URL, business destination, cache or
+fullscreen behavior belongs in the package.
+
+AGrid retains its default icon stack, surfaces, badges and state semantics.
+AGridItem.text supplies a measurable full label, optionally using an image in
+the existing icon slot. Narrow width and large text reduce columns; paging
+limits rows and preserves page height. Null rowsPerPage preserves expanded
+layout. The Playground owns image selection, one/two-line selection and paging
+controls; the package owns only their actual presentation behavior.
+
+### Feed, Announcement And Banner Composition
+
+AFeedCard composes text-only, trailing-image, three-image and large-image layouts
+on FCard. Primary copy uses body.md/foreground; metadata uses body.xs2/muted
+foreground. Titles, metadata and caller-owned media markers wrap. Long metadata
+moves below a trailing-image row when it cannot fit beside the cover. Missing
+images degrade the requested layout to a trailing image or text. Image loading,
+media meaning, durations, dates and complete semantic labels belong to the caller.
+
+AAnnouncement fills the gap for multiple announcements with wrapping copy,
+optional vertical autoplay and a manual next button using Forui controls. The
+viewport fits the tallest item at current width and text scale. Plain static
+status messages continue to use FAlert directly.
+
+ABanner exposes stacked images or vertical automatic rotation, with caller-owned
+aspect ratios and optional actions. Vertical drags scroll the parent; rotation
+has semantic paging actions. Both announcements and banners expose all content
+when reduced motion or accessible navigation is enabled. Leaving that expanded
+presentation starts a new rotation at the first item. Within rotation, stable IDs
+retain selection across content updates. The shared internal pager uses the
+existing carousel pause gates and settles interrupted automatic motion before
+resuming with a full interval. Each item has one complete accessible name and
+optional action; decorative children must not contain nested interactive controls.
 
 ## Theme And CLI Ownership
 

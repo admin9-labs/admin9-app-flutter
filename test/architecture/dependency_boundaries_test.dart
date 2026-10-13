@@ -25,6 +25,25 @@ void main() {
     );
   });
 
+  test('Starter consumes only the package public entry point', () {
+    final violations = <String>[];
+    final packageSource =
+        '${Directory('packages/admin9_ui/lib').absolute.path}${Platform.pathSeparator}';
+    for (final root in ['lib', 'test', 'integration_test']) {
+      for (final file in _dartFiles(root)) {
+        for (final directive in _directives(file)) {
+          final resolved = _resolvedProjectPath(file, directive);
+          if ((directive.startsWith('package:admin9_ui/') &&
+                  directive != 'package:admin9_ui/admin9_ui.dart') ||
+              (resolved?.startsWith(packageSource) ?? false)) {
+            violations.add('${file.path}: $directive');
+          }
+        }
+      }
+    }
+    expect(violations, isEmpty);
+  });
+
   test('settings and theme stay independent of Examples', () {
     final violations = <String>[];
     for (final root in ['lib/features/settings', 'lib/theme']) {
@@ -93,5 +112,5 @@ Iterable<String> _directives(File file) sync* {
 
 String? _resolvedProjectPath(File source, String import) {
   if (import.startsWith('dart:') || import.startsWith('package:')) return null;
-  return source.parent.uri.resolve(import).toFilePath();
+  return source.absolute.parent.uri.resolve(import).toFilePath();
 }

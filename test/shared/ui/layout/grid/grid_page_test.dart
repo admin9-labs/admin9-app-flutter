@@ -2,10 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:ui' as ui;
 
+import 'package:admin9_ui/admin9_ui.dart';
 import 'package:admin9_app_flutter/features/examples/presentation/pages/layout/grid/grid_page.dart';
-import 'package:admin9_app_flutter/shared/ui/layout/grid/a_grid.dart';
-import 'package:admin9_app_flutter/shared/ui/layout/grid/a_grid_badge.dart';
-import 'package:admin9_app_flutter/shared/ui/layout/grid/a_grid_item.dart';
 import 'package:admin9_app_flutter/theme/theme.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/widgets.dart';
@@ -24,6 +22,29 @@ void main() {
       await File('assets/translations/zh-CN.json').readAsString(),
     ) as Map<String, dynamic>;
   });
+
+  testWidgets(
+    'image, measurable-label and paging controls change the packaged grid',
+    (tester) async {
+      await _pumpPage(tester);
+      for (final name in ['images', 'compact', 'paged']) {
+        final control = find.byKey(ValueKey('grid-$name'));
+        await tester.ensureVisible(control);
+        await tester.tap(control);
+        await tester.pumpAndSettle();
+      }
+      final grid = tester.widget<AGrid>(find.byType(AGrid));
+      expect(grid.rowsPerPage, 1);
+      expect(grid.children.first.labelMaxLines, 1);
+      expect(grid.children.first.icon, isA<ClipRRect>());
+      final reset = find.byKey(const ValueKey('playground-reset'));
+      await tester.ensureVisible(reset);
+      await tester.tap(reset);
+      await tester.pumpAndSettle();
+      expect(tester.widget<AGrid>(find.byType(AGrid)).rowsPerPage, isNull);
+      expect(tester.takeException(), isNull);
+    },
+  );
 
   testWidgets('renders one complete icon action grid scenario', (tester) async {
     await _pumpPage(tester);

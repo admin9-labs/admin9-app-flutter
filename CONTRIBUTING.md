@@ -43,13 +43,16 @@ flutter pub get --enforce-lockfile
 dart run build_runner build
 git diff --exit-code
 test -z "$(git status --porcelain --untracked-files=all)"
-dart format --output=none --set-exit-if-changed lib test integration_test tool
+dart format --output=none --set-exit-if-changed lib test integration_test tool packages/admin9_ui/lib packages/admin9_ui/test
 dart run tool/check_markdown_links.dart
 flutter analyze
 flutter test
 git diff --check
 ```
 
+Run `flutter analyze` and `flutter test` independently in `packages/admin9_ui/`.
+Check minimum and latest compatible dependencies using the
+[package verification commands](packages/admin9_ui/README.md#verification).
 Run generation drift checks from a clean checkout. Add focused unit or Widget
 tests for changed behavior. Android/iOS builds, simulator checks, signing,
 installation, and physical-device acceptance are separate scopes; report

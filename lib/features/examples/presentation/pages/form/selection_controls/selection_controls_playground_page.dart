@@ -86,9 +86,6 @@ class _SelectionControlsPlaygroundPageState
                   ),
                   value: _updates,
                   enabled: _enabled,
-                  semanticsLabel:
-                      'examples.forms.playgrounds.selection_controls.updates'
-                          .tr(),
                   onChange: (value) => setState(() => _updates = value),
                 ),
                 FCheckbox(
@@ -104,9 +101,6 @@ class _SelectionControlsPlaygroundPageState
                   ),
                   value: _marketing,
                   enabled: _enabled,
-                  semanticsLabel:
-                      'examples.forms.playgrounds.selection_controls.marketing'
-                          .tr(),
                   error: _showError
                       ? Text(
                           'examples.forms.playgrounds.selection_controls.checkbox_error'
@@ -148,8 +142,6 @@ class _SelectionControlsPlaygroundPageState
                     .radio(
                       value: 'important',
                       enabled: false,
-                      semanticsLabel: 'examples.forms.playgrounds.selection_controls.important'
-                          .tr(),
                       label: Text(
                         'examples.forms.playgrounds.selection_controls.important'
                             .tr(),
@@ -175,9 +167,6 @@ class _SelectionControlsPlaygroundPageState
                   children: [
                     .checkbox(
                       value: 'email',
-                      semanticsLabel:
-                          'examples.forms.playgrounds.selection_controls.email'
-                              .tr(),
                       label: Text(
                         'examples.forms.playgrounds.selection_controls.email'
                             .tr(),
@@ -185,9 +174,6 @@ class _SelectionControlsPlaygroundPageState
                     ),
                     .checkbox(
                       value: 'push',
-                      semanticsLabel:
-                          'examples.forms.playgrounds.selection_controls.push'
-                              .tr(),
                       label: Text(
                         'examples.forms.playgrounds.selection_controls.push'
                             .tr(),
@@ -196,9 +182,6 @@ class _SelectionControlsPlaygroundPageState
                     .checkbox(
                       value: 'sms',
                       enabled: false,
-                      semanticsLabel:
-                          'examples.forms.playgrounds.selection_controls.sms'
-                              .tr(),
                       label: Text(
                         'examples.forms.playgrounds.selection_controls.sms'
                             .tr(),
