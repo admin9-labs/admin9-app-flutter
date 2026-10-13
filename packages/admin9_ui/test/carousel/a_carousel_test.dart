@@ -389,6 +389,52 @@ void main() {
     },
   );
 
+  testWidgets('focused arrow paging follows horizontal reading direction', (
+    tester,
+  ) async {
+    for (final direction in TextDirection.values) {
+      final changed = <int>[];
+      await _pump(
+        tester,
+        ACarousel(items: _items([1, 2]), loop: true, onChanged: changed.add),
+        direction: direction,
+      );
+      final focus = tester
+          .widget<Focus>(
+            find
+                .descendant(
+                  of: find
+                      .byWidgetPredicate((widget) => widget is FTappable)
+                      .first,
+                  matching: find.byWidgetPredicate(
+                    (widget) => widget is Focus && widget.focusNode != null,
+                  ),
+                )
+                .first,
+          )
+          .focusNode!;
+      focus.requestFocus();
+      await tester.pump();
+      await tester.sendKeyEvent(
+        direction == TextDirection.ltr
+            ? LogicalKeyboardKey.arrowRight
+            : LogicalKeyboardKey.arrowLeft,
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('图片2'), findsOneWidget);
+      expect(changed, [1]);
+      await tester.sendKeyEvent(
+        direction == TextDirection.ltr
+            ? LogicalKeyboardKey.arrowLeft
+            : LogicalKeyboardKey.arrowRight,
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('图片1'), findsOneWidget);
+      expect(changed, [1, 0]);
+      await tester.pumpWidget(const SizedBox());
+    }
+  });
+
   testWidgets(
     'theme, RTL, large copy and finite indicator window stay readable',
     (tester) async {

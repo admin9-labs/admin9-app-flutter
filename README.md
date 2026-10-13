@@ -119,7 +119,8 @@ images, and other third-party materials remain subject to their own
 
 ## Packaged Admin9 UI
 
-[admin9_ui](packages/admin9_ui/README.md) contains the action grid and horizontal
-carousel. The Starter is a consumer and runnable demonstration; downstream Apps
+[admin9_ui](packages/admin9_ui/README.md) contains the action grid, horizontal
+carousel, feed card, announcement strip and operation banners. The Starter is a
+consumer and runnable demonstration; downstream Apps
 can depend on the package without copying App or business source. admin9_ui is
 a local unpublished package pilot.

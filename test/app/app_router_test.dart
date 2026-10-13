@@ -50,6 +50,7 @@ void main() {
         'forui/feedback',
         'admin9/grid',
         'admin9/carousel',
+        'admin9/content-feed',
       ]),
     );
     expect(

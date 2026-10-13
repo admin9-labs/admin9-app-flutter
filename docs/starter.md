@@ -77,6 +77,9 @@ human visual review, not an automated claim that the result is attractive.
 | --- | --- | --- | --- |
 | AGrid | `packages/admin9_ui/lib/src/grid/` | `/app/components/admin9/grid` | `packages/admin9_ui/test/grid/a_grid_test.dart`, `test/shared/ui/layout/grid/grid_page_test.dart`, and `test/app/theme_resolution_test.dart` |
 | ACarousel | `packages/admin9_ui/lib/src/carousel/` | `/app/components/admin9/carousel` | `packages/admin9_ui/test/carousel/a_carousel_test.dart` and `test/features/examples/carousel_playground_test.dart` |
+| AFeedCard | `packages/admin9_ui/lib/src/feed/` | `/app/components/admin9/content-feed` | `packages/admin9_ui/test/feed/a_feed_card_test.dart` and `test/features/examples/content_feed_playground_test.dart` |
+| AAnnouncement | `packages/admin9_ui/lib/src/announcement/` | `/app/components/admin9/content-feed` | `packages/admin9_ui/test/announcement/a_announcement_test.dart` and `test/features/examples/content_feed_playground_test.dart` |
+| ABanner | `packages/admin9_ui/lib/src/banner/` | `/app/components/admin9/content-feed` | `packages/admin9_ui/test/banner/a_banner_test.dart` and `test/features/examples/content_feed_playground_test.dart` |
 
 ACarousel is the packaged horizontal carousel. Its Playground uses the existing
 licensed onboarding images and configures three caption modes, ratios, autoplay,
@@ -84,6 +87,17 @@ looping, interval and indicators. Swipe/click feedback and reset are observable.
 Package tests own paging/lifecycle behavior; the Playground test owns controls,
 translation, reset and responsive integration. It does not restore downstream
 business modules into the Starter.
+
+The Content Feed Playground combines AFeedCard, AAnnouncement and ABanner in one
+news/operations scenario. It configures four feed layouts or image-count selection,
+0/1/3 caller-owned images, a media marker, notice autoplay, stacked/rotating banners,
+and rotation interval. Item clicks, paging feedback and reset are observable.
+Titles, metadata and announcement copy use Forui semantic body typography and wrap
+without truncating dates or durations. The shared internal pager owns identity,
+focus/lifecycle/visibility pauses and interrupted-motion settling. Banners leave
+vertical scrolling to the parent. Reduced motion and accessible navigation expose
+all banners and announcements. This is a presentation example with local licensed
+assets, not a backend-configured business page or real media player.
 
 The Starter does not define `ATabs`. The Tabs Playground uses Forui `FTabs`
 directly. No `shared/ui/navigation/tabs/` directory, compatibility wrapper, or
@@ -112,7 +126,7 @@ invalidates this ledger and requires a full review.
 
 ### Current Playground Registry
 
-The current implementation has 4 group roots and 18 complete Playgrounds. The
+The current implementation has 4 group roots and 19 complete Playgrounds. The
 registry is the authoritative join between a Playground ID, source Page, typed
 route, translation namespace, focused behavior test, and official capability
 mapping. Multiple official capabilities intentionally share one complete page.
@@ -125,6 +139,7 @@ mapping. Multiple official capabilities intentionally share one complete page.
 | `foundation.interaction` | `foundation/playgrounds/interaction_playground_page.dart` | `/app/components/forui/foundation/playground/interaction` | `examples.foundation.playgrounds.interaction` | `test/features/examples/foundation_playgrounds_test.dart` | C02, WN06, WFD01, WFD02, WFD06 |
 | `foundation.grid` | `layout/grid/grid_page.dart` | `/app/components/admin9/grid` | `examples.foundation.layout.grid.playground` | `test/shared/ui/layout/grid/grid_page_test.dart` | Admin9 AGrid extension |
 | `content.carousel` | `content/carousel/carousel_page.dart` | `/app/components/admin9/carousel` | `examples.admin9.carousel` | `test/features/examples/carousel_playground_test.dart` | Admin9 ACarousel extension |
+| `content.feed` | `content/feed/content_feed_page.dart` | `/app/components/admin9/content-feed` | `examples.admin9.content_feed` | `test/features/examples/content_feed_playground_test.dart` | Admin9 feed, announcement and banner extensions |
 | `forms.buttons` | `form/buttons/buttons_playground_page.dart` | `/app/components/forui/forms/playground/buttons` | `examples.forms.playgrounds.buttons` | `test/features/examples/forms_playgrounds_test.dart` | WF02 |
 | `forms.text_input` | `form/text_input/text_input_playground_page.dart` | `/app/components/forui/forms/playground/text-input` | `examples.forms.playgrounds.text_input` | `test/features/examples/forms_playgrounds_test.dart` | WF01, WF06, WF08, WF15, WF16 |
 | `forms.selection_controls` | `form/selection_controls/selection_controls_playground_page.dart` | `/app/components/forui/forms/playground/selection-controls` | `examples.forms.playgrounds.selection_controls` | `test/features/examples/forms_playgrounds_test.dart` | WF03, WF10, WF11, WF14 |
@@ -140,7 +155,7 @@ mapping. Multiple official capabilities intentionally share one complete page.
 
 The official capability ledger below joins to this registry through Playground
 ID. Documented and excluded entries continue to name their authoritative source
-or rationale directly. AGrid and ACarousel remain in the registry as Admin9 extensions and
+or rationale directly. The packaged Admin9 components remain in the registry as extensions and
 are not counted as part of Forui's 72 official capabilities.
 
 ### Current Capability Ledger
@@ -233,9 +248,9 @@ all `examples.*` and `components.*` translations, and current screenshots or
 acceptance claims. It regenerates AutoRoute output and verifies that removed
 Pages, routes, translation namespaces, and tests have no residual consumer.
 
-Do not remove AGrid with Examples. Retain startup, base Home, Media, Settings,
-Legal, AImageViewer, and every shared pattern they
-still consumes. Re-evaluate any shared pattern that loses its final real
+Do not remove `packages/admin9_ui` with Examples: all five packaged component
+families remain independently maintained. Retain startup, base Home, Media,
+Settings, Legal, AImageViewer, and every shared pattern they still consume. Re-evaluate any shared pattern that loses its final real
 consumer instead of retaining an empty compatibility API.
 
 ## Acceptance Boundary

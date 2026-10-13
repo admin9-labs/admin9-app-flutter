@@ -1,5 +1,5 @@
 name: admin9_ui
-description: Forui-based Admin9 carousel and action grid components.
+description: Forui-based Admin9 grids, carousels, feed cards, announcements and banners.
 version: 0.1.0
 publish_to: none
 environment:

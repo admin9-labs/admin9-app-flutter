@@ -37,9 +37,14 @@ contract is defined only by [Product Startup Flow](product-startup-flow.md).
 
 Components has separate Forui and Admin9 catalogs. Foundation, Forms, Content,
 and Feedback are Forui catalog categories rather than persistent destinations.
-The formal Admin9 component catalog contains two families from `admin9_ui`:
+The formal Admin9 component catalog contains five families from `admin9_ui`:
 `AGrid`, `AGridItem`, `AGridBadge`, and `AGridStyle` form the action-grid family;
 `ACarousel` and `ACarouselItem` form the horizontal-carousel family.
+`AFeedCard` provides four news-content layouts. `AAnnouncement` and
+`AAnnouncementItem` own wrapping copy and optional rotation. `ABanner` and
+`ABannerItem` own stacked images or vertical automatic rotation. These three
+families share one configurable Content Feed Playground. Business models,
+backend configuration, image loading, navigation and media playback stay in Apps.
 
 Every direct Playground must provide a realistic scenario, configuration-driven
 preview, observable interaction feedback, reset behavior, responsive and

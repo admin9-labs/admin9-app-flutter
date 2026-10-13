@@ -262,8 +262,9 @@ void _writeDerivedStarterDocument() {
   File('docs/starter.md').writeAsStringSync('''# Upstream Starter Reference
 
 The removable Examples Feature has been removed from this derived App.
-Startup, Home, Media, Settings, Legal, Theme, persistence, AGrid, and
-AImageViewer remain part of the App baseline. Product-specific authority
+Startup, Home, Media, Settings, Legal, Theme, persistence, and
+AImageViewer remain part of the App baseline. The independently maintained
+admin9_ui package remains available. Product-specific authority
 belongs in this derived repository.
 ''');
 }

@@ -41,10 +41,10 @@ void main() {
     expect(widgets.where((row) => row.coverage == 'excluded'), hasLength(6));
   });
 
-  test('18 Playgrounds join source, route, translation, test, and ledger', () {
-    expect(registry, hasLength(18));
-    expect(registry.map((row) => row.id).toSet(), hasLength(18));
-    expect(registry.map((row) => row.route).toSet(), hasLength(18));
+  test('19 Playgrounds join source, route, translation, test, and ledger', () {
+    expect(registry, hasLength(19));
+    expect(registry.map((row) => row.id).toSet(), hasLength(19));
+    expect(registry.map((row) => row.route).toSet(), hasLength(19));
 
     final routes = _exampleRoutes();
     final translations = Map<String, dynamic>.from(
