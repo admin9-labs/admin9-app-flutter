@@ -9,6 +9,7 @@ import 'package:material_ui/material_ui.dart';
 import 'appearance/app_appearance_preference.dart';
 import 'appearance/app_appearance_provider.dart';
 import 'appearance/app_theme_catalog.dart';
+import '../features/authentication/presentation/providers/authentication_provider.dart';
 import 'routing/app_router.dart';
 import 'routing/app_router.gr.dart';
 import 'startup/startup_state.dart';
@@ -24,6 +25,7 @@ class Admin9App extends ConsumerStatefulWidget {
 class _Admin9AppState extends ConsumerState<Admin9App>
     with WidgetsBindingObserver {
   final AppRouter _router = AppRouter();
+  bool _sessionRestored = false;
 
   @override
   void initState() {
@@ -53,6 +55,14 @@ class _Admin9AppState extends ConsumerState<Admin9App>
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(startupCoordinatorProvider, (previous, next) {
+      if (!_sessionRestored &&
+          next.phase == StartupPhase.ready &&
+          next.accessMode == AccessMode.full) {
+        _sessionRestored = true;
+        unawaited(ref.read(authenticationProvider.notifier).restore());
+      }
+    });
     final preference =
         ref.watch(appAppearanceProvider).value?.preference ??
         AppAppearancePreference.defaults;

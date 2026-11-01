@@ -7,13 +7,20 @@ import 'package:admin9_app_flutter/app/appearance/app_appearance_preference.dart
 import 'package:admin9_app_flutter/app/appearance/app_appearance_provider.dart';
 import 'package:admin9_app_flutter/app/appearance/app_appearance_repository.dart';
 import 'package:admin9_app_flutter/app/appearance/app_theme_catalog.dart';
+import 'package:admin9_app_flutter/app/routing/app_router.gr.dart';
+import 'package:admin9_app_flutter/app/session/session.dart';
 import 'package:admin9_app_flutter/app/startup/startup_provider.dart';
 import 'package:admin9_app_flutter/app/page_configuration/page_configuration.dart';
 import 'package:admin9_app_flutter/app/page_configuration/page_configuration_provider.dart';
 import 'package:admin9_app_flutter/features/settings/presentation/pages/settings_page.dart';
+import 'package:admin9_app_flutter/features/authentication/domain/authentication_gateway.dart';
+import 'package:admin9_app_flutter/features/authentication/presentation/pages/login_page.dart';
+import 'package:admin9_app_flutter/features/authentication/presentation/pages/register_page.dart';
+import 'package:admin9_app_flutter/features/authentication/presentation/providers/authentication_provider.dart';
 import 'package:admin9_app_flutter/features/startup_ad/data/repositories/startup_ad_repository.dart';
 import 'package:admin9_app_flutter/features/startup_ad/presentation/providers/startup_ad_provider.dart';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:forui/forui.dart';
@@ -21,6 +28,7 @@ import 'package:material_ui/material_ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../app/support/test_admin9_app.dart';
+import '../../app/support/test_authentication.dart';
 
 void main() {
   late Map<String, dynamic> translations;
@@ -145,13 +153,153 @@ void main() {
 
     expect(find.text('当前处于有限浏览模式。'), findsOneWidget);
   });
+
+  for (final register in [false, true]) {
+    testWidgets(
+      '${register ? 'registration' : 'login'} returns to Settings after repeated mode switches',
+      (tester) async {
+        await _pumpApp(tester, _FakeRepository(), translations);
+        await _openSettings(tester);
+        final router = tester.element(find.byType(SettingsPage)).router.root;
+        final originalStack = router.stack.map((page) => page.name).toList();
+
+        expect(find.text('未登录'), findsOneWidget);
+        expect(
+          find.byKey(const ValueKey('authentication-logout')),
+          findsNothing,
+        );
+        await tester.tap(find.byKey(const ValueKey('settings-account')));
+        await tester.pumpAndSettle();
+        expect(find.byType(LoginPage), findsOneWidget);
+        for (var i = 0; i < (register ? 5 : 4); i++) {
+          await tester.tap(
+            find.byKey(const ValueKey('authentication-switch-mode')),
+          );
+          await tester.pumpAndSettle();
+          expect(router.stack.length, originalStack.length + 1);
+          expect(
+            router.stack.last.name,
+            i.isEven ? RegisterRoute.name : LoginRoute.name,
+          );
+        }
+
+        await tester.enterText(
+          find.byKey(const ValueKey('authentication-identifier')),
+          'reader@example.com',
+        );
+        await tester.enterText(
+          find.byKey(const ValueKey('authentication-password')),
+          'test-password',
+        );
+        await tester.tap(find.byKey(const ValueKey('authentication-submit')));
+        await tester.pumpAndSettle();
+
+        expect(router.stack.map((page) => page.name), originalStack);
+        expect(find.byType(SettingsPage), findsOneWidget);
+        expect(find.byType(LoginPage), findsNothing);
+        expect(find.byType(RegisterPage), findsNothing);
+        expect(find.text('reader@example.com'), findsOneWidget);
+        expect(find.text('已登录'), findsOneWidget);
+        expect(
+          tester
+              .widget<FItem>(find.byKey(const ValueKey('settings-account')))
+              .onPress,
+          isNull,
+        );
+        expect(find.text('退出登录'), findsOneWidget);
+        await tester.tap(find.byKey(const ValueKey('authentication-logout')));
+        await tester.pumpAndSettle();
+        expect(find.text('未登录'), findsOneWidget);
+        expect(find.text('reader@example.com'), findsNothing);
+        expect(
+          find.byKey(const ValueKey('authentication-logout')),
+          findsNothing,
+        );
+        expect(router.stack.map((page) => page.name), originalStack);
+      },
+    );
+  }
+
+  for (final register in [false, true]) {
+    for (final systemBack in [false, true]) {
+      testWidgets(
+        '${register ? 'registration' : 'login'} ${systemBack ? 'system' : 'header'} back returns to Settings',
+        (tester) async {
+          await _pumpApp(tester, _FakeRepository(), translations);
+          await _openSettings(tester);
+          await tester.tap(find.byKey(const ValueKey('settings-account')));
+          await tester.pumpAndSettle();
+          if (register) {
+            await tester.tap(
+              find.byKey(const ValueKey('authentication-switch-mode')),
+            );
+            await tester.pumpAndSettle();
+          }
+          expect(
+            find.byKey(const ValueKey('authentication-back')),
+            findsOneWidget,
+          );
+          if (systemBack) {
+            expect(await tester.binding.handlePopRoute(), isTrue);
+          } else {
+            await tester.tap(find.byKey(const ValueKey('authentication-back')));
+          }
+          await tester.pumpAndSettle();
+          expect(find.byType(SettingsPage), findsOneWidget);
+          expect(find.text('未登录'), findsOneWidget);
+          expect(find.byType(LoginPage), findsNothing);
+          expect(find.byType(RegisterPage), findsNothing);
+        },
+      );
+    }
+  }
+
+  testWidgets('logout stays disabled while pending and can retry a failure', (
+    tester,
+  ) async {
+    final gateway = _LogoutGateway();
+    await _pumpApp(
+      tester,
+      _FakeRepository(),
+      translations,
+      authenticationGateway: gateway,
+    );
+    await _openSettings(tester);
+    final logout = find.byKey(const ValueKey('authentication-logout'));
+    await tester.tap(logout);
+    await tester.pump();
+    expect(gateway.logoutCalls, 1);
+    expect(find.text('reader@example.com'), findsOneWidget);
+    expect(tester.widget<FItem>(logout).onPress, isNull);
+    expect(
+      tester
+          .widget<FItem>(find.byKey(const ValueKey('settings-account')))
+          .onPress,
+      isNull,
+    );
+    gateway.pending.completeError(StateError('logout failed'));
+    await tester.pumpAndSettle();
+    expect(find.text('退出登录失败，请重试。'), findsOneWidget);
+    expect(find.text('reader@example.com'), findsOneWidget);
+
+    gateway.pending = Completer<void>();
+    await tester.tap(logout);
+    await tester.pump();
+    gateway.pending.complete();
+    await tester.pumpAndSettle();
+    expect(gateway.logoutCalls, 2);
+    expect(find.text('未登录'), findsOneWidget);
+    expect(logout, findsNothing);
+  });
 }
 
 Future<void> _pumpApp(
   WidgetTester tester,
   AppAppearanceRepository repository,
-  Map<String, dynamic> translations,
-) async {
+  Map<String, dynamic> translations, {
+  AuthenticationGateway authenticationGateway =
+      const TestAuthenticationGateway(),
+}) async {
   tester.view
     ..physicalSize = const Size(390, 844)
     ..devicePixelRatio = 1;
@@ -172,6 +320,9 @@ Future<void> _pumpApp(
           ),
           startupAdRepositoryProvider.overrideWithValue(
             const DisabledStartupAdRepository(),
+          ),
+          authenticationGatewayProvider.overrideWithValue(
+            authenticationGateway,
           ),
           pageConfigurationProvider.overrideWith(
             (ref) async => _testPageConfiguration,
@@ -275,4 +426,33 @@ final class _FakeRepository implements AppAppearanceRepository {
     if (pendingSave case final pending?) await pending.future;
     value = preference;
   }
+}
+
+final class _LogoutGateway implements AuthenticationGateway {
+  Completer<void> pending = Completer<void>();
+  int logoutCalls = 0;
+
+  @override
+  Future<SessionSnapshot?> restore() async => const SessionSnapshot(
+    accountId: 'reader',
+    identifier: 'reader@example.com',
+  );
+
+  @override
+  Future<void> logout() {
+    logoutCalls++;
+    return pending.future;
+  }
+
+  @override
+  Future<SessionSnapshot> login({
+    required String identifier,
+    required String password,
+  }) => throw UnimplementedError();
+
+  @override
+  Future<SessionSnapshot> register({
+    required String identifier,
+    required String password,
+  }) => throw UnimplementedError();
 }

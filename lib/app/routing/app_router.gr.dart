@@ -11,14 +11,18 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 
 import 'package:admin9_app_flutter/app/page_configuration/page_configuration.dart'
-    as _i40;
-import 'package:admin9_app_flutter/app/routing/main_destination.dart' as _i44;
-import 'package:admin9_app_flutter/app/routing/main_shell_page.dart' as _i23;
+    as _i42;
+import 'package:admin9_app_flutter/app/routing/main_destination.dart' as _i46;
+import 'package:admin9_app_flutter/app/routing/main_shell_page.dart' as _i24;
 import 'package:admin9_app_flutter/app/routing/page_configuration_shell_page.dart'
-    as _i26;
-import 'package:admin9_app_flutter/app/routing/page_registry_page.dart' as _i27;
-import 'package:admin9_app_flutter/app/routing/startup_gate_page.dart' as _i32;
-import 'package:admin9_app_flutter/app/startup/startup_state.dart' as _i45;
+    as _i27;
+import 'package:admin9_app_flutter/app/routing/page_registry_page.dart' as _i28;
+import 'package:admin9_app_flutter/app/routing/startup_gate_page.dart' as _i34;
+import 'package:admin9_app_flutter/app/startup/startup_state.dart' as _i47;
+import 'package:admin9_app_flutter/features/authentication/presentation/pages/login_page.dart'
+    as _i23;
+import 'package:admin9_app_flutter/features/authentication/presentation/pages/register_page.dart'
+    as _i29;
 import 'package:admin9_app_flutter/features/examples/presentation/pages/catalog/content_page.dart'
     as _i11;
 import 'package:admin9_app_flutter/features/examples/presentation/pages/catalog/feedback_page.dart'
@@ -30,7 +34,7 @@ import 'package:admin9_app_flutter/features/examples/presentation/pages/catalog/
 import 'package:admin9_app_flutter/features/examples/presentation/pages/components_page.dart'
     as _i8;
 import 'package:admin9_app_flutter/features/examples/presentation/pages/concepts/themes/themes_page.dart'
-    as _i34;
+    as _i36;
 import 'package:admin9_app_flutter/features/examples/presentation/pages/content/carousel/carousel_page.dart'
     as _i7;
 import 'package:admin9_app_flutter/features/examples/presentation/pages/content/feed/content_feed_page.dart'
@@ -40,7 +44,7 @@ import 'package:admin9_app_flutter/features/examples/presentation/pages/data/pla
 import 'package:admin9_app_flutter/features/examples/presentation/pages/data/playgrounds/lists_playground_page.dart'
     as _i22;
 import 'package:admin9_app_flutter/features/examples/presentation/pages/data/playgrounds/overview_playground_page.dart'
-    as _i25;
+    as _i26;
 import 'package:admin9_app_flutter/features/examples/presentation/pages/feedback/playgrounds/async_status_playground_page.dart'
     as _i3;
 import 'package:admin9_app_flutter/features/examples/presentation/pages/feedback/playgrounds/confirmation_playground_page.dart'
@@ -50,15 +54,15 @@ import 'package:admin9_app_flutter/features/examples/presentation/pages/feedback
 import 'package:admin9_app_flutter/features/examples/presentation/pages/form/buttons/buttons_playground_page.dart'
     as _i5;
 import 'package:admin9_app_flutter/features/examples/presentation/pages/form/scheduling/scheduling_playground_page.dart'
-    as _i28;
-import 'package:admin9_app_flutter/features/examples/presentation/pages/form/selection_controls/selection_controls_playground_page.dart'
-    as _i29;
-import 'package:admin9_app_flutter/features/examples/presentation/pages/form/selects/selects_playground_page.dart'
     as _i30;
+import 'package:admin9_app_flutter/features/examples/presentation/pages/form/selection_controls/selection_controls_playground_page.dart'
+    as _i31;
+import 'package:admin9_app_flutter/features/examples/presentation/pages/form/selects/selects_playground_page.dart'
+    as _i32;
 import 'package:admin9_app_flutter/features/examples/presentation/pages/form/text_input/text_input_playground_page.dart'
-    as _i33;
-import 'package:admin9_app_flutter/features/examples/presentation/pages/form/value_controls/value_controls_playground_page.dart'
     as _i35;
+import 'package:admin9_app_flutter/features/examples/presentation/pages/form/value_controls/value_controls_playground_page.dart'
+    as _i37;
 import 'package:admin9_app_flutter/features/examples/presentation/pages/foundation/playgrounds/app_shell_playground_page.dart'
     as _i1;
 import 'package:admin9_app_flutter/features/examples/presentation/pages/foundation/playgrounds/interaction_playground_page.dart'
@@ -70,7 +74,7 @@ import 'package:admin9_app_flutter/features/examples/presentation/pages/referenc
 import 'package:admin9_app_flutter/features/home/presentation/pages/home_page.dart'
     as _i17;
 import 'package:admin9_app_flutter/features/legal/domain/legal_document.dart'
-    as _i43;
+    as _i45;
 import 'package:admin9_app_flutter/features/legal/presentation/pages/legal_document_page.dart'
     as _i21;
 import 'package:admin9_app_flutter/features/media/presentation/pages/article_page.dart'
@@ -80,29 +84,29 @@ import 'package:admin9_app_flutter/features/media/presentation/pages/audio_page.
 import 'package:admin9_app_flutter/features/media/presentation/pages/image_viewer_page.dart'
     as _i19;
 import 'package:admin9_app_flutter/features/media/presentation/pages/media_page.dart'
-    as _i24;
+    as _i25;
 import 'package:admin9_app_flutter/features/media/presentation/pages/video_fullscreen_page.dart'
-    as _i36;
+    as _i38;
 import 'package:admin9_app_flutter/features/media/presentation/pages/video_page.dart'
-    as _i37;
+    as _i39;
 import 'package:admin9_app_flutter/features/settings/presentation/pages/settings_page.dart'
-    as _i31;
+    as _i33;
 import 'package:admin9_app_flutter/shared/ui/media/image_viewer/a_image_viewer_item.dart'
-    as _i41;
-import 'package:auto_route/auto_route.dart' as _i38;
-import 'package:collection/collection.dart' as _i42;
-import 'package:flutter/widgets.dart' as _i39;
-import 'package:video_player/video_player.dart' as _i46;
+    as _i43;
+import 'package:auto_route/auto_route.dart' as _i40;
+import 'package:collection/collection.dart' as _i44;
+import 'package:flutter/widgets.dart' as _i41;
+import 'package:video_player/video_player.dart' as _i48;
 
 /// generated route for
 /// [_i1.AppShellPlaygroundPage]
-class AppShellPlaygroundRoute extends _i38.PageRouteInfo<void> {
-  const AppShellPlaygroundRoute({List<_i38.PageRouteInfo>? children})
+class AppShellPlaygroundRoute extends _i40.PageRouteInfo<void> {
+  const AppShellPlaygroundRoute({List<_i40.PageRouteInfo>? children})
     : super(AppShellPlaygroundRoute.name, initialChildren: children);
 
   static const String name = 'AppShellPlaygroundRoute';
 
-  static _i38.PageInfo page = _i38.PageInfo(
+  static _i40.PageInfo page = _i40.PageInfo(
     name,
     builder: (data) {
       return const _i1.AppShellPlaygroundPage();
@@ -112,11 +116,11 @@ class AppShellPlaygroundRoute extends _i38.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i2.ArticlePage]
-class ArticleRoute extends _i38.PageRouteInfo<ArticleRouteArgs> {
+class ArticleRoute extends _i40.PageRouteInfo<ArticleRouteArgs> {
   ArticleRoute({
-    _i39.Key? key,
+    _i41.Key? key,
     required String scenarioId,
-    List<_i38.PageRouteInfo>? children,
+    List<_i40.PageRouteInfo>? children,
   }) : super(
          ArticleRoute.name,
          args: ArticleRouteArgs(key: key, scenarioId: scenarioId),
@@ -125,7 +129,7 @@ class ArticleRoute extends _i38.PageRouteInfo<ArticleRouteArgs> {
 
   static const String name = 'ArticleRoute';
 
-  static _i38.PageInfo page = _i38.PageInfo(
+  static _i40.PageInfo page = _i40.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<ArticleRouteArgs>();
@@ -137,7 +141,7 @@ class ArticleRoute extends _i38.PageRouteInfo<ArticleRouteArgs> {
 class ArticleRouteArgs {
   const ArticleRouteArgs({this.key, required this.scenarioId});
 
-  final _i39.Key? key;
+  final _i41.Key? key;
 
   final String scenarioId;
 
@@ -159,13 +163,13 @@ class ArticleRouteArgs {
 
 /// generated route for
 /// [_i3.AsyncStatusPlaygroundPage]
-class AsyncStatusPlaygroundRoute extends _i38.PageRouteInfo<void> {
-  const AsyncStatusPlaygroundRoute({List<_i38.PageRouteInfo>? children})
+class AsyncStatusPlaygroundRoute extends _i40.PageRouteInfo<void> {
+  const AsyncStatusPlaygroundRoute({List<_i40.PageRouteInfo>? children})
     : super(AsyncStatusPlaygroundRoute.name, initialChildren: children);
 
   static const String name = 'AsyncStatusPlaygroundRoute';
 
-  static _i38.PageInfo page = _i38.PageInfo(
+  static _i40.PageInfo page = _i40.PageInfo(
     name,
     builder: (data) {
       return const _i3.AsyncStatusPlaygroundPage();
@@ -175,11 +179,11 @@ class AsyncStatusPlaygroundRoute extends _i38.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i4.AudioPage]
-class AudioRoute extends _i38.PageRouteInfo<AudioRouteArgs> {
+class AudioRoute extends _i40.PageRouteInfo<AudioRouteArgs> {
   AudioRoute({
-    _i39.Key? key,
+    _i41.Key? key,
     required String scenarioId,
-    List<_i38.PageRouteInfo>? children,
+    List<_i40.PageRouteInfo>? children,
   }) : super(
          AudioRoute.name,
          args: AudioRouteArgs(key: key, scenarioId: scenarioId),
@@ -188,7 +192,7 @@ class AudioRoute extends _i38.PageRouteInfo<AudioRouteArgs> {
 
   static const String name = 'AudioRoute';
 
-  static _i38.PageInfo page = _i38.PageInfo(
+  static _i40.PageInfo page = _i40.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<AudioRouteArgs>();
@@ -200,7 +204,7 @@ class AudioRoute extends _i38.PageRouteInfo<AudioRouteArgs> {
 class AudioRouteArgs {
   const AudioRouteArgs({this.key, required this.scenarioId});
 
-  final _i39.Key? key;
+  final _i41.Key? key;
 
   final String scenarioId;
 
@@ -222,13 +226,13 @@ class AudioRouteArgs {
 
 /// generated route for
 /// [_i5.ButtonsPlaygroundPage]
-class ButtonsPlaygroundRoute extends _i38.PageRouteInfo<void> {
-  const ButtonsPlaygroundRoute({List<_i38.PageRouteInfo>? children})
+class ButtonsPlaygroundRoute extends _i40.PageRouteInfo<void> {
+  const ButtonsPlaygroundRoute({List<_i40.PageRouteInfo>? children})
     : super(ButtonsPlaygroundRoute.name, initialChildren: children);
 
   static const String name = 'ButtonsPlaygroundRoute';
 
-  static _i38.PageInfo page = _i38.PageInfo(
+  static _i40.PageInfo page = _i40.PageInfo(
     name,
     builder: (data) {
       return const _i5.ButtonsPlaygroundPage();
@@ -238,13 +242,13 @@ class ButtonsPlaygroundRoute extends _i38.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i6.CalendarPlaygroundPage]
-class CalendarPlaygroundRoute extends _i38.PageRouteInfo<void> {
-  const CalendarPlaygroundRoute({List<_i38.PageRouteInfo>? children})
+class CalendarPlaygroundRoute extends _i40.PageRouteInfo<void> {
+  const CalendarPlaygroundRoute({List<_i40.PageRouteInfo>? children})
     : super(CalendarPlaygroundRoute.name, initialChildren: children);
 
   static const String name = 'CalendarPlaygroundRoute';
 
-  static _i38.PageInfo page = _i38.PageInfo(
+  static _i40.PageInfo page = _i40.PageInfo(
     name,
     builder: (data) {
       return const _i6.CalendarPlaygroundPage();
@@ -254,13 +258,13 @@ class CalendarPlaygroundRoute extends _i38.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i7.CarouselPage]
-class CarouselRoute extends _i38.PageRouteInfo<void> {
-  const CarouselRoute({List<_i38.PageRouteInfo>? children})
+class CarouselRoute extends _i40.PageRouteInfo<void> {
+  const CarouselRoute({List<_i40.PageRouteInfo>? children})
     : super(CarouselRoute.name, initialChildren: children);
 
   static const String name = 'CarouselRoute';
 
-  static _i38.PageInfo page = _i38.PageInfo(
+  static _i40.PageInfo page = _i40.PageInfo(
     name,
     builder: (data) {
       return const _i7.CarouselPage();
@@ -270,11 +274,11 @@ class CarouselRoute extends _i38.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i8.ComponentsPage]
-class ComponentsRoute extends _i38.PageRouteInfo<ComponentsRouteArgs> {
+class ComponentsRoute extends _i40.PageRouteInfo<ComponentsRouteArgs> {
   ComponentsRoute({
-    _i39.Key? key,
+    _i41.Key? key,
     bool showHeader = true,
-    List<_i38.PageRouteInfo>? children,
+    List<_i40.PageRouteInfo>? children,
   }) : super(
          ComponentsRoute.name,
          args: ComponentsRouteArgs(key: key, showHeader: showHeader),
@@ -283,7 +287,7 @@ class ComponentsRoute extends _i38.PageRouteInfo<ComponentsRouteArgs> {
 
   static const String name = 'ComponentsRoute';
 
-  static _i38.PageInfo page = _i38.PageInfo(
+  static _i40.PageInfo page = _i40.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<ComponentsRouteArgs>(
@@ -297,7 +301,7 @@ class ComponentsRoute extends _i38.PageRouteInfo<ComponentsRouteArgs> {
 class ComponentsRouteArgs {
   const ComponentsRouteArgs({this.key, this.showHeader = true});
 
-  final _i39.Key? key;
+  final _i41.Key? key;
 
   final bool showHeader;
 
@@ -319,13 +323,13 @@ class ComponentsRouteArgs {
 
 /// generated route for
 /// [_i9.ConfirmationPlaygroundPage]
-class ConfirmationPlaygroundRoute extends _i38.PageRouteInfo<void> {
-  const ConfirmationPlaygroundRoute({List<_i38.PageRouteInfo>? children})
+class ConfirmationPlaygroundRoute extends _i40.PageRouteInfo<void> {
+  const ConfirmationPlaygroundRoute({List<_i40.PageRouteInfo>? children})
     : super(ConfirmationPlaygroundRoute.name, initialChildren: children);
 
   static const String name = 'ConfirmationPlaygroundRoute';
 
-  static _i38.PageInfo page = _i38.PageInfo(
+  static _i40.PageInfo page = _i40.PageInfo(
     name,
     builder: (data) {
       return const _i9.ConfirmationPlaygroundPage();
@@ -335,13 +339,13 @@ class ConfirmationPlaygroundRoute extends _i38.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i10.ContentFeedPage]
-class ContentFeedRoute extends _i38.PageRouteInfo<void> {
-  const ContentFeedRoute({List<_i38.PageRouteInfo>? children})
+class ContentFeedRoute extends _i40.PageRouteInfo<void> {
+  const ContentFeedRoute({List<_i40.PageRouteInfo>? children})
     : super(ContentFeedRoute.name, initialChildren: children);
 
   static const String name = 'ContentFeedRoute';
 
-  static _i38.PageInfo page = _i38.PageInfo(
+  static _i40.PageInfo page = _i40.PageInfo(
     name,
     builder: (data) {
       return const _i10.ContentFeedPage();
@@ -351,13 +355,13 @@ class ContentFeedRoute extends _i38.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i11.ContentPage]
-class ContentRoute extends _i38.PageRouteInfo<void> {
-  const ContentRoute({List<_i38.PageRouteInfo>? children})
+class ContentRoute extends _i40.PageRouteInfo<void> {
+  const ContentRoute({List<_i40.PageRouteInfo>? children})
     : super(ContentRoute.name, initialChildren: children);
 
   static const String name = 'ContentRoute';
 
-  static _i38.PageInfo page = _i38.PageInfo(
+  static _i40.PageInfo page = _i40.PageInfo(
     name,
     builder: (data) {
       return const _i11.ContentPage();
@@ -367,13 +371,13 @@ class ContentRoute extends _i38.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i12.ContextualFeedbackPlaygroundPage]
-class ContextualFeedbackPlaygroundRoute extends _i38.PageRouteInfo<void> {
-  const ContextualFeedbackPlaygroundRoute({List<_i38.PageRouteInfo>? children})
+class ContextualFeedbackPlaygroundRoute extends _i40.PageRouteInfo<void> {
+  const ContextualFeedbackPlaygroundRoute({List<_i40.PageRouteInfo>? children})
     : super(ContextualFeedbackPlaygroundRoute.name, initialChildren: children);
 
   static const String name = 'ContextualFeedbackPlaygroundRoute';
 
-  static _i38.PageInfo page = _i38.PageInfo(
+  static _i40.PageInfo page = _i40.PageInfo(
     name,
     builder: (data) {
       return const _i12.ContextualFeedbackPlaygroundPage();
@@ -383,13 +387,13 @@ class ContextualFeedbackPlaygroundRoute extends _i38.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i13.FeedbackPage]
-class FeedbackRoute extends _i38.PageRouteInfo<void> {
-  const FeedbackRoute({List<_i38.PageRouteInfo>? children})
+class FeedbackRoute extends _i40.PageRouteInfo<void> {
+  const FeedbackRoute({List<_i40.PageRouteInfo>? children})
     : super(FeedbackRoute.name, initialChildren: children);
 
   static const String name = 'FeedbackRoute';
 
-  static _i38.PageInfo page = _i38.PageInfo(
+  static _i40.PageInfo page = _i40.PageInfo(
     name,
     builder: (data) {
       return const _i13.FeedbackPage();
@@ -399,13 +403,13 @@ class FeedbackRoute extends _i38.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i14.FormsPage]
-class FormsRoute extends _i38.PageRouteInfo<void> {
-  const FormsRoute({List<_i38.PageRouteInfo>? children})
+class FormsRoute extends _i40.PageRouteInfo<void> {
+  const FormsRoute({List<_i40.PageRouteInfo>? children})
     : super(FormsRoute.name, initialChildren: children);
 
   static const String name = 'FormsRoute';
 
-  static _i38.PageInfo page = _i38.PageInfo(
+  static _i40.PageInfo page = _i40.PageInfo(
     name,
     builder: (data) {
       return const _i14.FormsPage();
@@ -415,13 +419,13 @@ class FormsRoute extends _i38.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i15.FoundationPage]
-class FoundationRoute extends _i38.PageRouteInfo<void> {
-  const FoundationRoute({List<_i38.PageRouteInfo>? children})
+class FoundationRoute extends _i40.PageRouteInfo<void> {
+  const FoundationRoute({List<_i40.PageRouteInfo>? children})
     : super(FoundationRoute.name, initialChildren: children);
 
   static const String name = 'FoundationRoute';
 
-  static _i38.PageInfo page = _i38.PageInfo(
+  static _i40.PageInfo page = _i40.PageInfo(
     name,
     builder: (data) {
       return const _i15.FoundationPage();
@@ -431,13 +435,13 @@ class FoundationRoute extends _i38.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i16.GridPage]
-class GridRoute extends _i38.PageRouteInfo<void> {
-  const GridRoute({List<_i38.PageRouteInfo>? children})
+class GridRoute extends _i40.PageRouteInfo<void> {
+  const GridRoute({List<_i40.PageRouteInfo>? children})
     : super(GridRoute.name, initialChildren: children);
 
   static const String name = 'GridRoute';
 
-  static _i38.PageInfo page = _i38.PageInfo(
+  static _i40.PageInfo page = _i40.PageInfo(
     name,
     builder: (data) {
       return const _i16.GridPage();
@@ -447,12 +451,12 @@ class GridRoute extends _i38.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i17.HomePage]
-class HomeRoute extends _i38.PageRouteInfo<HomeRouteArgs> {
+class HomeRoute extends _i40.PageRouteInfo<HomeRouteArgs> {
   HomeRoute({
-    _i39.Key? key,
+    _i41.Key? key,
     bool showHeader = true,
-    _i40.PageDefinition? definition,
-    List<_i38.PageRouteInfo>? children,
+    _i42.PageDefinition? definition,
+    List<_i40.PageRouteInfo>? children,
   }) : super(
          HomeRoute.name,
          args: HomeRouteArgs(
@@ -465,7 +469,7 @@ class HomeRoute extends _i38.PageRouteInfo<HomeRouteArgs> {
 
   static const String name = 'HomeRoute';
 
-  static _i38.PageInfo page = _i38.PageInfo(
+  static _i40.PageInfo page = _i40.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<HomeRouteArgs>(
@@ -483,11 +487,11 @@ class HomeRoute extends _i38.PageRouteInfo<HomeRouteArgs> {
 class HomeRouteArgs {
   const HomeRouteArgs({this.key, this.showHeader = true, this.definition});
 
-  final _i39.Key? key;
+  final _i41.Key? key;
 
   final bool showHeader;
 
-  final _i40.PageDefinition? definition;
+  final _i42.PageDefinition? definition;
 
   @override
   String toString() {
@@ -509,13 +513,13 @@ class HomeRouteArgs {
 
 /// generated route for
 /// [_i18.IconsPage]
-class IconsRoute extends _i38.PageRouteInfo<void> {
-  const IconsRoute({List<_i38.PageRouteInfo>? children})
+class IconsRoute extends _i40.PageRouteInfo<void> {
+  const IconsRoute({List<_i40.PageRouteInfo>? children})
     : super(IconsRoute.name, initialChildren: children);
 
   static const String name = 'IconsRoute';
 
-  static _i38.PageInfo page = _i38.PageInfo(
+  static _i40.PageInfo page = _i40.PageInfo(
     name,
     builder: (data) {
       return const _i18.IconsPage();
@@ -525,12 +529,12 @@ class IconsRoute extends _i38.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i19.ImageViewerPage]
-class ImageViewerRoute extends _i38.PageRouteInfo<ImageViewerRouteArgs> {
+class ImageViewerRoute extends _i40.PageRouteInfo<ImageViewerRouteArgs> {
   ImageViewerRoute({
-    _i39.Key? key,
-    required List<_i41.AImageViewerItem> items,
+    _i41.Key? key,
+    required List<_i43.AImageViewerItem> items,
     required int initialIndex,
-    List<_i38.PageRouteInfo>? children,
+    List<_i40.PageRouteInfo>? children,
   }) : super(
          ImageViewerRoute.name,
          args: ImageViewerRouteArgs(
@@ -543,7 +547,7 @@ class ImageViewerRoute extends _i38.PageRouteInfo<ImageViewerRouteArgs> {
 
   static const String name = 'ImageViewerRoute';
 
-  static _i38.PageInfo page = _i38.PageInfo(
+  static _i40.PageInfo page = _i40.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<ImageViewerRouteArgs>();
@@ -563,9 +567,9 @@ class ImageViewerRouteArgs {
     required this.initialIndex,
   });
 
-  final _i39.Key? key;
+  final _i41.Key? key;
 
-  final List<_i41.AImageViewerItem> items;
+  final List<_i43.AImageViewerItem> items;
 
   final int initialIndex;
 
@@ -579,7 +583,7 @@ class ImageViewerRouteArgs {
     if (identical(this, other)) return true;
     if (other is! ImageViewerRouteArgs) return false;
     return key == other.key &&
-        const _i42.ListEquality<_i41.AImageViewerItem>().equals(
+        const _i44.ListEquality<_i43.AImageViewerItem>().equals(
           items,
           other.items,
         ) &&
@@ -589,19 +593,19 @@ class ImageViewerRouteArgs {
   @override
   int get hashCode =>
       key.hashCode ^
-      const _i42.ListEquality<_i41.AImageViewerItem>().hash(items) ^
+      const _i44.ListEquality<_i43.AImageViewerItem>().hash(items) ^
       initialIndex.hashCode;
 }
 
 /// generated route for
 /// [_i20.InteractionPlaygroundPage]
-class InteractionPlaygroundRoute extends _i38.PageRouteInfo<void> {
-  const InteractionPlaygroundRoute({List<_i38.PageRouteInfo>? children})
+class InteractionPlaygroundRoute extends _i40.PageRouteInfo<void> {
+  const InteractionPlaygroundRoute({List<_i40.PageRouteInfo>? children})
     : super(InteractionPlaygroundRoute.name, initialChildren: children);
 
   static const String name = 'InteractionPlaygroundRoute';
 
-  static _i38.PageInfo page = _i38.PageInfo(
+  static _i40.PageInfo page = _i40.PageInfo(
     name,
     builder: (data) {
       return const _i20.InteractionPlaygroundPage();
@@ -611,11 +615,11 @@ class InteractionPlaygroundRoute extends _i38.PageRouteInfo<void> {
 
 /// generated route for
 /// [_i21.LegalDocumentPage]
-class LegalDocumentRoute extends _i38.PageRouteInfo<LegalDocumentRouteArgs> {
+class LegalDocumentRoute extends _i40.PageRouteInfo<LegalDocumentRouteArgs> {
   LegalDocumentRoute({
-    _i39.Key? key,
-    required _i43.LegalDocument document,
-    List<_i38.PageRouteInfo>? children,
+    _i41.Key? key,
+    required _i45.LegalDocument document,
+    List<_i40.PageRouteInfo>? children,
   }) : super(
          LegalDocumentRoute.name,
          args: LegalDocumentRouteArgs(key: key, document: document),
@@ -624,7 +628,7 @@ class LegalDocumentRoute extends _i38.PageRouteInfo<LegalDocumentRouteArgs> {
 
   static const String name = 'LegalDocumentRoute';
 
-  static _i38.PageInfo page = _i38.PageInfo(
+  static _i40.PageInfo page = _i40.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<LegalDocumentRouteArgs>();
@@ -636,9 +640,9 @@ class LegalDocumentRoute extends _i38.PageRouteInfo<LegalDocumentRouteArgs> {
 class LegalDocumentRouteArgs {
   const LegalDocumentRouteArgs({this.key, required this.document});
 
-  final _i39.Key? key;
+  final _i41.Key? key;
 
-  final _i43.LegalDocument document;
+  final _i45.LegalDocument document;
 
   @override
   String toString() {
@@ -658,13 +662,13 @@ class LegalDocumentRouteArgs {
 
 /// generated route for
 /// [_i22.ListsPlaygroundPage]
-class ListsPlaygroundRoute extends _i38.PageRouteInfo<void> {
-  const ListsPlaygroundRoute({List<_i38.PageRouteInfo>? children})
+class ListsPlaygroundRoute extends _i40.PageRouteInfo<void> {
+  const ListsPlaygroundRoute({List<_i40.PageRouteInfo>? children})
     : super(ListsPlaygroundRoute.name, initialChildren: children);
 
   static const String name = 'ListsPlaygroundRoute';
 
-  static _i38.PageInfo page = _i38.PageInfo(
+  static _i40.PageInfo page = _i40.PageInfo(
     name,
     builder: (data) {
       return const _i22.ListsPlaygroundPage();
@@ -673,12 +677,28 @@ class ListsPlaygroundRoute extends _i38.PageRouteInfo<void> {
 }
 
 /// generated route for
-/// [_i23.MainShellPage]
-class MainShellRoute extends _i38.PageRouteInfo<MainShellRouteArgs> {
+/// [_i23.LoginPage]
+class LoginRoute extends _i40.PageRouteInfo<void> {
+  const LoginRoute({List<_i40.PageRouteInfo>? children})
+    : super(LoginRoute.name, initialChildren: children);
+
+  static const String name = 'LoginRoute';
+
+  static _i40.PageInfo page = _i40.PageInfo(
+    name,
+    builder: (data) {
+      return const _i23.LoginPage();
+    },
+  );
+}
+
+/// generated route for
+/// [_i24.MainShellPage]
+class MainShellRoute extends _i40.PageRouteInfo<MainShellRouteArgs> {
   MainShellRoute({
-    _i39.Key? key,
-    _i44.MainDestination initialDestination = _i44.MainDestination.home,
-    List<_i38.PageRouteInfo>? children,
+    _i41.Key? key,
+    _i46.MainDestination initialDestination = _i46.MainDestination.home,
+    List<_i40.PageRouteInfo>? children,
   }) : super(
          MainShellRoute.name,
          args: MainShellRouteArgs(
@@ -690,13 +710,13 @@ class MainShellRoute extends _i38.PageRouteInfo<MainShellRouteArgs> {
 
   static const String name = 'MainShellRoute';
 
-  static _i38.PageInfo page = _i38.PageInfo(
+  static _i40.PageInfo page = _i40.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<MainShellRouteArgs>(
         orElse: () => const MainShellRouteArgs(),
       );
-      return _i23.MainShellPage(
+      return _i24.MainShellPage(
         key: args.key,
         initialDestination: args.initialDestination,
       );
@@ -707,12 +727,12 @@ class MainShellRoute extends _i38.PageRouteInfo<MainShellRouteArgs> {
 class MainShellRouteArgs {
   const MainShellRouteArgs({
     this.key,
-    this.initialDestination = _i44.MainDestination.home,
+    this.initialDestination = _i46.MainDestination.home,
   });
 
-  final _i39.Key? key;
+  final _i41.Key? key;
 
-  final _i44.MainDestination initialDestination;
+  final _i46.MainDestination initialDestination;
 
   @override
   String toString() {
@@ -731,12 +751,12 @@ class MainShellRouteArgs {
 }
 
 /// generated route for
-/// [_i24.MediaPage]
-class MediaRoute extends _i38.PageRouteInfo<MediaRouteArgs> {
+/// [_i25.MediaPage]
+class MediaRoute extends _i40.PageRouteInfo<MediaRouteArgs> {
   MediaRoute({
-    _i39.Key? key,
+    _i41.Key? key,
     bool showHeader = true,
-    List<_i38.PageRouteInfo>? children,
+    List<_i40.PageRouteInfo>? children,
   }) : super(
          MediaRoute.name,
          args: MediaRouteArgs(key: key, showHeader: showHeader),
@@ -745,13 +765,13 @@ class MediaRoute extends _i38.PageRouteInfo<MediaRouteArgs> {
 
   static const String name = 'MediaRoute';
 
-  static _i38.PageInfo page = _i38.PageInfo(
+  static _i40.PageInfo page = _i40.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<MediaRouteArgs>(
         orElse: () => const MediaRouteArgs(),
       );
-      return _i24.MediaPage(key: args.key, showHeader: args.showHeader);
+      return _i25.MediaPage(key: args.key, showHeader: args.showHeader);
     },
   );
 }
@@ -759,7 +779,7 @@ class MediaRoute extends _i38.PageRouteInfo<MediaRouteArgs> {
 class MediaRouteArgs {
   const MediaRouteArgs({this.key, this.showHeader = true});
 
-  final _i39.Key? key;
+  final _i41.Key? key;
 
   final bool showHeader;
 
@@ -780,29 +800,29 @@ class MediaRouteArgs {
 }
 
 /// generated route for
-/// [_i25.OverviewPlaygroundPage]
-class OverviewPlaygroundRoute extends _i38.PageRouteInfo<void> {
-  const OverviewPlaygroundRoute({List<_i38.PageRouteInfo>? children})
+/// [_i26.OverviewPlaygroundPage]
+class OverviewPlaygroundRoute extends _i40.PageRouteInfo<void> {
+  const OverviewPlaygroundRoute({List<_i40.PageRouteInfo>? children})
     : super(OverviewPlaygroundRoute.name, initialChildren: children);
 
   static const String name = 'OverviewPlaygroundRoute';
 
-  static _i38.PageInfo page = _i38.PageInfo(
+  static _i40.PageInfo page = _i40.PageInfo(
     name,
     builder: (data) {
-      return const _i25.OverviewPlaygroundPage();
+      return const _i26.OverviewPlaygroundPage();
     },
   );
 }
 
 /// generated route for
-/// [_i26.PageConfigurationShellPage]
+/// [_i27.PageConfigurationShellPage]
 class PageConfigurationShellRoute
-    extends _i38.PageRouteInfo<PageConfigurationShellRouteArgs> {
+    extends _i40.PageRouteInfo<PageConfigurationShellRouteArgs> {
   PageConfigurationShellRoute({
     required String pageId,
-    _i39.Key? key,
-    List<_i38.PageRouteInfo>? children,
+    _i41.Key? key,
+    List<_i40.PageRouteInfo>? children,
   }) : super(
          PageConfigurationShellRoute.name,
          args: PageConfigurationShellRouteArgs(pageId: pageId, key: key),
@@ -812,7 +832,7 @@ class PageConfigurationShellRoute
 
   static const String name = 'PageConfigurationShellRoute';
 
-  static _i38.PageInfo page = _i38.PageInfo(
+  static _i40.PageInfo page = _i40.PageInfo(
     name,
     builder: (data) {
       final pathParams = data.inheritedPathParams;
@@ -821,7 +841,7 @@ class PageConfigurationShellRoute
           pageId: pathParams.getString('pageId'),
         ),
       );
-      return _i26.PageConfigurationShellPage(
+      return _i27.PageConfigurationShellPage(
         pageId: args.pageId,
         key: args.key,
       );
@@ -834,7 +854,7 @@ class PageConfigurationShellRouteArgs {
 
   final String pageId;
 
-  final _i39.Key? key;
+  final _i41.Key? key;
 
   @override
   String toString() {
@@ -853,9 +873,9 @@ class PageConfigurationShellRouteArgs {
 }
 
 /// generated route for
-/// [_i27.PageRegistryPage]
-class PageRegistryRoute extends _i38.PageRouteInfo<PageRegistryRouteArgs> {
-  PageRegistryRoute({_i39.Key? key, List<_i38.PageRouteInfo>? children})
+/// [_i28.PageRegistryPage]
+class PageRegistryRoute extends _i40.PageRouteInfo<PageRegistryRouteArgs> {
+  PageRegistryRoute({_i41.Key? key, List<_i40.PageRouteInfo>? children})
     : super(
         PageRegistryRoute.name,
         args: PageRegistryRouteArgs(key: key),
@@ -864,14 +884,14 @@ class PageRegistryRoute extends _i38.PageRouteInfo<PageRegistryRouteArgs> {
 
   static const String name = 'PageRegistryRoute';
 
-  static _i38.PageInfo page = _i38.PageInfo(
+  static _i40.PageInfo page = _i40.PageInfo(
     name,
     builder: (data) {
       final pathParams = data.inheritedPathParams;
       final args = data.argsAs<PageRegistryRouteArgs>(
         orElse: () => PageRegistryRouteArgs(),
       );
-      return _i27.PageRegistryPage(
+      return _i28.PageRegistryPage(
         pageId: pathParams.getString('pageId'),
         key: args.key,
       );
@@ -882,7 +902,7 @@ class PageRegistryRoute extends _i38.PageRouteInfo<PageRegistryRouteArgs> {
 class PageRegistryRouteArgs {
   const PageRegistryRouteArgs({this.key});
 
-  final _i39.Key? key;
+  final _i41.Key? key;
 
   @override
   String toString() {
@@ -901,61 +921,77 @@ class PageRegistryRouteArgs {
 }
 
 /// generated route for
-/// [_i28.SchedulingPlaygroundPage]
-class SchedulingPlaygroundRoute extends _i38.PageRouteInfo<void> {
-  const SchedulingPlaygroundRoute({List<_i38.PageRouteInfo>? children})
+/// [_i29.RegisterPage]
+class RegisterRoute extends _i40.PageRouteInfo<void> {
+  const RegisterRoute({List<_i40.PageRouteInfo>? children})
+    : super(RegisterRoute.name, initialChildren: children);
+
+  static const String name = 'RegisterRoute';
+
+  static _i40.PageInfo page = _i40.PageInfo(
+    name,
+    builder: (data) {
+      return const _i29.RegisterPage();
+    },
+  );
+}
+
+/// generated route for
+/// [_i30.SchedulingPlaygroundPage]
+class SchedulingPlaygroundRoute extends _i40.PageRouteInfo<void> {
+  const SchedulingPlaygroundRoute({List<_i40.PageRouteInfo>? children})
     : super(SchedulingPlaygroundRoute.name, initialChildren: children);
 
   static const String name = 'SchedulingPlaygroundRoute';
 
-  static _i38.PageInfo page = _i38.PageInfo(
+  static _i40.PageInfo page = _i40.PageInfo(
     name,
     builder: (data) {
-      return const _i28.SchedulingPlaygroundPage();
+      return const _i30.SchedulingPlaygroundPage();
     },
   );
 }
 
 /// generated route for
-/// [_i29.SelectionControlsPlaygroundPage]
-class SelectionControlsPlaygroundRoute extends _i38.PageRouteInfo<void> {
-  const SelectionControlsPlaygroundRoute({List<_i38.PageRouteInfo>? children})
+/// [_i31.SelectionControlsPlaygroundPage]
+class SelectionControlsPlaygroundRoute extends _i40.PageRouteInfo<void> {
+  const SelectionControlsPlaygroundRoute({List<_i40.PageRouteInfo>? children})
     : super(SelectionControlsPlaygroundRoute.name, initialChildren: children);
 
   static const String name = 'SelectionControlsPlaygroundRoute';
 
-  static _i38.PageInfo page = _i38.PageInfo(
+  static _i40.PageInfo page = _i40.PageInfo(
     name,
     builder: (data) {
-      return const _i29.SelectionControlsPlaygroundPage();
+      return const _i31.SelectionControlsPlaygroundPage();
     },
   );
 }
 
 /// generated route for
-/// [_i30.SelectsPlaygroundPage]
-class SelectsPlaygroundRoute extends _i38.PageRouteInfo<void> {
-  const SelectsPlaygroundRoute({List<_i38.PageRouteInfo>? children})
+/// [_i32.SelectsPlaygroundPage]
+class SelectsPlaygroundRoute extends _i40.PageRouteInfo<void> {
+  const SelectsPlaygroundRoute({List<_i40.PageRouteInfo>? children})
     : super(SelectsPlaygroundRoute.name, initialChildren: children);
 
   static const String name = 'SelectsPlaygroundRoute';
 
-  static _i38.PageInfo page = _i38.PageInfo(
+  static _i40.PageInfo page = _i40.PageInfo(
     name,
     builder: (data) {
-      return const _i30.SelectsPlaygroundPage();
+      return const _i32.SelectsPlaygroundPage();
     },
   );
 }
 
 /// generated route for
-/// [_i31.SettingsPage]
-class SettingsRoute extends _i38.PageRouteInfo<SettingsRouteArgs> {
+/// [_i33.SettingsPage]
+class SettingsRoute extends _i40.PageRouteInfo<SettingsRouteArgs> {
   SettingsRoute({
-    _i39.Key? key,
+    _i41.Key? key,
     bool showHeader = true,
-    _i40.PageDefinition? definition,
-    List<_i38.PageRouteInfo>? children,
+    _i42.PageDefinition? definition,
+    List<_i40.PageRouteInfo>? children,
   }) : super(
          SettingsRoute.name,
          args: SettingsRouteArgs(
@@ -968,13 +1004,13 @@ class SettingsRoute extends _i38.PageRouteInfo<SettingsRouteArgs> {
 
   static const String name = 'SettingsRoute';
 
-  static _i38.PageInfo page = _i38.PageInfo(
+  static _i40.PageInfo page = _i40.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<SettingsRouteArgs>(
         orElse: () => const SettingsRouteArgs(),
       );
-      return _i31.SettingsPage(
+      return _i33.SettingsPage(
         key: args.key,
         showHeader: args.showHeader,
         definition: args.definition,
@@ -986,11 +1022,11 @@ class SettingsRoute extends _i38.PageRouteInfo<SettingsRouteArgs> {
 class SettingsRouteArgs {
   const SettingsRouteArgs({this.key, this.showHeader = true, this.definition});
 
-  final _i39.Key? key;
+  final _i41.Key? key;
 
   final bool showHeader;
 
-  final _i40.PageDefinition? definition;
+  final _i42.PageDefinition? definition;
 
   @override
   String toString() {
@@ -1011,14 +1047,14 @@ class SettingsRouteArgs {
 }
 
 /// generated route for
-/// [_i32.StartupGatePage]
-class StartupGateRoute extends _i38.PageRouteInfo<StartupGateRouteArgs> {
+/// [_i34.StartupGatePage]
+class StartupGateRoute extends _i40.PageRouteInfo<StartupGateRouteArgs> {
   StartupGateRoute({
-    _i39.Key? key,
-    _i45.LaunchReason launchReason = _i45.LaunchReason.icon,
+    _i41.Key? key,
+    _i47.LaunchReason launchReason = _i47.LaunchReason.icon,
     String? initialPath,
     bool reviewPrivacy = false,
-    List<_i38.PageRouteInfo>? children,
+    List<_i40.PageRouteInfo>? children,
   }) : super(
          StartupGateRoute.name,
          args: StartupGateRouteArgs(
@@ -1032,13 +1068,13 @@ class StartupGateRoute extends _i38.PageRouteInfo<StartupGateRouteArgs> {
 
   static const String name = 'StartupGateRoute';
 
-  static _i38.PageInfo page = _i38.PageInfo(
+  static _i40.PageInfo page = _i40.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<StartupGateRouteArgs>(
         orElse: () => const StartupGateRouteArgs(),
       );
-      return _i32.StartupGatePage(
+      return _i34.StartupGatePage(
         key: args.key,
         launchReason: args.launchReason,
         initialPath: args.initialPath,
@@ -1051,14 +1087,14 @@ class StartupGateRoute extends _i38.PageRouteInfo<StartupGateRouteArgs> {
 class StartupGateRouteArgs {
   const StartupGateRouteArgs({
     this.key,
-    this.launchReason = _i45.LaunchReason.icon,
+    this.launchReason = _i47.LaunchReason.icon,
     this.initialPath,
     this.reviewPrivacy = false,
   });
 
-  final _i39.Key? key;
+  final _i41.Key? key;
 
-  final _i45.LaunchReason launchReason;
+  final _i47.LaunchReason launchReason;
 
   final String? initialPath;
 
@@ -1088,62 +1124,62 @@ class StartupGateRouteArgs {
 }
 
 /// generated route for
-/// [_i33.TextInputPlaygroundPage]
-class TextInputPlaygroundRoute extends _i38.PageRouteInfo<void> {
-  const TextInputPlaygroundRoute({List<_i38.PageRouteInfo>? children})
+/// [_i35.TextInputPlaygroundPage]
+class TextInputPlaygroundRoute extends _i40.PageRouteInfo<void> {
+  const TextInputPlaygroundRoute({List<_i40.PageRouteInfo>? children})
     : super(TextInputPlaygroundRoute.name, initialChildren: children);
 
   static const String name = 'TextInputPlaygroundRoute';
 
-  static _i38.PageInfo page = _i38.PageInfo(
+  static _i40.PageInfo page = _i40.PageInfo(
     name,
     builder: (data) {
-      return const _i33.TextInputPlaygroundPage();
+      return const _i35.TextInputPlaygroundPage();
     },
   );
 }
 
 /// generated route for
-/// [_i34.ThemesPage]
-class ThemesRoute extends _i38.PageRouteInfo<void> {
-  const ThemesRoute({List<_i38.PageRouteInfo>? children})
+/// [_i36.ThemesPage]
+class ThemesRoute extends _i40.PageRouteInfo<void> {
+  const ThemesRoute({List<_i40.PageRouteInfo>? children})
     : super(ThemesRoute.name, initialChildren: children);
 
   static const String name = 'ThemesRoute';
 
-  static _i38.PageInfo page = _i38.PageInfo(
+  static _i40.PageInfo page = _i40.PageInfo(
     name,
     builder: (data) {
-      return const _i34.ThemesPage();
+      return const _i36.ThemesPage();
     },
   );
 }
 
 /// generated route for
-/// [_i35.ValueControlsPlaygroundPage]
-class ValueControlsPlaygroundRoute extends _i38.PageRouteInfo<void> {
-  const ValueControlsPlaygroundRoute({List<_i38.PageRouteInfo>? children})
+/// [_i37.ValueControlsPlaygroundPage]
+class ValueControlsPlaygroundRoute extends _i40.PageRouteInfo<void> {
+  const ValueControlsPlaygroundRoute({List<_i40.PageRouteInfo>? children})
     : super(ValueControlsPlaygroundRoute.name, initialChildren: children);
 
   static const String name = 'ValueControlsPlaygroundRoute';
 
-  static _i38.PageInfo page = _i38.PageInfo(
+  static _i40.PageInfo page = _i40.PageInfo(
     name,
     builder: (data) {
-      return const _i35.ValueControlsPlaygroundPage();
+      return const _i37.ValueControlsPlaygroundPage();
     },
   );
 }
 
 /// generated route for
-/// [_i36.VideoFullscreenPage]
+/// [_i38.VideoFullscreenPage]
 class VideoFullscreenRoute
-    extends _i38.PageRouteInfo<VideoFullscreenRouteArgs> {
+    extends _i40.PageRouteInfo<VideoFullscreenRouteArgs> {
   VideoFullscreenRoute({
-    _i39.Key? key,
-    required _i46.VideoPlayerController controller,
+    _i41.Key? key,
+    required _i48.VideoPlayerController controller,
     required String title,
-    List<_i38.PageRouteInfo>? children,
+    List<_i40.PageRouteInfo>? children,
   }) : super(
          VideoFullscreenRoute.name,
          args: VideoFullscreenRouteArgs(
@@ -1156,11 +1192,11 @@ class VideoFullscreenRoute
 
   static const String name = 'VideoFullscreenRoute';
 
-  static _i38.PageInfo page = _i38.PageInfo(
+  static _i40.PageInfo page = _i40.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<VideoFullscreenRouteArgs>();
-      return _i36.VideoFullscreenPage(
+      return _i38.VideoFullscreenPage(
         key: args.key,
         controller: args.controller,
         title: args.title,
@@ -1176,9 +1212,9 @@ class VideoFullscreenRouteArgs {
     required this.title,
   });
 
-  final _i39.Key? key;
+  final _i41.Key? key;
 
-  final _i46.VideoPlayerController controller;
+  final _i48.VideoPlayerController controller;
 
   final String title;
 
@@ -1201,12 +1237,12 @@ class VideoFullscreenRouteArgs {
 }
 
 /// generated route for
-/// [_i37.VideoPage]
-class VideoRoute extends _i38.PageRouteInfo<VideoRouteArgs> {
+/// [_i39.VideoPage]
+class VideoRoute extends _i40.PageRouteInfo<VideoRouteArgs> {
   VideoRoute({
-    _i39.Key? key,
+    _i41.Key? key,
     required String scenarioId,
-    List<_i38.PageRouteInfo>? children,
+    List<_i40.PageRouteInfo>? children,
   }) : super(
          VideoRoute.name,
          args: VideoRouteArgs(key: key, scenarioId: scenarioId),
@@ -1215,11 +1251,11 @@ class VideoRoute extends _i38.PageRouteInfo<VideoRouteArgs> {
 
   static const String name = 'VideoRoute';
 
-  static _i38.PageInfo page = _i38.PageInfo(
+  static _i40.PageInfo page = _i40.PageInfo(
     name,
     builder: (data) {
       final args = data.argsAs<VideoRouteArgs>();
-      return _i37.VideoPage(key: args.key, scenarioId: args.scenarioId);
+      return _i39.VideoPage(key: args.key, scenarioId: args.scenarioId);
     },
   );
 }
@@ -1227,7 +1263,7 @@ class VideoRoute extends _i38.PageRouteInfo<VideoRouteArgs> {
 class VideoRouteArgs {
   const VideoRouteArgs({this.key, required this.scenarioId});
 
-  final _i39.Key? key;
+  final _i41.Key? key;
 
   final String scenarioId;
 
