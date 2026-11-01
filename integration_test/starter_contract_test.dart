@@ -543,7 +543,8 @@ final class _DeviceFixture {
   Directory? _directory;
   MockClient? _client;
   bool _authentication = false;
-  bool _accountsWereAbsent = false;
+  String? _originalSecureAccounts;
+  String? _originalLegacyAccounts;
   bool _surfaceConverted = false;
   late StartupAdCache cache;
   late StartupAdCampaign campaign;
@@ -567,14 +568,15 @@ final class _DeviceFixture {
       _original[key] = await preferences.getString(key);
     }
     if (firstLaunch) {
-      final accounts = await secureStorage.read(
+      _originalSecureAccounts = await secureStorage.read(
         key: LocalAuthenticationGateway.accountsKey,
       );
-      _accountsWereAbsent =
-          accounts == null &&
-          await preferences.getString(LocalAuthenticationGateway.accountsKey) ==
-              null;
-      if (accounts != null) expect(jsonDecode(accounts), isA<List<dynamic>>());
+      _originalLegacyAccounts = await preferences.getString(
+        LocalAuthenticationGateway.accountsKey,
+      );
+      if (_originalSecureAccounts != null) {
+        expect(jsonDecode(_originalSecureAccounts!), isA<List<dynamic>>());
+      }
       _authentication = true;
       await SharedPreferencesSessionStore(preferences).clear();
     }
@@ -761,27 +763,23 @@ final class _DeviceFixture {
   Future<void> dispose() async {
     try {
       if (_authentication) {
-        final value = await secureStorage.read(
-          key: LocalAuthenticationGateway.accountsKey,
-        );
-        if (value != null) {
-          final accounts = jsonDecode(value) as List<dynamic>;
-          final count = accounts.length;
-          accounts.removeWhere(
-            (account) => account is Map && account['identifier'] == identifier,
+        if (_originalSecureAccounts == null) {
+          await secureStorage.delete(
+            key: LocalAuthenticationGateway.accountsKey,
           );
-          if (accounts.length != count) {
-            if (accounts.isEmpty && _accountsWereAbsent) {
-              await secureStorage.delete(
-                key: LocalAuthenticationGateway.accountsKey,
-              );
-            } else {
-              await secureStorage.write(
-                key: LocalAuthenticationGateway.accountsKey,
-                value: jsonEncode(accounts),
-              );
-            }
-          }
+        } else {
+          await secureStorage.write(
+            key: LocalAuthenticationGateway.accountsKey,
+            value: _originalSecureAccounts!,
+          );
+        }
+        if (_originalLegacyAccounts == null) {
+          await preferences.remove(LocalAuthenticationGateway.accountsKey);
+        } else {
+          await preferences.setString(
+            LocalAuthenticationGateway.accountsKey,
+            _originalLegacyAccounts!,
+          );
         }
       }
     } finally {
