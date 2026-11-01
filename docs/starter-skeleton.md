@@ -87,10 +87,13 @@ production advertising deployment.
 
 The authentication flow is guest-first. `AuthenticationGateway` and
 `SessionStore` are provider-neutral ports. The Starter wires a local account
-implementation backed by `SharedPreferencesAsync` so registration, login,
-logout and session restoration can be exercised without a server. It is a
-development implementation; a product replaces the gateway and store before
-using production credentials.
+implementation so registration, login, logout and session restoration can be
+exercised without a server. Account records are stored in platform-backed secure
+storage; non-secret session metadata uses `SharedPreferencesAsync`. Legacy local
+account records are migrated into secure storage after consent. Limited browsing
+hides account actions and clears the session. This is a development
+implementation; a product replaces the gateway and store before using production
+credentials.
 
 SMS, Apple, WeChat, carrier, Laravel and member-profile integrations are
 product responsibilities and are outside this Starter.

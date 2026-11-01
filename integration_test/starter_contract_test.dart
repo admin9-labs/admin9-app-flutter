@@ -33,6 +33,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:forui/forui.dart';
 import 'package:http/http.dart' as http;
@@ -533,6 +534,7 @@ final class _DeviceFixture {
 
   final IntegrationTestWidgetsFlutterBinding binding;
   final preferences = SharedPreferencesAsync();
+  final secureStorage = const FlutterSecureStorage();
   final identifier =
       'starter-it-${DateTime.now().microsecondsSinceEpoch}@example.invalid';
   final _original = <String, String?>{};
@@ -565,10 +567,13 @@ final class _DeviceFixture {
       _original[key] = await preferences.getString(key);
     }
     if (firstLaunch) {
-      final accounts = await preferences.getString(
-        LocalAuthenticationGateway.accountsKey,
+      final accounts = await secureStorage.read(
+        key: LocalAuthenticationGateway.accountsKey,
       );
-      _accountsWereAbsent = accounts == null;
+      _accountsWereAbsent =
+          accounts == null &&
+          await preferences.getString(LocalAuthenticationGateway.accountsKey) ==
+              null;
       if (accounts != null) expect(jsonDecode(accounts), isA<List<dynamic>>());
       _authentication = true;
       await SharedPreferencesSessionStore(preferences).clear();
@@ -756,8 +761,8 @@ final class _DeviceFixture {
   Future<void> dispose() async {
     try {
       if (_authentication) {
-        final value = await preferences.getString(
-          LocalAuthenticationGateway.accountsKey,
+        final value = await secureStorage.read(
+          key: LocalAuthenticationGateway.accountsKey,
         );
         if (value != null) {
           final accounts = jsonDecode(value) as List<dynamic>;
@@ -767,11 +772,13 @@ final class _DeviceFixture {
           );
           if (accounts.length != count) {
             if (accounts.isEmpty && _accountsWereAbsent) {
-              await preferences.remove(LocalAuthenticationGateway.accountsKey);
+              await secureStorage.delete(
+                key: LocalAuthenticationGateway.accountsKey,
+              );
             } else {
-              await preferences.setString(
-                LocalAuthenticationGateway.accountsKey,
-                jsonEncode(accounts),
+              await secureStorage.write(
+                key: LocalAuthenticationGateway.accountsKey,
+                value: jsonEncode(accounts),
               );
             }
           }
