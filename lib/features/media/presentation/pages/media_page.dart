@@ -10,14 +10,16 @@ import '../providers/media_scenario_provider.dart';
 
 @RoutePage()
 class MediaPage extends ConsumerWidget {
-  const MediaPage({super.key});
+  const MediaPage({super.key, this.showHeader = true});
+
+  final bool showHeader;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final catalog = ref.watch(mediaScenarioRepositoryProvider).load();
     return Column(
       children: [
-        FHeader(title: Text(context.tr('media.title'))),
+        if (showHeader) FHeader(title: Text(context.tr('media.title'))),
         Expanded(
           child: ResponsivePageBody(
             safeAreaBottom: false,

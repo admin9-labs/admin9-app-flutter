@@ -245,7 +245,7 @@ String _code(String cell) => RegExp(r'`([^`]+)`').firstMatch(cell)!.group(1)!;
 String _normalize(String url) => url.replaceFirst(RegExp(r'\.md$'), '');
 
 Map<String, String> _exampleRoutes() => {
-  for (final route in examplesRoutes.single.children!)
+  for (final route in examplesRoutes)
     route.path.isEmpty ? '/app/components' : '/app/components/${route.path}':
         route.name,
 };

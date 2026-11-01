@@ -555,5 +555,9 @@
   "examples.admin9.content_feed.media_badge": "显示媒体标记",
   "examples.admin9.content_feed.notice_autoplay": "公告自动轮换",
   "examples.admin9.content_feed.banner_rotating": "Banner 纵向自动切换",
-  "examples.admin9.content_feed.interval": "切换间隔：{seconds} 秒"
+  "examples.admin9.content_feed.interval": "切换间隔：{seconds} 秒",
+  "page_configuration.error_title": "页面配置错误",
+  "page_configuration.error_body": "请检查本地页面配置，修正后重新构建应用。",
+  "page_configuration.unknown_page": "未注册的页面：{}",
+  "page_configuration.empty": "暂无内容"
 }

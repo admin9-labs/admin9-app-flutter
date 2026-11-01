@@ -1,3 +1,6 @@
+import 'package:admin9_app_flutter/app/page_configuration/page_configuration.dart';
+import 'package:admin9_app_flutter/app/page_configuration/page_configuration_provider.dart';
+
 import 'dart:convert';
 import 'dart:io';
 
@@ -21,6 +24,8 @@ Future<void> pumpTestAdmin9App(
   AppAppearanceRepository? repository,
   StartupPreferencesRepository? startupRepository,
   StartupAdRepository? startupAdRepository,
+  PageConfiguration? pageConfiguration,
+  Object? configurationError,
   Size size = const Size(390, 844),
   double textScale = 1,
 }) async {
@@ -47,14 +52,25 @@ Future<void> pumpTestAdmin9App(
       saveLocale: false,
       child: ProviderScope(
         overrides: [
+          pageConfigurationProvider.overrideWith((ref) async {
+            if (configurationError != null) throw configurationError;
+            return pageConfiguration ??
+                PageConfiguration.fromJson(
+                  jsonDecode(
+                    File('assets/config/page_configuration.json')
+                        .readAsStringSync(),
+                  ),
+                )!;
+          }),
           appAppearanceRepositoryProvider.overrideWithValue(
             repository ?? FakeAppAppearanceRepository(),
           ),
           startupPreferencesRepositoryProvider.overrideWithValue(
             startupRepository ?? FakeCompletedStartupRepository(),
           ),
-          if (startupAdRepository != null)
-            startupAdRepositoryProvider.overrideWithValue(startupAdRepository),
+          startupAdRepositoryProvider.overrideWithValue(
+            startupAdRepository ?? const DisabledStartupAdRepository(),
+          ),
         ],
         child: const Admin9App(),
       ),

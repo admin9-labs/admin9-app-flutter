@@ -1,0 +1,55 @@
+{
+  "schemaVersion": 1,
+  "revision": 1,
+  "navigation": [
+    {
+      "pageId": "home",
+      "pageType": "home",
+      "label": "首页",
+      "icon": "home"
+    },
+    {
+      "pageId": "components",
+      "pageType": "components",
+      "label": "组件",
+      "icon": "blocks"
+    },
+    {
+      "pageId": "media",
+      "pageType": "media",
+      "label": "媒体",
+      "icon": "play"
+    },
+    {
+      "pageId": "settings",
+      "pageType": "settings",
+      "label": "设置",
+      "icon": "settings"
+    }
+  ],
+  "pages": [
+    {
+      "pageId": "home",
+      "pageType": "home",
+      "title": "首页",
+      "actions": [
+        "open_settings"
+      ]
+    },
+    {
+      "pageId": "components",
+      "pageType": "components",
+      "title": "组件"
+    },
+    {
+      "pageId": "media",
+      "pageType": "media",
+      "title": "媒体"
+    },
+    {
+      "pageId": "settings",
+      "pageType": "settings",
+      "title": "设置"
+    }
+  ]
+}

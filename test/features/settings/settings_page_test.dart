@@ -8,7 +8,11 @@ import 'package:admin9_app_flutter/app/appearance/app_appearance_provider.dart';
 import 'package:admin9_app_flutter/app/appearance/app_appearance_repository.dart';
 import 'package:admin9_app_flutter/app/appearance/app_theme_catalog.dart';
 import 'package:admin9_app_flutter/app/startup/startup_provider.dart';
+import 'package:admin9_app_flutter/app/page_configuration/page_configuration.dart';
+import 'package:admin9_app_flutter/app/page_configuration/page_configuration_provider.dart';
 import 'package:admin9_app_flutter/features/settings/presentation/pages/settings_page.dart';
+import 'package:admin9_app_flutter/features/startup_ad/data/repositories/startup_ad_repository.dart';
+import 'package:admin9_app_flutter/features/startup_ad/presentation/providers/startup_ad_provider.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -123,7 +127,7 @@ void main() {
     expect(repository.loadCalls, 2);
   });
 
-  testWidgets('withdraws privacy consent and reports the real cache size', (
+  testWidgets('withdraws privacy consent and reports cache size', (
     tester,
   ) async {
     await _pumpApp(tester, _FakeRepository(), translations);
@@ -166,13 +170,70 @@ Future<void> _pumpApp(
           startupPreferencesRepositoryProvider.overrideWithValue(
             FakeCompletedStartupRepository(),
           ),
+          startupAdRepositoryProvider.overrideWithValue(
+            const DisabledStartupAdRepository(),
+          ),
+          pageConfigurationProvider.overrideWith(
+            (ref) async => _testPageConfiguration,
+          ),
         ],
         child: const Admin9App(),
       ),
     ),
   );
-  await tester.pumpAndSettle();
+  for (
+    var i = 0;
+    i < 50 && find.byType(FBottomNavigationBar).evaluate().isEmpty;
+    i++
+  ) {
+    await tester.pump(const Duration(milliseconds: 100));
+  }
 }
+
+const _testPageConfiguration = PageConfiguration(
+  schemaVersion: 1,
+  revision: 1,
+  navigation: [
+    NavigationEntry(
+      pageId: 'home',
+      pageType: 'home',
+      label: '首页',
+      icon: 'home',
+    ),
+    NavigationEntry(
+      pageId: 'components',
+      pageType: 'components',
+      label: '组件',
+      icon: 'blocks',
+    ),
+    NavigationEntry(
+      pageId: 'media',
+      pageType: 'media',
+      label: '媒体',
+      icon: 'play',
+    ),
+    NavigationEntry(
+      pageId: 'settings',
+      pageType: 'settings',
+      label: '设置',
+      icon: 'settings',
+    ),
+  ],
+  pages: {
+    'home': PageDefinition(pageId: 'home', pageType: 'home', title: '首页'),
+    'components': PageDefinition(
+      pageId: 'components',
+      pageType: 'components',
+      title: '组件',
+    ),
+    'media': PageDefinition(pageId: 'media', pageType: 'media', title: '媒体'),
+    'settings': PageDefinition(
+      pageId: 'settings',
+      pageType: 'settings',
+      title: '设置',
+    ),
+  },
+);
 
 final class _InMemoryAssetLoader extends AssetLoader {
   const _InMemoryAssetLoader(this.translations);

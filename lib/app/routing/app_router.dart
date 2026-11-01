@@ -7,9 +7,6 @@ import 'examples_routes.dart';
 // examples:end
 import 'media_routes.dart';
 
-const homeTab = EmptyShellRoute('HomeTab');
-const settingsTab = EmptyShellRoute('SettingsTab');
-
 @AutoRouterConfig()
 final class AppRouter extends RootStackRouter {
   @override
@@ -26,20 +23,15 @@ final class AppRouter extends RootStackRouter {
       transitionsBuilder: _mainShellTransition,
       children: [
         AutoRoute(
-          page: homeTab.page,
-          path: 'home',
-          initial: true,
-          children: [AutoRoute(page: HomeRoute.page, path: '', initial: true)],
-        ),
-        // examples:begin
-        ...examplesRoutes,
-        // examples:end
-        ...mediaRoutes,
-        AutoRoute(
-          page: settingsTab.page,
-          path: 'settings',
+          page: PageConfigurationShellRoute.page,
+          path: ':pageId',
+          usesPathAsKey: true,
           children: [
-            AutoRoute(page: SettingsRoute.page, path: '', initial: true),
+            AutoRoute(page: PageRegistryRoute.page, path: '', initial: true),
+            // examples:begin
+            ...examplesRoutes,
+            // examples:end
+            ...mediaRoutes,
           ],
         ),
       ],

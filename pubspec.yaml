@@ -45,6 +45,7 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
+    - assets/config/page_configuration.json
     - assets/images/brand/
     - assets/images/onboarding/
     - assets/media/

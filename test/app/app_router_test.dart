@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:admin9_app_flutter/app/routing/app_router.dart';
 import 'package:admin9_app_flutter/app/routing/app_router.gr.dart';
 import 'package:admin9_app_flutter/app/routing/examples_routes.dart';
-import 'package:admin9_app_flutter/app/routing/media_routes.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -28,19 +27,10 @@ void main() {
       (route) => route.name == MainShellRoute.name,
     );
     expect(shell.path, '/app');
-    expect(shell.children?.map((route) => route.path), [
-      'home',
-      'components',
-      'media',
-      'settings',
-    ]);
-    expect(shell.children?.map((route) => route.name), [
-      homeTab.name,
-      componentsTab.name,
-      mediaTab.name,
-      settingsTab.name,
-    ]);
-    expect(examplesRoutes, hasLength(1));
+    expect(shell.children!.single.path, ':pageId');
+    expect(shell.children!.single.usesPathAsKey, isTrue);
+    expect(shell.children!.single.children!.first.page, PageRegistryRoute.page);
+    expect(examplesRoutes, isNotEmpty);
     expect(
       _flatten(examplesRoutes).map((route) => route.path),
       containsAll([

@@ -7,12 +7,14 @@ import 'package:forui/forui.dart';
 
 @RoutePage()
 class ComponentsPage extends StatelessWidget {
-  const ComponentsPage({super.key});
+  const ComponentsPage({super.key, this.showHeader = true});
+
+  final bool showHeader;
 
   @override
   Widget build(BuildContext context) => Column(
     children: [
-      FHeader(title: Text(context.tr('components.title'))),
+      if (showHeader) FHeader(title: Text(context.tr('components.title'))),
       Expanded(
         child: ResponsivePageBody(
           safeAreaBottom: false,
