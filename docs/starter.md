@@ -1,5 +1,9 @@
 # Upstream Starter Reference
 
+The reusable startup, local page configuration, navigation, Settings and
+provider-neutral account skeleton is documented in
+[Starter Skeleton](starter-skeleton.md).
+
 ## Authority And Derivation
 
 This document defines the Admin9 UI Showroom bundled with the upstream Flutter

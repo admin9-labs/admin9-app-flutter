@@ -1,0 +1,46 @@
+{
+  "runtimeCommit": "8da073f794345af46bb888f5dafda43afdc72777",
+  "date": "2026-11-01",
+  "android": {
+    "model": "M2007J22C",
+    "os": "Android 11 / API 30",
+    "businessTests": 7,
+    "frameworkCount": 9,
+    "hostResult": {
+      "exit": 0,
+      "fired": true,
+      "errors": []
+    },
+    "videoOutcome": "validated_static_fallback",
+    "releaseProcessRestart": "passed"
+  },
+  "ios": {
+    "model": "iPhone 17 Pro Max",
+    "os": "iOS 27.0.1",
+    "businessTests": 7,
+    "frameworkCount": 9,
+    "hostResult": {
+      "exit": 0,
+      "fired": true,
+      "errors": []
+    },
+    "videoOutcome": "playing_muted_then_unmuted",
+    "releaseProcessRestart": "passed"
+  },
+  "binarySha256": {
+    "build/app/outputs/flutter-apk/app-release.apk": "1b8af0bb6a068401e03b608213a0bcfc14347461cb4b00a353bf00d359d5c308",
+    "build/ios/iphoneos/Runner.app/Runner": "643037e438c9c2f22fef23718915aa0db350560e5488736b8c521acf65e5460f",
+    "build/ios/iphoneos/Runner.app/Frameworks/App.framework/App": "9a70af5cedfc97b811483c4c2c48a3e5f05ae4c1db9cebf81b7d9f7b506ea662"
+  },
+  "evidenceSha256": {
+    "android-background-resume-home.png": "23addee6d31c599b4fe0276249a210b651a1fe45a6f9e2ed95635e5cca477727",
+    "android-registered-settings.png": "b7d1bdb3423cd91ea8db47a05d4db68a9414e8726c2c7fb51ed374ec6e75a7f0",
+    "android-release-session-restored.png": "4e542000224b17d2dd1d14391881850c7a40f721ffc772a91b4d42f525e72d94",
+    "android-video-deadline-fallback.png": "f6288090641c006d225624c77cfc08f7b1adc9073c63d2187c0f17b0216ab23b",
+    "ios-background-resume-home.png": "8193c59105210d868ad177617f55fdfcb20d09265f166f16f19de3d1f0b3fc37",
+    "ios-registered-settings.png": "65d59718096fbcdf5ee04761b6cb83c914e92aba7666ac1d43f2947893de9263",
+    "ios-release-session-restored.jpg": "5c17393864b5176bdd6408ec84d0724af06e75617c74bfefafda5741d6f163f0",
+    "ios-video-unmuted.png": "63e5df8158c3bc4b7d14ba96c9504c23f0f4f5c28a6b6f47721542330a483651",
+    "runtime-source-sha256.json": "e58a1e84e16cfcf0030f6c3fa34ba0991b2566915ed94b7964b2b32a73234e68"
+  }
+}
