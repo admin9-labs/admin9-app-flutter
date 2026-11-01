@@ -5,6 +5,8 @@ const _blockFiles = [
   'lib/app/routing/app_router.dart',
   'lib/app/routing/main_destination.dart',
   'lib/app/routing/main_shell_page.dart',
+  'lib/app/routing/page_registry_page.dart',
+  'lib/app/page_configuration/page_configuration.dart',
   'lib/app/routing/startup_gate_page.dart',
   'lib/app/startup/startup_state.dart',
   'lib/features/home/presentation/pages/home_page.dart',
@@ -55,6 +57,7 @@ Future<void> main(List<String> arguments) async {
     _stripOwnedBlocks(File(path));
   }
   _removeTranslations();
+  _removeConfiguredExamples();
   _moveStartupFixtureToMedia();
   _writeDerivedRouterTest();
   _writeDerivedNavigationTest();
@@ -155,6 +158,25 @@ void _removeTranslations() {
   );
 }
 
+void _removeConfiguredExamples() {
+  final file = File('assets/config/page_configuration.json');
+  final value = jsonDecode(file.readAsStringSync()) as Map<String, dynamic>;
+  for (final key in ['navigation', 'pages']) {
+    (value[key] as List<dynamic>).removeWhere(
+      (entry) => entry['pageType'] == 'components',
+    );
+  }
+  for (final page in value['pages'] as List<dynamic>) {
+    (page['regions'] as Map<String, dynamic>?)?.remove('components');
+    for (final tab in page['tabs'] as List<dynamic>? ?? []) {
+      (tab['regions'] as Map<String, dynamic>?)?.remove('components');
+    }
+  }
+  file.writeAsStringSync(
+    '${const JsonEncoder.withIndent('  ').convert(value)}\n',
+  );
+}
+
 void _moveStartupFixtureToMedia() {
   final fixture = File('test/fixtures/startup_ad/campaign.json');
   final json = jsonDecode(fixture.readAsStringSync()) as Map<String, dynamic>;
@@ -185,7 +207,6 @@ void _writeDerivedRouterTest() {
   File('test/app/app_router_test.dart').writeAsStringSync(
     r'''import 'package:admin9_app_flutter/app/routing/app_router.dart';
 import 'package:admin9_app_flutter/app/routing/app_router.gr.dart';
-import 'package:admin9_app_flutter/app/routing/media_routes.dart';
 import 'dart:io';
 
 import 'package:auto_route/auto_route.dart';
@@ -202,16 +223,9 @@ void main() {
     final shell = router.routes.singleWhere(
       (route) => route.name == MainShellRoute.name,
     );
-    expect(shell.children?.map((route) => route.path), [
-      'home',
-      'media',
-      'settings',
-    ]);
-    expect(shell.children?.map((route) => route.name), [
-      homeTab.name,
-      mediaTab.name,
-      settingsTab.name,
-    ]);
+    expect(shell.children!.single.path, ':pageId');
+    expect(shell.children!.single.usesPathAsKey, isTrue);
+    expect(shell.children!.single.children!.first.page, PageRegistryRoute.page);
     expect(
       File('lib/app/routing/app_router.gr.dart').readAsStringSync(),
       isNot(contains('ComponentsRoute')),

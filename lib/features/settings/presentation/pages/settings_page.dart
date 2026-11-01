@@ -4,6 +4,7 @@ import 'package:admin9_app_flutter/app/routing/app_router.gr.dart';
 import 'package:admin9_app_flutter/app/startup/startup_provider.dart';
 import 'package:admin9_app_flutter/app/startup/startup_state.dart';
 import 'package:admin9_app_flutter/features/legal/domain/legal_document.dart';
+import 'package:admin9_app_flutter/app/page_configuration/page_configuration.dart';
 import 'package:admin9_app_flutter/features/startup_ad/presentation/providers/startup_ad_provider.dart';
 import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -18,14 +19,17 @@ import '../../../../shared/ui/responsive_page_body.dart';
 
 @RoutePage()
 class SettingsPage extends ConsumerWidget {
-  const SettingsPage({super.key});
+  const SettingsPage({super.key, this.showHeader = true, this.definition});
+
+  final bool showHeader;
+  final PageDefinition? definition;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final appearance = ref.watch(appAppearanceProvider);
     return Column(
       children: [
-        FHeader(title: Text(context.tr('settings.title'))),
+        if (showHeader) FHeader(title: Text(context.tr('settings.title'))),
         Expanded(
           child: appearance.when(
             data: (state) =>
@@ -51,58 +55,60 @@ class SettingsPage extends ConsumerWidget {
     bool saving,
   ) => ResponsivePageBody(
     children: [
-      ComponentExampleSection(
-        title: context.tr('settings.theme_mode'),
-        description: context.tr('settings.theme_description'),
-        child: _ChoiceGroup<AppBrightnessPreference>(
-          groupKey: 'settings-brightness',
-          enabled: !saving,
-          value: preference.brightness,
-          values: AppBrightnessPreference.values,
-          label: _brightnessLabel,
-          onChanged: (value) =>
-              _save(context, ref, preference.copyWith(brightness: value)),
+      if (definition?.shows('appearance') ?? true) ...[
+        ComponentExampleSection(
+          title: context.tr('settings.theme_mode'),
+          description: context.tr('settings.theme_description'),
+          child: _ChoiceGroup<AppBrightnessPreference>(
+            groupKey: 'settings-brightness',
+            enabled: !saving,
+            value: preference.brightness,
+            values: AppBrightnessPreference.values,
+            label: _brightnessLabel,
+            onChanged: (value) =>
+                _save(context, ref, preference.copyWith(brightness: value)),
+          ),
         ),
-      ),
-      ComponentExampleSection(
-        title: context.tr('settings.theme_preset'),
-        description: context.tr('settings.theme_preset_description'),
-        child: _ChoiceGroup<AppThemePreset>(
-          groupKey: 'settings-preset',
-          enabled: !saving,
-          value: preference.preset,
-          values: AppThemePreset.values,
-          label: _presetLabel,
-          onChanged: (value) =>
-              _save(context, ref, preference.copyWith(preset: value)),
+        ComponentExampleSection(
+          title: context.tr('settings.theme_preset'),
+          description: context.tr('settings.theme_preset_description'),
+          child: _ChoiceGroup<AppThemePreset>(
+            groupKey: 'settings-preset',
+            enabled: !saving,
+            value: preference.preset,
+            values: AppThemePreset.values,
+            label: _presetLabel,
+            onChanged: (value) =>
+                _save(context, ref, preference.copyWith(preset: value)),
+          ),
         ),
-      ),
-      ComponentExampleSection(
-        title: context.tr('settings.font_size'),
-        description: context.tr('settings.font_size_description'),
-        child: _ChoiceGroup<AppFontSizePreference>(
-          groupKey: 'settings-font-size',
-          enabled: !saving,
-          value: preference.fontSize,
-          values: AppFontSizePreference.values,
-          label: _fontSizeLabel,
-          onChanged: (value) =>
-              _save(context, ref, preference.copyWith(fontSize: value)),
+        ComponentExampleSection(
+          title: context.tr('settings.font_size'),
+          description: context.tr('settings.font_size_description'),
+          child: _ChoiceGroup<AppFontSizePreference>(
+            groupKey: 'settings-font-size',
+            enabled: !saving,
+            value: preference.fontSize,
+            values: AppFontSizePreference.values,
+            label: _fontSizeLabel,
+            onChanged: (value) =>
+                _save(context, ref, preference.copyWith(fontSize: value)),
+          ),
         ),
-      ),
-      ComponentExampleSection(
-        title: context.tr('settings.theme_radius'),
-        description: context.tr('settings.theme_radius_description'),
-        child: _ChoiceGroup<AppRadiusPreference>(
-          groupKey: 'settings-radius',
-          enabled: !saving,
-          value: preference.radius,
-          values: AppRadiusPreference.values,
-          label: _radiusLabel,
-          onChanged: (value) =>
-              _save(context, ref, preference.copyWith(radius: value)),
+        ComponentExampleSection(
+          title: context.tr('settings.theme_radius'),
+          description: context.tr('settings.theme_radius_description'),
+          child: _ChoiceGroup<AppRadiusPreference>(
+            groupKey: 'settings-radius',
+            enabled: !saving,
+            value: preference.radius,
+            values: AppRadiusPreference.values,
+            label: _radiusLabel,
+            onChanged: (value) =>
+                _save(context, ref, preference.copyWith(radius: value)),
+          ),
         ),
-      ),
+      ],
       const _PrivacyAndCacheSettings(),
       FButton(
         key: const ValueKey('settings-reset'),

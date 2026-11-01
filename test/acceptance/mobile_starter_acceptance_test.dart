@@ -6,6 +6,8 @@ import 'package:admin9_app_flutter/app/appearance/app_appearance_preference.dart
 import 'package:admin9_app_flutter/app/appearance/app_appearance_provider.dart';
 import 'package:admin9_app_flutter/app/appearance/app_appearance_repository.dart';
 import 'package:admin9_app_flutter/app/appearance/app_theme_catalog.dart';
+import 'package:admin9_app_flutter/app/page_configuration/page_configuration.dart';
+import 'package:admin9_app_flutter/app/page_configuration/page_configuration_provider.dart';
 import 'package:admin9_app_flutter/app/routing/main_shell_page.dart';
 import 'package:admin9_app_flutter/app/startup/startup_provider.dart';
 import 'package:admin9_app_flutter/features/examples/presentation/pages/catalog/content_page.dart';
@@ -16,6 +18,8 @@ import 'package:admin9_app_flutter/features/examples/presentation/pages/concepts
 import 'package:admin9_app_flutter/features/examples/presentation/pages/feedback/playgrounds/async_status_playground_page.dart';
 import 'package:admin9_app_flutter/features/examples/presentation/pages/feedback/playgrounds/confirmation_playground_page.dart';
 import 'package:admin9_app_flutter/features/settings/presentation/pages/settings_page.dart';
+import 'package:admin9_app_flutter/features/startup_ad/data/repositories/startup_ad_repository.dart';
+import 'package:admin9_app_flutter/features/startup_ad/presentation/providers/startup_ad_provider.dart';
 import 'package:admin9_app_flutter/shared/ui/responsive_page_body.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -408,17 +412,75 @@ Future<void> _pumpStarter(
           startupPreferencesRepositoryProvider.overrideWithValue(
             FakeCompletedStartupRepository(),
           ),
+          startupAdRepositoryProvider.overrideWithValue(
+            const DisabledStartupAdRepository(),
+          ),
+          pageConfigurationProvider.overrideWith(
+            (ref) async => _testPageConfiguration,
+          ),
         ],
         child: const Admin9App(),
       ),
     ),
   );
-  await tester.pumpAndSettle();
+  for (
+    var i = 0;
+    i < 50 &&
+        find.byKey(const ValueKey('home-open-components')).evaluate().isEmpty;
+    i++
+  ) {
+    await tester.pump(const Duration(milliseconds: 100));
+  }
   await tester.tap(find.byKey(const ValueKey('home-open-components')));
   await tester.pumpAndSettle();
   await tester.tap(find.byKey(const ValueKey('components-forui-foundation')));
   await tester.pumpAndSettle();
 }
+
+const _testPageConfiguration = PageConfiguration(
+  schemaVersion: 1,
+  revision: 1,
+  navigation: [
+    NavigationEntry(
+      pageId: 'home',
+      pageType: 'home',
+      label: '首页',
+      icon: 'home',
+    ),
+    NavigationEntry(
+      pageId: 'components',
+      pageType: 'components',
+      label: '组件',
+      icon: 'blocks',
+    ),
+    NavigationEntry(
+      pageId: 'media',
+      pageType: 'media',
+      label: '媒体',
+      icon: 'play',
+    ),
+    NavigationEntry(
+      pageId: 'settings',
+      pageType: 'settings',
+      label: '设置',
+      icon: 'settings',
+    ),
+  ],
+  pages: {
+    'home': PageDefinition(pageId: 'home', pageType: 'home', title: '首页'),
+    'components': PageDefinition(
+      pageId: 'components',
+      pageType: 'components',
+      title: '组件',
+    ),
+    'media': PageDefinition(pageId: 'media', pageType: 'media', title: '媒体'),
+    'settings': PageDefinition(
+      pageId: 'settings',
+      pageType: 'settings',
+      title: '设置',
+    ),
+  },
+);
 
 Future<void> _selectDestination(WidgetTester tester, String label) async {
   if (const {'基础', '表单', '内容', '反馈'}.contains(label)) {

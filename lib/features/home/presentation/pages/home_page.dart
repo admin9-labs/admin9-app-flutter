@@ -1,6 +1,7 @@
 import 'package:admin9_app_flutter/app/routing/app_router.gr.dart';
 import 'package:admin9_app_flutter/app/app_metadata.dart';
-import 'package:admin9_app_flutter/app/routing/main_destination.dart';
+import 'package:admin9_app_flutter/app/page_configuration/page_configuration_provider.dart';
+import 'package:admin9_app_flutter/app/page_configuration/page_configuration.dart';
 import 'package:admin9_app_flutter/app/startup/startup_provider.dart';
 import 'package:admin9_app_flutter/app/startup/startup_state.dart';
 import 'package:auto_route/auto_route.dart';
@@ -11,7 +12,10 @@ import 'package:forui/forui.dart';
 
 @RoutePage()
 class HomePage extends ConsumerStatefulWidget {
-  const HomePage({super.key});
+  const HomePage({super.key, this.showHeader = true, this.definition});
+
+  final bool showHeader;
+  final PageDefinition? definition;
 
   @override
   ConsumerState<HomePage> createState() => _HomePageState();
@@ -33,21 +37,26 @@ class _HomePageState extends ConsumerState<HomePage> {
   @override
   Widget build(BuildContext context) {
     final startup = ref.watch(startupCoordinatorProvider);
+    final configuration = ref.watch(pageConfigurationProvider).requireValue;
+    final settingsIndex = configuration.visibleNavigation.indexWhere(
+      (entry) => entry.pageType == 'settings',
+    );
     final theme = FTheme.of(context);
     return Column(
       children: [
-        FHeader(
-          title: Text(context.tr('home.title')),
-          suffixes: [
-            FHeaderAction(
-              icon: const Icon(FLucideIcons.settings),
-              semanticsLabel: context.tr('home.open_settings'),
-              onPress: () => context.tabsRouter.setActiveIndex(
-                MainDestination.settings.index,
+        if (widget.showHeader)
+          FHeader(
+            title: Text(context.tr('home.title')),
+            suffixes: [
+              FHeaderAction(
+                icon: const Icon(FLucideIcons.settings),
+                semanticsLabel: context.tr('home.open_settings'),
+                onPress: settingsIndex < 0
+                    ? null
+                    : () => context.tabsRouter.setActiveIndex(settingsIndex),
               ),
-            ),
-          ],
-        ),
+            ],
+          ),
         Expanded(
           child: ListView(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
@@ -107,84 +116,112 @@ class _HomePageState extends ConsumerState<HomePage> {
                     ),
                   ),
                 ),
-              const SizedBox(height: 20),
-              Text(
-                context.tr('home.product_name'),
-                key: const ValueKey('home-product-name'),
-                style: theme.typography.display.lg,
-              ),
-              const SizedBox(height: 6),
-              Text(
-                context.tr(
-                  'home.product_version',
-                  namedArgs: {'version': admin9AppVersion},
+              if (widget.definition?.shows('introduction') ?? true) ...[
+                const SizedBox(height: 20),
+                Text(
+                  context.tr('home.product_name'),
+                  key: const ValueKey('home-product-name'),
+                  style: theme.typography.display.lg,
                 ),
-                key: const ValueKey('home-product-version'),
-                style: theme.typography.body.sm,
-              ),
-              const SizedBox(height: 24),
+                const SizedBox(height: 6),
+                Text(
+                  context.tr(
+                    'home.product_version',
+                    namedArgs: {'version': admin9AppVersion},
+                  ),
+                  key: const ValueKey('home-product-version'),
+                  style: theme.typography.body.sm,
+                ),
+                const SizedBox(height: 24),
+              ],
               // examples:begin
-              Text(
-                context.tr('home.components_title'),
-                style: theme.typography.body.lg,
-              ),
-              const SizedBox(height: 10),
-              FItemGroup(
-                children: [
-                  FItem(
-                    key: const ValueKey('home-open-components'),
-                    prefix: const Icon(FLucideIcons.layoutGrid),
-                    title: Text(context.tr('home.components_grid')),
-                    subtitle: Text(context.tr('home.components_grid_body')),
-                    suffix: const Icon(FLucideIcons.chevronRight),
-                    onPress: () => context.tabsRouter.setActiveIndex(
-                      MainDestination.components.index,
+              if ((widget.definition?.shows('components') ?? true) &&
+                  _indexFor(configuration, 'components') >= 0) ...[
+                Text(
+                  context.tr('home.components_title'),
+                  style: theme.typography.body.lg,
+                ),
+                const SizedBox(height: 10),
+                FItemGroup(
+                  children: [
+                    FItem(
+                      key: const ValueKey('home-open-components'),
+                      prefix: const Icon(FLucideIcons.layoutGrid),
+                      title: Text(context.tr('home.components_grid')),
+                      subtitle: Text(context.tr('home.components_grid_body')),
+                      suffix: const Icon(FLucideIcons.chevronRight),
+                      onPress: () => context.tabsRouter.setActiveIndex(
+                        _indexFor(configuration, 'components'),
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
+                  ],
+                ),
+                const SizedBox(height: 24),
+              ],
               // examples:end
-              Text(
-                context.tr('home.media_title'),
-                style: theme.typography.body.lg,
-              ),
-              const SizedBox(height: 10),
-              FItemGroup(
-                children: [
-                  FItem(
-                    key: const ValueKey('home-open-media'),
-                    prefix: const Icon(FLucideIcons.play),
-                    title: Text(context.tr('home.media')),
-                    subtitle: Text(context.tr('home.media_body')),
-                    suffix: const Icon(FLucideIcons.chevronRight),
-                    onPress: () => context.tabsRouter.setActiveIndex(
-                      MainDestination.media.index,
+              if ((widget.definition?.shows('media') ?? true) &&
+                  _indexFor(configuration, 'media') >= 0) ...[
+                Text(
+                  context.tr('home.media_title'),
+                  style: theme.typography.body.lg,
+                ),
+                const SizedBox(height: 10),
+                FItemGroup(
+                  children: [
+                    FItem(
+                      key: const ValueKey('home-open-media'),
+                      prefix: const Icon(FLucideIcons.play),
+                      title: Text(context.tr('home.media')),
+                      subtitle: Text(context.tr('home.media_body')),
+                      suffix: const Icon(FLucideIcons.chevronRight),
+                      onPress: () => context.tabsRouter.setActiveIndex(
+                        _indexFor(configuration, 'media'),
+                      ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-              Text(
-                context.tr('home.workspace'),
-                style: theme.typography.body.lg,
-              ),
-              const SizedBox(height: 12),
-              FItemGroup(
-                divider: .indented,
-                children: [
-                  FItem(
-                    key: const ValueKey('home-open-settings'),
-                    prefix: const Icon(FLucideIcons.slidersHorizontal),
-                    title: Text(context.tr('home.settings')),
-                    subtitle: Text(context.tr('home.settings_body')),
-                    suffix: const Icon(FLucideIcons.chevronRight),
-                    onPress: () => context.tabsRouter.setActiveIndex(
-                      MainDestination.settings.index,
+                  ],
+                ),
+                const SizedBox(height: 24),
+              ],
+              if ((widget.definition?.shows('settings') ?? true) &&
+                  settingsIndex >= 0) ...[
+                Text(
+                  context.tr('home.workspace'),
+                  style: theme.typography.body.lg,
+                ),
+                const SizedBox(height: 12),
+                FItemGroup(
+                  divider: .indented,
+                  children: [
+                    FItem(
+                      key: const ValueKey('home-open-settings'),
+                      prefix: const Icon(FLucideIcons.slidersHorizontal),
+                      title: Text(context.tr('home.settings')),
+                      subtitle: Text(context.tr('home.settings_body')),
+                      suffix: const Icon(FLucideIcons.chevronRight),
+                      onPress: settingsIndex < 0
+                          ? null
+                          : () => context.tabsRouter.setActiveIndex(
+                              settingsIndex,
+                            ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
+              ],
+              if (!(widget.definition?.shows('introduction') ?? true) &&
+                  configuration.visibleNavigation
+                      .where(
+                        (entry) => const {
+                          // examples:begin
+                          'components',
+                          // examples:end
+                          'media', 'settings',
+                        }.contains(entry.pageType),
+                      )
+                      .every(
+                        (entry) =>
+                            !(widget.definition?.shows(entry.pageType) ?? true),
+                      ))
+                Text(context.tr('page_configuration.empty')),
             ],
           ),
         ),
@@ -192,3 +229,7 @@ class _HomePageState extends ConsumerState<HomePage> {
     );
   }
 }
+
+int _indexFor(PageConfiguration configuration, String pageId) => configuration
+    .visibleNavigation
+    .indexWhere((entry) => entry.pageType == pageId);
