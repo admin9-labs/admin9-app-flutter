@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import '../models/startup_ad_campaign.dart';
+import 'startup_ad_http.dart';
 
 abstract interface class StartupAdService {
   Future<StartupAdCampaign?> fetchCampaign();
@@ -28,16 +29,12 @@ final class HttpStartupAdService implements StartupAdService {
   final String locale;
 
   @override
-  Future<StartupAdCampaign?> fetchCampaign() =>
-      _fetchCampaign().timeout(const Duration(milliseconds: 800));
-
-  Future<StartupAdCampaign?> _fetchCampaign() async {
+  Future<StartupAdCampaign?> fetchCampaign() async {
     if (!_allowed(endpoint, allowedApiHosts)) {
       throw const FormatException('Untrusted startup-ad API endpoint.');
     }
     final uri = endpoint.replace(
       queryParameters: {
-        ...endpoint.queryParameters,
         'placement': StartupAdCampaign.placement,
         'platform': platform,
         'app_version': appVersion,
@@ -45,29 +42,13 @@ final class HttpStartupAdService implements StartupAdService {
         'locale': locale,
       },
     );
-    var current = uri;
-    http.StreamedResponse? streamed;
-    for (var redirect = 0; redirect <= 3; redirect++) {
-      final request = http.Request('GET', current)
-        ..followRedirects = false
-        ..headers['accept'] = 'application/json';
-      streamed = await client.send(request);
-      if (!_redirectStatus(streamed.statusCode)) break;
-      final location = streamed.headers['location'];
-      await streamed.stream.drain<void>();
-      if (location == null) {
-        throw const FormatException('Startup-ad API redirect has no location.');
-      }
-      current = current.resolve(location);
-      if (!_allowed(current, allowedApiHosts)) {
-        throw const FormatException(
-          'Startup-ad API redirect left the allowlist.',
-        );
-      }
-      streamed = null;
-    }
-    if (streamed == null) throw const StartupAdServiceException(310);
-    final response = await http.Response.fromStream(streamed);
+    final response = await startupAdResponse(
+      client: client,
+      uri: uri,
+      allowedHosts: allowedApiHosts,
+      timeout: const Duration(milliseconds: 800),
+      accept: 'application/json',
+    );
     if (response.statusCode == 204) return null;
     if (response.statusCode != 200) {
       throw StartupAdServiceException(response.statusCode);
@@ -94,11 +75,4 @@ final class StartupAdServiceException implements Exception {
 bool startupAdUriAllowed(Uri uri, Set<String> hosts) => _allowed(uri, hosts);
 
 bool _allowed(Uri uri, Set<String> hosts) =>
-    uri.scheme == 'https' && uri.hasAuthority && hosts.contains(uri.host);
-
-bool _redirectStatus(int status) =>
-    status == 301 ||
-    status == 302 ||
-    status == 303 ||
-    status == 307 ||
-    status == 308;
+    startupAdHttpsUriValid(uri) && hosts.contains(uri.host);

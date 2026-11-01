@@ -14,6 +14,8 @@ class StartupAdPage extends StatefulWidget {
     required this.campaign,
     required this.onVisible,
     required this.onSkip,
+    required this.onCompleted,
+    required this.onBackgrounded,
     required this.onAction,
     required this.onFailure,
   });
@@ -21,6 +23,8 @@ class StartupAdPage extends StatefulWidget {
   final StartupAdCampaign campaign;
   final Future<void> Function() onVisible;
   final VoidCallback onSkip;
+  final VoidCallback onCompleted;
+  final VoidCallback onBackgrounded;
   final ValueChanged<StartupAdAction> onAction;
   final VoidCallback onFailure;
 
@@ -31,9 +35,14 @@ class StartupAdPage extends StatefulWidget {
 class _StartupAdPageState extends State<StartupAdPage>
     with WidgetsBindingObserver {
   Timer? _timer;
+  Timer? _completionTimer;
+  Timer? _mediaTimeout;
+  bool _finished = false;
+  bool _fallbackScheduled = false;
   VideoPlayerController? _videoController;
   late int _remainingSeconds;
   bool _visibleRecorded = false;
+  bool _visibleScheduled = false;
   bool _muted = true;
   bool _usingFallback = false;
   bool _failed = false;
@@ -48,6 +57,15 @@ class _StartupAdPageState extends State<StartupAdPage>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    _mediaTimeout ??= Timer(
+      const Duration(milliseconds: 800),
+      _useFallbackOrFail,
+    );
+    if (MediaQuery.disableAnimationsOf(context) && _videoController != null) {
+      final video = _videoController;
+      _videoController = null;
+      video?.dispose();
+    }
     _prepareMedia();
   }
 
@@ -55,7 +73,7 @@ class _StartupAdPageState extends State<StartupAdPage>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.hidden ||
         state == AppLifecycleState.paused) {
-      widget.onSkip();
+      _finish(widget.onBackgrounded);
     }
   }
 
@@ -63,6 +81,8 @@ class _StartupAdPageState extends State<StartupAdPage>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _timer?.cancel();
+    _completionTimer?.cancel();
+    _mediaTimeout?.cancel();
     _videoController?.dispose();
     super.dispose();
   }
@@ -82,7 +102,7 @@ class _StartupAdPageState extends State<StartupAdPage>
             behavior: HitTestBehavior.opaque,
             onTap: campaign.action.type == StartupAdActionType.none
                 ? null
-                : () => widget.onAction(campaign.action),
+                : () => _finish(() => widget.onAction(campaign.action)),
             child: _media(media),
           ),
           SafeArea(
@@ -93,30 +113,34 @@ class _StartupAdPageState extends State<StartupAdPage>
                 children: [
                   Row(
                     children: [
-                      DecoratedBox(
-                        decoration: BoxDecoration(
-                          color: const Color(0xb3000000),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 5,
-                          ),
-                          child: Text(
-                            context.tr('startup_ad.label'),
-                            style: FTheme.of(context).typography.body.xs
-                                .copyWith(color: const Color(0xffffffff)),
+                      Expanded(
+                        child: Align(
+                          alignment: AlignmentDirectional.centerStart,
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              color: const Color(0xb3000000),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 5,
+                              ),
+                              child: Text(
+                                context.tr('startup_ad.label'),
+                                style: FTheme.of(context).typography.body.xs
+                                    .copyWith(color: const Color(0xffffffff)),
+                              ),
+                            ),
                           ),
                         ),
                       ),
-                      const Spacer(),
                       if (media.type == StartupAdMediaType.video &&
                           _videoController != null)
                         FButton.icon(
                           key: const ValueKey('startup-ad-mute'),
                           variant: .secondary,
-                          size: .sm,
+                          size: .lg,
                           semanticsLabel: context.tr(
                             _muted ? 'startup_ad.unmute' : 'startup_ad.mute',
                           ),
@@ -131,9 +155,9 @@ class _StartupAdPageState extends State<StartupAdPage>
                       FButton(
                         key: const ValueKey('startup-ad-skip'),
                         variant: .secondary,
-                        size: .sm,
+                        size: .lg,
                         mainAxisSize: MainAxisSize.min,
-                        onPress: widget.onSkip,
+                        onPress: () => _finish(widget.onSkip),
                         child: Text(
                           context.tr(
                             'startup_ad.skip',
@@ -145,29 +169,11 @@ class _StartupAdPageState extends State<StartupAdPage>
                   ),
                   const Spacer(),
                   if (campaign.action.type != StartupAdActionType.none)
-                    Semantics(
-                      label: context.tr('startup_ad.open'),
-                      button: true,
-                      child: Align(
-                        alignment: Alignment.bottomCenter,
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(
-                            color: const Color(0xb3000000),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 14,
-                              vertical: 8,
-                            ),
-                            child: Text(
-                              context.tr('startup_ad.open'),
-                              style: FTheme.of(context).typography.body.sm
-                                  .copyWith(color: const Color(0xffffffff)),
-                            ),
-                          ),
-                        ),
-                      ),
+                    FButton(
+                      variant: .secondary,
+                      onPress: () =>
+                          _finish(() => widget.onAction(campaign.action)),
+                      child: Text(context.tr('startup_ad.open')),
                     ),
                 ],
               ),
@@ -180,7 +186,10 @@ class _StartupAdPageState extends State<StartupAdPage>
 
   Widget _media(StartupAdMedia media) {
     if (media.type == StartupAdMediaType.video &&
-        _videoController?.value.isInitialized == true) {
+        _videoController?.value.isInitialized == true &&
+        _videoController?.value.hasError == false &&
+        !_fallbackScheduled) {
+      if (_videoController!.value.isPlaying) _recordVisible(media);
       return Semantics(
         image: true,
         label: media.semanticLabel,
@@ -200,13 +209,20 @@ class _StartupAdPageState extends State<StartupAdPage>
         ),
       );
     }
+    if (media.type == StartupAdMediaType.video) {
+      return const SizedBox.shrink();
+    }
+    if (media.localPath == null) {
+      _useFallbackOrFail();
+      return const SizedBox.shrink();
+    }
     return Image.file(
       File(media.localPath!),
       fit: BoxFit.cover,
       alignment: Alignment((media.focalX * 2) - 1, (media.focalY * 2) - 1),
       semanticLabel: media.semanticLabel,
       frameBuilder: (context, child, frame, synchronous) {
-        if (frame != null || synchronous) _recordVisible();
+        if (frame != null || synchronous) _recordVisible(media);
         return child;
       },
       errorBuilder: (context, error, stackTrace) {
@@ -229,16 +245,28 @@ class _StartupAdPageState extends State<StartupAdPage>
   }
 
   void _prepareMedia() {
-    if (_videoController != null || _failed) return;
+    if (_videoController != null || _failed || _finished) return;
     final media = _displayMedia(context);
     if (media.type != StartupAdMediaType.video) return;
+    if (media.localPath == null) {
+      _useFallbackOrFail();
+      return;
+    }
     final controller = VideoPlayerController.file(File(media.localPath!));
     _videoController = controller;
+    controller.addListener(() {
+      if (mounted &&
+          !_finished &&
+          _videoController == controller &&
+          controller.value.hasError) {
+        _useFallbackOrFail();
+      }
+    });
     controller
         .initialize()
         .timeout(const Duration(milliseconds: 800))
         .then((_) async {
-          if (!mounted) return;
+          if (!mounted || _finished || _videoController != controller) return;
           final size = controller.value.size;
           final expectedDuration = media.duration;
           final dimensionsMatch =
@@ -256,44 +284,93 @@ class _StartupAdPageState extends State<StartupAdPage>
           }
           await controller.setVolume(0);
           await controller.setLooping(true);
+          if (!mounted || _finished || _videoController != controller) return;
           await controller.play();
-          if (!mounted) return;
+          if (!mounted ||
+              _finished ||
+              _videoController != controller ||
+              controller.value.hasError ||
+              _fallbackScheduled) {
+            return;
+          }
           setState(() {});
-          _recordVisible();
         })
         .catchError((Object _) {
-          if (mounted) _useFallbackOrFail();
+          if (mounted && !_finished && _videoController == controller) {
+            _useFallbackOrFail();
+          }
         });
   }
 
-  void _recordVisible() {
-    if (_visibleRecorded || _failed) return;
-    _visibleRecorded = true;
+  void _recordVisible(StartupAdMedia media) {
+    if (_failed || _finished || _fallbackScheduled) return;
+    // Each successfully rendered medium cancels its own load deadline, even
+    // when a previous medium already recorded this campaign's exposure.
+    _mediaTimeout?.cancel();
+    if (_visibleRecorded || _visibleScheduled) return;
+    _visibleScheduled = true;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) widget.onVisible();
-    });
-    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (!mounted) return;
-      if (_remainingSeconds <= 1) {
-        _timer?.cancel();
-        widget.onSkip();
+      _visibleScheduled = false;
+      if (!mounted ||
+          _finished ||
+          _failed ||
+          _fallbackScheduled ||
+          !identical(_displayMedia(context), media)) {
         return;
       }
-      setState(() => _remainingSeconds--);
+      if (media.type == StartupAdMediaType.video &&
+          (_videoController == null ||
+              _videoController!.value.hasError ||
+              !_videoController!.value.isPlaying)) {
+        return;
+      }
+      _visibleRecorded = true;
+      widget.onVisible();
+      _completionTimer = Timer(
+        widget.campaign.displayDuration,
+        () => _finish(widget.onCompleted),
+      );
+      _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+        if (!mounted || _finished) return;
+        setState(() => _remainingSeconds = (_remainingSeconds - 1).clamp(0, 5));
+      });
     });
   }
 
+  void _finish(VoidCallback callback) {
+    if (_finished || !mounted) return;
+    _finished = true;
+    _timer?.cancel();
+    _completionTimer?.cancel();
+    _mediaTimeout?.cancel();
+    _videoController?.pause();
+    callback();
+  }
+
   void _useFallbackOrFail() {
-    if (_usingFallback || widget.campaign.fallbackImage == null) {
-      _failed = true;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) widget.onFailure();
-      });
-      return;
-    }
-    _videoController?.dispose();
-    _videoController = null;
-    setState(() => _usingFallback = true);
+    if (_finished || _failed || _fallbackScheduled || !mounted) return;
+    _mediaTimeout?.cancel();
+    _fallbackScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _fallbackScheduled = false;
+      if (!mounted || _finished) return;
+      if (_usingFallback ||
+          widget.campaign.fallbackImage == null ||
+          _displayMedia(context) == widget.campaign.fallbackImage) {
+        _failed = true;
+        _finish(widget.onFailure);
+        return;
+      }
+      final video = _videoController;
+      _videoController = null;
+      video?.dispose();
+      setState(() => _usingFallback = true);
+      _mediaTimeout = Timer(
+        const Duration(milliseconds: 800),
+        _useFallbackOrFail,
+      );
+    });
+    WidgetsBinding.instance.ensureVisualUpdate();
   }
 
   Future<void> _toggleMuted() async {

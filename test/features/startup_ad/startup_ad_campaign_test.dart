@@ -117,6 +117,8 @@ Map<String, Object?> _campaignJson({
     'height': 1920,
     'sha256': 'a' * 64,
     'semanticLabel': '推广内容',
+    'focalX': 0.5,
+    'focalY': 0.5,
     'durationMs': mediaType == 'video' ? 5000 : null,
     'localPath': '/cache/creative',
   },
@@ -130,6 +132,8 @@ Map<String, Object?> _campaignJson({
           'height': 1920,
           'sha256': 'b' * 64,
           'semanticLabel': '推广备用图片',
+          'focalX': 0.5,
+          'focalY': 0.5,
           'localPath': '/cache/fallback.jpg',
         }
       : null,
