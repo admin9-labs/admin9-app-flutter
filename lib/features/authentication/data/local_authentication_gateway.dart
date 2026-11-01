@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../app/session/session.dart';
@@ -8,17 +9,19 @@ import '../../../app/session/session_store.dart';
 import '../domain/authentication_gateway.dart';
 
 /// Development/test-only local authentication, not for production use.
-/// SharedPreferences and unsalted password hashes are not a secure credential store.
+/// Unsalted password hashes are not suitable for production authentication.
 final class LocalAuthenticationGateway implements AuthenticationGateway {
   LocalAuthenticationGateway({
     required this.preferences,
     required this.sessionStore,
+    this.secureStorage = const FlutterSecureStorage(),
   });
 
   static const accountsKey = 'admin9.starter.accounts';
 
   final SharedPreferencesAsync preferences;
   final SessionStore sessionStore;
+  final FlutterSecureStorage secureStorage;
 
   @override
   Future<SessionSnapshot> register({
@@ -35,7 +38,7 @@ final class LocalAuthenticationGateway implements AuthenticationGateway {
       'identifier': identifier,
       'passwordDigest': _digest(password),
     });
-    await preferences.setString(accountsKey, jsonEncode(accounts));
+    await secureStorage.write(key: accountsKey, value: jsonEncode(accounts));
     final session = SessionSnapshot(
       accountId: accountId,
       identifier: identifier,
@@ -48,7 +51,10 @@ final class LocalAuthenticationGateway implements AuthenticationGateway {
       currentAccounts.removeWhere(
         (account) => account['accountId'] == accountId,
       );
-      await preferences.setString(accountsKey, jsonEncode(currentAccounts));
+      await secureStorage.write(
+        key: accountsKey,
+        value: jsonEncode(currentAccounts),
+      );
       rethrow;
     }
     return session;
@@ -80,13 +86,26 @@ final class LocalAuthenticationGateway implements AuthenticationGateway {
   }
 
   @override
-  Future<SessionSnapshot?> restore() => sessionStore.read();
+  Future<SessionSnapshot?> restore() async {
+    await _accounts();
+    return sessionStore.read();
+  }
 
   @override
   Future<void> logout() => sessionStore.clear();
 
   Future<List<Map<String, Object?>>> _accounts() async {
-    final value = await preferences.getString(accountsKey);
+    var value = await secureStorage.read(key: accountsKey);
+    final legacy = await preferences.getString(accountsKey);
+    if (legacy != null) {
+      if (value == null) {
+        await secureStorage.write(key: accountsKey, value: legacy);
+        value = legacy;
+      } else if (value != legacy) {
+        throw StateError('Conflicting local account stores');
+      }
+      await preferences.remove(accountsKey);
+    }
     if (value == null) return [];
     try {
       final decoded = jsonDecode(value);

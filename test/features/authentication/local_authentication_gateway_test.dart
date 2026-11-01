@@ -5,15 +5,18 @@ import 'package:admin9_app_flutter/app/session/session_store.dart';
 import 'package:admin9_app_flutter/features/authentication/data/local_authentication_gateway.dart';
 import 'package:admin9_app_flutter/features/authentication/domain/authentication_gateway.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   late SharedPreferencesAsyncPlatform? previous;
   late LocalAuthenticationGateway gateway;
 
   setUp(() {
+    FlutterSecureStorage.setMockInitialValues({});
     previous = SharedPreferencesAsyncPlatform.instance;
     SharedPreferencesAsyncPlatform.instance =
         InMemorySharedPreferencesAsync.empty();
@@ -34,6 +37,18 @@ void main() {
       password: 'local-pass-123',
     );
     expect((await gateway.restore())?.accountId, session.accountId);
+    expect(
+      await SharedPreferencesAsync().getString(
+        LocalAuthenticationGateway.accountsKey,
+      ),
+      isNull,
+    );
+    expect(
+      await const FlutterSecureStorage().read(
+        key: LocalAuthenticationGateway.accountsKey,
+      ),
+      isNotNull,
+    );
 
     await gateway.logout();
     expect(await gateway.restore(), isNull);
@@ -51,6 +66,24 @@ void main() {
     );
   });
 
+  test('migrates legacy account records into secure storage', () async {
+    final preferences = SharedPreferencesAsync();
+    const legacy =
+        '[{"accountId":"old","identifier":"old","passwordDigest":"digest"}]';
+    await preferences.setString(LocalAuthenticationGateway.accountsKey, legacy);
+    expect(await gateway.restore(), isNull);
+    expect(
+      await preferences.getString(LocalAuthenticationGateway.accountsKey),
+      isNull,
+    );
+    expect(
+      await const FlutterSecureStorage().read(
+        key: LocalAuthenticationGateway.accountsKey,
+      ),
+      legacy,
+    );
+  });
+
   for (final hasExistingAccount in [false, true]) {
     test(
       'failed session write allows registration retry${hasExistingAccount ? ' and preserves existing accounts' : ''}',
@@ -64,7 +97,9 @@ void main() {
           );
         }
         final originalAccounts = jsonDecode(
-          await preferences.getString(LocalAuthenticationGateway.accountsKey) ??
+          await const FlutterSecureStorage().read(
+                key: LocalAuthenticationGateway.accountsKey,
+              ) ??
               '[]',
         );
         final store = _FailingSessionStore(
@@ -84,8 +119,8 @@ void main() {
         );
         expect(
           jsonDecode(
-            await preferences.getString(
-                  LocalAuthenticationGateway.accountsKey,
+            await const FlutterSecureStorage().read(
+                  key: LocalAuthenticationGateway.accountsKey,
                 ) ??
                 '[]',
           ),

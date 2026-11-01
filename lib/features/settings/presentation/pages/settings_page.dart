@@ -208,6 +208,9 @@ class _AccountSettings extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    if (ref.watch(startupCoordinatorProvider).accessMode != AccessMode.full) {
+      return const SizedBox.shrink();
+    }
     final authentication = ref.watch(authenticationProvider);
     final signedIn = authentication.session != null;
     final busy =

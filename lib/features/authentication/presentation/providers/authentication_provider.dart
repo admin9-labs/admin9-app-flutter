@@ -2,6 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../app/session/session_store.dart';
+import '../../../../app/startup/startup_provider.dart';
+import '../../../../app/startup/startup_state.dart';
 import '../../data/local_authentication_gateway.dart';
 import '../../domain/authentication_gateway.dart';
 import '../../domain/authentication_state.dart';
@@ -20,13 +22,22 @@ final authenticationProvider =
     );
 
 final class AuthenticationController extends Notifier<AuthenticationState> {
+  int _generation = 0;
+  Future<Object?>? _pendingOperation;
+
   @override
   AuthenticationState build() => const AuthenticationState.signedOut();
 
   Future<void> restore() async {
+    final generation = ++_generation;
     state = const AuthenticationState(status: AuthenticationStatus.restoring);
+    final operation = Future.sync(
+      () => ref.read(authenticationGatewayProvider).restore(),
+    );
+    _pendingOperation = operation;
     try {
-      final session = await ref.read(authenticationGatewayProvider).restore();
+      final session = await operation;
+      if (generation != _generation) return;
       state = session == null
           ? const AuthenticationState.signedOut()
           : AuthenticationState(
@@ -34,10 +45,13 @@ final class AuthenticationController extends Notifier<AuthenticationState> {
               session: session,
             );
     } on Object {
+      if (generation != _generation) return;
       state = const AuthenticationState(
         status: AuthenticationStatus.failure,
         errorCode: 'restore_failed',
       );
+    } finally {
+      if (identical(_pendingOperation, operation)) _pendingOperation = null;
     }
   }
 
@@ -54,15 +68,26 @@ final class AuthenticationController extends Notifier<AuthenticationState> {
   );
 
   Future<void> logout() async {
+    final generation = ++_generation;
+    final pending = _pendingOperation;
     final session = state.session;
     state = AuthenticationState(
       status: AuthenticationStatus.submitting,
       session: session,
     );
     try {
+      if (pending != null) {
+        try {
+          await pending;
+        } on Object {
+          // A failed pending operation must not prevent session clearing.
+        }
+      }
       await ref.read(authenticationGatewayProvider).logout();
+      if (generation != _generation) return;
       state = const AuthenticationState.signedOut();
     } on Object {
+      if (generation != _generation) return;
       state = AuthenticationState(
         status: AuthenticationStatus.failure,
         session: session,
@@ -72,26 +97,46 @@ final class AuthenticationController extends Notifier<AuthenticationState> {
   }
 
   Future<bool> _submit(Future<dynamic> Function() action) async {
+    if (ref.read(startupCoordinatorProvider).accessMode != AccessMode.full ||
+        state.status == AuthenticationStatus.submitting ||
+        state.status == AuthenticationStatus.restoring) {
+      return false;
+    }
+    final generation = ++_generation;
     state = const AuthenticationState(status: AuthenticationStatus.submitting);
+    final operation = Future.sync(action);
+    _pendingOperation = operation;
     try {
-      final session = await action();
+      final session = await operation;
+      if (generation != _generation) return false;
+      if (ref.read(startupCoordinatorProvider).accessMode != AccessMode.full) {
+        await ref.read(authenticationGatewayProvider).logout();
+        if (generation == _generation) {
+          state = const AuthenticationState.signedOut();
+        }
+        return false;
+      }
       state = AuthenticationState(
         status: AuthenticationStatus.signedIn,
         session: session,
       );
       return true;
     } on AuthenticationFailure catch (error) {
+      if (generation != _generation) return false;
       state = AuthenticationState(
         status: AuthenticationStatus.failure,
         errorCode: error.code,
       );
       return false;
     } on Object {
+      if (generation != _generation) return false;
       state = const AuthenticationState(
         status: AuthenticationStatus.failure,
         errorCode: 'unknown',
       );
       return false;
+    } finally {
+      if (identical(_pendingOperation, operation)) _pendingOperation = null;
     }
   }
 }

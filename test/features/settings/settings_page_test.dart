@@ -152,6 +152,35 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('当前处于有限浏览模式。'), findsOneWidget);
+    expect(find.byKey(const ValueKey('settings-account')), findsNothing);
+  });
+
+  testWidgets('withdrawing consent clears an existing session', (tester) async {
+    final gateway = _LogoutGateway();
+    await _pumpApp(
+      tester,
+      _FakeRepository(),
+      translations,
+      authenticationGateway: gateway,
+    );
+    await _openSettings(tester);
+    expect(find.text('reader@example.com'), findsOneWidget);
+    final privacy = find.byKey(const ValueKey('settings-privacy-consent'));
+    await tester.ensureVisible(privacy);
+    await tester.tap(privacy);
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.byKey(const ValueKey('settings-privacy-withdraw-confirm')),
+    );
+    await tester.pump();
+    expect(gateway.logoutCalls, 1);
+    expect(find.byKey(const ValueKey('settings-account')), findsNothing);
+    gateway.pending.complete();
+    await tester.pumpAndSettle();
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(SettingsPage)),
+    );
+    expect(container.read(authenticationProvider).session, isNull);
   });
 
   for (final register in [false, true]) {
