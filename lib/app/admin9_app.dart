@@ -9,6 +9,7 @@ import 'package:material_ui/material_ui.dart';
 import 'appearance/app_appearance_preference.dart';
 import 'appearance/app_appearance_provider.dart';
 import 'appearance/app_theme_catalog.dart';
+import '../features/authentication/presentation/providers/authentication_provider.dart';
 import 'routing/app_router.dart';
 import 'routing/app_router.gr.dart';
 import 'startup/startup_state.dart';
@@ -24,6 +25,8 @@ class Admin9App extends ConsumerStatefulWidget {
 class _Admin9AppState extends ConsumerState<Admin9App>
     with WidgetsBindingObserver {
   final AppRouter _router = AppRouter();
+  bool _sessionRestored = false;
+  Future<void>? _sessionClearing;
 
   @override
   void initState() {
@@ -53,6 +56,21 @@ class _Admin9AppState extends ConsumerState<Admin9App>
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(startupCoordinatorProvider, (previous, next) {
+      if (next.phase == StartupPhase.ready &&
+          next.accessMode == AccessMode.limited &&
+          (previous?.phase != StartupPhase.ready ||
+              previous?.accessMode != AccessMode.limited)) {
+        _sessionRestored = false;
+        _sessionClearing = ref.read(authenticationProvider.notifier).logout();
+      }
+      if (!_sessionRestored &&
+          next.phase == StartupPhase.ready &&
+          next.accessMode == AccessMode.full) {
+        _sessionRestored = true;
+        unawaited(_restoreSession());
+      }
+    });
     final preference =
         ref.watch(appAppearanceProvider).value?.preference ??
         AppAppearancePreference.defaults;
@@ -112,5 +130,18 @@ class _Admin9AppState extends ConsumerState<Admin9App>
         );
       },
     );
+  }
+
+  Future<void> _restoreSession() async {
+    if (_sessionClearing case final clearing?) await clearing;
+    if (!mounted) return;
+    final startup = ref.read(startupCoordinatorProvider);
+    if (startup.phase != StartupPhase.ready ||
+        startup.accessMode != AccessMode.full) {
+      _sessionRestored = false;
+      return;
+    }
+    if (ref.read(authenticationProvider).errorCode == 'logout_failed') return;
+    await ref.read(authenticationProvider.notifier).restore();
   }
 }

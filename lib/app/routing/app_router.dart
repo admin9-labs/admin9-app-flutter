@@ -39,6 +39,8 @@ final class AppRouter extends RootStackRouter {
     AutoRoute(page: ImageViewerRoute.page),
     AutoRoute(page: VideoFullscreenRoute.page),
     AutoRoute(page: LegalDocumentRoute.page, path: '/legal'),
+    AutoRoute(page: LoginRoute.page, path: '/auth/login'),
+    AutoRoute(page: RegisterRoute.page, path: '/auth/register'),
     RedirectRoute(path: '*', redirectTo: '/'),
   ];
 }

@@ -11,6 +11,7 @@ import 'package:admin9_app_flutter/app/appearance/app_appearance_repository.dart
 import 'package:admin9_app_flutter/app/startup/startup_preferences.dart';
 import 'package:admin9_app_flutter/app/startup/startup_preferences_repository.dart';
 import 'package:admin9_app_flutter/app/startup/startup_provider.dart';
+import 'package:admin9_app_flutter/features/authentication/presentation/providers/authentication_provider.dart';
 import 'package:admin9_app_flutter/features/startup_ad/data/repositories/startup_ad_repository.dart';
 import 'package:admin9_app_flutter/features/startup_ad/presentation/providers/startup_ad_provider.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -18,6 +19,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'test_authentication.dart';
 
 Future<void> pumpTestAdmin9App(
   WidgetTester tester, {
@@ -70,6 +73,9 @@ Future<void> pumpTestAdmin9App(
           ),
           startupAdRepositoryProvider.overrideWithValue(
             startupAdRepository ?? const DisabledStartupAdRepository(),
+          ),
+          authenticationGatewayProvider.overrideWithValue(
+            const TestAuthenticationGateway(),
           ),
         ],
         child: const Admin9App(),

@@ -18,6 +18,7 @@ import 'package:admin9_app_flutter/features/examples/presentation/pages/concepts
 import 'package:admin9_app_flutter/features/examples/presentation/pages/feedback/playgrounds/async_status_playground_page.dart';
 import 'package:admin9_app_flutter/features/examples/presentation/pages/feedback/playgrounds/confirmation_playground_page.dart';
 import 'package:admin9_app_flutter/features/settings/presentation/pages/settings_page.dart';
+import 'package:admin9_app_flutter/features/authentication/presentation/providers/authentication_provider.dart';
 import 'package:admin9_app_flutter/features/startup_ad/data/repositories/startup_ad_repository.dart';
 import 'package:admin9_app_flutter/features/startup_ad/presentation/providers/startup_ad_provider.dart';
 import 'package:admin9_app_flutter/shared/ui/responsive_page_body.dart';
@@ -30,6 +31,7 @@ import 'package:material_ui/material_ui.dart' as material_ui;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../app/support/test_admin9_app.dart';
+import '../app/support/test_authentication.dart';
 
 const _locale = Locale('zh', 'CN');
 late Map<String, dynamic> _translations;
@@ -414,6 +416,9 @@ Future<void> _pumpStarter(
           ),
           startupAdRepositoryProvider.overrideWithValue(
             const DisabledStartupAdRepository(),
+          ),
+          authenticationGatewayProvider.overrideWithValue(
+            const TestAuthenticationGateway(),
           ),
           pageConfigurationProvider.overrideWith(
             (ref) async => _testPageConfiguration,

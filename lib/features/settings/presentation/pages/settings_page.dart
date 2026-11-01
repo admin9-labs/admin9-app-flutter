@@ -4,6 +4,8 @@ import 'package:admin9_app_flutter/app/routing/app_router.gr.dart';
 import 'package:admin9_app_flutter/app/startup/startup_provider.dart';
 import 'package:admin9_app_flutter/app/startup/startup_state.dart';
 import 'package:admin9_app_flutter/features/legal/domain/legal_document.dart';
+import 'package:admin9_app_flutter/features/authentication/presentation/providers/authentication_provider.dart';
+import 'package:admin9_app_flutter/features/authentication/domain/authentication_state.dart';
 import 'package:admin9_app_flutter/app/page_configuration/page_configuration.dart';
 import 'package:admin9_app_flutter/features/startup_ad/presentation/providers/startup_ad_provider.dart';
 import 'package:auto_route/auto_route.dart';
@@ -55,6 +57,7 @@ class SettingsPage extends ConsumerWidget {
     bool saving,
   ) => ResponsivePageBody(
     children: [
+      if (definition?.shows('account') ?? true) const _AccountSettings(),
       if (definition?.shows('appearance') ?? true) ...[
         ComponentExampleSection(
           title: context.tr('settings.theme_mode'),
@@ -197,6 +200,62 @@ class SettingsPage extends ConsumerWidget {
     if (confirmed == true && context.mounted) {
       await _save(context, ref, AppAppearancePreference.defaults);
     }
+  }
+}
+
+class _AccountSettings extends ConsumerWidget {
+  const _AccountSettings();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    if (ref.watch(startupCoordinatorProvider).accessMode != AccessMode.full) {
+      return const SizedBox.shrink();
+    }
+    final authentication = ref.watch(authenticationProvider);
+    final signedIn = authentication.session != null;
+    final busy =
+        authentication.status == AuthenticationStatus.submitting ||
+        authentication.status == AuthenticationStatus.restoring;
+    return ComponentExampleSection(
+      title: context.tr('settings.account_title'),
+      description: context.tr('settings.account_description'),
+      child: FItemGroup(
+        children: [
+          FItem(
+            key: const ValueKey('settings-account'),
+            prefix: Icon(
+              signedIn ? FLucideIcons.circleUserRound : FLucideIcons.logIn,
+            ),
+            title: Text(
+              signedIn
+                  ? authentication.session?.identifier ??
+                        context.tr('authentication.signed_in')
+                  : context.tr('authentication.signed_out'),
+            ),
+            subtitle: signedIn
+                ? Text(context.tr('authentication.signed_in'))
+                : null,
+            suffix: signedIn ? null : const Icon(FLucideIcons.chevronRight),
+            onPress: signedIn || busy
+                ? null
+                : () => context.pushRoute(const LoginRoute()),
+          ),
+          if (signedIn)
+            FItem(
+              key: const ValueKey('authentication-logout'),
+              variant: .destructive,
+              prefix: const Icon(FLucideIcons.logOut),
+              title: Text(context.tr('authentication.logout')),
+              subtitle: authentication.errorCode == 'logout_failed'
+                  ? Text(context.tr('authentication.logout_failed'))
+                  : null,
+              onPress: busy
+                  ? null
+                  : () => ref.read(authenticationProvider.notifier).logout(),
+            ),
+        ],
+      ),
+    );
   }
 }
 
