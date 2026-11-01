@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:admin9_app_flutter/app/session/session.dart';
+import 'package:admin9_app_flutter/app/startup/startup_provider.dart';
+import 'package:admin9_app_flutter/app/startup/startup_state.dart';
 import 'package:admin9_app_flutter/features/authentication/domain/authentication_gateway.dart';
 import 'package:admin9_app_flutter/features/authentication/presentation/providers/authentication_provider.dart';
 import 'package:admin9_app_flutter/features/authentication/presentation/widgets/authentication_form.dart';
@@ -13,6 +15,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:forui/forui.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../app/support/test_admin9_app.dart';
 
 void main() {
   setUpAll(() async {
@@ -89,6 +93,79 @@ void main() {
       },
     );
   }
+
+  testWidgets('limited browsing cannot submit credentials', (tester) async {
+    final gateway = _Gateway();
+    await _pumpForm(
+      tester,
+      gateway,
+      AuthenticationForm(
+        register: false,
+        onAuthenticated: () {},
+        onSwitchMode: () {},
+      ),
+    );
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(AuthenticationForm)),
+    );
+    container.read(startupCoordinatorProvider.notifier).continueLimited();
+    await tester.enterText(
+      find.byKey(const ValueKey('authentication-identifier')),
+      'reader@example.com',
+    );
+    await tester.enterText(
+      find.byKey(const ValueKey('authentication-password')),
+      'test-password',
+    );
+    await tester.tap(find.byKey(const ValueKey('authentication-submit')));
+    await tester.pumpAndSettle();
+    expect(gateway.calls, isEmpty);
+  });
+
+  testWidgets('withdrawal and renewed consent cancel an in-flight login', (
+    tester,
+  ) async {
+    final gateway = _Gateway();
+    var authenticated = false;
+    await _pumpForm(
+      tester,
+      gateway,
+      AuthenticationForm(
+        register: false,
+        onAuthenticated: () => authenticated = true,
+        onSwitchMode: () {},
+      ),
+    );
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(AuthenticationForm)),
+    );
+    await tester.enterText(
+      find.byKey(const ValueKey('authentication-identifier')),
+      'reader@example.com',
+    );
+    await tester.enterText(
+      find.byKey(const ValueKey('authentication-password')),
+      'test-password',
+    );
+    await tester.tap(find.byKey(const ValueKey('authentication-submit')));
+    await tester.pump();
+    container.read(startupCoordinatorProvider.notifier).continueLimited();
+    final logout = container.read(authenticationProvider.notifier).logout();
+    await container
+        .read(startupCoordinatorProvider.notifier)
+        .begin(launchReason: LaunchReason.deepLink);
+    gateway.pending.complete(
+      const SessionSnapshot(
+        accountId: 'reader',
+        identifier: 'reader@example.com',
+      ),
+    );
+    await logout;
+    await tester.pumpAndSettle();
+    expect(authenticated, isFalse);
+    expect(container.read(authenticationProvider).session, isNull);
+    expect(gateway.logoutCalls, 1);
+  });
 }
 
 Future<void> _pumpForm(
@@ -111,7 +188,12 @@ Future<void> _pumpForm(
       assetLoader: const _Translations(),
       saveLocale: false,
       child: ProviderScope(
-        overrides: [authenticationGatewayProvider.overrideWithValue(gateway)],
+        overrides: [
+          authenticationGatewayProvider.overrideWithValue(gateway),
+          startupPreferencesRepositoryProvider.overrideWithValue(
+            FakeCompletedStartupRepository(),
+          ),
+        ],
         child: Builder(
           builder: (context) => MaterialApp(
             locale: context.locale,
@@ -132,6 +214,12 @@ Future<void> _pumpForm(
     ),
   );
   await tester.pumpAndSettle();
+  await ProviderScope.containerOf(
+        tester.element(find.byType(AuthenticationForm)),
+      )
+      .read(startupCoordinatorProvider.notifier)
+      .begin(launchReason: LaunchReason.deepLink);
+  await tester.pumpAndSettle();
 }
 
 final class _Translations extends AssetLoader {
@@ -146,6 +234,7 @@ final class _Translations extends AssetLoader {
 final class _Gateway implements AuthenticationGateway {
   Completer<SessionSnapshot> pending = Completer<SessionSnapshot>();
   final List<String> calls = [];
+  int logoutCalls = 0;
   String? identifier;
 
   @override
@@ -172,5 +261,5 @@ final class _Gateway implements AuthenticationGateway {
   Future<SessionSnapshot?> restore() async => null;
 
   @override
-  Future<void> logout() async {}
+  Future<void> logout() async => logoutCalls++;
 }

@@ -26,6 +26,7 @@ class _Admin9AppState extends ConsumerState<Admin9App>
     with WidgetsBindingObserver {
   final AppRouter _router = AppRouter();
   bool _sessionRestored = false;
+  Future<void>? _sessionClearing;
 
   @override
   void initState() {
@@ -56,11 +57,18 @@ class _Admin9AppState extends ConsumerState<Admin9App>
   @override
   Widget build(BuildContext context) {
     ref.listen(startupCoordinatorProvider, (previous, next) {
+      if (next.phase == StartupPhase.ready &&
+          next.accessMode == AccessMode.limited &&
+          (previous?.phase != StartupPhase.ready ||
+              previous?.accessMode != AccessMode.limited)) {
+        _sessionRestored = false;
+        _sessionClearing = ref.read(authenticationProvider.notifier).logout();
+      }
       if (!_sessionRestored &&
           next.phase == StartupPhase.ready &&
           next.accessMode == AccessMode.full) {
         _sessionRestored = true;
-        unawaited(ref.read(authenticationProvider.notifier).restore());
+        unawaited(_restoreSession());
       }
     });
     final preference =
@@ -122,5 +130,18 @@ class _Admin9AppState extends ConsumerState<Admin9App>
         );
       },
     );
+  }
+
+  Future<void> _restoreSession() async {
+    if (_sessionClearing case final clearing?) await clearing;
+    if (!mounted) return;
+    final startup = ref.read(startupCoordinatorProvider);
+    if (startup.phase != StartupPhase.ready ||
+        startup.accessMode != AccessMode.full) {
+      _sessionRestored = false;
+      return;
+    }
+    if (ref.read(authenticationProvider).errorCode == 'logout_failed') return;
+    await ref.read(authenticationProvider.notifier).restore();
   }
 }
