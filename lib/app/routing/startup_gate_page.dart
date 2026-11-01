@@ -34,12 +34,30 @@ class StartupGatePage extends ConsumerStatefulWidget {
 
 class _StartupGatePageState extends ConsumerState<StartupGatePage> {
   bool _navigating = false;
+  bool _initialized = false;
 
   @override
   void initState() {
     super.initState();
+    _scheduleStartup();
+  }
+
+  @override
+  void didUpdateWidget(covariant StartupGatePage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.initialPath != widget.initialPath ||
+        oldWidget.launchReason != widget.launchReason ||
+        oldWidget.reviewPrivacy != widget.reviewPrivacy) {
+      _scheduleStartup();
+    }
+  }
+
+  void _scheduleStartup() {
+    _initialized = false;
+    _navigating = false;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
+      setState(() => _initialized = true);
       if (widget.reviewPrivacy) {
         ref.read(startupCoordinatorProvider.notifier).requestPrivacyReview();
       } else {
@@ -58,6 +76,7 @@ class _StartupGatePageState extends ConsumerState<StartupGatePage> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(startupCoordinatorProvider);
+    if (!_initialized) return const InitializationView();
     return switch (state.phase) {
       StartupPhase.initializing => const InitializationView(),
       StartupPhase.privacy => PrivacyPage(
@@ -102,7 +121,12 @@ class _StartupGatePageState extends ConsumerState<StartupGatePage> {
       _navigating = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
-        context.router.replaceAll(_routesFor(state.pendingDestination));
+        final current = ref.read(startupCoordinatorProvider);
+        if (current.phase != StartupPhase.ready || !identical(current, state)) {
+          setState(() => _navigating = false);
+          return;
+        }
+        context.router.replaceAll(_routesFor(current.pendingDestination));
       });
     }
     return const InitializationView();

@@ -273,6 +273,7 @@ final class StartupCoordinator extends Notifier<StartupState> {
   }
 
   void requestPrivacyReview() {
+    ++_generation;
     state = state.copyWith(phase: StartupPhase.privacy, clearCampaign: true);
   }
 

@@ -1,3 +1,7 @@
+import 'package:auto_route/auto_route.dart';
+import 'package:admin9_app_flutter/app/routing/app_router.gr.dart';
+import 'package:admin9_app_flutter/app/startup/startup_state.dart';
+
 import 'dart:io';
 
 import 'package:admin9_app_flutter/app/startup/startup_preferences.dart';
@@ -127,6 +131,22 @@ void main() {
     expect(image.semanticLabel, '静态备用图');
     expect(tester.takeException(), isNull);
   });
+  testWidgets(
+    'warm external entry does not reuse the previous ready destination',
+    (tester) async {
+      await pumpTestAdmin9App(tester);
+      final router = AutoRouter.of(tester.element(find.byType(HomePage))).root;
+      await router.replaceAll([
+        StartupGateRoute(
+          launchReason: LaunchReason.deepLink,
+          initialPath: '/app/settings',
+        ),
+      ]);
+      await tester.pumpAndSettle();
+      expect(find.byType(SettingsPage), findsOneWidget);
+      expect(find.byType(StartupAdPage), findsNothing);
+    },
+  );
 }
 
 final class _CampaignRepository implements StartupAdRepository {
