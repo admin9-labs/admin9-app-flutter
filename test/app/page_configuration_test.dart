@@ -29,6 +29,7 @@ void main() {
       'pages': [page],
     };
     expect(PageConfiguration.fromJson({...json, 'schemaVersion': 2}), isNull);
+    expect(PageConfiguration.fromJson({...json, 'schemaVersion': 1.0}), isNull);
     for (final badPage in [
       {...page, 'url': 'https://example.com'},
       {
