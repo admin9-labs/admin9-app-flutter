@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:admin9_app_flutter/app/startup/startup_preferences.dart';
 import 'package:admin9_app_flutter/app/startup/startup_preferences_repository.dart';
 import 'package:admin9_app_flutter/app/startup/startup_provider.dart';
@@ -210,6 +212,77 @@ void main() {
       ]);
     },
   );
+  test(
+    'policy acceptance suppresses an otherwise eligible cached ad',
+    () async {
+      final harness = _Harness(
+        StartupPreferences(
+          onboardingVersion: currentOnboardingVersion,
+          privacyConsent: PrivacyConsentRecord(
+            policyVersion: 0,
+            acceptedAt: DateTime.utc(2026),
+          ),
+        ),
+        campaign: _campaign(),
+      );
+      await harness.coordinator.begin();
+      await harness.coordinator.acceptPrivacy();
+      expect(harness.state.phase, StartupPhase.ready);
+      expect(harness.state.accessMode, AccessMode.full);
+      expect(harness.ads.loadCalls, 0);
+    },
+  );
+
+  test(
+    'first external entry keeps its target after privacy, bypassing onboarding',
+    () async {
+      final harness = _Harness(
+        const StartupPreferences(),
+        campaign: _campaign(),
+      );
+      const target = PendingDestination(routeKey: 'settings');
+      await harness.coordinator.begin(
+        launchReason: LaunchReason.deepLink,
+        pendingDestination: target,
+      );
+      await harness.coordinator.acceptPrivacy();
+      expect(harness.state.phase, StartupPhase.ready);
+      expect(harness.state.pendingDestination, target);
+      expect(harness.preferences.value.onboardingVersion, isNull);
+      expect(harness.ads.loadCalls, 0);
+    },
+  );
+
+  test(
+    'failed onboarding save proceeds with a warning and no advertisement',
+    () async {
+      final harness = _Harness(
+        StartupPreferences(
+          privacyConsent: _completedPreferences().privacyConsent,
+        ),
+        saveError: StateError('disk unavailable'),
+        campaign: _campaign(),
+      );
+      await harness.coordinator.begin();
+      await harness.coordinator.completeOnboarding();
+      expect(harness.state.phase, StartupPhase.ready);
+      expect(harness.state.persistenceWarning, isTrue);
+      expect(harness.ads.loadCalls, 0);
+    },
+  );
+
+  test('privacy review supersedes an in-flight cached lookup', () async {
+    final harness = _Harness(_completedPreferences(), campaign: _campaign());
+    final pending = Completer<StartupAdCampaign?>();
+    harness.ads.pending = pending;
+    final startup = harness.coordinator.begin();
+    await Future<void>.delayed(Duration.zero);
+    harness.coordinator.requestPrivacyReview();
+    pending.complete(_campaign());
+    await startup;
+    expect(harness.state.phase, StartupPhase.privacy);
+    expect(harness.state.campaign, isNull);
+  });
 }
 
 final class _Harness {
@@ -280,6 +353,8 @@ final class _FakeAdRepository implements StartupAdRepository {
   final StartupAdCampaign? campaign;
   final Object? loadError;
   int loadCalls = 0;
+  int refreshCalls = 0;
+  Completer<StartupAdCampaign?>? pending;
 
   @override
   Future<int> cacheSize() async => 0;
@@ -297,11 +372,13 @@ final class _FakeAdRepository implements StartupAdRepository {
   }) async {
     loadCalls++;
     if (loadError case final error?) throw error;
-    return campaign;
+    return pending == null ? campaign : await pending!.future;
   }
 
   @override
-  Future<void> refresh() async {}
+  Future<void> refresh() async {
+    refreshCalls++;
+  }
 }
 
 StartupPreferences _completedPreferences() => StartupPreferences(
