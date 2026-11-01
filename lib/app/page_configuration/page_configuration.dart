@@ -30,6 +30,7 @@ final class PageConfiguration {
           'navigation',
           'pages',
         }) ||
+        schemaVersion is! int ||
         schemaVersion != 1 ||
         revision is! int ||
         navigationValue is! List<dynamic> ||
