@@ -35,6 +35,7 @@ class StartupGatePage extends ConsumerStatefulWidget {
 class _StartupGatePageState extends ConsumerState<StartupGatePage> {
   bool _navigating = false;
   bool _initialized = false;
+  int _startupGeneration = 0;
 
   @override
   void initState() {
@@ -53,10 +54,11 @@ class _StartupGatePageState extends ConsumerState<StartupGatePage> {
   }
 
   void _scheduleStartup() {
+    final generation = ++_startupGeneration;
     _initialized = false;
     _navigating = false;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
+      if (!mounted || generation != _startupGeneration) return;
       setState(() => _initialized = true);
       if (widget.reviewPrivacy) {
         ref.read(startupCoordinatorProvider.notifier).requestPrivacyReview();
@@ -124,8 +126,9 @@ class _StartupGatePageState extends ConsumerState<StartupGatePage> {
   Widget _finishNavigation(StartupState state) {
     if (!_navigating) {
       _navigating = true;
+      final generation = _startupGeneration;
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted) return;
+        if (!mounted || generation != _startupGeneration) return;
         final current = ref.read(startupCoordinatorProvider);
         if (current.phase != StartupPhase.ready || !identical(current, state)) {
           setState(() => _navigating = false);
