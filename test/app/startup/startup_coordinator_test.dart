@@ -213,6 +213,43 @@ void main() {
     },
   );
   test(
+    'background during cache lookup cannot reveal an ad on resume',
+    () async {
+      final harness = _Harness(_completedPreferences(), campaign: _campaign());
+      final pending = Completer<StartupAdCampaign?>();
+      harness.ads.pending = pending;
+      final startup = harness.coordinator.begin();
+      await Future<void>.delayed(Duration.zero);
+      harness.coordinator.handleBackgrounded();
+      pending.complete(_campaign());
+      await startup;
+      expect(harness.state.phase, StartupPhase.ready);
+      expect(harness.state.campaign, isNull);
+    },
+  );
+
+  test('stalled cached lookup times out directly to Home', () async {
+    final harness = _Harness(_completedPreferences());
+    harness.ads.pending = Completer<StartupAdCampaign?>();
+    await harness.coordinator.begin();
+    expect(harness.state.phase, StartupPhase.ready);
+    harness.ads.pending!.complete(_campaign());
+    await Future<void>.delayed(Duration.zero);
+    expect(harness.state.campaign, isNull);
+  });
+
+  test('repeated visible callbacks record only one exposure', () async {
+    final harness = _Harness(_completedPreferences(), campaign: _campaign());
+    await harness.coordinator.begin();
+    await harness.coordinator.markCampaignVisible();
+    await harness.coordinator.markCampaignVisible();
+    expect(
+      harness.preferences.value.exposures['campaign:creative'],
+      hasLength(1),
+    );
+  });
+
+  test(
     'policy acceptance suppresses an otherwise eligible cached ad',
     () async {
       final harness = _Harness(
@@ -271,17 +308,20 @@ void main() {
     },
   );
 
-  test('privacy review supersedes an in-flight cached lookup', () async {
-    final harness = _Harness(_completedPreferences(), campaign: _campaign());
-    final pending = Completer<StartupAdCampaign?>();
-    harness.ads.pending = pending;
-    final startup = harness.coordinator.begin();
-    await Future<void>.delayed(Duration.zero);
+  test('refresh requires consent and a ready Home', () async {
+    final harness = _Harness(const StartupPreferences());
+    await harness.coordinator.begin();
+    await harness.coordinator.refreshCampaign();
+    harness.coordinator.continueLimited();
+    await harness.coordinator.refreshCampaign();
+    expect(harness.ads.refreshCalls, 0);
     harness.coordinator.requestPrivacyReview();
-    pending.complete(_campaign());
-    await startup;
-    expect(harness.state.phase, StartupPhase.privacy);
-    expect(harness.state.campaign, isNull);
+    await harness.coordinator.acceptPrivacy();
+    await harness.coordinator.refreshCampaign();
+    expect(harness.ads.refreshCalls, 0);
+    await harness.coordinator.completeOnboarding();
+    await harness.coordinator.refreshCampaign();
+    expect(harness.ads.refreshCalls, 1);
   });
 }
 

@@ -131,6 +131,63 @@ void main() {
     expect(image.semanticLabel, '静态备用图');
     expect(tester.takeException(), isNull);
   });
+  testWidgets('background ends advertisement and resume stays at Home', (
+    tester,
+  ) async {
+    await pumpTestAdmin9App(
+      tester,
+      startupAdRepository: _CampaignRepository(_campaign()),
+    );
+    expect(find.byType(StartupAdPage), findsOneWidget);
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    await tester.pumpAndSettle();
+    expect(find.byType(StartupAdPage), findsNothing);
+    expect(find.byType(HomePage), findsOneWidget);
+  });
+
+  testWidgets(
+    'unreadable primary and fallback leave the ad without a blocking page',
+    (tester) async {
+      final broken = _campaign().copyWith(
+        media: _campaign().media.copyWith(localPath: '/missing/startup.jpg'),
+      );
+      await pumpTestAdmin9App(
+        tester,
+        startupAdRepository: _CampaignRepository(broken),
+      );
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 30)),
+      );
+      await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 1));
+      await tester.pumpAndSettle();
+      expect(find.byType(HomePage), findsOneWidget);
+      expect(find.byType(StartupAdPage), findsNothing);
+      expect(tester.takeException(), isNull);
+    },
+  );
+  for (final width in [320.0, 390.0]) {
+    testWidgets('ad immediate skip fits $width at 2x text with 48dp target', (
+      tester,
+    ) async {
+      await pumpTestAdmin9App(
+        tester,
+        size: Size(width, 844),
+        textScale: 2,
+        startupAdRepository: _CampaignRepository(_campaign()),
+      );
+      final skip = find.byKey(const ValueKey('startup-ad-skip'));
+      expect(skip, findsOneWidget);
+      final rect = tester.getRect(skip);
+      expect(rect.height, greaterThanOrEqualTo(48));
+      expect(rect.right, lessThanOrEqualTo(width));
+      expect(tester.takeException(), isNull);
+      await tester.tap(skip);
+      await tester.pumpAndSettle();
+      expect(find.byType(HomePage), findsOneWidget);
+    });
+  }
   testWidgets(
     'warm external entry does not reuse the previous ready destination',
     (tester) async {

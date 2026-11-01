@@ -109,6 +109,11 @@ class _StartupGatePageState extends ConsumerState<StartupGatePage> {
         onSkip: () => ref
             .read(startupCoordinatorProvider.notifier)
             .finishCampaign(reason: 'skip'),
+        onCompleted: () => ref
+            .read(startupCoordinatorProvider.notifier)
+            .finishCampaign(reason: 'complete'),
+        onBackgrounded: () =>
+            ref.read(startupCoordinatorProvider.notifier).handleBackgrounded(),
         onAction: _openCampaignAction,
         onFailure: () => ref
             .read(startupCoordinatorProvider.notifier)
@@ -165,10 +170,17 @@ class _StartupGatePageState extends ConsumerState<StartupGatePage> {
       case StartupAdActionType.externalHttps:
         final url = action.url!;
         final allowed = ref.read(startupAdExternalHostsProvider);
-        if (allowed.contains(url.host)) {
-          await launchUrl(url, mode: LaunchMode.externalApplication);
+        coordinator.finishCampaign(reason: 'click');
+        if (url.scheme == 'https' &&
+            url.userInfo.isEmpty &&
+            (!url.hasPort || url.port == 443) &&
+            allowed.contains(url.host)) {
+          try {
+            await launchUrl(url, mode: LaunchMode.externalApplication);
+          } on Object {
+            // Failure to open an optional action never blocks Home.
+          }
         }
-        if (mounted) coordinator.finishCampaign(reason: 'click');
     }
   }
 }

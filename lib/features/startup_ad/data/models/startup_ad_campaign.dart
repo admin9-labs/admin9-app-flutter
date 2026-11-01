@@ -23,7 +23,7 @@ final class StartupAdFrequencyCap {
     if (value is! Map<String, dynamic>) return null;
     final maxImpressions = value['maxImpressions'];
     final windowSeconds = value['windowSeconds'];
-    final intervalSeconds = value['minimumIntervalSeconds'] ?? 0;
+    final intervalSeconds = value['minimumIntervalSeconds'];
     if (maxImpressions is! int ||
         maxImpressions < 1 ||
         windowSeconds is! int ||
@@ -102,7 +102,9 @@ final class StartupAdMedia {
   static StartupAdMedia? fromJson(Object? value) {
     if (value is! Map<String, dynamic>) return null;
     final type = _enumByName(StartupAdMediaType.values, value['type']);
-    final url = Uri.tryParse(value['url'] as String? ?? '');
+    final url = value['url'] is String
+        ? Uri.tryParse(value['url'] as String)
+        : null;
     final mimeType = value['mimeType'];
     final byteLength = value['byteLength'];
     final width = value['width'];
@@ -111,7 +113,7 @@ final class StartupAdMedia {
     final semanticLabel = value['semanticLabel'];
     if (type == null ||
         url == null ||
-        url.scheme != 'https' ||
+        !startupAdHttpsUriValid(url) ||
         mimeType is! String ||
         byteLength is! int ||
         byteLength < 1 ||
@@ -126,6 +128,21 @@ final class StartupAdMedia {
       return null;
     }
     final durationMs = value['durationMs'];
+    final focalX = _unitDouble(value['focalX']);
+    final focalY = _unitDouble(value['focalY']);
+    if (!switch (type) {
+          StartupAdMediaType.image =>
+            mimeType == 'image/jpeg' || mimeType == 'image/png',
+          StartupAdMediaType.gif => mimeType == 'image/gif',
+          StartupAdMediaType.video => mimeType == 'video/mp4',
+        } ||
+        (durationMs != null && (durationMs is! int || durationMs <= 0)) ||
+        (type == StartupAdMediaType.video && durationMs == null) ||
+        focalX == null ||
+        focalY == null ||
+        (value['localPath'] != null && value['localPath'] is! String)) {
+      return null;
+    }
     return StartupAdMedia(
       type: type,
       url: url,
@@ -138,8 +155,8 @@ final class StartupAdMedia {
       duration: durationMs is int && durationMs > 0
           ? Duration(milliseconds: durationMs)
           : null,
-      focalX: _unitDouble(value['focalX'], 0.5),
-      focalY: _unitDouble(value['focalY'], 0.5),
+      focalX: focalX,
+      focalY: focalY,
       localPath: value['localPath'] is String
           ? value['localPath'] as String
           : null,
@@ -185,25 +202,38 @@ final class StartupAdAction {
     if (value is! Map<String, dynamic>) return null;
     final type = _enumByName(StartupAdActionType.values, value['type']);
     if (type == null) return null;
-    return switch (type) {
-      StartupAdActionType.none => const StartupAdAction.none(),
-      StartupAdActionType.internalRoute => switch (value['routeKey']) {
-        final String routeKey when _allowedRouteKeys.contains(routeKey) =>
-          StartupAdAction.internalRoute(
-            routeKey: routeKey,
-            parameters: _stringMap(value['parameters']),
-          ),
-        _ => null,
-      },
-      StartupAdActionType.externalHttps => switch (Uri.tryParse(
-        value['url'] as String? ?? '',
-      )) {
-        final uri? when uri.scheme == 'https' => StartupAdAction.externalHttps(
-          uri,
-        ),
-        _ => null,
-      },
-    };
+    if (value.containsKey('parameters') && value['parameters'] == null) {
+      return null;
+    }
+    final parameters = _stringMap(value['parameters']);
+    if (parameters == null) return null;
+    // The currently allowlisted shell destinations have no route arguments.
+    if (parameters.isNotEmpty) return null;
+    switch (type) {
+      case StartupAdActionType.none:
+        return value['routeKey'] == null && value['url'] == null
+            ? const StartupAdAction.none()
+            : null;
+      case StartupAdActionType.internalRoute:
+        final routeKey = value['routeKey'];
+        return routeKey is String &&
+                _allowedRouteKeys.contains(routeKey) &&
+                value['url'] == null
+            ? StartupAdAction.internalRoute(
+                routeKey: routeKey,
+                parameters: parameters,
+              )
+            : null;
+      case StartupAdActionType.externalHttps:
+        final url = value['url'] is String
+            ? Uri.tryParse(value['url'] as String)
+            : null;
+        return url != null &&
+                startupAdHttpsUriValid(url) &&
+                value['routeKey'] == null
+            ? StartupAdAction.externalHttps(url)
+            : null;
+    }
   }
 }
 
@@ -264,7 +294,9 @@ final class StartupAdCampaign {
     required List<DateTime> exposures,
   }) {
     final utcNow = now.toUtc();
-    if (!active ||
+    if (!_validVersion(appVersion) ||
+        !const {'android', 'ios'}.contains(platform) ||
+        !active ||
         schemaVersion != 1 ||
         placementId != placement ||
         utcNow.isBefore(startsAt) ||
@@ -290,6 +322,7 @@ final class StartupAdCampaign {
   StartupAdCampaign copyWith({
     StartupAdMedia? media,
     StartupAdMedia? fallbackImage,
+    bool clearFallbackImage = false,
   }) => StartupAdCampaign(
     schemaVersion: schemaVersion,
     placementId: placementId,
@@ -309,7 +342,9 @@ final class StartupAdCampaign {
     minimumAppVersion: minimumAppVersion,
     maximumAppVersion: maximumAppVersion,
     media: media ?? this.media,
-    fallbackImage: fallbackImage ?? this.fallbackImage,
+    fallbackImage: clearFallbackImage
+        ? null
+        : fallbackImage ?? this.fallbackImage,
     action: action,
   );
 
@@ -338,22 +373,35 @@ final class StartupAdCampaign {
 
   static StartupAdCampaign? fromJson(Object? value) {
     if (value is! Map<String, dynamic>) return null;
-    final startsAt = DateTime.tryParse(value['startsAt'] as String? ?? '');
-    final endsAt = DateTime.tryParse(value['endsAt'] as String? ?? '');
-    final serverTime = DateTime.tryParse(value['serverTime'] as String? ?? '');
-    final updatedAt = DateTime.tryParse(value['updatedAt'] as String? ?? '');
-    final freshUntil = DateTime.tryParse(value['freshUntil'] as String? ?? '');
+    final startsAt = _utcTime(value['startsAt']);
+    final endsAt = _utcTime(value['endsAt']);
+    final serverTime = _utcTime(value['serverTime']);
+    final updatedAt = _utcTime(value['updatedAt']);
+    final freshUntil = _utcTime(value['freshUntil']);
     final frequencyCap = StartupAdFrequencyCap.fromJson(value['frequencyCap']);
     final media = StartupAdMedia.fromJson(value['media']);
     final fallbackImage = StartupAdMedia.fromJson(value['fallbackImage']);
     final action = StartupAdAction.fromJson(value['action']);
     final displayDuration = _displayDuration(value['displayDurationMs']);
+    final platforms = _stringSet(value['platforms']);
+    final channels = _stringSet(value['channels']);
+    final minimum = value['minimumAppVersion'];
+    final maximum = value['maximumAppVersion'];
     if (value['schemaVersion'] is! int ||
-        value['placementId'] is! String ||
+        value['schemaVersion'] != 1 ||
+        value['placementId'] != placement ||
+        platforms == null ||
+        !platforms.every(const {'android', 'ios'}.contains) ||
+        channels == null ||
+        (minimum != null && !_validVersion(minimum)) ||
+        (maximum != null && !_validVersion(maximum)) ||
+        (minimum is String &&
+            maximum is String &&
+            _compareVersions(minimum, maximum) > 0) ||
         value['campaignId'] is! String ||
-        (value['campaignId'] as String).isEmpty ||
+        (value['campaignId'] as String).trim().isEmpty ||
         value['creativeId'] is! String ||
-        (value['creativeId'] as String).isEmpty ||
+        (value['creativeId'] as String).trim().isEmpty ||
         value['active'] is! bool ||
         value['priority'] is! int ||
         startsAt == null ||
@@ -362,6 +410,9 @@ final class StartupAdCampaign {
         serverTime == null ||
         updatedAt == null ||
         freshUntil == null ||
+        (value['fallbackImage'] != null && fallbackImage == null) ||
+        (fallbackImage != null &&
+            fallbackImage.type != StartupAdMediaType.image) ||
         frequencyCap == null ||
         media == null ||
         action == null ||
@@ -388,8 +439,8 @@ final class StartupAdCampaign {
       freshUntil: freshUntil.toUtc(),
       displayDuration: displayDuration,
       frequencyCap: frequencyCap,
-      platforms: _stringSet(value['platforms']),
-      channels: _stringSet(value['channels']),
+      platforms: platforms,
+      channels: channels,
       minimumAppVersion: value['minimumAppVersion'] is String
           ? value['minimumAppVersion'] as String
           : null,
@@ -418,22 +469,55 @@ T? _enumByName<T extends Enum>(List<T> values, Object? name) {
   return null;
 }
 
-double _unitDouble(Object? value, double fallback) {
-  if (value is! num) return fallback;
+bool startupAdHttpsUriValid(Uri uri) =>
+    uri.scheme == 'https' &&
+    uri.hasAuthority &&
+    uri.host.isNotEmpty &&
+    uri.userInfo.isEmpty &&
+    !uri.authority.contains('@') &&
+    uri.port == 443 &&
+    !uri.hasFragment;
+
+double? _unitDouble(Object? value) {
+  if (value is! num) return null;
   final result = value.toDouble();
-  return result >= 0 && result <= 1 ? result : fallback;
+  return result.isFinite && result >= 0 && result <= 1 ? result : null;
 }
 
-Set<String> _stringSet(Object? value) => value is List<dynamic>
-    ? value.whereType<String>().where((item) => item.isNotEmpty).toSet()
-    : const {};
+Set<String>? _stringSet(Object? value) {
+  if (value is! List ||
+      value.any((item) => item is! String || item.trim().isEmpty)) {
+    return null;
+  }
+  return value.cast<String>().toSet();
+}
 
-Map<String, String> _stringMap(Object? value) => value is Map<String, dynamic>
-    ? {
-        for (final entry in value.entries)
-          if (entry.value is String) entry.key: entry.value as String,
-      }
-    : const {};
+Map<String, String>? _stringMap(Object? value) {
+  if (value == null) return const {};
+  if (value is! Map<String, dynamic> ||
+      value.values.any((item) => item is! String)) {
+    return null;
+  }
+  return value.cast<String, String>();
+}
+
+DateTime? _utcTime(Object? value) {
+  if (value is! String ||
+      !RegExp(r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,6})?Z$')
+          .hasMatch(value)) {
+    return null;
+  }
+  final result = DateTime.tryParse(value);
+  // DateTime.parse normalizes out-of-range days and clock fields.
+  if (result == null ||
+      result.toIso8601String().substring(0, 19) != value.substring(0, 19)) {
+    return null;
+  }
+  return result;
+}
+
+bool _validVersion(Object? value) =>
+    value is String && RegExp(r'^\d+\.\d+\.\d+(?:\+\d+)?$').hasMatch(value);
 
 bool _versionInRange(String value, String? minimum, String? maximum) {
   if (minimum != null && _compareVersions(value, minimum) < 0) return false;

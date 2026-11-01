@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -42,6 +41,9 @@ final class StartupCoordinator extends Notifier<StartupState> {
   StartupPreferences _preferences = const StartupPreferences();
   int _generation = 0;
   bool _homeInteractiveRecorded = false;
+  bool _backgroundedForLaunch = false;
+  bool _campaignVisible = false;
+  bool _refreshing = false;
 
   @override
   StartupState build() => const StartupState.initializing();
@@ -53,6 +55,8 @@ final class StartupCoordinator extends Notifier<StartupState> {
     final startedAt = DateTime.now();
     final generation = ++_generation;
     _homeInteractiveRecorded = false;
+    _backgroundedForLaunch = false;
+    _campaignVisible = false;
     state = StartupState.initializing(
       launchReason: launchReason,
       pendingDestination: pendingDestination,
@@ -116,15 +120,17 @@ final class StartupCoordinator extends Notifier<StartupState> {
           .read(startupAdRepositoryProvider)
           .loadCachedEligible(
             now: DateTime.now().toUtc(),
-            platform: Platform.isIOS ? 'ios' : 'android',
+            platform: ref.read(startupAdPlatformProvider),
             appVersion: startupAdAppVersion,
             channel: startupAdChannel,
             preferences: _preferences,
-          );
+          )
+          .timeout(const Duration(milliseconds: 800));
     } on Object {
       campaign = null;
     }
     if (generation != _generation) return;
+    if (_backgroundedForLaunch) campaign = null;
     state = StartupState(
       phase: campaign == null ? StartupPhase.ready : StartupPhase.startupAd,
       launchReason: launchReason,
@@ -210,7 +216,13 @@ final class StartupCoordinator extends Notifier<StartupState> {
 
   Future<void> markCampaignVisible() async {
     final campaign = state.campaign;
-    if (campaign == null) return;
+    if (campaign == null ||
+        _campaignVisible ||
+        state.phase != StartupPhase.startupAd ||
+        _backgroundedForLaunch) {
+      return;
+    }
+    _campaignVisible = true;
     ref
         .read(startupExposureContextProvider)
         .record(
@@ -249,6 +261,7 @@ final class StartupCoordinator extends Notifier<StartupState> {
     String reason = 'skip',
   }) {
     final campaign = state.campaign;
+    if (state.phase != StartupPhase.startupAd) return;
     state = state.copyWith(
       phase: StartupPhase.ready,
       pendingDestination: destination,
@@ -267,6 +280,7 @@ final class StartupCoordinator extends Notifier<StartupState> {
   }
 
   void handleBackgrounded() {
+    _backgroundedForLaunch = true;
     if (state.phase == StartupPhase.startupAd) {
       finishCampaign(reason: 'backgrounded');
     }
@@ -295,13 +309,19 @@ final class StartupCoordinator extends Notifier<StartupState> {
 
   Future<void> refreshCampaign() async {
     if (state.accessMode != AccessMode.full ||
-        state.phase != StartupPhase.ready) {
+        state.phase != StartupPhase.ready ||
+        _preferences.privacyConsent?.policyVersion !=
+            currentPrivacyPolicyVersion ||
+        _refreshing) {
       return;
     }
+    _refreshing = true;
     try {
       await ref.read(startupAdRepositoryProvider).refresh();
     } on Object {
       // Prefetch failure never interrupts the current route or enables an ad.
+    } finally {
+      _refreshing = false;
     }
   }
 

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
@@ -7,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 
 import '../models/startup_ad_campaign.dart';
+import 'startup_ad_http.dart';
 import 'startup_ad_service.dart';
 
 typedef StartupAdCacheDirectory = Future<Directory> Function();
@@ -28,111 +30,194 @@ final class StartupAdCache {
   final Set<String> allowedMediaHosts;
   final StartupAdCacheDirectory _cacheDirectory;
 
-  Future<StartupAdCampaign?> readValidated() async {
+  Future<void> _pending = Future<void>.value();
+  int _pendingOperations = 0;
+
+  // Reads/clears must not remove a refresh's staged files or partial promotion.
+  Future<T> _exclusive<T>(Future<T> Function() operation) {
+    _pendingOperations++;
+    final result = _pending.then((_) => operation()).whenComplete(() {
+      _pendingOperations--;
+    });
+    _pending = result.then<void>((_) {}, onError: (Object _, StackTrace _) {});
+    return result;
+  }
+
+  // Startup must never wait for an in-flight refresh/download.
+  Future<StartupAdCampaign?> readValidated() =>
+      _pendingOperations == 0 ? _exclusive(_readValidated) : Future.value(null);
+
+  Future<StartupAdCampaign?> _readValidated() async {
     final directory = await _cacheDirectory();
     final manifest = File('${directory.path}/$_manifestName');
-    if (!await manifest.exists()) return null;
     try {
+      if (await FileSystemEntity.type(manifest.path, followLinks: false) !=
+              FileSystemEntityType.file ||
+          await manifest.length() > maxTotalBytes) {
+        await _clear();
+        return null;
+      }
       final campaign = StartupAdCampaign.fromJson(
         jsonDecode(await manifest.readAsString()),
       );
-      if (campaign == null) {
-        await clear();
+      if (campaign == null || !_validMetadata(campaign)) {
+        await _clear();
+        return null;
+      }
+      if (await manifest.length() +
+              campaign.media.byteLength +
+              (campaign.fallbackImage?.byteLength ?? 0) >
+          maxTotalBytes) {
+        await _clear();
         return null;
       }
       final primaryValid = await _validFile(directory, campaign.media);
+      final fallback = campaign.fallbackImage;
       final fallbackValid =
-          campaign.fallbackImage != null &&
-          await _validFile(directory, campaign.fallbackImage!);
+          fallback != null && await _validFile(directory, fallback);
+      StartupAdCampaign retained = campaign;
       if (!primaryValid) {
-        if (fallbackValid) {
-          return campaign.copyWith(media: campaign.fallbackImage!);
+        if (!fallbackValid) {
+          await _clear();
+          return null;
         }
-        await clear();
+        retained = campaign.copyWith(media: fallback, clearFallbackImage: true);
+      } else if (fallback != null && !fallbackValid) {
+        if (campaign.media.type != StartupAdMediaType.image) {
+          await _clear();
+          return null;
+        }
+        retained = campaign.copyWith(clearFallbackImage: true);
+      }
+      if (!identical(retained, campaign)) {
+        await _writeManifest(directory, retained);
+      }
+      await _removeUnreferenced(directory, retained);
+      if (await _size() > maxTotalBytes) {
+        await _clear();
         return null;
       }
-      if ((campaign.media.type == StartupAdMediaType.gif ||
-              campaign.media.type == StartupAdMediaType.video) &&
-          !fallbackValid) {
-        await clear();
-        return null;
-      }
-      return campaign;
+      return retained;
     } on Object {
-      await clear();
+      await _clear();
       return null;
     }
   }
 
-  Future<void> store(StartupAdCampaign campaign) async {
+  Future<void> store(StartupAdCampaign campaign) =>
+      _exclusive(() => _store(campaign));
+
+  Future<void> _store(StartupAdCampaign campaign) async {
+    // Constructors are also used by callers: validate them as strictly as JSON.
+    if (StartupAdCampaign.fromJson(campaign.toJson()) == null ||
+        !_validMetadata(campaign)) {
+      throw const FormatException('Invalid startup-ad campaign metadata.');
+    }
     final directory = await _cacheDirectory();
     await directory.create(recursive: true);
-    final staging = Directory('${directory.path}/.staging');
-    if (await staging.exists()) await staging.delete(recursive: true);
-    await staging.create();
+    final staging = await directory.createTemp('.staging-');
+    final promoted = <String>[];
+    var committed = false;
+    final stopwatch = Stopwatch()..start();
     try {
       final stagedMedia = await _download(
         directory: staging,
-        campaign: campaign,
         media: campaign.media,
         suffix: 'primary',
+        timeout: const Duration(seconds: 8) - stopwatch.elapsed,
       );
       final stagedFallback = campaign.fallbackImage == null
           ? null
           : await _download(
               directory: staging,
-              campaign: campaign,
               media: campaign.fallbackImage!,
               suffix: 'fallback',
+              timeout: const Duration(seconds: 8) - stopwatch.elapsed,
             );
-      if ((campaign.media.type == StartupAdMediaType.gif ||
-              campaign.media.type == StartupAdMediaType.video) &&
-          stagedFallback == null) {
-        throw const FormatException('Moving startup media needs a fallback.');
-      }
-
       final media = await _promote(directory, stagedMedia);
+      promoted.add(media.localPath!);
       final fallback = stagedFallback == null
           ? null
           : await _promote(directory, stagedFallback);
+      if (fallback != null) promoted.add(fallback.localPath!);
       final cached = campaign.copyWith(media: media, fallbackImage: fallback);
-      final manifest = File('${directory.path}/$_manifestName');
-      final temporaryManifest = File('${manifest.path}.part');
-      await temporaryManifest.writeAsString(
-        jsonEncode(cached.toJson()),
-        flush: true,
-      );
-      await temporaryManifest.rename(manifest.path);
-      await _removeUnreferenced(directory, cached);
-      if (await size() > maxTotalBytes) {
-        await clear();
-        throw const FileSystemException('Startup-ad cache exceeds its budget.');
+      if (media.byteLength +
+              (fallback?.byteLength ?? 0) +
+              utf8.encode(jsonEncode(cached.toJson())).length >
+          maxTotalBytes) {
+        throw const FormatException(
+          'Startup-ad cache exceeds its total budget.',
+        );
       }
+      await _writeManifest(directory, cached);
+      committed = true;
+      await _removeUnreferenced(directory, cached, staging: staging.path);
     } finally {
+      stopwatch.stop();
+      if (!committed) {
+        for (final path in promoted) {
+          final file = File(path);
+          if (await file.exists()) await file.delete();
+        }
+        final temporaryManifest = File('${directory.path}/$_manifestName.part');
+        if (await temporaryManifest.exists()) await temporaryManifest.delete();
+      }
       if (await staging.exists()) await staging.delete(recursive: true);
     }
   }
 
-  Future<int> size() async {
+  bool _validMetadata(StartupAdCampaign campaign) {
+    final media = [
+      campaign.media,
+      if (campaign.fallbackImage != null) campaign.fallbackImage!,
+    ];
+    return media.every(
+          (item) =>
+              startupAdUriAllowed(item.url, allowedMediaHosts) &&
+              item.byteLength > 0 &&
+              item.byteLength <= _maximumBytes(item.type),
+        ) &&
+        media.fold<int>(0, (sum, item) => sum + item.byteLength) <=
+            maxTotalBytes;
+  }
+
+  Future<void> _writeManifest(
+    Directory directory,
+    StartupAdCampaign campaign,
+  ) async {
+    final manifest = File('${directory.path}/$_manifestName');
+    final temporary = File('${manifest.path}.part');
+    await temporary.writeAsString(jsonEncode(campaign.toJson()), flush: true);
+    await temporary.rename(manifest.path);
+  }
+
+  Future<int> size() => _exclusive(_size);
+
+  Future<int> _size() async {
     final directory = await _cacheDirectory();
     if (!await directory.exists()) return 0;
     var total = 0;
-    await for (final entity in directory.list()) {
+    await for (final entity in directory.list(
+      recursive: true,
+      followLinks: false,
+    )) {
       if (entity is File) total += await entity.length();
     }
     return total;
   }
 
-  Future<void> clear() async {
+  Future<void> clear() => _exclusive(_clear);
+
+  Future<void> _clear() async {
     final directory = await _cacheDirectory();
     if (await directory.exists()) await directory.delete(recursive: true);
   }
 
   Future<StartupAdMedia> _download({
     required Directory directory,
-    required StartupAdCampaign campaign,
     required StartupAdMedia media,
     required String suffix,
+    required Duration timeout,
   }) async {
     if (!startupAdUriAllowed(media.url, allowedMediaHosts)) {
       throw const FormatException('Untrusted startup-ad media URL.');
@@ -142,60 +227,39 @@ final class StartupAdCache {
       throw const FormatException('Startup-ad media exceeds its type budget.');
     }
 
-    var uri = media.url;
-    http.StreamedResponse? response;
-    for (var redirect = 0; redirect <= 3; redirect++) {
-      final request = http.Request('GET', uri)..followRedirects = false;
-      response = await client.send(request).timeout(const Duration(seconds: 8));
-      if (!_redirectStatus(response.statusCode)) break;
-      final location = response.headers['location'];
-      await response.stream.drain<void>();
-      if (location == null) {
-        throw const FormatException('Startup-ad redirect has no location.');
-      }
-      uri = uri.resolve(location);
-      if (!startupAdUriAllowed(uri, allowedMediaHosts)) {
-        throw const FormatException('Startup-ad redirect left the allowlist.');
-      }
-      response = null;
+    if (timeout <= Duration.zero) {
+      throw TimeoutException('Startup-ad media expired.');
     }
-    if (response == null || response.statusCode != 200) {
-      throw StartupAdServiceException(response?.statusCode ?? 310);
+    final response = await startupAdResponse(
+      client: client,
+      uri: media.url,
+      allowedHosts: allowedMediaHosts,
+      timeout: timeout,
+      expectedMime: media.mimeType,
+      expectedLength: media.byteLength,
+    );
+    if (response.statusCode != 200) {
+      throw StartupAdServiceException(response.statusCode);
     }
-    final contentType = response.headers['content-type']
-        ?.split(';')
-        .first
-        .trim();
-    if (contentType != media.mimeType) {
-      await response.stream.drain<void>();
-      throw const FormatException('Startup-ad media MIME does not match.');
-    }
-    final builder = BytesBuilder(copy: false);
-    var length = 0;
-    await for (final chunk in response.stream) {
-      length += chunk.length;
-      if (length > maximum || length > media.byteLength) {
-        throw const FormatException('Startup-ad media download is too large.');
-      }
-      builder.add(chunk);
-    }
-    final bytes = builder.takeBytes();
+    final bytes = response.bodyBytes;
     if (bytes.length != media.byteLength ||
         sha256.convert(bytes).toString() != media.sha256 ||
-        !_matchesSignature(bytes, media.type) ||
+        !_matchesSignature(bytes, media) ||
         !_matchesDimensions(bytes, media)) {
       throw const FormatException('Startup-ad media integrity check failed.');
     }
 
     final extension = switch (media.type) {
-      StartupAdMediaType.image => contentType == 'image/png' ? 'png' : 'jpg',
+      StartupAdMediaType.image => media.mimeType == 'image/png' ? 'png' : 'jpg',
       StartupAdMediaType.gif => 'gif',
       StartupAdMediaType.video => 'mp4',
     };
-    final basename = _safeName(
-      '${campaign.campaignId}_${campaign.creativeId}_${media.sha256.substring(0, 12)}',
+    final generation = directory.uri.pathSegments
+        .where((part) => part.isNotEmpty)
+        .last;
+    final target = File(
+      '${directory.path}/${generation}_${media.sha256}_$suffix.$extension',
     );
-    final target = File('${directory.path}/${basename}_$suffix.$extension');
     final temporary = File('${target.path}.part');
     await temporary.writeAsBytes(bytes, flush: true);
     await temporary.rename(target.path);
@@ -209,14 +273,20 @@ final class StartupAdCache {
     final staged = File(media.localPath!);
     final filename = staged.uri.pathSegments.last;
     final target = File('${directory.path}/$filename');
-    if (await target.exists()) await target.delete();
     await staged.rename(target.path);
     return media.copyWith(localPath: target.path);
   }
 
   Future<bool> _validFile(Directory directory, StartupAdMedia media) async {
     final path = media.localPath;
-    if (path == null) return false;
+    if (path == null ||
+        !startupAdUriAllowed(media.url, allowedMediaHosts) ||
+        media.byteLength > _maximumBytes(media.type) ||
+        File(path).parent.absolute.path != directory.absolute.path ||
+        await FileSystemEntity.type(path, followLinks: false) !=
+            FileSystemEntityType.file) {
+      return false;
+    }
     final file = File(path);
     if (!await file.exists() || await file.length() != media.byteLength) {
       return false;
@@ -228,22 +298,24 @@ final class StartupAdCache {
     }
     final bytes = await file.readAsBytes();
     return sha256.convert(bytes).toString() == media.sha256 &&
-        _matchesSignature(bytes, media.type) &&
+        _matchesSignature(bytes, media) &&
         _matchesDimensions(bytes, media);
   }
 
   Future<void> _removeUnreferenced(
     Directory directory,
-    StartupAdCampaign campaign,
-  ) async {
+    StartupAdCampaign campaign, {
+    String? staging,
+  }) async {
     final retained = {
       '${directory.path}/$_manifestName',
       campaign.media.localPath,
       campaign.fallbackImage?.localPath,
+      staging,
     };
-    await for (final entity in directory.list()) {
-      if (entity is File && !retained.contains(entity.path)) {
-        await entity.delete();
+    await for (final entity in directory.list(followLinks: false)) {
+      if (!retained.contains(entity.path)) {
+        await entity.delete(recursive: true);
       }
     }
   }
@@ -260,39 +332,61 @@ int _maximumBytes(StartupAdMediaType type) => switch (type) {
   StartupAdMediaType.video => StartupAdCache.maxVideoBytes,
 };
 
-bool _redirectStatus(int status) =>
-    status == 301 ||
-    status == 302 ||
-    status == 303 ||
-    status == 307 ||
-    status == 308;
-
 bool _matchesSignature(
   Uint8List bytes,
-  StartupAdMediaType type,
-) => switch (type) {
-  StartupAdMediaType.image =>
-    (bytes.length >= 3 &&
-            bytes[0] == 0xff &&
-            bytes[1] == 0xd8 &&
-            bytes[2] == 0xff) ||
-        (bytes.length >= 8 &&
-            bytes[0] == 0x89 &&
-            utf8.decode(bytes.sublist(1, 4), allowMalformed: true) == 'PNG'),
-  StartupAdMediaType.gif =>
-    bytes.length >= 6 &&
+  StartupAdMedia media,
+) => switch (media.mimeType) {
+  'image/jpeg' =>
+    media.type == StartupAdMediaType.image &&
+        bytes.length >= 3 &&
+        bytes[0] == 0xff &&
+        bytes[1] == 0xd8 &&
+        bytes[2] == 0xff,
+  'image/png' =>
+    media.type == StartupAdMediaType.image &&
+        bytes.length >= 33 &&
+        _hasBytes(bytes, 0, const [
+          0x89,
+          0x50,
+          0x4e,
+          0x47,
+          0x0d,
+          0x0a,
+          0x1a,
+          0x0a,
+        ]) &&
+        _bigEndian32(bytes, 8) == 13 &&
+        _fourCC(bytes, 12) == 'IHDR',
+  'image/gif' =>
+    media.type == StartupAdMediaType.gif &&
+        bytes.length >= 13 &&
         (ascii.decode(bytes.sublist(0, 6), allowInvalid: true) == 'GIF87a' ||
             ascii.decode(bytes.sublist(0, 6), allowInvalid: true) == 'GIF89a'),
-  StartupAdMediaType.video =>
-    bytes.length >= 12 &&
-        ascii.decode(bytes.sublist(4, 8), allowInvalid: true) == 'ftyp',
+  'video/mp4' =>
+    media.type == StartupAdMediaType.video && _matchesMp4Signature(bytes),
+  _ => false,
 };
 
+bool _hasBytes(Uint8List bytes, int offset, List<int> expected) {
+  if (offset + expected.length > bytes.length) return false;
+  for (var index = 0; index < expected.length; index++) {
+    if (bytes[offset + index] != expected[index]) return false;
+  }
+  return true;
+}
+
+String _fourCC(Uint8List bytes, int offset) =>
+    ascii.decode(bytes.sublist(offset, offset + 4), allowInvalid: true);
+
 bool _matchesDimensions(Uint8List bytes, StartupAdMedia media) {
+  // The platform decoder checks actual video dimensions during initialization.
   if (media.type == StartupAdMediaType.video) return true;
   final dimensions = switch (media.type) {
     StartupAdMediaType.gif => _gifDimensions(bytes),
-    StartupAdMediaType.image => _pngDimensions(bytes) ?? _jpegDimensions(bytes),
+    StartupAdMediaType.image =>
+      media.mimeType == 'image/png'
+          ? _pngDimensions(bytes)
+          : _jpegDimensions(bytes),
     StartupAdMediaType.video => null,
   };
   return dimensions != null &&
@@ -345,6 +439,7 @@ bool _matchesDimensions(Uint8List bytes, StartupAdMedia media) {
       return null;
     }
     if (frameMarkers.contains(marker)) {
+      if (segmentLength < 8) return null;
       final height = (bytes[index + 5] << 8) | bytes[index + 6];
       final width = (bytes[index + 7] << 8) | bytes[index + 8];
       return (width, height);
@@ -360,5 +455,30 @@ int _bigEndian32(Uint8List bytes, int offset) =>
     (bytes[offset + 2] << 8) |
     bytes[offset + 3];
 
-String _safeName(String value) =>
-    value.replaceAll(RegExp(r'[^A-Za-z0-9_-]'), '_');
+bool _matchesMp4Signature(Uint8List bytes) {
+  if (bytes.length < 16 || _fourCC(bytes, 4) != 'ftyp') return false;
+  final size = _bigEndian32(bytes, 0);
+  if (size < 16 || size > bytes.length || size % 4 != 0) return false;
+  // ISO-BMFF is also used by HEIF/AVIF and QuickTime; require an MP4 brand.
+  const brands = {
+    'isom',
+    'iso2',
+    'iso3',
+    'iso4',
+    'iso5',
+    'iso6',
+    'iso7',
+    'iso8',
+    'iso9',
+    'mp41',
+    'mp42',
+    'avc1',
+    'M4V ',
+    'dash',
+  };
+  if (brands.contains(_fourCC(bytes, 8))) return true;
+  for (var offset = 16; offset < size; offset += 4) {
+    if (brands.contains(_fourCC(bytes, offset))) return true;
+  }
+  return false;
+}

@@ -10,6 +10,10 @@ import '../../data/services/startup_ad_cache.dart';
 import '../../data/services/startup_ad_service.dart';
 
 const startupAdAppVersion = admin9AppVersion;
+
+final startupAdPlatformProvider = Provider<String>(
+  (ref) => Platform.isIOS ? 'ios' : 'android',
+);
 const startupAdChannel = String.fromEnvironment(
   'APP_CHANNEL',
   defaultValue: 'official',
@@ -28,7 +32,9 @@ final startupAdRepositoryProvider = Provider<StartupAdRepository>((ref) {
   final mediaHosts = _hostSet(
     const String.fromEnvironment('STARTUP_AD_MEDIA_HOSTS'),
   );
-  if (endpoint == null || apiHosts.isEmpty || mediaHosts.isEmpty) {
+  if (endpoint == null ||
+      !startupAdUriAllowed(endpoint, apiHosts) ||
+      mediaHosts.isEmpty) {
     return const DisabledStartupAdRepository();
   }
   final client = http.Client();
@@ -38,16 +44,17 @@ final startupAdRepositoryProvider = Provider<StartupAdRepository>((ref) {
     client: client,
     endpoint: endpoint,
     allowedApiHosts: apiHosts,
-    platform: Platform.isIOS ? 'ios' : 'android',
+    platform: ref.watch(startupAdPlatformProvider),
     appVersion: startupAdAppVersion,
     channel: startupAdChannel,
   );
   return CachedStartupAdRepository(
     service: service,
     cache: cache,
-    platform: Platform.isIOS ? 'ios' : 'android',
+    platform: ref.watch(startupAdPlatformProvider),
     appVersion: startupAdAppVersion,
     channel: startupAdChannel,
+    allowedExternalHosts: ref.watch(startupAdExternalHostsProvider),
   );
 });
 

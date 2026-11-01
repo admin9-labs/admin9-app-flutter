@@ -11,6 +11,7 @@ final class CachedStartupAdRepository implements StartupAdRepository {
     required this.platform,
     required this.appVersion,
     required this.channel,
+    this.allowedExternalHosts = const {},
   });
 
   final StartupAdService service;
@@ -18,6 +19,7 @@ final class CachedStartupAdRepository implements StartupAdRepository {
   final String platform;
   final String appVersion;
   final String channel;
+  final Set<String> allowedExternalHosts;
 
   @override
   Future<StartupAdCampaign?> loadCachedEligible({
@@ -29,6 +31,10 @@ final class CachedStartupAdRepository implements StartupAdRepository {
   }) async {
     final campaign = await cache.readValidated();
     if (campaign == null) return null;
+    if (!_allowedAction(campaign)) {
+      await cache.clear();
+      return null;
+    }
     final eligible = campaign.isEligible(
       now: now,
       platform: platform,
@@ -46,7 +52,18 @@ final class CachedStartupAdRepository implements StartupAdRepository {
       await cache.clear();
       return;
     }
+    if (!_allowedAction(campaign)) {
+      await cache.clear();
+      throw const FormatException('Untrusted startup-ad action.');
+    }
     await cache.store(campaign);
+  }
+
+  bool _allowedAction(StartupAdCampaign campaign) {
+    final action = StartupAdAction.fromJson(campaign.action.toJson());
+    if (action == null) return false;
+    return action.type != StartupAdActionType.externalHttps ||
+        startupAdUriAllowed(action.url!, allowedExternalHosts);
   }
 
   @override
